@@ -18,9 +18,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+//cors
+const cors = require('cors');
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  credentials: true
+}));
+
+
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/auth', authRoutes);
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -38,4 +51,25 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+
+//testing connectivity 
+const { connectDB } = require("./config/db");
+
+async function startApp() {
+  console.log("🚀 Starting Application...");
+
+  // Connect to MongoDB
+  try {
+    const db = await connectDB(); 
+    console.log(" Connected to MongoDB!");
+  } catch (error) {
+    console.error(" MongoDB connection failed:", error);
+  }
+}
+
+startApp();
+
+app.listen(5000, () => {
+  console.log("Server is running on port 5000");
+});
 module.exports = app;
