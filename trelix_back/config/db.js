@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+//Call Mongo URI from .env file
 require('dotenv').config(); 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
