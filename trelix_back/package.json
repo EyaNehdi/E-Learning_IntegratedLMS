@@ -16,9 +16,11 @@
     "express-session": "^1.18.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.0",
     "morgan": "~1.9.1",
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0"
+    "nodemon": "^3.1.9"
   }
 }

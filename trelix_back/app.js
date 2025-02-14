@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -20,16 +22,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 //cors
-const cors = require('cors');
 app.use(cors({
-  origin: 'http://localhost:5173', 
-  credentials: true
+  origin: "http://localhost:5173", // Allow only your frontend URL
+    credentials: true, // Allow cookies and credentials
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+//auth routes
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 app.use("/signup/mfa", mfaRoutes);
@@ -69,8 +73,9 @@ async function startApp() {
 }
 
 startApp();
-
-app.listen(5000, () => {
-  console.log("Server is running on port 5000");
+//port number from .env
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log("Server is running on port " + PORT);
 });
 module.exports = app;
