@@ -7,6 +7,8 @@ const User = new Schema({
     lastName: String,
     email:{type:String, unique:true},
     password:String,
+    mfaEnabled: { type: Boolean, default: false }, 
+    mfaSecret: { type: String, default: null },
     role: { 
         type: String, 
         enum: ["superAdmin","admin", "student", "instructor"]
