@@ -11,11 +11,21 @@
   },
   "dependencies": {
     "axios": "^1.7.9",
+    "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+
+    "foundation-sites": "^6.9.0",
+
+    "http-proxy-middleware": "^3.0.3",
     "react": "^19.0.0",
+    "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",
+    "react-foundation": "^0.9.7",
+    "react-icons": "^5.4.0",
     "react-router-dom": "^7.1.5",
+    "recharts": "^2.15.1",
+    "styled-components": "^6.1.15",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
