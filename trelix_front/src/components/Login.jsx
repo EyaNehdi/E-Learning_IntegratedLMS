@@ -1,5 +1,39 @@
-
+import { useState, useEffect } from "react";
+import { useAuthStore } from "../store/authStore";
+import { useNavigate } from "react-router-dom";
 function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate(); // Initialize the useNavigate hook
+
+  const { login, isAuthenticated } = useAuthStore();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    try {
+      await login(email, password);
+      // Redirect to the dashboard or homepage after successful login
+      navigate("/Home"); // Replace with the route you want to redirect to
+    } catch (error) {
+      if (error.response?.data?.message === "Account does not exist") {
+        setErrorMessage("Account does not exist");
+      } else {
+        setErrorMessage(error.response?.data?.message || "Error logging in");
+      }
+    }
+  };
+
+ 
+
+  useEffect(() => {
+    // If the user is already authenticated, redirect them to the dashboard
+    if (isAuthenticated) {
+      navigate("/logged"); // Redirect to a different page when logged in
+    }
+  }, [isAuthenticated, navigate]);
                       return (
                                           <div>
  <section className="signup-sec full-screen">
@@ -13,14 +47,18 @@ function Login() {
       <div className="col-xl-7 col-md-7">
         <div className="login-form">
           <h1 className="display-3 text-center mb-5">Let’s Sign In Trelix</h1>
-          <form action="#">
+          <form onSubmit={handleLogin}>
             <div className="form-group position-relative">
               <span><i className="feather-icon icon-mail" /></span>
-              <input type="email" placeholder="Your Email" required />
+              <input type="email" placeholder="Your Email" name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div className="form-group position-relative">
               <span><i className="feather-icon icon-lock" /></span>
-              <input type="password" placeholder="Password" required />
+              <input type="password" placeholder="Password" name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <button 
   className="btn btn-primary w-100" 
@@ -49,8 +87,9 @@ function Login() {
               <img src="assets/images/microsoft.png" alt="Google" style={{ width: '40px', height: '40px', marginRight: '10px' }} />
                Continue with Microsoft
                </a>              
-               <p>Don't have account? <a href="signup.html" className="text-primary fw-bold">Sign Up Now</a></p>
+               <p>Don&apos;t have account? <a href="signup.html" className="text-primary fw-bold">Sign Up Now</a></p>
             </div>
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
           </form>
         </div>
       </div>
