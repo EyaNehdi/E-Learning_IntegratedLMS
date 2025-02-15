@@ -1,4 +1,5 @@
 import './App.css';
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from './components/Login';
 import SignupInstructor from './components/Instructor/Signup';
@@ -18,6 +19,7 @@ function App() {
       </Routes>
    
     </Router>
+
   );
 }
 
