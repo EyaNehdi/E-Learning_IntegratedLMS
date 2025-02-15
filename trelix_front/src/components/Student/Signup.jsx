@@ -1,4 +1,42 @@
+import { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 function Signup() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await axios.post(
+        '/api/auth/register/student',
+        formData,
+        { withCredentials: true }
+      );
+
+      if (response.data) {
+        navigate('/'); 
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
                       return (
 <div>
   {/* Mirrored from html.theme-village.com/eduxo/signup.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:26:40 GMT */}
@@ -23,22 +61,31 @@ function Signup() {
         <div className="col-xl-7 col-md-7">
           <div className="signup-form">
             <h1 className="display-3 text-center mb-5">Let’s Sign Up Student</h1>
-            <form action="#">
+            {error && <div className="error-message">{error}</div>}
+            <form onSubmit={handleSubmit}>
               <div className="form-group position-relative">
                 <span><i className="feather-icon icon-user" /></span>
-                <input type="text" placeholder=" FirstName" required />
+                <input type="text" placeholder=" FirstName" name="firstName"
+            value={formData.firstName}
+            onChange={handleChange} required />
               </div>
               <div className="form-group position-relative">
                 <span><i className="feather-icon icon-user" /></span>
-                <input type="text" placeholder=" LastName" required />
+                <input type="text" placeholder=" LastName"  name="lastName"
+            value={formData.lastName}
+            onChange={handleChange} required />
               </div>
               <div className="form-group position-relative">
                 <span><i className="feather-icon icon-mail" /></span>
-                <input type="email" placeholder=" Email" required />
+                <input type="email" placeholder=" Email" name="email"
+            value={formData.email}
+            onChange={handleChange} required />
               </div>
               <div className="form-group position-relative">
                 <span><i className="feather-icon icon-lock" /></span>
-                <input type="password" placeholder="Password" required />
+                <input type="password" placeholder="Password" name="password"
+            value={formData.password}
+            onChange={handleChange} required />
               </div>
               <button 
   className="btn btn-primary w-100" 
@@ -48,7 +95,7 @@ function Signup() {
     borderRadius: "8px" // Arrondi les bords
   }}
 >
-  Sign In
+{loading ? 'Registering...' : 'Sign Up as Student'}
 </button>
               <div className="form-footer mt-4 text-center">
                 <div className="alter overly">
