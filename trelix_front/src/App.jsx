@@ -1,19 +1,25 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
-import Sidebar from './components/Admin/Sidebar'
-import Dashboard from './components/Admin/Dashboard'
-
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from './components/Login';
+import SignupInstructor from './components/Instructor/Signup';
+import SignupStudent from './components/Student/Signup';
+import Index from './components/index';
+import ForgetPassword from './components/ForgetPassword';
 
 function App() {
   return (
-    <>
-    <Sidebar />
-    <Dashboard />
+    <Router>
+      <Routes>
+        <Route path="/instructor" element={<SignupInstructor />} />
+        <Route path="/student" element={<SignupStudent />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/forget" element={<ForgetPassword />} />
+        <Route path="/" element={<Index/>} />
+      </Routes>
    
-    </>
-   
+    </Router>
+
   );
 }
 
