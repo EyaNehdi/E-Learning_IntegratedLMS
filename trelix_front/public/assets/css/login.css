@@ -1,0 +1,27 @@
+.social-btn {
+                      display: flex;
+                      align-items: center; 
+                      justify-content: center; 
+                      padding: 15px; /* Taille plus grande */
+                      font-size: 18px; /* Texte bien visible */
+                      border-radius: 8px; /* Bords arrondis */
+                      font-weight: bold;
+                      border: none;
+                    }
+                    
+                    .facebook-btn {
+                      background-color: #1877F2; /* Bleu Facebook */
+                      color: white;
+                    }
+                    
+                    .google-btn {
+                      background-color: #DB4437; /* Rouge Google */
+                      color: white;
+                    }
+                    
+                    .social-icon {
+                      width: 24px;
+                      height: 24px;
+                      margin-right: 10px; /* Espacement entre l'icône et le texte */
+                    }
+                    
