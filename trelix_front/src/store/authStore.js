@@ -27,7 +27,7 @@ export const useAuthStore = create((set) => ({
 	login: async (email, password) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.post(`${API_URL}/login`, { email, password });
+			const response = await axios.post(`${API_URL}/login`, { email, password }, { withCredentials: true });
 			set({
 				isAuthenticated: true,
 				user: response.data.user,
@@ -55,13 +55,28 @@ export const useAuthStore = create((set) => ({
 	checkAuth: async () => {
 		set({ isCheckingAuth: true, error: null });
 		try {
-			const response = await axios.get(`${API_URL}/check-auth`);
-			set({ user: response.data.user, isAuthenticated: true, isCheckingAuth: false });
-		// eslint-disable-next-line no-unused-vars
+			const response = await axios.get(`${API_URL}/check-auth`,  {credentials: 'include'});
+			if (response.status === 200) {
+				set({ 
+					user: response.data.user, 
+					isAuthenticated: true,
+					isCheckingAuth: false 
+				});
+			} else {
+				set({ 
+					isAuthenticated: false,
+					isCheckingAuth: false 
+				});
+			}
 		} catch (error) {
-			set({ error: null, isCheckingAuth: false, isAuthenticated: false });
+			set({ 
+				isAuthenticated: false,
+				isCheckingAuth: false,
+				error: "Authentication check failed"
+			});
+			console.log(error);
 		}
 	},
-	 
+
 	
 }));

@@ -5,18 +5,37 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const navigate = useNavigate();
+  const { login, isAuthenticated, checkAuth } = useAuthStore();
 
-  const { login, isAuthenticated } = useAuthStore();
+  // Effect to check authentication only once on mount
+  useEffect(() => {
+    console.log("🟢 Checking authentication on mount...");
+    checkAuth();
+  }, [checkAuth]);
+
+  // Effect to redirect when authentication state changes
+  useEffect(() => {
+    console.log("🟢 isAuthenticated state:", isAuthenticated);
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated]);
+  useEffect(() => {
+    console.log("🟢 Checking authentication...");
+    checkAuth();
+  }, []); // Run only once on mount
+  
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
-
     try {
       await login(email, password);
-      // Redirect to the dashboard or homepage after successful login
-      navigate("/"); // Replace with the route you want to redirect to
+      
+        navigate("/"); // Redirect when authenticated
+      
+      // Redirection is handled by the second useEffect when isAuthenticated becomes true
     } catch (error) {
       if (error.response?.data?.message === "Account does not exist") {
         setErrorMessage("Account does not exist");
@@ -28,12 +47,6 @@ function Login() {
 
  
 
-  useEffect(() => {
-    // If the user is already authenticated, redirect them to the dashboard
-    if (isAuthenticated) {
-      navigate("/"); // Redirect to a different page when logged in
-    }
-  }, [isAuthenticated, navigate]);
                       return (
                                           <div>
  <section className="signup-sec full-screen">
