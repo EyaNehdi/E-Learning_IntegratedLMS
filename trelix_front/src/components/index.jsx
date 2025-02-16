@@ -37,13 +37,6 @@ function Index() {
 
 
     <![endif]*/}
-  {/* Preloader */}
-  <div id="preloader">
-    <div className="preloader">
-      <span />
-      <span />
-    </div>
-  </div>
   <header className="header header-1">
     <div className="sticky-height" />
     <div className="header-top bg-primary text-info text-uppercase">
