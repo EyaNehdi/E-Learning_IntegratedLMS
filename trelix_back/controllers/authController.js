@@ -39,20 +39,22 @@ generateToken(res,newUser._id);
 };
 
 const checkAuth = async (req, res) => {
-try{
-  const user = await User.findById(req.id);
-  if(!user) return res.json({error:"User not found"});
-  res.json({
-    success:true,
-    user:{
-      ...user._doc,
-      password:undefined
-    }
-  })
-}catch{
-  res.json({error:"Unauthorized"});
-}
+  
+  try {
+		const user = await User.findById(req.userId).select("-password");
+		if (!user) {
+			return res.status(400).json({ success: false, message: "User not found" });
+		}
+
+		res.status(200).json({ success: true, user });
+	} catch (error) {
+		console.log("Error in checkAuth ", error);
+		res.status(400).json({ success: false, message: error.message });
+	}
 };
+
+
+
 
 // Student registration
 const registerStudent = async (req, res) => {
