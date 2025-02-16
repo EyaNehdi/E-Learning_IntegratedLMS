@@ -7,6 +7,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setLoading] = useState("");
+  const [stayLoggedIn,setStayLoggedIn]= useState(false);
   const navigate = useNavigate();
   const { login, isAuthenticated, checkAuth } = useAuthStore();
 
@@ -29,7 +30,7 @@ function Login() {
     setErrorMessage("");
     setLoading(true); 
     try {
-      await login(email, password);
+      await login(email, password,stayLoggedIn);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -40,6 +41,9 @@ function Login() {
       }
     }
   };
+  const handleStayLogged = () => {
+setStayLoggedIn(!stayLoggedIn);
+  }
 
   return (
     <>
@@ -104,10 +108,13 @@ function Login() {
                       <div className="form-footer mt-4 text-center">
                         <div className="d-flex justify-content-between">
                           <div className="form-check">
+                            {/*Stay logged in input */}
                             <input
                               type="checkbox"
                               className="form-check-input"
                               id="logged-in"
+                              value={stayLoggedIn}
+                              onChange={handleStayLogged}
                             />
                             <label
                               className="form-check-label"
