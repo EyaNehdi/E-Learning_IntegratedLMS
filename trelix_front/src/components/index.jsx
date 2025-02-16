@@ -1,4 +1,21 @@
+import { useAuthStore } from "../store/authStore";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 function Index() {
+  const { isAuthenticated, logout, user } = useAuthStore();
+  const navigate = useNavigate();
+  const checkAuth = useAuthStore((state) => state.checkAuth);
+
+  useEffect(() => {
+    console.log("🟢 Triggering checkAuth");
+    console.log("🟢 isAuthenticated after checkAuth:", isAuthenticated);
+    useAuthStore.getState().checkAuth();
+}, [checkAuth,isAuthenticated]);
+
+  const handleLogout = () => {
+      logout(); // Clear user session
+      navigate("/"); // Redirect to home
+  };
                       return (
 <div>
   {/* Mirrored from html.theme-village.com/eduxo/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:25:31 GMT */}
@@ -200,14 +217,30 @@ function Index() {
               </nav>
             </div>
           
-            <a href="" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5 "  role="button" data-bs-toggle="dropdown" aria-expanded="false">Sign Up</a>
-            <ul className="dropdown-menu">
-                    <li><a className=" feather-icon icon-user" href="instructor">Sign In Instructor</a></li>
-                    <li><a className="feather-icon icon-user" href="student">Sign In Student</a></li>
-                   
-                  </ul>
-                  
-            <a href="/login" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5">Login</a>
+            {!isAuthenticated ? (
+                <>
+                    {/* Sign Up Dropdown */}
+                    <div className="dropdown">
+                        <a href="#" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Sign Up
+                        </a>
+                        <ul className="dropdown-menu">
+                            <li><a className="dropdown-item" href="/instructor">Sign In Instructor</a></li>
+                            <li><a className="dropdown-item" href="/student">Sign In Student</a></li>
+                        </ul>
+                    </div>
+
+                    {/* Login Button */}
+                    <a href="/login" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5">Login</a>
+                </>
+            ) : (
+                <>
+                    {/* Logout Button */}
+                    <button onClick={handleLogout} className="btn btn-danger d-none d-lg-block shadow-none border-0 rounded-5">
+                        Logout ({user?.firstName})
+                    </button>
+                </>
+            )}
           </div>
           <button className="navbar-toggler offcanvas-nav-btn" type="button">
             <span className="feather-icon icon-menu" />
@@ -1329,7 +1362,7 @@ function Index() {
                   <span><i className="feather-icon icon-clock" />3 Min Read</span>
                   <span><i className="feather-icon icon-calendar" />21 Dec, 2024</span>
                 </div>
-                <h3 className="display-4 mt-2 font-bold"><a href="single-post.html" className="text-reset">Learning Today, Leading Tomorrow's World</a></h3>
+                <h3 className="display-4 mt-2 font-bold"><a href="single-post.html" className="text-reset">Learning Today, Leading Tomorrow&apos;s World</a></h3>
               </div>
               <div className="entry-hover">
                 <p>Education is the most powerful tool to change the world Better education improves the nation one thing that can’t be taken. . .</p>

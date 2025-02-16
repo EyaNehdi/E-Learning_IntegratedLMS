@@ -29,7 +29,7 @@ function Signup() {
       );
 
       if (response.data) {
-        navigate('/Home'); // Redirect to home or dashboard after successful signup
+        navigate('/'); // Redirect to home or dashboard after successful signup
       }
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed. Please try again.');

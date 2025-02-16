@@ -3,7 +3,7 @@ const router = express.Router();
 const { registerStudent, registerInstructor, checkAuth, signIn,signOut } = require('../controllers/authController');
 const { verifyToken } = require ('../middlewares/verifyToken.js');
 
-router.get('/verifyToken', verifyToken,checkAuth);
+router.get('/check-auth', verifyToken, checkAuth);
 router.post('/register/student', registerStudent);
 
 router.post('/register/instructor', registerInstructor);
