@@ -15,7 +15,9 @@ function App() {
         <Route path="/student" element={<SignupStudent />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forget" element={<ForgetPassword />} />
+        
         <Route path="/" element={<Index/>} />
+        
       </Routes>
    
     </Router>
