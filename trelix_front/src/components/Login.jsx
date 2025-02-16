@@ -16,7 +16,7 @@ function Login() {
     try {
       await login(email, password);
       // Redirect to the dashboard or homepage after successful login
-      navigate("/Home"); // Replace with the route you want to redirect to
+      navigate("/"); // Replace with the route you want to redirect to
     } catch (error) {
       if (error.response?.data?.message === "Account does not exist") {
         setErrorMessage("Account does not exist");
@@ -31,7 +31,7 @@ function Login() {
   useEffect(() => {
     // If the user is already authenticated, redirect them to the dashboard
     if (isAuthenticated) {
-      navigate("/logged"); // Redirect to a different page when logged in
+      navigate("/"); // Redirect to a different page when logged in
     }
   }, [isAuthenticated, navigate]);
                       return (

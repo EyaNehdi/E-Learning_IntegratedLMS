@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //cors
 app.use(cors({
   origin: "http://localhost:5173", // Allow only your frontend URL
-    credentials: true, // Allow cookies and credentials
+  credentials: true, // Allow cookies and credentials
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
