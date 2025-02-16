@@ -2,15 +2,14 @@ import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 function Index() {
-  const { isAuthenticated, logout, user } = useAuthStore();
+  const { isAuthenticated, logout } = useAuthStore();
   const navigate = useNavigate();
   const checkAuth = useAuthStore((state) => state.checkAuth);
 
-  useEffect(() => {
-    console.log("🟢 Triggering checkAuth");
-    console.log("🟢 isAuthenticated after checkAuth:", isAuthenticated);
-    useAuthStore.getState().checkAuth();
-}, [checkAuth,isAuthenticated]);
+ useEffect(() => {
+  console.log("🟢 Checking authentication...");
+   checkAuth(); // Call from Zustand store
+}, []);
 
   const handleLogout = () => {
       logout(); // Clear user session
@@ -157,16 +156,22 @@ function Index() {
       <nav className="navbar nav-center navbar-expand-xl">
         <div className="container navbar-line px-3">
           <a className="navbar-brand d-xl-none" href="index-2.html"><img src="assets/images/logo.png" alt="Logo" /></a>
+         
           <div className="header-actions position-relative order-xl-2 d-flex align-items-center justify-content-between">
             <a className="text-reset icon rounded-5 bg-shade" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-search"><i className="feather-icon icon-search" /></a>
+            {isAuthenticated ? (
+            <div id="user icon"> 
             <a className="text-reset icon rounded-5 bg-shade" data-bs-toggle="collapse" href="#collapseAdminMenu" role="button" aria-expanded="false" aria-controls="collapseAdminMenu">
               <i className="feather-icon icon-user" />
             </a>
+           
             <div className="admin-menu pt-3 bg-white collapse" id="collapseAdminMenu">
+            
               <div className="d-flex avatar border-bottom pb-3">
                 <img className="img-fluid border rounded-circle" src="assets/images/ava-sm1.jpg" width={50} alt="avatar" />
                 <div className="grettings ps-3">
-                  <h6 className="mb-0">Jack Carey</h6>
+                  
+                  <h6 className="mb-0">Jim Carrey</h6>
                   <small>Founder</small>
                 </div>
               </div>
@@ -211,13 +216,13 @@ function Index() {
                     <a className="nav-link" href="instructor-settings.html"><i className="feather-icon icon-settings" /><span>Settings</span></a>
                   </li>
                   <li>
-                    <a className="nav-link" href="index-2.html"><i className="feather-icon icon-log-out" /><span>Logout</span></a>
+                    <a className="nav-link" href="" onClick={handleLogout}><i className="feather-icon icon-log-out" /><span>Logout</span></a>
                   </li>
                 </ul>
               </nav>
             </div>
-          
-            {!isAuthenticated ? (
+          </div>
+            ):(
                 <>
                     {/* Sign Up Dropdown */}
                     <div className="dropdown">
@@ -233,14 +238,8 @@ function Index() {
                     {/* Login Button */}
                     <a href="/login" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5">Login</a>
                 </>
-            ) : (
-                <>
-                    {/* Logout Button */}
-                    <button onClick={handleLogout} className="btn btn-danger d-none d-lg-block shadow-none border-0 rounded-5">
-                        Logout ({user?.firstName})
-                    </button>
-                </>
             )}
+                
           </div>
           <button className="navbar-toggler offcanvas-nav-btn" type="button">
             <span className="feather-icon icon-menu" />
