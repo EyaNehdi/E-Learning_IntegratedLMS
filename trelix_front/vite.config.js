@@ -9,6 +9,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000', // Your backend port
         changeOrigin: true,
+        "/cdn-cgi/rum": false
       }
     }
   }
