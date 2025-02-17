@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 import { GoogleLogin } from '@react-oauth/google';
 import GitHubLogin from 'react-github-login';
 import MicrosoftLogin from 'react-microsoft-login';
@@ -6,7 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useState,useEffect } from 'react';
-
+import { useAuthStore } from "../../store/authStore";
 import { motion } from "framer-motion";
 import PasswordStrengthMeter from '../PasswordStrengthMeter';
 function Signup() {
@@ -19,9 +19,17 @@ function Signup() {
     role: 'instructor'});
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
- 
-  
+  const {  isAuthenticated, checkAuth } = useAuthStore();
+  useEffect(() => {
+    console.log("🟢 isAuthenticated state:", isAuthenticated);
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+  useEffect(() => {
+    console.log("🟢 Checking authentication on mount...");
+    checkAuth();
+  }, [checkAuth]);
   
   const handleGoogleLoginSuccess = async (response) => {
     try {
@@ -41,6 +49,7 @@ function Signup() {
       if (res.data) {
         navigate('/');  // Redirect after successful signup
       }
+      setLoading(false);
     } catch (err) {
       setError('Google signup failed. Please try again.');
       console.error(err);
@@ -221,6 +230,12 @@ function Signup() {
   const handleMicrosoftLoginError = () => {
     setError('Microsoft login failed.');
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
                       return (
 <div>
   {/* Mirrored from html.theme-village.com/eduxo/signup.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:26:40 GMT */}

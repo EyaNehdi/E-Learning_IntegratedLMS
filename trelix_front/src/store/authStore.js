@@ -42,7 +42,7 @@ export const useAuthStore = create((set) => ({
 	logingoogle: async (email,stayLoggedIn) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.post(`${API_URL}/login`, { email, password,stayLoggedIn}, { withCredentials: true });
+			const response = await axios.post(`${API_URL}/logingoogle`, { email,stayLoggedIn}, { withCredentials: true });
 			set({
 				isAuthenticated: true,
 				user: response.data.user,
@@ -53,7 +53,8 @@ export const useAuthStore = create((set) => ({
 			set({ error: error.response?.data?.message || "Error logging in", isLoading: false });
 			throw error;
 		}
-	},    
+	},  
+	  
 
 	logout: async () => {
 		set({ isLoading: true, error: null });
