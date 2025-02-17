@@ -14,9 +14,6 @@
     "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-
-
-
     "foundation-sites": "^6.9.0",
 
     "framer-motion": "^12.4.3",
