@@ -196,8 +196,8 @@ function Header() {
       
         <a href="" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5 "  role="button" data-bs-toggle="dropdown" aria-expanded="false">Sign Up</a>
         <ul className="dropdown-menu">
-                <li><a className=" feather-icon icon-user" href="/login/instructor">Sign In Instructor</a></li>
-                <li><a className="feather-icon icon-user" href="/login/student">Sign In Student</a></li>
+                <li><a className=" feather-icon icon-user" href="instructor">Sign In Instructor</a></li>
+                <li><a className="feather-icon icon-user" href="student">Sign In Student</a></li>
                
               </ul>
               
