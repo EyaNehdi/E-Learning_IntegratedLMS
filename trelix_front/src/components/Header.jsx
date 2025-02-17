@@ -1,19 +1,30 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { useProfileStore } from "../store/profileStore";
+
 function Header() {
   const { isAuthenticated, logout } = useAuthStore();
   const navigate = useNavigate();
   const checkAuth = useAuthStore((state) => state.checkAuth);
-
+  const { user, fetchUser , clearUser } = useProfileStore();
  useEffect(() => {
   console.log("🟢 Checking authentication...");
-   checkAuth(); // Call from Zustand store
-}, []);
+   checkAuth();
+   console.log("user avant fetch:"+user);
+   const fetchData = async () => {
+    await fetchUser(); // Ensure user data is fetched first
+    console.log("user after fetch", user);
+  };
+  fetchData();
+}, [fetchUser]); 
+
 
   const handleLogout = () => {
       logout(); // Clear user session
+      clearUser();
       navigate("/"); // Redirect to home
+      
   };
                       return (
                         <>
@@ -140,7 +151,11 @@ function Header() {
           <div className="d-flex avatar border-bottom pb-3">
             <img className="img-fluid border rounded-circle" src="assets/images/ava-sm1.jpg" width={50} alt="avatar" />
             <div className="grettings ps-3">
-              <h6 className="mb-0">Jack Carey</h6>
+              {user ? (
+              <h6 className="mb-0">{user.firstName} {user.lastName}</h6>
+              ) : (
+                <h6 className="mb-0">Unknown</h6>
+              )}
               <small>Founder</small>
             </div>
           </div>
