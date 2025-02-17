@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { registerStudent, registerInstructor, checkAuth, signIn,signOut,verifyEmail,forgotPassword,resetPassword } = require('../controllers/authController');
+const { registerStudent, registerInstructor, checkAuth, signIn,signOut,verifyEmail,forgotPassword,resetPassword,registerInstructorgoogle,registerInstructorgithub,registerStudentgithub,registerStudentgoogle, signIngoogle, signIngithub } = require('../controllers/authController');
 const { verifyToken } = require ('../middlewares/verifyToken.js');
 
 router.get('/check-auth', verifyToken, checkAuth);
@@ -13,7 +13,8 @@ router.post('/register/githubStudent', registerStudentgithub);
 router.post('/register/googleStudent', registerStudentgoogle);
 
 router.post("/login", signIn);
-router.post("/logingoogle", signIn);
+router.post("/logingoogle", signIngoogle);
+router.post("/loginGit", signIngithub);
 router.post("/logout", signOut);
 router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", forgotPassword );
