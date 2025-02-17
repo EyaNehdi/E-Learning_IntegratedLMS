@@ -102,11 +102,14 @@ const registerInstructor = async (req, res) => {
 };
 
 const signIn = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, stayLoggedIn } = req.body;
+  console.log("StayLoggedIn:", stayLoggedIn);
 
   try {
     const user = await User.findOne({ email });
-
+    if (stayLoggedIn === undefined) {
+      return res.status(400).json({ message: "Missing stayLoggedIn value" });
+  }
     if (!user) {
       console.log("🔴 User not found");
       return res.status(400).json({ success: false, message: "Invalid credentials" });
@@ -122,7 +125,8 @@ const signIn = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
 
-    generateToken(res, user._id);
+      // Set token expiration based on stayLoggedIn
+      generateToken(res, user._id, stayLoggedIn);
 
     console.log("🟢 Login successful for user:", user.email);
 
