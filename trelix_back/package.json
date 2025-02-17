@@ -13,7 +13,7 @@
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "dotenv": "^16.4.7",
-    "express": "~4.16.1",
+    "express": "^4.18.2",
     "express-session": "^1.18.1",
     "google-auth-library": "^9.15.1",
     "http-errors": "~1.6.3",
@@ -23,7 +23,6 @@
     "mailtrap": "^3.4.0",
     "mongoose": "^8.10.0",
     "morgan": "~1.9.1",
-    "nodemon": "^3.1.9",
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0",
     "trelix-back": "file:"
