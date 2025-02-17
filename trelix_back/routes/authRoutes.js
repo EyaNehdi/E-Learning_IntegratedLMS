@@ -7,8 +7,13 @@ router.get('/check-auth', verifyToken, checkAuth);
 router.post('/register/student', registerStudent);
 
 router.post('/register/instructor', registerInstructor);
+router.post('/register/google', registerInstructorgoogle);
+router.post('/register/github', registerInstructorgithub);
+router.post('/register/githubStudent', registerStudentgithub);
+router.post('/register/googleStudent', registerStudentgoogle);
 
 router.post("/login", signIn);
+router.post("/logingoogle", signIn);
 router.post("/logout", signOut);
 router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", forgotPassword );
