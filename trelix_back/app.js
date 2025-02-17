@@ -9,8 +9,10 @@ const cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mfaRoutes = require('./routes/mfaRoutes');
-
 var app = express();
+require('dotenv').config();
+console.log("MONGO_URI:", process.env.MONGO_URI);  // Debug
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -79,3 +81,4 @@ app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
 });
 module.exports = app;
+
