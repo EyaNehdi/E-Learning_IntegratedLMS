@@ -271,6 +271,42 @@ const signIngoogle = async (req, res) => {
   }
 };
 
+const signIngithub = async (req, res) => {
+  const { code } = req.body;
+  if (!code) return res.status(400).json({ error: 'Code is required' });
+
+  try {
+    
+
+     
+                                            
+const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
+  client_id: 'Ov23liQcQlFtxrCS9Hkz',
+  client_secret: 'f5af5884e6f5d79e0c7a525180dc22c2cbd679a8',
+  code,
+}, {
+  headers: {
+      'Accept': 'application/json'
+  }
+});
+
+const accessToken = tokenResponse.data.access_token;
+
+// Fetch user details
+
+
+const emailResponse = await axios.get('https://api.github.com/user/emails', {
+  headers: { Authorization: `Bearer ${accessToken}` }
+});
+const emailg = emailResponse.data.find(e => e.primary)?.email || null;
+
+res.json({ email: emailg });
+      
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'GitHub authentication failed' });
+  }
+};
 
 
 const forgotPassword = async (req, res) => {
@@ -341,5 +377,5 @@ const resetPassword = async (req, res) => {
 	res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
-module.exports = {signIngoogle,registerStudentgithub, registerStudentgoogle,registerInstructorgithub, registerInstructorgoogle, registerStudent, registerInstructor,checkAuth , signIn , signOut, verifyEmail, forgotPassword, resetPassword };
+module.exports = {signIngithub,signIngoogle,registerStudentgithub, registerStudentgoogle,registerInstructorgithub, registerInstructorgoogle, registerStudent, registerInstructor,checkAuth , signIn , signOut, verifyEmail, forgotPassword, resetPassword };
 
