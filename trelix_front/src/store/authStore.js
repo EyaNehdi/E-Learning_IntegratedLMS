@@ -46,6 +46,28 @@ export const useAuthStore = create((set) => ({
             throw error;
         }
     },
+	logingoogle: async (email) => {
+        set({ isLoading: true, error: null });
+    
+        console.log("🟢 Sending login request:", { email }); // Log request data
+    
+        try {
+            const response = await axios.post(`${API_URL}/login`, { email }, { withCredentials: true });
+    
+            console.log("🟢 Login response:", response.data); // Log response
+    
+            set({
+                isAuthenticated: true,
+                user: response.data.user,
+                error: null,
+                isLoading: false,
+            });
+        } catch (error) {
+            console.log("🔴 Login error response:", error.response?.data || error); // Log error
+            set({ error: error.response?.data?.message || "Error logging in", isLoading: false });
+            throw error;
+        }
+    },
     
 
 	logout: async () => {

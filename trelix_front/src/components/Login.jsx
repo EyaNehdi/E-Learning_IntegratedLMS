@@ -1,5 +1,75 @@
 
+import { GoogleLogin } from '@react-oauth/google';
+import GitHubLogin from 'react-github-login';
+import MicrosoftLogin from 'react-microsoft-login';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useAuthStore } from "../store/authStore";
+
 function Login() {
+
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const [email, setEmail] = useState("");
+ 
+  const [errorMessage, setErrorMessage] = useState("");
+  const { logingoogle, isAuthenticated } = useAuthStore();
+  const [password, setPassword] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  const getPassword = async (email) => {
+    try {
+      const response = await axios.post("/api/auth/register/getpassfrommail", { email }); // Backend should return hashed password
+      return response.data.password; // This should ideally be checked on the backend, not sent to frontend
+    } catch (error) {
+      console.error("Error fetching password:", error);
+      return null;
+    }
+  };
+ 
+  
+  const handleLoginWithGoogle = async (response) => {
+    setErrorMessage("");
+
+    if (!response?.credential) {
+      setErrorMessage("Google authentication failed.");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(response.credential);
+      const email = decoded.email;
+
+      // Fetch password from the database (not recommended for production, should be handled via backend authentication)
+      const password = await getPassword(email);
+
+      if (!password) {
+        setErrorMessage("User not found or incorrect credentials.");
+        return;
+      }
+
+      // Authenticate user
+      await logingoogle(email, password);
+      navigate("/logged");
+    } catch (error) {
+      setErrorMessage(error.message || "Error logging in.");
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/logged");
+    }
+  }, [isAuthenticated, navigate]);
+  
+  const handleGoogleLoginError = () => {
+    setError('Google login failed.');
+  };
                       return (
                                           <div>
  <section className="signup-sec full-screen">
@@ -41,15 +111,22 @@ function Login() {
                 <a href="/forget" className="text-reset">Forget Password?</a>
               </div>
               <div className="alter overly"><p>OR</p></div>
-              <a href="#" className="btn w-100" style={{ backgroundColor: 'white', border: '1px solid #ddd', color: '#333', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px', textDecoration: 'none', fontWeight: 'bold' }}>
-              <img src="assets/images/icons/facebook.png" alt="Facebook" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
-              Continue with Facebook
-              </a>
+              <div className="google-login">
+                      <GoogleLogin
+                        onSuccess={handleLoginWithGoogle}
+                        onError={handleGoogleLoginError}
+                        theme="outline"
+                        size="large"
+                        shape="rectangular"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      {error && <p className="text-red-500 mt-2">{error}</p>}
+                    </div>
               <a href="#" className="btn w-100" style={{ backgroundColor: 'white', border: '1px solid #ddd', color: '#333', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px', textDecoration: 'none', fontWeight: 'bold' }}>
               <img src="assets/images/microsoft.png" alt="Google" style={{ width: '40px', height: '40px', marginRight: '10px' }} />
                Continue with Microsoft
                </a>              
-               <p>Don't have account? <a href="signup.html" className="text-primary fw-bold">Sign Up Now</a></p>
+               <p>Dont have account? <a href="signup.html" className="text-primary fw-bold">Sign Up Now</a></p>
             </div>
           </form>
         </div>

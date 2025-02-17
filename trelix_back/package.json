@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "~1.4.4",
@@ -14,13 +15,15 @@
     "dotenv": "^16.4.7",
     "express": "~4.16.1",
     "express-session": "^1.18.1",
+    "google-auth-library": "^9.15.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.0",
     "morgan": "~1.9.1",
+    "nodemon": "^3.1.9",
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0",
-    "nodemon": "^3.1.9"
+    "trelix-back": "file:"
   }
 }

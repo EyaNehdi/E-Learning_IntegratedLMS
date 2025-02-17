@@ -6,6 +6,8 @@ import SignupInstructor from './components/Instructor/Signup';
 import SignupStudent from './components/Student/Signup';
 import Index from './components/index';
 import ForgetPassword from './components/ForgetPassword';
+import Dashboard from './components/Admin/Dashboard';
+
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forget" element={<ForgetPassword />} />
         <Route path="/" element={<Index/>} />
+        <Route path="/Dashboard" element={<Dashboard/>} />
       </Routes>
    
     </Router>

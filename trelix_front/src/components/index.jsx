@@ -156,7 +156,7 @@ function Index() {
               <nav className="dashboard-nav mt-1">
                 <ul className="list-unstyled nav">
                   <li>
-                    <a className="nav-link" href="instructor-dashboard.html"><i className="feather-icon icon-home" /><span>Dashboard</span></a>
+                    <a className="nav-link" href="/Dashboard"><i className="feather-icon icon-home" /><span>Dashboard</span></a>
                   </li>
                   <li>
                     <a className="nav-link" href="instructor-profile.html"><i className="feather-icon icon-user" /><span>My Profile</span></a>

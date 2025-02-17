@@ -1,81 +1,225 @@
+import { useState } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
+import GitHubLogin from 'react-github-login';
+import MicrosoftLogin from 'react-microsoft-login';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 function Signup() {
-                      return (
-<div>
-  {/* Mirrored from html.theme-village.com/eduxo/signup.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:26:40 GMT */}
-  <meta charSet="utf-8" />
-  <meta httpEquiv="x-ua-compatible" content="ie=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <meta name="description" content="An ideal tempalte for online education, e-Learning, Course School, Online School, Kindergarten, Classic LMS, University, Language Academy, Coaching, Online Course, Single Course, and Course marketplace." />
-  <meta name="keywords" content="bootstrap 5, online course, education, creative, gulp, business, minimal, modern, course, one page, responsive, saas, e-Learning, seo, startup, html5, site template" />
-  <meta name="author" content="theme-village" />
-  <title>Eduxo - Online Courses and Education HTML5 Template</title>
-  <link rel="apple-touch-icon" href="assets/images/favicon.png" />
-  <link rel="shortcut icon" href="assets/images/favicon.ico" />
-  {/* SignUp Section Start */}
-  <section className="signup-sec full-screen">
-    <div className="container">
-      <div className="row align-items-center">
-        <div className="col-xl-5 col-md-5">
-          <div className="signup-thumb">
-            <img className="img-fluid" src="assets/images/signup-2.png" alt="Sign Up" />
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    role: 'instructor'
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+
+  const handleGoogleLoginSuccess = async (response) => {
+    try {
+      const decoded = jwtDecode(response.credential);  // Decode JWT token from Google
+      const googleUserData = {
+        firstName: decoded.given_name,
+        lastName: decoded.family_name,
+        email: decoded.email,
+        role: 'Student',  // Default role for Google sign-up
+      };
+
+      // Send Google user data to the backend for registration
+      const res = await axios.post('http://localhost:5173/api/auth/register/googleStudent', googleUserData, {
+        withCredentials: true,
+      });
+
+      if (res.data) {
+        navigate('/');  // Redirect after successful signup
+      }
+    } catch (err) {
+      setError('Google signup failed. Please try again.');
+      console.error(err);
+    }
+  };
+
+  const handleGoogleLoginFailure = () => {
+    console.error("Google login failed");
+  };
+
+  // Handle Google login error
+  const handleGoogleLoginError = () => {
+    setError('Google login failed.');
+  };
+
+  // Handle GitHub login success
+  const handleGitHubLoginSuccess = async (response) => {
+    try {
+      // Send the authorization code to the backend
+      const res = await axios.post('http://localhost:5173/api/auth/register/githubStudent', {
+        code: response.code,
+      });
+
+      if (res.data) {
+        navigate('/');  // Redirect after successful signup
+      }
+    } catch (err) {
+      setError('GitHub signup failed. Please try again.');
+      console.error(err);
+    }
+  };
+
+  // Handle GitHub login error
+  const handleGitHubLoginError = () => {
+    setError('GitHub login failed.');
+  };
+
+  // Handle Microsoft login success
+  const handleMicrosoftLoginSuccess = async (response) => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const responseData = await axios.post(
+        '/api/auth/register/instructor',
+        { token: response.authentication.accessToken },
+        { withCredentials: true }
+      );
+
+      if (responseData.data) {
+        navigate('/Home'); // Redirect after successful login
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Microsoft login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Microsoft login error
+  const handleMicrosoftLoginError = () => {
+    setError('Microsoft login failed.');
+  };
+  return (
+    <div>
+      {/* SignUp Section Start */}
+      <section className="signup-sec full-screen">
+        <div className="container">
+          <div className="row align-items-center">
+            <div className="col-xl-5 col-md-5">
+              <div className="signup-thumb">
+                <img className="img-fluid" src="assets/images/signup-2.png" alt="Sign Up" />
+              </div>
+            </div>
+            <div className="col-xl-7 col-md-7">
+              <div className="signup-form">
+                <h1 className="display-3 text-center mb-5">Let’s Sign Up Student</h1>
+                <form action="#">
+                  <div className="form-group position-relative">
+                    <input
+                      type="text"
+                      name="firstName"
+                      placeholder="FirstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group position-relative">
+                    <input
+                      type="text"
+                      name="lastName"
+                      placeholder="LastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group position-relative">
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group position-relative">
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <button
+                    className="btn btn-primary w-100"
+                    style={{
+                      padding: '15px',
+                      fontSize: '18px',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    Sign In
+                  </button>
+                  <div className="form-footer mt-4 text-center">
+                    <div className="alter overly">
+                      <p>OR</p>
+                    </div>
+                    
+                    <p>
+                      Already have an account?{' '}
+                      <a href="login.html" className="text-primary fw-bold">
+                        Login Now
+                      </a>
+                    </p>
+                  </div>
+                </form>
+                <div className="google-login">
+                      <GoogleLogin
+                        onSuccess={handleGoogleLoginSuccess}
+                        onError={handleGoogleLoginError}
+                        theme="outline"
+                        size="large"
+                        shape="rectangular"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      {error && <p className="text-red-500 mt-2">{error}</p>}
+                    </div>
+
+                    <div className="microsoft-login">
+                      <MicrosoftLogin
+                        clientId="0081ceb9-215c-491a-aaab-e478787be7e8"
+                        redirectUri="http://localhost:5173/login/student"
+                        onSuccess={handleMicrosoftLoginSuccess}
+                        onFailure={handleMicrosoftLoginError}
+                      />
+                    </div>
+                    <div className="github-login">
+                      <GitHubLogin
+                        clientId="Ov23liQcQlFtxrCS9Hkz"
+                        redirectUri="http://localhost:5173/login/student"
+                        onSuccess={handleGitHubLoginSuccess}
+                        onFailure={handleGitHubLoginError}
+                        
+                      />
+                    </div>
+
+              </div>
+            </div>
           </div>
         </div>
-        <div className="col-xl-7 col-md-7">
-          <div className="signup-form">
-            <h1 className="display-3 text-center mb-5">Let’s Sign Up Student</h1>
-            <form action="#">
-              <div className="form-group position-relative">
-                <span><i className="feather-icon icon-user" /></span>
-                <input type="text" placeholder=" FirstName" required />
-              </div>
-              <div className="form-group position-relative">
-                <span><i className="feather-icon icon-user" /></span>
-                <input type="text" placeholder=" LastName" required />
-              </div>
-              <div className="form-group position-relative">
-                <span><i className="feather-icon icon-mail" /></span>
-                <input type="email" placeholder=" Email" required />
-              </div>
-              <div className="form-group position-relative">
-                <span><i className="feather-icon icon-lock" /></span>
-                <input type="password" placeholder="Password" required />
-              </div>
-              <button 
-  className="btn btn-primary w-100" 
-  style={{ 
-    padding: "15px", // Augmente la hauteur du bouton
-    fontSize: "18px", // Augmente la taille du texte
-    borderRadius: "8px" // Arrondi les bords
-  }}
->
-  Sign In
-</button>
-              <div className="form-footer mt-4 text-center">
-                <div className="alter overly">
-                  <p>OR</p>
-                </div>
-                <a href="#" className="btn w-100" style={{ backgroundColor: 'white', border: '1px solid #ddd', color: '#333', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px', textDecoration: 'none', fontWeight: 'bold' }}>
-              <img src="assets/images/icons/google.png" alt="Facebook" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
-              Continue with Google
-              </a>
-              <a href="#" className="btn w-100" style={{ backgroundColor: 'white', border: '1px solid #ddd', color: '#333', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px', textDecoration: 'none', fontWeight: 'bold' }}>
-              <img src="assets/images/microsoft.png" alt="Google" style={{ width: '40px', height: '40px', marginRight: '10px' }} />
-               Continue with Microsoft
-               </a> 
-               <a href="#" className="btn w-100" style={{ backgroundColor: 'white', border: '1px solid #ddd', color: '#333', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px', textDecoration: 'none', fontWeight: 'bold' }}>
-              <img src="assets/images/gitt.png" alt="Google" style={{ width: '40px', height: '40px', marginRight: '10px' }} />
-               Continue with GitHub
-               </a> 
-                <p>Already have account? <a href="login.html" className="text-primary fw-bold">Login Now</a></p>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
-  </section>
-  {/* Mirrored from html.theme-village.com/eduxo/signup.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:26:41 GMT */}
-</div>
-                      );
+
+  );
+
 }
+
 export default Signup;
