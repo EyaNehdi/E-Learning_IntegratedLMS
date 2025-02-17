@@ -1,0 +1,59 @@
+#spinLoad.done {
+  visibility: hidden;
+  opacity: 0;
+}
+#spinLoad {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #f7f7f7;
+  z-index: 999999;
+}
+.spinLoad {
+  padding: 0;
+  text-align: left;
+  box-sizing: border-box;
+  top: 50%;
+  left: 50%;
+  margin-left: -1.5625rem;
+  margin-top: -1.5625rem;
+}
+.spinLoad,
+.spinLoad span {
+  width: 3.125rem;
+  height: 3.125rem;
+  display: inline-block;
+  position: absolute;
+}
+.spinLoad span {
+  border-radius: 100%;
+  background: #ffa03a;
+  -webkit-animation: spinLoad 1.3s linear infinite;
+  animation: spinLoad 1.3s linear infinite;
+}
+.spinLoad span:last-child {
+  animation-delay: -0.8s;
+  -webkit-animation-delay: -0.8s;
+}
+@keyframes spinLoad {
+  0% {
+    transform: scale(0);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+@-webkit-keyframes spinLoad {
+  0% {
+    -webkit-transform: scale(0);
+    opacity: 0.7;
+  }
+  to {
+    -webkit-transform: scale(1);
+    opacity: 0;
+  }
+}

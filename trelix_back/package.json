@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "dev": "nodemon ./bin/www"
   },
   "dependencies": {
     "axios": "^1.7.9",
@@ -18,12 +18,17 @@
     "google-auth-library": "^9.15.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
+    "mailtrap": "^3.4.0",
     "mongoose": "^8.10.0",
     "morgan": "~1.9.1",
     "nodemon": "^3.1.9",
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0",
     "trelix-back": "file:"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }
