@@ -7,11 +7,13 @@ import Orders from './Orders'
 import Analytic from './Analytic'
 import Shopping from './Shopping'
 import Add from './Add'
+import Sidebar from './Sidebar'
 
 function Dashboard() {
     return (
         <Section>
             <Navbar />
+            <Sidebar />
             <div className="grid">
                 <div className="grid_1">
                     <Statistic />
