@@ -1,22 +1,7 @@
-import { useAuthStore } from "../store/authStore";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import Footer from "./Footer";
 import Header from "./Header";
 function Index() {
-  const { isAuthenticated, logout } = useAuthStore();
-  const navigate = useNavigate();
-  const checkAuth = useAuthStore((state) => state.checkAuth);
 
- useEffect(() => {
-  console.log("🟢 Checking authentication...");
-   checkAuth(); // Call from Zustand store
-}, []);
-
-  const handleLogout = () => {
-      logout(); // Clear user session
-      navigate("/"); // Redirect to home
-  };
                       return (
 <div>
   {/* Mirrored from html.theme-village.com/eduxo/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:25:31 GMT */}

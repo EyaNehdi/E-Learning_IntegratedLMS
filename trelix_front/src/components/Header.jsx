@@ -1,5 +1,22 @@
+import { useEffect } from "react";
+import useNavigate from "react-router-dom";
+import useAuthStore from "../store/authStore";
 function Header() {
+  const { isAuthenticated, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const checkAuth = useAuthStore((state) => state.checkAuth);
+
+ useEffect(() => {
+  console.log("🟢 Checking authentication...");
+   checkAuth(); // Call from Zustand store
+}, []);
+
+  const handleLogout = () => {
+      logout(); // Clear user session
+      navigate("/"); // Redirect to home
+  };
                       return (
+                        <>
 <header className="header header-1">
 <div className="sticky-height" />
 <div className="header-top bg-primary text-info text-uppercase">
@@ -114,6 +131,8 @@ function Header() {
       <a className="navbar-brand d-xl-none" href="index-2.html"><img src="assets/images/logo.png" alt="Logo" /></a>
       <div className="header-actions position-relative order-xl-2 d-flex align-items-center justify-content-between">
         <a className="text-reset icon rounded-5 bg-shade" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-search"><i className="feather-icon icon-search" /></a>
+        {isAuthenticated ? (
+        <div>
         <a className="text-reset icon rounded-5 bg-shade" data-bs-toggle="collapse" href="#collapseAdminMenu" role="button" aria-expanded="false" aria-controls="collapseAdminMenu">
           <i className="feather-icon icon-user" />
         </a>
@@ -166,11 +185,14 @@ function Header() {
                 <a className="nav-link" href="instructor-settings.html"><i className="feather-icon icon-settings" /><span>Settings</span></a>
               </li>
               <li>
-                <a className="nav-link" href="index-2.html"><i className="feather-icon icon-log-out" /><span>Logout</span></a>
+                <a className="nav-link" href="" onClick={handleLogout}><i className="feather-icon icon-log-out" /><span>Logout</span></a>
               </li>
             </ul>
           </nav>
         </div>
+        </div>
+                      ):(
+                        <div>
       
         <a href="" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5 "  role="button" data-bs-toggle="dropdown" aria-expanded="false">Sign Up</a>
         <ul className="dropdown-menu">
@@ -181,6 +203,7 @@ function Header() {
               
         <a href="/login" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5">Login</a>
       </div>
+                      )}
       <button className="navbar-toggler offcanvas-nav-btn" type="button">
         <span className="feather-icon icon-menu" />
       </button>
@@ -325,9 +348,11 @@ function Header() {
         </div>
       </div>
     </div>
+    </div>
   </nav>
 </div>
 </header>
+</>
                       );
 }
 export default Header;
