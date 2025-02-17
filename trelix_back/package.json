@@ -1,15 +1,11 @@
 {
   "name": "trelix-back",
   "version": "0.0.0",
- 
   "private": true,
   "scripts": {
     "dev": "nodemon ./bin/www"
-    
-    
   },
   "dependencies": {
-    
     "bcrypt": "^5.1.1",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "~1.4.4",
@@ -26,12 +22,10 @@
     "mongoose": "^8.10.0",
     "morgan": "~1.9.1",
     "qrcode": "^1.5.4",
-    "speakeasy": "^2.0.0"
-    
-
+    "speakeasy": "^2.0.0",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
-
   }
 }

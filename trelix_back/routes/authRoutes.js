@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 const { registerStudent, registerInstructor, checkAuth, signIn,signOut,verifyEmail,forgotPassword,resetPassword } = require('../controllers/authController');
 const { verifyToken } = require ('../middlewares/verifyToken.js');
+const { validateInput } = require ('../middlewares/validators.js');
 
 router.get('/check-auth', verifyToken, checkAuth);
-router.post('/register/student', registerStudent);
+router.post('/register/student', validateInput,registerStudent);
 
-router.post('/register/instructor', registerInstructor);
+router.post('/register/instructor',validateInput ,registerInstructor);
 
 router.post("/login", signIn);
 router.post("/logout", signOut);
