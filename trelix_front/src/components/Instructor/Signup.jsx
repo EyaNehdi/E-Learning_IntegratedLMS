@@ -1,6 +1,12 @@
-import { useState,useEffect } from 'react';
+
+import { GoogleLogin } from '@react-oauth/google';
+import GitHubLogin from 'react-github-login';
+import MicrosoftLogin from 'react-microsoft-login';
+import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useState,useEffect } from 'react';
+import { useAuthStore } from "../../store/authStore";
 import { motion } from "framer-motion";
 import PasswordStrengthMeter from '../PasswordStrengthMeter';
 function Signup() {
@@ -9,10 +15,98 @@ function Signup() {
     firstName: '',
     lastName: '',
     email: '',
-    password: ''
-  });
+    password: '',
+    role: 'instructor'});
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const {  isAuthenticated, checkAuth } = useAuthStore();
+  useEffect(() => {
+    console.log("🟢 isAuthenticated state:", isAuthenticated);
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+  useEffect(() => {
+    console.log("🟢 Checking authentication on mount...");
+    checkAuth();
+  }, [checkAuth]);
+  
+  const handleGoogleLoginSuccess = async (response) => {
+    try {
+      const decoded = jwtDecode(response.credential);  // Decode JWT token from Google
+      const googleUserData = {
+        firstName: decoded.given_name,
+        lastName: decoded.family_name,
+        email: decoded.email,
+        role: 'instructor',  // Default role for Google sign-up
+      };
+  
+      // Send Google user data to the backend for registration
+      const res = await axios.post('http://localhost:5173/api/auth/register/google', googleUserData, {
+        withCredentials: true,
+      });
+  
+      if (res.data) {
+        navigate('/');  // Redirect after successful signup
+      }
+      setLoading(false);
+    } catch (err) {
+      setError('Google signup failed. Please try again.');
+      console.error(err);
+    }
+  };
+
+  const handleGoogleLoginFailure = () => {
+    console.error("Google login failed");
+  };
+  
+  // Handle Google login error
+  const handleGoogleLoginError = () => {
+    setError('Google login failed.');
+  };
+  
+  // Handle GitHub login success
+  const handleGitHubLoginSuccess = async (response) => {
+    try {
+      // Send the authorization code to the backend
+      const res = await axios.post('http://localhost:5173/api/auth/register/github', {
+        code: response.code,
+      });
+  
+      if (res.data) {
+        navigate('/');  // Redirect after successful signup
+      }
+    } catch (err) {
+      setError('GitHub signup failed. Please try again.');
+      console.error(err);
+    }
+  };
+  
+  // Handle GitHub login error
+  const handleGitHubLoginError = () => {
+    setError('GitHub login failed.');
+  };
+  
+  // Handle Microsoft login success
+  const handleMicrosoftLoginSuccess = async (response) => {
+    setLoading(true);
+    setError('');
+  
+    try {
+      const responseData = await axios.post(
+        '/api/auth/register/instructor',
+        { token: response.authentication.accessToken },
+        { withCredentials: true }
+      );
+  
+      if (responseData.data) {
+        navigate('/Home'); // Redirect after successful login
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Microsoft login failed. Please try again.');
+    
+  }};
+
   const [errors,setErrors] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
   useEffect(() => {
@@ -133,6 +227,15 @@ function Signup() {
       setLoading(false);
     }
   };
+  const handleMicrosoftLoginError = () => {
+    setError('Microsoft login failed.');
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
                       return (
 <div>
   {/* Mirrored from html.theme-village.com/eduxo/signup.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:26:40 GMT */}
@@ -217,31 +320,51 @@ function Signup() {
 {loading ? 'Registering...' : 'Sign Up as Instructor'}
 </button>
               <div className="form-footer mt-4 text-center">
-                <div className="alter overly">
-                  <p>OR</p>
-                </div>
-                <a href="#" className="btn w-100" style={{ backgroundColor: 'white', border: '1px solid #ddd', color: '#333', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px', textDecoration: 'none', fontWeight: 'bold' }}>
-              <img src="assets/images/icons/google.png" alt="Facebook" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
-              Continue with Google
-              </a>
-              <a href="#" className="btn w-100" style={{ backgroundColor: 'white', border: '1px solid #ddd', color: '#333', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px', textDecoration: 'none', fontWeight: 'bold' }}>
-              <img src="assets/images/microsoft.png" alt="Google" style={{ width: '40px', height: '40px', marginRight: '10px' }} />
-               Continue with Microsoft
-               </a> 
-               <a href="#" className="btn w-100" style={{ backgroundColor: 'white', border: '1px solid #ddd', color: '#333', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px', textDecoration: 'none', fontWeight: 'bold' }}>
-              <img src="assets/images/gitt.png" alt="Google" style={{ width: '40px', height: '40px', marginRight: '10px' }} />
-               Continue with GitHub
-               </a> 
-                <p>Already have account? <a href="login.html" className="text-primary fw-bold">Login Now</a></p>
-              </div>
+              <div className="alter overly">
+                      <p>OR</p>
+                    </div>
+                    <div className="google-login">
+                      <GoogleLogin
+                        onSuccess={handleGoogleLoginSuccess}
+                        onError={handleGoogleLoginError}
+                      />
+                      {error && <p className="text-red-500 mt-2">{error}</p>}
+                    </div>
+
+                    <div className="microsoft-login">
+                      <MicrosoftLogin
+                        clientId="0081ceb9-215c-491a-aaab-e478787be7e8"
+                        redirectUri="http://localhost:5173/login/student"
+                        onSuccess={handleMicrosoftLoginSuccess}
+                        onFailure={handleMicrosoftLoginError}
+                      />
+                    </div>
+                    <div className="github-login">
+                      <GitHubLogin
+                        clientId="Ov23liQcQlFtxrCS9Hkz"
+                        redirectUri="http://localhost:5173/login/student"
+                        onSuccess={handleGitHubLoginSuccess}
+                        onFailure={handleGitHubLoginError}
+                      />
+                    </div>
+
+                    <p>
+                      Already have an account?{' '}
+                      <a href="login.html" className="text-primary fw-bold">
+                        Login Now
+                      </a>
+                    </p>
+                    </div>
             </form>
           </div>
         </div>
       </div>
     </div>
+    
   </section>
-  {/* Mirrored from html.theme-village.com/eduxo/signup.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:26:41 GMT */}
-</div>
-                      );
+  </div>
+  );
+  
 }
+
 export default Signup;
