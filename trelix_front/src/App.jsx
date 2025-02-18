@@ -6,7 +6,7 @@ import SignupInstructor from "./components/Instructor/Signup";
 import SignupStudent from "./components/Student/Signup";
 import Index from "./components/index";
 import ForgetPassword from "./components/ForgetPassword";
-import Preloader from "./components/Preloader/Preloader";
+import MfaSetupPage from "./components/MfaSetup/MfaSetupPage";
 
 function App() {
   return (
@@ -17,6 +17,7 @@ function App() {
         <Route path="/instructor" element={<SignupInstructor />} />
         <Route path="/student" element={<SignupStudent />} />
         <Route path="/forget" element={<ForgetPassword />} />
+        <Route path="/testMfa" element={<MfaSetupPage />} />
       </Routes>
     </Router>
   );
