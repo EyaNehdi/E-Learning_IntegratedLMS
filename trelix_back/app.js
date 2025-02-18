@@ -9,8 +9,12 @@ const cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mfaRoutes = require('./routes/mfaRoutes');
+const profileRoutes = require("./routes/profileRoutes");
 
 var app = express();
+require('dotenv').config();
+console.log("MONGO_URI:", process.env.MONGO_URI);  // Debug
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -18,7 +22,7 @@ app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 //cors
@@ -37,6 +41,7 @@ app.use('/users', usersRouter);
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 app.use("/signup/mfa", mfaRoutes);
+app.use("/api/info", profileRoutes);
 
 
 
@@ -79,3 +84,4 @@ app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
 });
 module.exports = app;
+

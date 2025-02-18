@@ -10,6 +10,10 @@ const User = new Schema({
     mfaEnabled: { type: Boolean, default: false }, 
     mfaSecret: { type: String, default: null },
     backupCodes: { type: [String], default: [] }, 
+    resetPasswordToken: String,
+		resetPasswordExpiresAt: Date,
+		verificationToken: String,
+		verificationTokenExpiresAt: Date,
     role: { 
         type: String, 
         enum: ["superAdmin","admin", "student", "instructor"]

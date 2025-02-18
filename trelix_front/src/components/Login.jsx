@@ -2,13 +2,21 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import Preloader from "./Preloader/Preloader";
+import { GoogleLogin } from '@react-oauth/google';
+import GitHubLogin from 'react-github-login';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+
+
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setLoading] = useState("");
+  const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const navigate = useNavigate();
-  const { login, isAuthenticated, checkAuth } = useAuthStore();
+  const { logingoogle, login, isAuthenticated, checkAuth } = useAuthStore();
+  const [error, setError] = useState('');
 
   // Effect to check authentication only once on mount
   useEffect(() => {
@@ -19,7 +27,7 @@ function Login() {
   // Effect to redirect when authentication state changes
   useEffect(() => {
     console.log("🟢 isAuthenticated state:", isAuthenticated);
-    if (isAuthenticated) {  
+    if (isAuthenticated) {
       navigate("/");
     }
   }, [isAuthenticated, navigate]);
@@ -27,9 +35,9 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
-    setLoading(true); 
+    setLoading(true);
     try {
-      await login(email, password);
+      await login(email, password, stayLoggedIn);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -41,6 +49,58 @@ function Login() {
     }
   };
 
+  const handleStayLogged = () => {
+    setStayLoggedIn(!stayLoggedIn);
+  }
+
+
+
+  const handleLoginWithGoogle = async (response) => {
+    
+    
+    const decoded = jwtDecode(response.credential); 
+    setLoading(true);
+    try {
+      await logingoogle(decoded.email, stayLoggedIn);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      if (error.response?.data?.message === "Account does not exist") {
+        setErrorMessage("Account does not exist");
+      } else {
+        setErrorMessage(error.response?.data?.message || "Error logging in");
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleGoogleLoginError = () => {
+    setError('Google login failed.');
+  };
+  const handleGitHubLoginError = () => {
+    setError('GitHub login failed.');
+  };
+  const handleGitHubLoginSuccess = async (response) => {
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/loginGit', {
+          code: response.code,
+      });
+
+      if (res.data?.email) {
+        await logingoogle(res.data.email, stayLoggedIn);
+        setLoading(false);
+      }
+  } catch (err) {
+    setLoading(false);
+      setError('GitHub signup failed. Please try again.');
+      console.error(err);
+  }
+  };
   return (
     <>
       {isLoading ? (
@@ -104,10 +164,13 @@ function Login() {
                       <div className="form-footer mt-4 text-center">
                         <div className="d-flex justify-content-between">
                           <div className="form-check">
+                            {/*Stay logged in input */}
                             <input
                               type="checkbox"
                               className="form-check-input"
                               id="logged-in"
+                              value={stayLoggedIn}
+                              onChange={handleStayLogged}
                             />
                             <label
                               className="form-check-label"
@@ -123,62 +186,11 @@ function Login() {
                         <div className="alter overly">
                           <p>OR</p>
                         </div>
-                        <a
-                          href="#"
-                          className="btn w-100"
-                          style={{
-                            backgroundColor: "white",
-                            border: "1px solid #ddd",
-                            color: "#333",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            padding: "10px",
-                            textDecoration: "none",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          <img
-                            src="assets/images/icons/facebook.png"
-                            alt="Facebook"
-                            style={{
-                              width: "30px",
-                              height: "30px",
-                              marginRight: "10px",
-                            }}
-                          />
-                          Continue with Facebook
-                        </a>
-                        <a
-                          href="#"
-                          className="btn w-100"
-                          style={{
-                            backgroundColor: "white",
-                            border: "1px solid #ddd",
-                            color: "#333",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            padding: "10px",
-                            textDecoration: "none",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          <img
-                            src="assets/images/microsoft.png"
-                            alt="Google"
-                            style={{
-                              width: "40px",
-                              height: "40px",
-                              marginRight: "10px",
-                            }}
-                          />
-                          Continue with Microsoft
-                        </a>
+                        
                         <p>
                           Don&apos;t have account?{" "}
                           <a
-                            href="signup.html"
+                            href="/Switch"
                             className="text-primary fw-bold"
                           >
                             Sign Up Now
@@ -189,9 +201,31 @@ function Login() {
                         <div className="error-message">{errorMessage}</div>
                       )}
                     </form>
+                    <div className="alter overly"><p>OR</p>
+                <div className="google-login">
+                  <GoogleLogin
+                    onSuccess={handleLoginWithGoogle}
+                    onError={handleGoogleLoginError}
+                    theme="outline"
+                    size="large"
+                    shape="rectangular"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  {error && <p className="text-red-500 mt-2">{error}</p>}
+                </div>
+                <div className="github-login">
+                      <GitHubLogin
+                        clientId="Ov23liQcQlFtxrCS9Hkz"
+                        redirectUri="http://localhost:5173/login/student"
+                        onSuccess={handleGitHubLoginSuccess}
+                        onFailure={handleGitHubLoginError}
+                      />
+                    </div>
+                 </div>
                   </div>
                 </div>
               </div>
+             
             </div>
           </section>
         </div>

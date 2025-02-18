@@ -1,12 +1,17 @@
 import "./App.css";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./components/Login";
-import SignupInstructor from "./components/Instructor/Signup";
-import SignupStudent from "./components/Student/Signup";
-import Index from "./components/index";
-import ForgetPassword from "./components/ForgetPassword";
+import Login from './components/Login';
+import SignupInstructor from './components/Instructor/Signup';
+import SignupStudent from './components/Student/Signup';
+import Index from './components/index';
+import ForgetPassword from './components/ForgetPassword';
+import Dashboard from './components/Admin/Dashboard';
+import Profile from "./components/Profile";
+import Switch from "./components/Switch";
 import MfaSetupPage from "./components/MfaSetup/MfaSetupPage";
+
+import Preloader from "./components/Preloader/Preloader";
 
 function App() {
   return (
@@ -18,6 +23,10 @@ function App() {
         <Route path="/student" element={<SignupStudent />} />
         <Route path="/forget" element={<ForgetPassword />} />
         <Route path="/testMfa" element={<MfaSetupPage />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/Switch" element={<Switch />} />
+        
+        <Route path="/Dashboard" element={<Dashboard/>} />
       </Routes>
     </Router>
   );
