@@ -28,7 +28,7 @@
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0",
 
-    "yup": "^1.6.1"
+    "yup": "^1.6.1",
 
     "trelix-back": "file:"
 
