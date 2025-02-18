@@ -165,7 +165,7 @@ function Header() {
                 <a className="nav-link" href="instructor-dashboard.html"><i className="feather-icon icon-home" /><span>Dashboard</span></a>
               </li>
               <li>
-                <a className="nav-link" href="instructor-profile.html"><i className="feather-icon icon-user" /><span>My Profile</span></a>
+                <a className="nav-link" href="/profile"><i className="feather-icon icon-user" /><span>My Profile</span></a>
               </li>
               <li>
                 <a className="nav-link" href="instructor-enrolled-courses.html"><i className="feather-icon icon-book-open" /><span>Enrolled Courses</span></a>
@@ -209,12 +209,8 @@ function Header() {
                       ):(
                         <div>
       
-        <a href="" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5 "  role="button" data-bs-toggle="dropdown" aria-expanded="false">Sign Up</a>
-        <ul className="dropdown-menu">
-                <li><a className=" feather-icon icon-user" href="instructor">Sign Up Instructor</a></li>
-                <li><a className="feather-icon icon-user" href="student">Sign Up Student</a></li>
-               
-              </ul>
+        <a href="/Switch" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5 " >Sign Up</a>
+       
               
         <a href="/login" className="btn btn-primary d-none d-lg-block shadow-none border-0 rounded-5">Login</a>
       </div>
@@ -250,7 +246,7 @@ function Header() {
                     <li className="dropdown-header">Instructor</li>
                     <li>
                       <a className="dropdown-item" href="instructor-dashboard.html">Dashbaord</a>
-                      <a className="dropdown-item" href="instructor-profile.html">Profile</a>
+                      <a className="dropdown-item" href="/profile">Profile</a>
                       <a className="dropdown-item" href="instructor-enrolled-courses.html">Enrolled Courses</a>
                       <a className="dropdown-item" href="instructor-wishlist.html">Wishlist</a>
                       <a className="dropdown-item" href="instructor-reviews.html">Reviews</a>
