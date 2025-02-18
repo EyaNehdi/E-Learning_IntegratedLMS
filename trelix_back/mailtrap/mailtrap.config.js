@@ -11,7 +11,9 @@ const mailtrapClient = new MailtrapClient({
 });
 
 const sender = {
-    email: "bouteraa.yassmine@esprit.tn",
+    email: "mailtrap@demomailtrap.com",
     name: "yasmine",
 };
 
+
+module.exports={mailtrapClient, sender};
