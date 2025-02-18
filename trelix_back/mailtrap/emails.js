@@ -1,11 +1,12 @@
-import {
-	PASSWORD_RESET_REQUEST_TEMPLATE,
-	PASSWORD_RESET_SUCCESS_TEMPLATE,
-	VERIFICATION_EMAIL_TEMPLATE,
-} from "./emailTemplates.js";
-import { mailtrapClient, sender } from "./mailtrap.config.js";
+const { VERIFICATION_EMAIL_TEMPLATE,PASSWORD_RESET_REQUEST_TEMPLATE,
+	PASSWORD_RESET_SUCCESS_TEMPLATE, } = require("../mailtrap/emailTemplate.js");
+  // emails.js
 
-export const sendVerificationEmail = async (email, verificationToken) => {
+
+  
+  const { mailtrapClient, sender } = require("./mailtrap.config.js");
+
+ const sendVerificationEmail = async (email, verificationToken) => {
 	const recipient = [{ email }];
 
 	try {
@@ -25,7 +26,7 @@ export const sendVerificationEmail = async (email, verificationToken) => {
 	}
 };
 
-export const sendPasswordResetEmail = async (email, resetURL) => {
+ const sendPasswordResetEmail = async (email, resetURL) => {
 	const recipient = [{ email }];
 
 	try {
@@ -43,7 +44,7 @@ export const sendPasswordResetEmail = async (email, resetURL) => {
 	}
 };
 
-export const sendResetSuccessEmail = async (email) => {
+ const sendResetSuccessEmail = async (email) => {
 	const recipient = [{ email }];
 
 	try {
@@ -62,3 +63,4 @@ export const sendResetSuccessEmail = async (email) => {
 		throw new Error(`Error sending password reset success email: ${error}`);
 	}
 };
+module.exports={sendResetSuccessEmail,sendPasswordResetEmail,sendVerificationEmail,}

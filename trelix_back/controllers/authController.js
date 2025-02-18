@@ -2,6 +2,11 @@
 const User = require('../models/userModel');
 const generateToken = require('../utils/generateTokenAndSetCookie');
 const bcrypt = require('bcrypt');
+const crypto = require ('crypto');
+
+
+
+const { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail } = require("../mailtrap/emails.js");
 
 
 
@@ -17,13 +22,16 @@ const register = async (req, res, role) => {
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
+	const verificationToken = crypto.randomBytes(20).toString('hex');
+
     const newUser = new User({
       firstName,
       lastName,
       email,
-      password ,
-    
-      role 
+	  password,
+      role ,
+	  verificationToken,
+	  verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, 
     });
     await newUser.save();
     
@@ -32,7 +40,8 @@ const register = async (req, res, role) => {
 
 //jwt
 generateToken(res,newUser._id);
-await sendVerificationEmail(user.email, verificationToken);
+//dans utils
+await sendVerificationEmail(newUser.email, verificationToken);
     res.status(201).json({
       success: true,
       message: "Registration successful",
@@ -148,33 +157,37 @@ const signIn = async (req, res) => {
 
 
 const forgotPassword = async (req, res) => {
-
 	const { email } = req.body;
+  
+	console.log("Requête reçue avec l'email :", email);  // Log de débogage
+  
 	try {
-		const user = await User.findOne({ email });
-
-		if (!user) {
-			return res.status(400).json({ success: false, message: "User not found" });
-		}
-
-		// Generate reset token
-		const resetToken = crypto.randomBytes(20).toString("hex");
-		const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
-
-		user.resetPasswordToken = resetToken;
-		user.resetPasswordExpiresAt = resetTokenExpiresAt;
-
-		await user.save();
-
-		// send email
-		await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`);
-
-		res.status(200).json({ success: true, message: "Password reset link sent to your email" });
+	  const user = await User.findOne({ email });
+  
+	  if (!user) {
+		console.log("Utilisateur non trouvé pour l'email :", email);  // Log de débogage
+		return res.status(400).json({ success: false, message: "User not found" });
+	  }
+  
+	  // Générer le token de réinitialisation
+	  const resetToken = crypto.randomBytes(20).toString("hex");
+	  const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 heure
+  
+	  user.resetPasswordToken = resetToken;
+	  user.resetPasswordExpiresAt = resetTokenExpiresAt;
+  
+	  await user.save();
+  
+	  // Envoyer l'email
+	  await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`);
+  
+	  res.status(200).json({ success: true, message: "Password reset link sent to your email" });
 	} catch (error) {
-		console.log("Error in forgotPassword ", error);
-		res.status(400).json({ success: false, message: error.message });
+	  console.log("Error in forgotPassword ", error);
+	  res.status(400).json({ success: false, message: error.message });
 	}
-};
+  };
+  
 
 const resetPassword = async (req, res) => {
 
@@ -193,6 +206,7 @@ const resetPassword = async (req, res) => {
 
 		// update password
 		const hashedPassword = await bcryptjs.hash(password, 10);
+		const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
 		user.password = hashedPassword;
 		user.resetPasswordToken = undefined;
