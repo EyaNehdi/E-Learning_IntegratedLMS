@@ -9,6 +9,8 @@ const cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mfaRoutes = require('./routes/mfaRoutes');
+const profileRoutes = require("./routes/profileRoutes");
+
 var app = express();
 require('dotenv').config();
 console.log("MONGO_URI:", process.env.MONGO_URI);  // Debug
@@ -39,6 +41,7 @@ app.use('/users', usersRouter);
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 app.use("/signup/mfa", mfaRoutes);
+app.use("/api/info", profileRoutes);
 
 
 
