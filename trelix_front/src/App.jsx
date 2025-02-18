@@ -9,7 +9,7 @@ import ForgetPassword from './components/ForgetPassword';
 import Dashboard from './components/Admin/Dashboard';
 import Profile from "./components/Profile";
 import Switch from "./components/Switch";
-import MfaSetupPage from "./components/MfaSetup/MfaSetupPage";
+import SignUpPage from "./pages/SignUpPage";
 
 import Preloader from "./components/Preloader/Preloader";
 
@@ -22,7 +22,7 @@ function App() {
         <Route path="/instructor" element={<SignupInstructor />} />
         <Route path="/student" element={<SignupStudent />} />
         <Route path="/forget" element={<ForgetPassword />} />
-        <Route path="/testMfa" element={<MfaSetupPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/Switch" element={<Switch />} />
         

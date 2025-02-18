@@ -33,15 +33,18 @@ const authenticateMfa = async (req, res) => {
 
 const generateBackupCodes = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.query.userId;
+    console.log(userId);
 
     const backupCodes = generateCodes();
     const hashedBackupCodes = backupCodes.map((code) =>
       crypto.createHash("sha256").update(code).digest("hex")
     );
 
-    await User.findByIdAndUpdate(userId, { backupCodes: hashedBackupCodes });
-    res.json({ success: true, backupCodes });
+    const updatedUser = await User.findByIdAndUpdate(userId, { backupCodes: hashedBackupCodes }, { new: true });
+    if (updatedUser) {
+      res.json({ success: true, backupCodes });
+    }
 
   } catch (error) {
     console.error("Error generating backup codes:", error);
@@ -49,4 +52,4 @@ const generateBackupCodes = async (req, res) => {
   }
 };
 
-module.exports = { enableMFA, authenticateMfa , generateBackupCodes};
+module.exports = { enableMFA, authenticateMfa, generateBackupCodes };
