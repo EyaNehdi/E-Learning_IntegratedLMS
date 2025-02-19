@@ -190,7 +190,7 @@ function Login() {
                         <p>
                           Don&apos;t have account?{" "}
                           <a
-                            href="/Switch"
+                            href="/signup"
                             className="text-primary fw-bold"
                           >
                             Sign Up Now
