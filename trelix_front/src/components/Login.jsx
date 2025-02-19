@@ -190,7 +190,7 @@ function Login() {
                         <p>
                           Don&apos;t have account?{" "}
                           <a
-                            href="signup.html"
+                            href="/signup"
                             className="text-primary fw-bold"
                           >
                             Sign Up Now
@@ -221,8 +221,7 @@ function Login() {
                         onFailure={handleGitHubLoginError}
                       />
                     </div>
-                <p>Dont have account? <a href="instructor" className="text-primary fw-bold">Sign Up Instructor//</a> <a href="student" className="text-primary fw-bold">//Sign Up Student</a> </p>
-              </div>
+                 </div>
                   </div>
                 </div>
               </div>

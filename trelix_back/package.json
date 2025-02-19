@@ -6,7 +6,9 @@
     "dev": "nodemon ./bin/www"
   },
   "dependencies": {
+
     "axios": "^1.7.9",
+
     "bcrypt": "^5.1.1",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "~1.4.4",
@@ -28,7 +30,11 @@
     "pdf-parse": "^1.1.1",
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0",
+
+    "yup": "^1.6.1",
+
     "trelix-back": "file:"
+
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

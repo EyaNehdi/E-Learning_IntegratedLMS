@@ -12,6 +12,8 @@ const multer = require('multer');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mfaRoutes = require('./routes/mfaRoutes');
+const profileRoutes = require("./routes/profileRoutes");
+
 var app = express();
 require('dotenv').config();
 console.log("MONGO_URI:", process.env.MONGO_URI);  // Debug
@@ -45,6 +47,7 @@ app.use('/api/auth', authRoutes);
 app.use('/ia/auth', authRoutesIA);
 
 app.use("/signup/mfa", mfaRoutes);
+app.use("/api/info", profileRoutes);
 
 app.use((err, req, res, next) => {
   console.error('Upload Error:', err.message);
