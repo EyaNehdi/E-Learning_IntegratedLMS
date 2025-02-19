@@ -9,6 +9,8 @@ import ForgetPassword from './components/ForgetPassword';
 import Dashboard from './components/Admin/Dashboard';
 
 import Preloader from "./components/Preloader/Preloader";
+import CV from "./pages/cv";
+
 
 function App() {
   return (
@@ -19,7 +21,7 @@ function App() {
         <Route path="/instructor" element={<SignupInstructor />} />
         <Route path="/student" element={<SignupStudent />} />
         <Route path="/forget" element={<ForgetPassword />} />
-        
+        <Route path="/CV" element={<CV />} />
         <Route path="/Dashboard" element={<Dashboard/>} />
       </Routes>
     </Router>
