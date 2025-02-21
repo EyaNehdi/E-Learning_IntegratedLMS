@@ -13,6 +13,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mfaRoutes = require('./routes/mfaRoutes');
 const profileRoutes = require("./routes/profileRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 var app = express();
 require('dotenv').config();
@@ -48,6 +49,7 @@ app.use('/ia/auth', authRoutesIA);
 
 app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((err, req, res, next) => {
   console.error('Upload Error:', err.message);
