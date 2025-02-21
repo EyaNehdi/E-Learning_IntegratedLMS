@@ -11,7 +11,7 @@ function Profile() {
   <meta name="description" content="An ideal tempalte for online education, e-Learning, Course School, Online School, Kindergarten, Classic LMS, University, Language Academy, Coaching, Online Course, Single Course, and Course marketplace." />
   <meta name="keywords" content="bootstrap 5, online course, education, creative, gulp, business, minimal, modern, course, one page, responsive, saas, e-Learning, seo, startup, html5, site template" />
   <meta name="author" content="theme-village" />
-  <title>Eduxo - Online Courses and Education HTML5 Template</title>
+  <title>Trelix</title>
   <link rel="apple-touch-icon" href="images/favicon.png" />
   <link rel="shortcut icon" href="images/favicon.ico" />
   <link rel="stylesheet" href="css/feather.css" />
