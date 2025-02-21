@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
-import { useAuthStore } from "../store/authStore";
+import { useState, useEffect, useRef } from "react";
+import { useAuthStore } from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
-import Preloader from "./Preloader/Preloader";
-import { GoogleLogin } from '@react-oauth/google';
-import GitHubLogin from 'react-github-login';
-import { jwtDecode } from 'jwt-decode';
-import axios from 'axios';
-
+import Preloader from "../../components/Preloader/Preloader";
+import { GoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
+import GitHubLogin from "react-github-login";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -16,7 +15,7 @@ function Login() {
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const navigate = useNavigate();
   const { logingoogle, login, isAuthenticated, checkAuth } = useAuthStore();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Effect to check authentication only once on mount
   useEffect(() => {
@@ -51,14 +50,10 @@ function Login() {
 
   const handleStayLogged = () => {
     setStayLoggedIn(!stayLoggedIn);
-  }
-
-
+  };
 
   const handleLoginWithGoogle = async (response) => {
-    
-    
-    const decoded = jwtDecode(response.credential); 
+    const decoded = jwtDecode(response.credential);
     setLoading(true);
     try {
       await logingoogle(decoded.email, stayLoggedIn);
@@ -80,27 +75,51 @@ function Login() {
   }, [isAuthenticated, navigate]);
 
   const handleGoogleLoginError = () => {
-    setError('Google login failed.');
+    setError("Google login failed.");
   };
+
   const handleGitHubLoginError = () => {
-    setError('GitHub login failed.');
+    setError("GitHub login failed.");
   };
+
   const handleGitHubLoginSuccess = async (response) => {
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/loginGit', {
-          code: response.code,
+      const res = await axios.post("http://localhost:5000/api/auth/loginGit", {
+        code: response.code,
       });
 
       if (res.data?.email) {
         await logingoogle(res.data.email, stayLoggedIn);
         setLoading(false);
       }
-  } catch (err) {
-    setLoading(false);
-      setError('GitHub signup failed. Please try again.');
+    } catch (err) {
+      setLoading(false);
+      setError("GitHub signup failed. Please try again.");
       console.error(err);
-  }
+    }
   };
+
+  const [enableGoogleLogin, setEnableGoogleLogin] = useState(false);
+  useGoogleOneTapLogin({
+    onSuccess: handleLoginWithGoogle,
+    onError: handleGoogleLoginError,
+    disabled: !enableGoogleLogin,
+  });
+
+  const triggerGoogleLogin = () => {
+    setEnableGoogleLogin(true);
+  };
+
+  const githubRef = useRef(null);
+  const triggerGitHubLogin = () => {
+    if (githubRef.current) {
+      const githubButton = githubRef.current.querySelector("button");
+      if (githubButton) {
+        githubButton.click();
+      }
+    }
+  };
+
   return (
     <>
       {isLoading ? (
@@ -186,13 +205,10 @@ function Login() {
                         <div className="alter overly">
                           <p>OR</p>
                         </div>
-                        
+
                         <p>
                           Don&apos;t have account?{" "}
-                          <a
-                            href="/signup"
-                            className="text-primary fw-bold"
-                          >
+                          <a href="/signup" className="text-primary fw-bold">
                             Sign Up Now
                           </a>
                         </p>
@@ -201,31 +217,42 @@ function Login() {
                         <div className="error-message">{errorMessage}</div>
                       )}
                     </form>
-                    <div className="alter overly"><p>OR</p>
-                <div className="google-login">
-                  <GoogleLogin
-                    onSuccess={handleLoginWithGoogle}
-                    onError={handleGoogleLoginError}
-                    theme="outline"
-                    size="large"
-                    shape="rectangular"
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                  {error && <p className="text-red-500 mt-2">{error}</p>}
-                </div>
-                <div className="github-login">
-                      <GitHubLogin
-                        clientId="Ov23liQcQlFtxrCS9Hkz"
-                        redirectUri="http://localhost:5173/login/student"
-                        onSuccess={handleGitHubLoginSuccess}
-                        onFailure={handleGitHubLoginError}
-                      />
+                    <div className="alter overly">
+                      <p>OR</p>
+                      <div className="container d-flex justify-content-center align-items-center custom-gap">
+                        <div className="">
+                          <img
+                            src="/assets/icons/google.png"
+                            alt="Google"
+                            width="24"
+                            height="24"
+                            onClick={triggerGoogleLogin}
+                            style={{ cursor: "pointer" }}
+                          />
+                        </div>
+                        <div className="">
+                          <img
+                            src="/assets/icons/github.png"
+                            alt="GitHub"
+                            width="24"
+                            height="24"
+                            onClick={triggerGitHubLogin}
+                            style={{ cursor: "pointer" }}
+                          />
+                        </div>
+                        <div className="d-none" ref={githubRef}>
+                          <GitHubLogin
+                            clientId="Ov23liQcQlFtxrCS9Hkz"
+                            redirectUri="http://localhost:5173/login/student"
+                            onSuccess={handleGitHubLoginSuccess}
+                            onFailure={handleGitHubLoginError}
+                          />
+                        </div>
+                      </div>
                     </div>
-                 </div>
                   </div>
                 </div>
               </div>
-             
             </div>
           </section>
         </div>
