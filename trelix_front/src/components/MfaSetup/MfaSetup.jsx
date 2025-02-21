@@ -116,16 +116,19 @@ const MfaSetup = () => {
   };
 
   const downloadBackupCodes = () => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    const filename = `backup_codes_Trelix_${formattedDate}.txt`;
     const element = document.createElement("a");
     const file = new Blob([backupCodes.join("\n")], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
-    element.download = "backup_codes.txt";
+    element.download = filename;
     document.body.appendChild(element);
     element.click();
   };
   return (
     <>
-      <div className="signup-form">
+      <div className="signup-form m-0">
         <span className="badge-lg bg-primary rounded-5">MFA Setup</span>
 
         {!mfaEnabled && (
@@ -154,32 +157,36 @@ const MfaSetup = () => {
           </>
         )}
 
-        {qrCodeUrl && (!backupCodes || backupCodes.length === 0) && (
-          <>
-            <p
-              style={{
-                fontSize: "1.2rem",
-                fontWeight: "bold",
-                opacity: "0.8",
-              }}
-            >
-              Scan the QR code from your authenticator app and then input the 6
-              digit verification code generated from the app.
-            </p>
-            <p style={{ fontSize: "0.9rem", opacity: "0.6" }}>
-              Examples of apps you can use are Google Authenticator (Android /
-              iOS) or Microsoft Authenticator (Android / iOS)
-            </p>
-            <div>
-              <h3 style={{ fontSize: "1.1rem", opacity: "0.8" }}>QR Code :</h3>
-              <img
-                src={qrCodeUrl}
-                alt="QR Code"
-                style={{ maxWidth: "100%", height: "auto" }}
-              />
-            </div>
-          </>
-        )}
+        {qrCodeUrl &&
+          (!backupCodes || backupCodes.length === 0) &&
+          !success && (
+            <>
+              <p
+                style={{
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                  opacity: "0.8",
+                }}
+              >
+                Scan the QR code from your authenticator app and then input the
+                6 digit verification code generated from the app.
+              </p>
+              <p style={{ fontSize: "0.9rem", opacity: "0.6" }}>
+                Examples of apps you can use are Google Authenticator (Android /
+                iOS) or Microsoft Authenticator (Android / iOS)
+              </p>
+              <div>
+                <h3 style={{ fontSize: "1.1rem", opacity: "0.8" }}>
+                  QR Code :
+                </h3>
+                <img
+                  src={qrCodeUrl}
+                  alt="QR Code"
+                  style={{ maxWidth: "100%", height: "auto" }}
+                />
+              </div>
+            </>
+          )}
 
         {qrCodeUrl &&
           !success &&
@@ -229,6 +236,25 @@ const MfaSetup = () => {
 
         {success && (!backupCodes || backupCodes.length === 0) && (
           <>
+            <div>
+              <p
+                style={{
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                  opacity: "0.8",
+                }}
+              >
+                Now that Multi-Factor Authentication (MFA) is enabled, here are
+                your backup codes. These one-time-use codes can be used to
+                access your account if you lose access to your authenticator
+                app. Save them in a secure place.
+              </p>
+              <p style={{ fontSize: "0.9rem", opacity: "0.6" }}>
+                You can copy these codes to your clipboard or save them as a
+                text file for safe keeping. Make sure to store them in a secure
+                location, such as a password manager or a safe.
+              </p>
+            </div>
             <Button
               variant="contained"
               sx={{ m: "5px" }}
