@@ -10,6 +10,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mfaRoutes = require('./routes/mfaRoutes');
 const profileRoutes = require("./routes/profileRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 var app = express();
 require('dotenv').config();
@@ -42,6 +43,7 @@ const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 
