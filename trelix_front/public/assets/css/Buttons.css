@@ -1,0 +1,23 @@
+.button-container {
+                      display: flex;
+                      justify-content: flex-end;
+                      width: 100%;
+                      padding: 10px;
+                  }
+                  
+                  .button-container .btn {
+                      text-decoration: none;
+                      padding: 10px 20px;
+                      border-radius: 25px;
+                      color: white;
+                      background-color: #007bff;
+                      margin-left: 10px;
+                      border: none;
+                      box-shadow: none;
+                  }
+                  
+                  .button-container .btn:hover {
+                      background-color: #0056b3;
+                  }
+                
+                  
