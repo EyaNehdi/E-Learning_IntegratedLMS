@@ -12,6 +12,9 @@ import Switch from "./components/Switch";
 import SignUpPage from "./pages/SignUpPage";
 
 import Preloader from "./components/Preloader/Preloader";
+
+import Statistic from "./components/Admin/Statistic";
+
 import CV from "./pages/cv";
 
 
@@ -33,6 +36,8 @@ function App() {
         
 
         <Route path="/Dashboard" element={<Dashboard/>} />
+
+        <Route path="stat" element={<Statistic/>} />
       </Routes>
     </Router>
   );
