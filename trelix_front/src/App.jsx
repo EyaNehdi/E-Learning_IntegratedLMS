@@ -12,7 +12,11 @@ import Switch from "./components/Switch";
 import SignUpPage from "./pages/SignUpPage";
 
 import Preloader from "./components/Preloader/Preloader";
+
 import Statistic from "./components/Admin/Statistic";
+
+import CV from "./pages/cv";
+
 
 function App() {
   return (
@@ -23,10 +27,14 @@ function App() {
         <Route path="/instructor" element={<SignupInstructor />} />
         <Route path="/student" element={<SignupStudent />} />
         <Route path="/forget" element={<ForgetPassword />} />
+
+        <Route path="/CV" element={<CV />} />
+
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/Switch" element={<Switch />} />
         
+
         <Route path="/Dashboard" element={<Dashboard/>} />
 
         <Route path="stat" element={<Statistic/>} />
