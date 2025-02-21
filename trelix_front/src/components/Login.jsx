@@ -213,13 +213,15 @@ function Login() {
                   />
                   {error && <p className="text-red-500 mt-2">{error}</p>}
                 </div>
-                <div className="github-login">
+                <div className="">
+                <a className="btn w-100" style={{ backgroundColor: '#007bff', border: '1px solid #ddd', color: '#333', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px', textDecoration: 'none', fontWeight: 'bold', marginBottom: '10px', cursor: 'pointer' }}>
                       <GitHubLogin
                         clientId="Ov23liQcQlFtxrCS9Hkz"
                         redirectUri="http://localhost:5173/login/student"
                         onSuccess={handleGitHubLoginSuccess}
                         onFailure={handleGitHubLoginError}
                       />
+                      </a>
                     </div>
                  </div>
                   </div>

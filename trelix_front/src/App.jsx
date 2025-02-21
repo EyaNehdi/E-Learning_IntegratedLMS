@@ -12,6 +12,7 @@ import Switch from "./components/Switch";
 import SignUpPage from "./pages/SignUpPage";
 
 import Preloader from "./components/Preloader/Preloader";
+import Statistic from "./components/Admin/Statistic";
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
         <Route path="/Switch" element={<Switch />} />
         
         <Route path="/Dashboard" element={<Dashboard/>} />
+
+        <Route path="stat" element={<Statistic/>} />
       </Routes>
     </Router>
   );
