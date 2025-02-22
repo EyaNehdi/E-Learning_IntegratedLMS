@@ -6,14 +6,16 @@ import SignupInstructor from './components/Instructor/Signup';
 import SignupStudent from './components/Student/Signup';
 import Index from './components/index';
 import ForgetPassword from './components/ForgetPassword';
-import Dashboard from './components/Admin/Dashboard';
 import Profile from "./components/Profile";
 import Switch from "./components/Switch";
 import SignUpPage from "./pages/SignUpPage";
 
 import Preloader from "./components/Preloader/Preloader";
-import Statistic from "./components/Admin/Statistic";
-
+import Admin from './components/Admin/Admin';
+import Review from './components/Admin/Review';
+import Leave from './components/Admin/Leave';
+import Manage from './components/Admin/Manage';
+import Reports from './components/Admin/Reports';
 function App() {
   return (
     <Router>
@@ -26,10 +28,12 @@ function App() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/Switch" element={<Switch />} />
+        <Route path="/Review" element={<Review />} />
+        <Route path="/leave" element={<Leave />} />
+        <Route path="/manage" element={<Manage />} />
+        <Route path="/report" element={<Reports />} />
         
-        <Route path="/Dashboard" element={<Dashboard/>} />
 
-        <Route path="stat" element={<Statistic/>} />
       </Routes>
     </Router>
   );
