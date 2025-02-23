@@ -22,6 +22,7 @@ import Statistic from "./components/Admin/Statistic";
 import CV from "./pages/cv";
 
 
+import NotFound from "./components/Notfound";
 function App() {
   return (
     <Router>
@@ -35,9 +36,13 @@ function App() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/Review" element={<Review />} />
+        <Route path="/admin" element={<Review />} />
         <Route path="/leave" element={<Leave />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/report" element={<Reports />} />
+
+
+        <Route path="*" element={<NotFound />} />
         
 
 

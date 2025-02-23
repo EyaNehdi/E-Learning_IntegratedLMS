@@ -14,6 +14,23 @@ function Manage(){
   <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
 
 
+ <div>
+  {/* Bootstrap CSS */}
+  <link rel="stylesheet" href="assetss/css/bootstrap.min.css" />
+  {/* Linearicon Font */}
+  <link rel="stylesheet" href="assetss/css/lnr-icon.css" />
+  {/* Fontawesome CSS */}
+  <link rel="stylesheet" href="assetss/css/font-awesome.min.css" />
+  {/* Custom CSS */}
+  <link rel="stylesheet" href="assetss/css/style.css" />
+  <div>
+    <link rel="stylesheet" href="assetss/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assetss/css/lnr-icon.css" />
+    <link rel="stylesheet" href="assetss/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="assetss/css/style.css" />
+  </div>
+</div>
+
 
     <Headeradmin/>
 
