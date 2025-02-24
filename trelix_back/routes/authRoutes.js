@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { registerStudent, registerInstructor, checkAuth, signIn,signOut,verifyEmail,forgotPassword,resetPassword,registerInstructorgoogle,registerInstructorgithub,registerStudentgithub,registerStudentgoogle, signIngoogle, signIngithub } = require('../controllers/authController');
+const { registerStudent,
+     registerInstructor,
+      checkAuth,
+       signIn,signOut,verifyEmail,forgotPassword,resetPassword,registerInstructorgoogle,registerInstructorgithub,registerStudentgithub,registerStudentgoogle, signIngoogle, signIngithub , registerLinkedIn} = require('../controllers/authController');
 const { verifyToken } = require ('../middlewares/verifyToken.js');
 const { validateInput } = require ('../middlewares/validators.js');
 
@@ -15,7 +18,7 @@ router.post('/register/github', registerInstructorgithub);
 router.post('/register/githubStudent', registerStudentgithub);
 router.post('/register/googleStudent', registerStudentgoogle);
 
-
+router.post("/register/linkedin", registerLinkedIn);
 router.post("/login", signIn);
 router.post("/logingoogle", signIngoogle);
 router.post("/loginGit", signIngithub);
