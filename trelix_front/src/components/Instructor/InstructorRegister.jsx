@@ -38,6 +38,7 @@ const InstructorRegister = ({setisRegisterSuccess}) => {
         firstName: decoded.given_name,
         lastName: decoded.family_name,
         email: decoded.email,
+        image: decoded.picture,
         role: "instructor", // Default role for Google sign-up
       };
 

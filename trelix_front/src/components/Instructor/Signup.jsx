@@ -38,9 +38,10 @@ function Signup() {
         firstName: decoded.given_name,
         lastName: decoded.family_name,
         email: decoded.email,
+        image: decoded.picture,
         role: 'instructor',  // Default role for Google sign-up
       };
-  
+  console.log("googleUserData",googleUserData);
       // Send Google user data to the backend for registration
       const res = await axios.post('http://localhost:5173/api/auth/register/google', googleUserData, {
         withCredentials: true,
