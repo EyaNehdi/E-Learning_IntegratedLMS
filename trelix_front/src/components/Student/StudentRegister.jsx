@@ -7,13 +7,19 @@ import GitHubLogin from "react-github-login";
 import MicrosoftLogin from "react-microsoft-login";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import PasswordStrengthMeter from "../PasswordStrengthMeter";
 import { motion } from "framer-motion";
+import { useLinkedIn, LinkedIn } from 'react-linkedin-login-oauth2';
+// You can use provided image shipped by this package or using your own
+import linkedin from 'react-linkedin-login-oauth2/assets/linkedin.png';
 
 const StudentRegister = ({ setisRegisterSuccess }) => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRegisterSuccess, setIsRegisterSuccess] = useState(false); 
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -21,6 +27,61 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
     password: "",
     role: "instructor",
   });
+  const handleLinkedInError = (error) => {
+    if (error.error === 'user_closed_popup') {
+      console.warn("User closed the popup. Please try again.");
+      alert("It seems you closed the login popup. Please try again.");
+    } else {
+      console.error("LinkedIn Authentication Error:", error);
+      alert("An error occurred during LinkedIn authentication. Please try again.");
+    }
+  };
+  const { linkedInLogin } = useLinkedIn({
+    clientId: "86un9qr2kersxv",
+    redirectUri: "http://localhost:5173/linkedin/callback",
+    scope: "openid profile w_member_social email",
+    onSuccess: async (code, state) => {
+        console.log("LinkedIn code:", code);
+        setIsLoading(true); // Start loading
+
+        try {
+            const response = await axios.post(
+                "http://localhost:5000/api/auth/register/linkedin",
+                { code }
+            );
+
+            if (response.data.token) {
+                localStorage.setItem("token", response.data.token);
+                setIsRegisterSuccess(true);
+                setisRegisterSuccess(true);
+            } else {
+                throw new Error("No token received from backend");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            // Simulate a 5-second wait
+            setTimeout(() => {
+                setIsLoading(false); // Stop loading
+            }, 5000);
+        }
+    },
+    onError: (error) => {
+        console.error("LinkedIn Error:", error);
+    },
+});
+
+// Example of how to test with the provided code (replace the below line in the appropriate context)
+
+  
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const code = queryParams.get("code");
+  
+    if (code) {
+      linkedInLogin.onSuccess(code); // Ensure this is correctly called
+    }
+  }, [location]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -29,11 +90,13 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
     console.log(response);
     try {
       const decoded = jwtDecode(response.credential); // Decode JWT token from Google
+      // Decode JWT token from Google
       const googleUserData = {
         firstName: decoded.given_name,
         lastName: decoded.family_name,
         email: decoded.email,
-        role: "Student",
+        image: decoded.picture,
+        role: 'Student',  // Default role for Google sign-up
       };
       // Send Google user data to the backend for registration
       const res = await axios.post(
@@ -50,6 +113,11 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
       setError("Google signup failed. Please try again.");
       console.error(err);
     }
+  };
+
+
+  const handleGoogleLoginFailure = () => {
+    console.error("Google login failed");
   };
 
   // Handle Google login error
@@ -417,6 +485,11 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
               Login Now
             </a>
           </p>
+        </div>
+        <div>
+            <button onClick={linkedInLogin}>Login with LinkedIn</button>
+            {isLoading && <div>Loading... Please wait.</div>} {/* Show loading message */}
+            {isRegisterSuccess && <div>Registration Successful!</div>}
         </div>
       </div>
     </>
