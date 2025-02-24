@@ -1,14 +1,14 @@
-import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
 import GitHubLogin from "react-github-login";
 import MicrosoftLogin from "react-microsoft-login";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { motion } from "framer-motion";
 import PasswordStrengthMeter from "../PasswordStrengthMeter";
-const InstructorRegister = ({setisRegisterSuccess}) => {
+const InstructorRegister = ({ setisRegisterSuccess }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
@@ -59,10 +59,6 @@ const InstructorRegister = ({setisRegisterSuccess}) => {
       setError("Google signup failed. Please try again.");
       console.error(err);
     }
-  };
-
-  const handleGoogleLoginFailure = () => {
-    console.error("Google login failed");
   };
 
   // Handle Google login error
@@ -263,9 +259,29 @@ const InstructorRegister = ({setisRegisterSuccess}) => {
     }
   }, [isAuthenticated, navigate]);
 
+  const githubRef = useRef(null);
+  const triggerGitHubLogin = () => {
+    if (githubRef.current) {
+      const githubButton = githubRef.current.querySelector("button");
+      if (githubButton) {
+        githubButton.click();
+      }
+    }
+  };
+  const [enableGoogleLogin, setEnableGoogleLogin] = useState(false);
+  useGoogleOneTapLogin({
+    onSuccess: handleGoogleLoginSuccess,
+    onError: handleGoogleLoginError,
+    disabled: !enableGoogleLogin,
+  });
+
+  const triggerGoogleLogin = () => {
+    setEnableGoogleLogin(true);
+  };
+
   return (
     <>
-      <div className="signup-form">
+      <div className="signup-form m-0">
         <h1 className="display-3 text-center mb-5">Let’s Sign Up Instructor</h1>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
@@ -357,27 +373,45 @@ const InstructorRegister = ({setisRegisterSuccess}) => {
           >
             {loading ? "Registering..." : "Sign Up as Instructor"}
           </button>
-          <div className="form-footer mt-4 text-center">
-            <div className="alter overly">
-              <p>OR</p>
-            </div>
-            <div className="google-login">
-              <GoogleLogin
-                onSuccess={handleGoogleLoginSuccess}
-                onError={handleGoogleLoginError}
+        </form>
+        <div className="form-footer mt-4 text-center">
+          <div className="alter overly">
+            <p>OR</p>
+          </div>
+          {/* Other Logins Icons */}
+          <div className="container d-flex justify-content-center align-items-center custom-gap">
+            {/* Google Login */}
+            <div className="">
+              <img
+                src="/assets/icons/google.png"
+                alt="Google"
+                width="24"
+                height="24"
+                onClick={triggerGoogleLogin}
+                style={{ cursor: "pointer" }}
               />
-              {error && <p className="text-red-500 mt-2">{error}</p>}
             </div>
 
-            <div className="microsoft-login">
+            {/* Microsoft Login */}
+            <div className="">
               <MicrosoftLogin
                 clientId="0081ceb9-215c-491a-aaab-e478787be7e8"
                 redirectUri="http://localhost:5173/login/student"
                 onSuccess={handleMicrosoftLoginSuccess}
                 onFailure={handleMicrosoftLoginError}
-              />
+              >
+                <img
+                  src="/assets/icons/microsoft.png"
+                  alt="Microsoft"
+                  width="24"
+                  height="24"
+                  style={{ cursor: "pointer" }}
+                />
+              </MicrosoftLogin>
             </div>
-            <div className="github-login">
+
+            {/* GitHub Login */}
+            <div className="d-none" ref={githubRef}>
               <GitHubLogin
                 clientId="Ov23liQcQlFtxrCS9Hkz"
                 redirectUri="http://localhost:5173/login/student"
@@ -385,15 +419,25 @@ const InstructorRegister = ({setisRegisterSuccess}) => {
                 onFailure={handleGitHubLoginError}
               />
             </div>
-
-            <p>
-              Already have an account?{" "}
-              <a href="login.html" className="text-primary fw-bold">
-                Login Now
-              </a>
-            </p>
+            <div className="">
+              <img
+                src="/assets/icons/github.png"
+                alt="GitHub"
+                width="24"
+                height="24"
+                onClick={triggerGitHubLogin}
+                style={{ cursor: "pointer" }}
+              />
+            </div>
           </div>
-        </form>
+
+          <p>
+            Already have an account?{" "}
+            <a href="/login" className="text-primary fw-bold">
+              Login Now
+            </a>
+          </p>
+        </div>
       </div>
     </>
   );

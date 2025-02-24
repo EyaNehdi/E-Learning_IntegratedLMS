@@ -1,10 +1,14 @@
-import { GoogleLogin } from "@react-oauth/google";
+import {
+  GoogleLogin,
+  useGoogleLogin,
+  useGoogleOneTapLogin,
+} from "@react-oauth/google";
 import GitHubLogin from "react-github-login";
 import MicrosoftLogin from "react-microsoft-login";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import { useNavigate , useLocation} from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useNavigate , useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import PasswordStrengthMeter from "../PasswordStrengthMeter";
 import { motion } from "framer-motion";
 import { useLinkedIn, LinkedIn } from 'react-linkedin-login-oauth2';
@@ -82,6 +86,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleLoginSuccess = async (response) => {
+    console.log("****console.log(response);****");
     console.log(response);
     try {
       const decoded = jwtDecode(response.credential); // Decode JWT token from Google
@@ -302,9 +307,29 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
     setError("Microsoft login failed.");
   };
 
+  const githubRef = useRef(null);
+  const triggerGitHubLogin = () => {
+    if (githubRef.current) {
+      const githubButton = githubRef.current.querySelector("button");
+      if (githubButton) {
+        githubButton.click();
+      }
+    }
+  };
+  const [enableGoogleLogin, setEnableGoogleLogin] = useState(false);
+  useGoogleOneTapLogin({
+    onSuccess: handleGoogleLoginSuccess,
+    onError: handleGoogleLoginError,
+    disabled: !enableGoogleLogin
+  });
+
+  const triggerGoogleLogin = () => {
+    setEnableGoogleLogin(true);
+  };
+
   return (
     <>
-      <div className="signup-form">
+      <div className="signup-form m-0">
         <h1 className="display-3 text-center mb-5">Let’s Sign Up Student</h1>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
@@ -399,39 +424,67 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
           >
             {loading ? "Registering..." : "Sign Up as Student"}
           </button>
-          <div className="form-footer mt-4 text-center">
-            <div className="alter overly">
-              <p>OR</p>
+        </form>
+        <div className="form-footer mt-4 text-center">
+          <div className="alter overly">
+            <p>OR</p>
+          </div>
+          {/* Other Logins Icons */}
+          <div className="container d-flex justify-content-center align-items-center custom-gap">
+            {/* Google Login */}
+
+            <div className="">
+              <img
+                src="/assets/icons/google.png"
+                alt="Google"
+                width="24"
+                height="24"
+                onClick={triggerGoogleLogin}
+                style={{ cursor: "pointer" }}
+              />
+            </div>
+
+            <div className="">
+              <MicrosoftLogin
+                clientId="0081ceb9-215c-491a-aaab-e478787be7e8"
+                redirectUri="http://localhost:5173/login/student"
+                onSuccess={handleMicrosoftLoginSuccess}
+                onFailure={handleMicrosoftLoginError}
+              >
+                <img
+                  src="/assets/icons/microsoft.png"
+                  alt="Microsoft"
+                  width="24"
+                  height="24"
+                  style={{ cursor: "pointer" }}
+                />
+              </MicrosoftLogin>
+            </div>
+            <div className="d-none" ref={githubRef}>
+              <GitHubLogin
+                clientId="Ov23liQcQlFtxrCS9Hkz"
+                redirectUri="http://localhost:5173/login/student"
+                onSuccess={handleGitHubLoginSuccess}
+                onFailure={handleGitHubLoginError}
+              />
+            </div>
+            <div className="">
+              <img
+                src="/assets/icons/github.png"
+                alt="GitHub"
+                width="24"
+                height="24"
+                onClick={triggerGitHubLogin}
+                style={{ cursor: "pointer" }}
+              />
             </div>
           </div>
-        </form>
-        <div className="google-login">
-          <GoogleLogin
-            onSuccess={handleGoogleLoginSuccess}
-            onError={handleGoogleLoginError}
-            theme="outline"
-            size="large"
-            shape="rectangular"
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          />
-          {error && <p className="text-red-500 mt-2">{error}</p>}
-        </div>
-
-        <div className="microsoft-login">
-          <MicrosoftLogin
-            clientId="0081ceb9-215c-491a-aaab-e478787be7e8"
-            redirectUri="http://localhost:5173/login/student"
-            onSuccess={handleMicrosoftLoginSuccess}
-            onFailure={handleMicrosoftLoginError}
-          />
-        </div>
-        <div className="github-login">
-          <GitHubLogin
-            clientId="Ov23liQcQlFtxrCS9Hkz"
-            redirectUri="http://localhost:5173/login/student"
-            onSuccess={handleGitHubLoginSuccess}
-            onFailure={handleGitHubLoginError}
-          />
+          <p>
+            Already have an account?{" "}
+            <a href="/login" className="text-primary fw-bold">
+              Login Now
+            </a>
+          </p>
         </div>
         <div>
             <button onClick={linkedInLogin}>Login with LinkedIn</button>
