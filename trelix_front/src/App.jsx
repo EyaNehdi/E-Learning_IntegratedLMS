@@ -32,7 +32,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/Review" element={<Review />} />
         <Route path="/admin" element={<Review />} />
-        <Route path="/leave" element={<Leave />} />
+        <Route path="/leave" element={<Leave />} /> {/* Add User Route */}
+        <Route path="/leave/:id" element={<Leave />} /> {/* Edit User Route */}
         <Route path="/manage" element={<Manage />} />
         <Route path="/report" element={<Reports />} />
 
