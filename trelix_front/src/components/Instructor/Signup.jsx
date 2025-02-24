@@ -5,9 +5,10 @@ import MicrosoftLogin from 'react-microsoft-login';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import PasswordStrengthMeter from '../PasswordStrengthMeter';
+import { useState,useEffect } from 'react';
+import { useAuthStore } from "../../store/authStore";
 import { motion } from "framer-motion";
+import PasswordStrengthMeter from '../PasswordStrengthMeter';
 function Signup() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -15,54 +16,64 @@ function Signup() {
     lastName: '',
     email: '',
     password: '',
-    role: 'instructor'
-  });
+    role: 'instructor'});
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const {  isAuthenticated, checkAuth } = useAuthStore();
   useEffect(() => {
-    if (user) {
-      setEditableUser({ ...user });
+    console.log("🟢 isAuthenticated state:", isAuthenticated);
+    if (isAuthenticated) {
+      navigate("/");
     }
-  }, [user]);
-
-  const handleEdit = async (field) => {
-    const newValue = prompt(`Enter new ${field}:`, editableUser[field]);
-    if (newValue !== null) {
-      const updatedUser = { ...editableUser, [field]: newValue };
-      setEditableUser(updatedUser);
-
-      // Make API call to update the user's information in the backend using axios
-      try {
-        const res = await axios.post('/api/user/update', updatedUser, {
-          withCredentials: true, // Include credentials if needed
-        });
-
-        if (res.data) {
-          setEditableUser(res.data); // Update the local state with the new user data
-        }
-      } catch (error) {
-        console.error("Error updating user:", error);
+  }, [isAuthenticated, navigate]);
+  useEffect(() => {
+    console.log("🟢 Checking authentication on mount...");
+    checkAuth();
+  }, [checkAuth]);
+  
+  const handleGoogleLoginSuccess = async (response) => {
+    try {
+      const decoded = jwtDecode(response.credential);  // Decode JWT token from Google
+      const googleUserData = {
+        firstName: decoded.given_name,
+        lastName: decoded.family_name,
+        email: decoded.email,
+        image: decoded.picture,
+        role: 'instructor',  // Default role for Google sign-up
+      };
+  console.log("googleUserData",googleUserData);
+      // Send Google user data to the backend for registration
+      const res = await axios.post('http://localhost:5173/api/auth/register/google', googleUserData, {
+        withCredentials: true,
+      });
+  
+      if (res.data) {
+        navigate('/');  // Redirect after successful signup
       }
+      setLoading(false);
+    } catch (err) {
+      setError('Google signup failed. Please try again.');
+      console.error(err);
     }
   };
 
   const handleGoogleLoginFailure = () => {
     console.error("Google login failed");
   };
-
+  
   // Handle Google login error
   const handleGoogleLoginError = () => {
     setError('Google login failed.');
   };
-
+  
   // Handle GitHub login success
   const handleGitHubLoginSuccess = async (response) => {
     try {
       // Send the authorization code to the backend
-      const res = await axios.post('http://localhost:5173/api/auth/register/githubStudent', {
+      const res = await axios.post('http://localhost:5173/api/auth/register/github', {
         code: response.code,
       });
-
+  
       if (res.data) {
         navigate('/');  // Redirect after successful signup
       }
@@ -71,32 +82,32 @@ function Signup() {
       console.error(err);
     }
   };
-
+  
   // Handle GitHub login error
   const handleGitHubLoginError = () => {
     setError('GitHub login failed.');
   };
-
+  
   // Handle Microsoft login success
   const handleMicrosoftLoginSuccess = async (response) => {
     setLoading(true);
     setError('');
-
+  
     try {
       const responseData = await axios.post(
         '/api/auth/register/instructor',
         { token: response.authentication.accessToken },
         { withCredentials: true }
       );
-
+  
       if (responseData.data) {
         navigate('/Home'); // Redirect after successful login
       }
     } catch (err) {
       setError(err.response?.data?.error || 'Microsoft login failed. Please try again.');
-
+    
   }};
- 
+
   const [errors,setErrors] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
   useEffect(() => {
@@ -114,29 +125,18 @@ function Signup() {
    //Controle de saisie 
    const validateForm = () => {
     const newErrors = {};
-  //firstname validation only letters
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "First name is required.";
-    } else if (!/^[A-Za-z]+$/.test(formData.firstName.trim())) {
-      newErrors.firstName = "First name must contain only letters (A-Z, a-z).";
-    } else if (formData.firstName.trim().length < 2) {
+  
+    if (formData.firstName.trim().length < 2) {
       newErrors.firstName = "First name must be at least 2 characters.";
     }
-  //lastname validation only letters
-  if (!formData.lastName.trim()) {
-    newErrors.lastName = "Last name is required.";
-  } else if (!/^[A-Za-z]+$/.test(formData.lastName.trim())) {
-    newErrors.lastName = "Last name must contain only letters (A-Z, a-z).";
-  } else if (formData.lastName.trim().length < 2) {
-    newErrors.lastName = "Last name must be at least 2 characters.";
-  }
   
-  // Email validation - must start with letter, only @ and . allowed as special chars
-  if (!formData.email) {
-    newErrors.email = "Email is required.";
-  } else if (!/^[A-Za-z][A-Za-z0-9]*@[A-Za-z0-9]+\.[A-Za-z]+$/.test(formData.email)) {
-    newErrors.email = "Email must start with a letter and can only contain '@' and '.' as special characters.";
-  }
+    if (formData.lastName.trim().length < 2) {
+      newErrors.lastName = "Last name must be at least 2 characters.";
+    }
+  
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email format.";
+    }
   
     if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters.";
@@ -171,37 +171,14 @@ function Signup() {
       // Field-specific validation
       switch (name) {
         case "firstName":
-          if (!value.trim()) {
-            newErrors.firstName = "First name is required.";
-          } else if (!/^[A-Za-z]+$/.test(value.trim())) {
-            newErrors.firstName = "First name must contain only letters (A-Z, a-z).";
-          } else if (value.trim().length < 2) {
-            newErrors.firstName = "First name must be at least 2 characters.";
-          } else {
-            newErrors.firstName = "";
-          }
+          newErrors.firstName = value.trim().length < 2 ? "First name must be at least 2 characters." : "";
           break;
         case "lastName":
-          if (!value.trim()) {
-            newErrors.lastName = "Last name is required.";
-          } else if (!/^[A-Za-z]+$/.test(value.trim())) {
-            newErrors.lastName = "Last name must contain only letters (A-Z, a-z).";
-          } else if (value.trim().length < 2) {
-            newErrors.lastName = "Last name must be at least 2 characters.";
-          } else {
-            newErrors.lastName = "";
-          }
+          newErrors.lastName = value.trim().length < 2 ? "Last name must be at least 2 characters." : "";
           break;
         case "email":
-          if (!value) {
-            newErrors.email = "Email is required.";
-          } else if (!/^[A-Za-z][A-Za-z0-9]*@[A-Za-z0-9]+\.[A-Za-z]+$/.test(value)) {
-            newErrors.email = "Email must start with a letter and can only contain '@' and '.' as special characters.";
-          } else {
-            newErrors.email = "";
-          }
+          newErrors.email = !/\S+@\S+\.\S+/.test(value) ? "Invalid email format." : "";
           break;
-  
         case "password":
           if (value.length < 6) {
             newErrors.password = "Password must be at least 6 characters.";
@@ -237,7 +214,7 @@ function Signup() {
 
     try {
       const response = await axios.post(
-        '/api/auth/register/student',
+        '/api/auth/register/instructor',
         formData,
         { withCredentials: true }
       );
@@ -254,7 +231,12 @@ function Signup() {
   const handleMicrosoftLoginError = () => {
     setError('Microsoft login failed.');
   };
- 
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
                       return (
 <div>
   {/* Mirrored from html.theme-village.com/eduxo/signup.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:26:40 GMT */}
@@ -278,22 +260,20 @@ function Signup() {
         </div>
         <div className="col-xl-7 col-md-7">
           <div className="signup-form">
-            <h1 className="display-3 text-center mb-5">Let’s Sign Up Student</h1>
+            <h1 className="display-3 text-center mb-5">Let’s Sign Up Instructor</h1>
             {error && <div className="error-message">{error}</div>}
             <form onSubmit={handleSubmit}>
               <div className="form-group position-relative">
                 <span><i className="feather-icon icon-user" /></span>
-
                 <input type="text" placeholder=" FirstName" name="firstName"
             value={formData.firstName}
             onChange={handleChange}
             className={`form-control ${errors.firstName ? "is-invalid" : ""}`}
-            required />
+             required />
              {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
               </div>
               <div className="form-group position-relative">
                 <span><i className="feather-icon icon-user" /></span>
-
                 <input type="text" placeholder=" LastName"  name="lastName"
             value={formData.lastName}
             onChange={handleChange}
@@ -303,7 +283,6 @@ function Signup() {
               </div>
               <div className="form-group position-relative">
                 <span><i className="feather-icon icon-mail" /></span>
-
                 <input type="email" placeholder=" Email" name="email"
             value={formData.email}
             onChange={handleChange}
@@ -313,7 +292,7 @@ function Signup() {
               </div>
               <div className="form-group position-relative">
                 <span><i className="feather-icon icon-lock" /></span>
-                <input type="password" placeholder="Password" name="password"
+                <input type="password" placeholder="Password"  name="password"
             value={formData.password}
             onChange={handleChange} required />
             
@@ -331,7 +310,7 @@ function Signup() {
               </div>
               </motion.div>
               {/*Password Strength meter ends*/}
-              <button disabled={!isFormValid || loading}
+              <button  disabled={!isFormValid || loading}
   className="btn btn-primary w-100" 
   style={{ 
     padding: "15px", // Augmente la hauteur du bouton
@@ -339,22 +318,16 @@ function Signup() {
     borderRadius: "8px" // Arrondi les bords
   }}
 >
-{loading ? 'Registering...' : 'Sign Up as Student'} 
+{loading ? 'Registering...' : 'Sign Up as Instructor'}
 </button>
               <div className="form-footer mt-4 text-center">
-                <div className="alter overly">
-                  <p>OR</p>
-                </div>
-              </div>
-            </form>
-            <div className="google-login">
+              <div className="alter overly">
+                      <p>OR</p>
+                    </div>
+                    <div className="google-login">
                       <GoogleLogin
                         onSuccess={handleGoogleLoginSuccess}
                         onError={handleGoogleLoginError}
-                        theme="outline"
-                        size="large"
-                        shape="rectangular"
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       />
                       {error && <p className="text-red-500 mt-2">{error}</p>}
                     </div>
@@ -373,18 +346,26 @@ function Signup() {
                         redirectUri="http://localhost:5173/login/student"
                         onSuccess={handleGitHubLoginSuccess}
                         onFailure={handleGitHubLoginError}
-                        
                       />
                     </div>
+
+                    <p>
+                      Already have an account?{' '}
+                      <a href="login.html" className="text-primary fw-bold">
+                        Login Now
+                      </a>
+                    </p>
+                    </div>
+            </form>
           </div>
         </div>
       </div>
     </div>
+    
   </section>
-</div>
-
+  </div>
   );
-
+  
 }
 
 export default Signup;
