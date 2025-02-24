@@ -12,7 +12,7 @@ import Review from './components/Admin/Review';
 import Leave from './components/Admin/Leave';
 import Manage from './components/Admin/Manage';
 import Reports from './components/Admin/Reports';
-
+import { LinkedInCallback } from 'react-linkedin-login-oauth2';
 import CV from "./pages/cv";
 
 
@@ -25,7 +25,9 @@ function App() {
         <Route path="/forget" element={<ForgetPassword />} />
 
         <Route path="/CV" element={<CV />} />
+        <Route path="/linkedin/callback" element={<LinkedInCallback />} />
 
+       
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/Review" element={<Review />} />
