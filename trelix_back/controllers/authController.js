@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 
 const crypto = require('crypto');
 
-
+const jwt = require('jsonwebtoken');
 
 const { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail } = require("../mailtrap/emails.js");
 
@@ -57,8 +57,74 @@ const register = async (req, res, role) => {
     res.status(500).json({ error: "Registration failed: " + err.message });
   }
 };
-const regestergoogle = async (req, res, role) => {
-  const { firstName, lastName, email, password } = req.body;
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const registerLinkedIn = async (req, res) => {
+  const client_id = process.env.LINKEDIN_CLIENT_ID;
+  const client_secret = process.env.LINKEDIN_CLIENT_SECRET;
+  const redirect_uri = process.env.LINKEDIN_REDIRECT_URI;
+  console.log("Delaying for 5 seconds...");
+      await delay(5000);
+
+  try {
+      const authCode = req.body.code;
+      // Exchange auth code for access token
+      
+      const response = await axios.post(
+          "https://www.linkedin.com/oauth/v2/accessToken",
+          null,
+          {
+              params: {
+                  grant_type: "authorization_code",
+                  code: authCode,
+                  redirect_uri,
+                  client_id,
+                  client_secret,
+              },
+              headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+              },
+          }
+      );
+
+      // Decode the id_token to get user details
+      const idToken = response.data.id_token;
+      const decodedToken = jwt.decode(idToken);
+
+      // Extract user information
+      const { email, given_name: firstName, family_name: lastName } = decodedToken;
+
+      // Check if user exists in your database or create a new one
+      let user = await User.findOne({ email });
+      if (!user) {
+        const randomPassword = crypto.randomBytes(16).toString('hex');
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+          user = new User({
+              email,
+              firstName,
+              lastName,
+              password: hashedPassword, 
+              role: 'student' // Add other fields as needed
+          });
+          await user.save();
+      }
+
+      // Generate your application's JWT
+      const appToken = jwt.sign(
+          { userId: user._id },
+          process.env.JWT_SECRET,
+          { expiresIn: '1h' }
+      );
+
+      // Send the token to the frontend
+      res.json({ token: appToken });
+
+  } catch (error) {
+      console.error("LinkedIn Token Error:", error.response?.data || error.message);
+      res.status(500).json({ error: "LinkedIn authentication failed" });
+  }
+};
+const regestergoogle = async (req, res,role) => {
+  const { firstName, lastName, email, image, password} = req.body;
 
   try {
     // Check if user already exists
@@ -67,35 +133,43 @@ const regestergoogle = async (req, res, role) => {
       return res.status(400).json({ error: "Email already registered" });
     }
 
-    // Create user data object
+    // Create new user object
     const newUserData = {
       firstName,
       lastName,
       email,
-      role
+      image,
+      role  
     };
 
-    // If the request contains a password (i.e., normal signup), add it to the user data
+    // If normal signup (not Google), include password
     if (password) {
       newUserData.password = password;
     }
 
+    // Save user to database
     const newUser = new User(newUserData);
     await newUser.save();
-    generateToken(res, newUser._id);
+
+    // Generate authentication token
+    await generateToken(res, newUser._id);
+
+    // Send success response (hide password)
     res.json({
       success: true,
       message: "Registration successful",
       user: {
         ...newUser._doc,
-        password: undefined
+        password: undefined  // Exclude password from response
       }
     });
 
   } catch (err) {
-    res.status(500).json({ error: "Registration failed: " + err.message });
+    console.error("Google Signup Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 const regestergithub = async (req, res, role) => {
   const { code } = req.body;
 
@@ -407,5 +481,18 @@ const signOut = async (req, res) => {
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
-module.exports = { signIngithub, signIngoogle, registerStudentgithub, registerStudentgoogle, registerInstructorgithub, registerInstructorgoogle, registerStudent, registerInstructor, checkAuth, signIn, signOut, verifyEmail, forgotPassword, resetPassword };
+module.exports = { signIngithub,
+   signIngoogle, 
+   registerStudentgithub, 
+   registerStudentgoogle, 
+   registerInstructorgithub,
+    registerInstructorgoogle,
+     registerStudent, 
+     registerInstructor,
+      checkAuth, signIn, 
+      signOut,
+       verifyEmail,
+        forgotPassword,
+         resetPassword ,
+         registerLinkedIn};
 
