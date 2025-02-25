@@ -7,12 +7,12 @@ import Index from "./components/index";
 import Profile from "./components/Profile";
 import SignUpPage from "./pages/SignUpPage/SignUpPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicy/PrivacyPolicyPage";
-import NotFound from "./pages/NotFound/NotFound";
 import Review from './components/Admin/Review';
 import Leave from './components/Admin/Leave';
 import Manage from './components/Admin/Manage';
 import Reports from './components/Admin/Reports';
-
+import NotFound from "./components/Notfound";
+import Settings from './components/Admin/Settings';
 import CV from "./pages/cv";
 
 
@@ -33,9 +33,9 @@ function App() {
         <Route path="/leave" element={<Leave />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/report" element={<Reports />} />
+        <Route path="/set" element={<Settings />} />
 
 
-        <Route path="*" element={<NotFound />} />
         
 
 

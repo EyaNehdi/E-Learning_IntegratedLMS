@@ -14,10 +14,7 @@ function Profile() {
   <title>Trelix</title>
   <link rel="apple-touch-icon" href="images/favicon.png" />
   <link rel="shortcut icon" href="images/favicon.ico" />
-  <link rel="stylesheet" href="css/feather.css" />
-  <link rel="stylesheet" href="css/nice-select2.css" />
-  <link href="css/glightbox.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="css/swiper-bundle.min.css" />
+
   {/* Style css */}
 
   {/*[if lt IE 9]>
@@ -32,8 +29,8 @@ function Profile() {
     </div>
   </div>
 
-  <Header/>
 
+<Header/>
 
   {/* Header End */}
   <div className="dashbaord-promo position-relative" />
