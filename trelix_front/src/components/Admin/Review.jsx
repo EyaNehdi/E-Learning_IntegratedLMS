@@ -2,6 +2,8 @@ import Headeradmin from './Headeradmin';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import axios from "axios"; 
+import { useEffect } from 'react';
+
 
 const fetchUsers = async () => {
   const res = await axios.get("/api/admin/allUsers", { withCredentials: true });
@@ -12,11 +14,14 @@ function Review() {
 
   const queryClient = useQueryClient();
   // Fetch users using React Query
-  const { data: users } = useQuery({
+  const { data: users , refetch } = useQuery({
     queryKey: ["users"],
     queryFn: fetchUsers,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
+  useEffect(()=>{
+    refetch();
+  },[users]);
   // Mutation to delete user
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
