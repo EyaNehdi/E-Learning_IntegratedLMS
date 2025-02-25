@@ -9,6 +9,53 @@ import { useProfileStore } from "../store/profileStore";
 import { FaEdit, FaSave } from "react-icons/fa";
 import axios from "axios";
 function Profile() {
+                      return (
+<div>
+  {/* Mirrored from html.theme-village.com/eduxo/student-profile.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:26:24 GMT */}
+  <meta charSet="utf-8" />
+  <meta httpEquiv="x-ua-compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="An ideal tempalte for online education, e-Learning, Course School, Online School, Kindergarten, Classic LMS, University, Language Academy, Coaching, Online Course, Single Course, and Course marketplace." />
+  <meta name="keywords" content="bootstrap 5, online course, education, creative, gulp, business, minimal, modern, course, one page, responsive, saas, e-Learning, seo, startup, html5, site template" />
+  <meta name="author" content="theme-village" />
+  <title>Trelix</title>
+  <link rel="apple-touch-icon" href="images/favicon.png" />
+  <link rel="shortcut icon" href="images/favicon.ico" />
+
+  {/* Style css */}
+
+  {/*[if lt IE 9]>
+    
+    
+    <![endif]*/}
+  {/* Preloader */}
+  <div id="preloader">
+    <div className="preloader">
+      <span />
+      <span />
+    </div>
+  </div>
+
+
+<Header/>
+
+  {/* Header End */}
+  <div className="dashbaord-promo position-relative" />
+  {/* Dashboard Cover Start */}
+  <div className="dashbaord-cover bg-shade sec-padding">
+    <div className="container">
+      <div className="row">
+        <div className="col-lg-12 position-relative">
+          <div className="dash-cover-bg rounded-3" style={{backgroundImage: 'url("assets/images/student_bg.jpg")'}} />
+          <div className="dash-cover-info d-sm-flex justify-content-between align-items-center">
+            <div className="ava-wrap d-flex align-items-center">
+              <div className="avatar me-3 rounded-circle"><img width={150} src="assets/images/avatar.png" className="rounded-circle" alt="Avatar" /></div>
+              <div className="ava-info">
+                <h4 className="display-5 text-white mb-0">Maria Carey Mc.</h4>
+                <div className="ava-meta text-white mt-1">
+                  <span><i className="feather-icon icon-book" /> 6 Courses Enrolled </span>
+                  <span><i className="feather-icon icon-award" />3 cerficates</span>
+
   const { isAuthenticated, logout } = useAuthStore();
   const navigate = useNavigate();
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -172,6 +219,7 @@ function Profile() {
                       <h4 className="display-5 text-white mb-0">{user?.firstName} {user?.lastName}</h4>
                     </div>
                   </div>
+
                 </div>
               </div>
               <div className="photo-upload-buttons d-flex flex-column align-items-center mt-3">
