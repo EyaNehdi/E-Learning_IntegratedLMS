@@ -1,0 +1,499 @@
+import {
+  GoogleLogin,
+  useGoogleLogin,
+  useGoogleOneTapLogin,
+} from "@react-oauth/google";
+import GitHubLogin from "react-github-login";
+import MicrosoftLogin from "react-microsoft-login";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
+import { useNavigate , useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import PasswordStrengthMeter from "../PasswordStrengthMeter";
+import { motion } from "framer-motion";
+import { useLinkedIn, LinkedIn } from 'react-linkedin-login-oauth2';
+// You can use provided image shipped by this package or using your own
+import linkedin from 'react-linkedin-login-oauth2/assets/linkedin.png';
+
+const StudentRegister = ({ setisRegisterSuccess }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRegisterSuccess, setIsRegisterSuccess] = useState(false); 
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    role: "instructor",
+  });
+  const handleLinkedInError = (error) => {
+    if (error.error === 'user_closed_popup') {
+      console.warn("User closed the popup. Please try again.");
+      alert("It seems you closed the login popup. Please try again.");
+    } else {
+      console.error("LinkedIn Authentication Error:", error);
+      alert("An error occurred during LinkedIn authentication. Please try again.");
+    }
+  };
+  const { linkedInLogin } = useLinkedIn({
+    clientId: "86un9qr2kersxv",
+    redirectUri: "http://localhost:5173/linkedin/callback",
+    scope: "openid profile w_member_social email",
+    onSuccess: async (code, state) => {
+        console.log("LinkedIn code:", code);
+        setIsLoading(true); // Start loading
+
+        try {
+            const response = await axios.post(
+                "http://localhost:5000/api/auth/register/linkedin",
+                { code }
+            );
+
+            if (response.data.token) {
+                localStorage.setItem("token", response.data.token);
+                setIsRegisterSuccess(true);
+                setisRegisterSuccess(true);
+            } else {
+                throw new Error("No token received from backend");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            // Simulate a 5-second wait
+            setTimeout(() => {
+                setIsLoading(false); // Stop loading
+            }, 5000);
+        }
+    },
+    onError: (error) => {
+        console.error("LinkedIn Error:", error);
+    },
+});
+
+// Example of how to test with the provided code (replace the below line in the appropriate context)
+
+  
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const code = queryParams.get("code");
+  
+    if (code) {
+      linkedInLogin.onSuccess(code); // Ensure this is correctly called
+    }
+  }, [location]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleGoogleLoginSuccess = async (response) => {
+    console.log("****console.log(response);****");
+    console.log(response);
+    try {
+      const decoded = jwtDecode(response.credential); // Decode JWT token from Google
+      // Decode JWT token from Google
+      const googleUserData = {
+        firstName: decoded.given_name,
+        lastName: decoded.family_name,
+        email: decoded.email,
+        image: decoded.picture,
+        role: 'Student',  // Default role for Google sign-up
+      };
+      // Send Google user data to the backend for registration
+      const res = await axios.post(
+        "http://localhost:5173/api/auth/register/googleStudent",
+        googleUserData,
+        {
+          withCredentials: true,
+        }
+      );
+      if (res.data) {
+        setisRegisterSuccess(true);
+      }
+    } catch (err) {
+      setError("Google signup failed. Please try again.");
+      console.error(err);
+    }
+  };
+
+
+  const handleGoogleLoginFailure = () => {
+    console.error("Google login failed");
+  };
+
+  // Handle Google login error
+  const handleGoogleLoginError = () => {
+    setError("Google login failed.");
+  };
+
+  // Handle GitHub login success
+  const handleGitHubLoginSuccess = async (response) => {
+    try {
+      // Send the authorization code to the backend
+      const res = await axios.post(
+        "http://localhost:5173/api/auth/register/githubStudent",
+        {
+          code: response.code,
+        }
+      );
+      if (res.data) {
+        setisRegisterSuccess(true);
+      }
+    } catch (err) {
+      setError("GitHub signup failed. Please try again.");
+      console.error(err);
+    }
+  };
+
+  // Handle GitHub login error
+  const handleGitHubLoginError = () => {
+    setError("GitHub login failed.");
+  };
+
+  // Handle Microsoft login success
+  const handleMicrosoftLoginSuccess = async (response) => {
+    setLoading(true);
+    setError("");
+    try {
+      const responseData = await axios.post(
+        "/api/auth/register/instructor",
+        { token: response.authentication.accessToken },
+        { withCredentials: true }
+      );
+
+      if (responseData.data) {
+        navigate("/Home"); // Redirect after successful login
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.error || "Microsoft login failed. Please try again."
+      );
+    }
+  };
+
+  const [errors, setErrors] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false);
+  useEffect(() => {
+    // Check if there are any errors
+    const hasErrors = Object.values(errors).some((error) => error !== "");
+    // Check if all fields are filled
+    const allFieldsFilled = Object.values(formData).every(
+      (value) => value.trim() !== ""
+    );
+    // Set form validity state
+    setIsFormValid(!hasErrors && allFieldsFilled);
+  }, [errors, formData]); // Re-run when errors or form data change
+
+  //Controle de saisie
+  const validateForm = () => {
+    const newErrors = {};
+    if (formData.firstName.trim().length < 2) {
+      newErrors.firstName = "First name must be at least 2 characters.";
+    }
+
+    if (formData.lastName.trim().length < 2) {
+      newErrors.lastName = "Last name must be at least 2 characters.";
+    }
+
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email format.";
+    }
+
+    if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters.";
+    }
+
+    if (!/[A-Z]/.test(formData.password)) {
+      newErrors.password =
+        "Password must contain at least one uppercase letter.";
+    }
+
+    if (!/[a-z]/.test(formData.password)) {
+      newErrors.password =
+        "Password must contain at least one lowercase letter.";
+    }
+
+    if (!/\d/.test(formData.password)) {
+      newErrors.password = "Password must contain at least one number.";
+    }
+
+    if (!/[^A-Za-z0-9]/.test(formData.password)) {
+      newErrors.password =
+        "Password must contain at least one special character.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Returns true if no errors
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      const { name, value } = e.target;
+      // Field-specific validation
+      switch (name) {
+        case "firstName":
+          newErrors.firstName =
+            value.trim().length < 2
+              ? "First name must be at least 2 characters."
+              : "";
+          break;
+        case "lastName":
+          newErrors.lastName =
+            value.trim().length < 2
+              ? "Last name must be at least 2 characters."
+              : "";
+          break;
+        case "email":
+          newErrors.email = !/\S+@\S+\.\S+/.test(value)
+            ? "Invalid email format."
+            : "";
+          break;
+        case "password":
+          if (value.length < 6) {
+            newErrors.password = "Password must be at least 6 characters.";
+          } else if (!/[A-Z]/.test(value)) {
+            newErrors.password =
+              "Password must contain at least one uppercase letter.";
+          } else if (!/[a-z]/.test(value)) {
+            newErrors.password =
+              "Password must contain at least one lowercase letter.";
+          } else if (!/\d/.test(value)) {
+            newErrors.password = "Password must contain at least one number.";
+          } else if (!/[^A-Za-z0-9]/.test(value)) {
+            newErrors.password =
+              "Password must contain at least one special character.";
+          } else {
+            newErrors.password = ""; // No errors
+          }
+          break;
+        default:
+          break;
+      }
+
+      return newErrors;
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setErrors({});
+    if (!validateForm()) {
+      setLoading(false);
+      return; // Stop submission if validation fails
+    }
+
+    try {
+      const response = await axios.post(
+        "/api/auth/register/student",
+        formData,
+        { withCredentials: true }
+      );
+
+      if (response.data) {
+        setisRegisterSuccess(true);
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.error || "Registration failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleMicrosoftLoginError = () => {
+    setError("Microsoft login failed.");
+  };
+
+  const githubRef = useRef(null);
+  const triggerGitHubLogin = () => {
+    if (githubRef.current) {
+      const githubButton = githubRef.current.querySelector("button");
+      if (githubButton) {
+        githubButton.click();
+      }
+    }
+  };
+  const [enableGoogleLogin, setEnableGoogleLogin] = useState(false);
+  useGoogleOneTapLogin({
+    onSuccess: handleGoogleLoginSuccess,
+    onError: handleGoogleLoginError,
+    disabled: !enableGoogleLogin
+  });
+
+  const triggerGoogleLogin = () => {
+    setEnableGoogleLogin(true);
+  };
+
+  return (
+    <>
+      <div className="signup-form m-0">
+        <h1 className="display-3 text-center mb-5">Let’s Sign Up Student</h1>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="form-group position-relative">
+            <span>
+              <i className="feather-icon icon-user" />
+            </span>
+
+            <input
+              type="text"
+              placeholder=" FirstName"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              className={`form-control ${errors.firstName ? "is-invalid" : ""}`}
+              required
+            />
+            {errors.firstName && (
+              <div className="invalid-feedback">{errors.firstName}</div>
+            )}
+          </div>
+          <div className="form-group position-relative">
+            <span>
+              <i className="feather-icon icon-user" />
+            </span>
+
+            <input
+              type="text"
+              placeholder=" LastName"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              className={`form-control ${errors.lastName ? "is-invalid" : ""}`}
+              required
+            />
+            {errors.lastName && (
+              <div className="invalid-feedback">{errors.lastName}</div>
+            )}
+          </div>
+          <div className="form-group position-relative">
+            <span>
+              <i className="feather-icon icon-mail" />
+            </span>
+
+            <input
+              type="email"
+              placeholder=" Email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`form-control ${errors.email ? "is-invalid" : ""}`}
+              required
+            />
+            {errors.email && (
+              <div className="invalid-feedback">{errors.email}</div>
+            )}
+          </div>
+          <div className="form-group position-relative">
+            <span>
+              <i className="feather-icon icon-lock" />
+            </span>
+            <input
+              type="password"
+              placeholder="Password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          {/*Password Strength meter */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl 
+			overflow-hidden"
+          >
+            <div className="p-8">
+              <PasswordStrengthMeter password={formData.password} />
+            </div>
+          </motion.div>
+          {/*Password Strength meter ends*/}
+          <button
+            disabled={!isFormValid || loading}
+            className="btn btn-primary w-100"
+            style={{
+              padding: "15px", // Augmente la hauteur du bouton
+              fontSize: "18px", // Augmente la taille du texte
+              borderRadius: "8px", // Arrondi les bords
+            }}
+          >
+            {loading ? "Registering..." : "Sign Up as Student"}
+          </button>
+        </form>
+        <div className="form-footer mt-4 text-center">
+          <div className="alter overly">
+            <p>OR</p>
+          </div>
+          {/* Other Logins Icons */}
+          <div className="container d-flex justify-content-center align-items-center custom-gap">
+            {/* Google Login */}
+
+            <div className="">
+              <img
+                src="/assets/icons/google.png"
+                alt="Google"
+                width="24"
+                height="24"
+                onClick={triggerGoogleLogin}
+                style={{ cursor: "pointer" }}
+              />
+            </div>
+
+            <div className="">
+              <MicrosoftLogin
+                clientId="0081ceb9-215c-491a-aaab-e478787be7e8"
+                redirectUri="http://localhost:5173/login/student"
+                onSuccess={handleMicrosoftLoginSuccess}
+                onFailure={handleMicrosoftLoginError}
+              >
+                <img
+                  src="/assets/icons/microsoft.png"
+                  alt="Microsoft"
+                  width="24"
+                  height="24"
+                  style={{ cursor: "pointer" }}
+                />
+              </MicrosoftLogin>
+            </div>
+            <div className="d-none" ref={githubRef}>
+              <GitHubLogin
+                clientId="Ov23liQcQlFtxrCS9Hkz"
+                redirectUri="http://localhost:5173/login/student"
+                onSuccess={handleGitHubLoginSuccess}
+                onFailure={handleGitHubLoginError}
+              />
+            </div>
+            <div className="">
+              <img
+                src="/assets/icons/github.png"
+                alt="GitHub"
+                width="24"
+                height="24"
+                onClick={triggerGitHubLogin}
+                style={{ cursor: "pointer" }}
+              />
+            </div>
+          </div>
+          <p>
+            Already have an account?{" "}
+            <a href="/login" className="text-primary fw-bold">
+              Login Now
+            </a>
+          </p>
+        </div>
+        <div>
+            <button onClick={linkedInLogin}>Login with LinkedIn</button>
+            {isLoading && <div>Loading... Please wait.</div>} {/* Show loading message */}
+            {isRegisterSuccess && <div>Registration Successful!</div>}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default StudentRegister;

@@ -7,8 +7,13 @@ const User = new Schema({
     lastName: String,
     email:{type:String, unique:true},
     password:String,
+    image: { type: String, default: null },
     mfaEnabled: { type: Boolean, default: false }, 
     mfaSecret: { type: String, default: null },
+    phone: { type: String, default: null },
+    backupCodes: { type: [String], default: [] }, 
+    profilePhoto: { type: String, default: null },  // Added profile photo
+    coverPhoto: { type: String, default: null },  // Added cover photo
     resetPasswordToken: String,
 		resetPasswordExpiresAt: Date,
 		verificationToken: String,

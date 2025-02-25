@@ -19,28 +19,30 @@ function Signup() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (user) {
+      setEditableUser({ ...user });
+    }
+  }, [user]);
 
-  const handleGoogleLoginSuccess = async (response) => {
-    try {
-      const decoded = jwtDecode(response.credential);  // Decode JWT token from Google
-      const googleUserData = {
-        firstName: decoded.given_name,
-        lastName: decoded.family_name,
-        email: decoded.email,
-        role: 'Student',  // Default role for Google sign-up
-      };
+  const handleEdit = async (field) => {
+    const newValue = prompt(`Enter new ${field}:`, editableUser[field]);
+    if (newValue !== null) {
+      const updatedUser = { ...editableUser, [field]: newValue };
+      setEditableUser(updatedUser);
 
-      // Send Google user data to the backend for registration
-      const res = await axios.post('http://localhost:5173/api/auth/register/googleStudent', googleUserData, {
-        withCredentials: true,
-      });
+      // Make API call to update the user's information in the backend using axios
+      try {
+        const res = await axios.post('/api/user/update', updatedUser, {
+          withCredentials: true, // Include credentials if needed
+        });
 
-      if (res.data) {
-        navigate('/');  // Redirect after successful signup
+        if (res.data) {
+          setEditableUser(res.data); // Update the local state with the new user data
+        }
+      } catch (error) {
+        console.error("Error updating user:", error);
       }
-    } catch (err) {
-      setError('Google signup failed. Please try again.');
-      console.error(err);
     }
   };
 
@@ -112,18 +114,29 @@ function Signup() {
    //Controle de saisie 
    const validateForm = () => {
     const newErrors = {};
-  
-    if (formData.firstName.trim().length < 2) {
+  //firstname validation only letters
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "First name is required.";
+    } else if (!/^[A-Za-z]+$/.test(formData.firstName.trim())) {
+      newErrors.firstName = "First name must contain only letters (A-Z, a-z).";
+    } else if (formData.firstName.trim().length < 2) {
       newErrors.firstName = "First name must be at least 2 characters.";
     }
+  //lastname validation only letters
+  if (!formData.lastName.trim()) {
+    newErrors.lastName = "Last name is required.";
+  } else if (!/^[A-Za-z]+$/.test(formData.lastName.trim())) {
+    newErrors.lastName = "Last name must contain only letters (A-Z, a-z).";
+  } else if (formData.lastName.trim().length < 2) {
+    newErrors.lastName = "Last name must be at least 2 characters.";
+  }
   
-    if (formData.lastName.trim().length < 2) {
-      newErrors.lastName = "Last name must be at least 2 characters.";
-    }
-  
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Invalid email format.";
-    }
+  // Email validation - must start with letter, only @ and . allowed as special chars
+  if (!formData.email) {
+    newErrors.email = "Email is required.";
+  } else if (!/^[A-Za-z][A-Za-z0-9]*@[A-Za-z0-9]+\.[A-Za-z]+$/.test(formData.email)) {
+    newErrors.email = "Email must start with a letter and can only contain '@' and '.' as special characters.";
+  }
   
     if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters.";
@@ -158,14 +171,37 @@ function Signup() {
       // Field-specific validation
       switch (name) {
         case "firstName":
-          newErrors.firstName = value.trim().length < 2 ? "First name must be at least 2 characters." : "";
+          if (!value.trim()) {
+            newErrors.firstName = "First name is required.";
+          } else if (!/^[A-Za-z]+$/.test(value.trim())) {
+            newErrors.firstName = "First name must contain only letters (A-Z, a-z).";
+          } else if (value.trim().length < 2) {
+            newErrors.firstName = "First name must be at least 2 characters.";
+          } else {
+            newErrors.firstName = "";
+          }
           break;
         case "lastName":
-          newErrors.lastName = value.trim().length < 2 ? "Last name must be at least 2 characters." : "";
+          if (!value.trim()) {
+            newErrors.lastName = "Last name is required.";
+          } else if (!/^[A-Za-z]+$/.test(value.trim())) {
+            newErrors.lastName = "Last name must contain only letters (A-Z, a-z).";
+          } else if (value.trim().length < 2) {
+            newErrors.lastName = "Last name must be at least 2 characters.";
+          } else {
+            newErrors.lastName = "";
+          }
           break;
         case "email":
-          newErrors.email = !/\S+@\S+\.\S+/.test(value) ? "Invalid email format." : "";
+          if (!value) {
+            newErrors.email = "Email is required.";
+          } else if (!/^[A-Za-z][A-Za-z0-9]*@[A-Za-z0-9]+\.[A-Za-z]+$/.test(value)) {
+            newErrors.email = "Email must start with a letter and can only contain '@' and '.' as special characters.";
+          } else {
+            newErrors.email = "";
+          }
           break;
+  
         case "password":
           if (value.length < 6) {
             newErrors.password = "Password must be at least 6 characters.";

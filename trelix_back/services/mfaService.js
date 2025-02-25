@@ -3,6 +3,7 @@ const QRCode = require("qrcode");
 const User = require("../models/userModel");
 require("dotenv").config();
 const { encryptSecret, decryptSecret } = require("./encryptionService");
+const crypto = require("crypto");
 
 const generateMFA = async (userId) => {
   try {
@@ -51,4 +52,18 @@ const verifyMFA = async (userId, token) => {
   }
 };
 
-module.exports = { generateMFA, verifyMFA };
+function generateSingleCode() {
+  return crypto.randomInt(100000, 1000000).toString();
+}
+
+function generateCodes() {
+  const codes = new Set();
+  while (codes.size < 8) {
+    const newCode = generateSingleCode();
+    console.log(newCode);
+    codes.add(newCode);
+  }
+  return Array.from(codes);
+}
+
+module.exports = { generateMFA, verifyMFA, generateCodes };

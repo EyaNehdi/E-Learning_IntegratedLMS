@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import apple from "../../../public/assets/apple.png"
 function Orders() {
     return (
         <Section>
@@ -25,7 +24,7 @@ function Orders() {
             </tr>
             <tr>
               <td>#9876543</td>
-              <td className="img"> <img src={apple} alt="" /><span>Apple Watch</span></td>
+              <td className="img"> <img src="/assets/apple.png" alt="" /><span>Apple Watch</span></td>
               <td>Jul 29, 2021</td>
               <td>$329</td>
               <td ><button>Complete</button></td>

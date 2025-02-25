@@ -21,5 +21,8 @@ export const useProfileStore = create((set) => ({
       set({ user: null });
     }
   },
-  clearUser: () => set({ user: null }),  // To clear user on logout
+  clearUser: () => set({ user: null }),  
+  updateUser: (updatedData) => set((state) => ({
+    user: { ...state.user, ...updatedData },
+  })),// To clear user on logout
 }));
