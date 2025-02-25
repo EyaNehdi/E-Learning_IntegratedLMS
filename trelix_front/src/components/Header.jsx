@@ -33,11 +33,9 @@ function Header() {
         <div className="header-top bg-primary text-info text-uppercase">
           <div className="marquee">
             <p>
-              <span>Start Education is a Way to Success in Life</span>
-              <span>Better Education Improves The Nation</span>
+      
               <span>Learn Today Lead Tomorrow</span>
-              <span>Free education for all</span>
-              <span>Education is all the dreams</span>
+              <span>Education is the dreams</span>
               <span>Education is a Way to Success in Life</span>
               <span>Better Education Improves The Nation</span>
               <span>Learn Today Lead Tomorrow</span>
@@ -206,9 +204,9 @@ function Header() {
 
         <div className="header-nav-wrapper header-sticky">
           <nav className="navbar nav-center navbar-expand-xl">
-            <img src="/assets/images/logoo.png" alt="Logo" style={{ marginTop: "-21px" ,marginLeft: "190px" }} />
+            <img src="/assets/images/ss.png" alt="Logo" style={{ marginTop: "-33px" ,marginLeft: "104px" }} />
 
-            <div className="container navbar-line px-3">
+            <div className="container navbar-line px-3"  style={{marginLeft: "45px" }} >
               <a className="navbar-brand d-xl-none" href="index-2.html">
 
               </a>

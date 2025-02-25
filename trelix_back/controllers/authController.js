@@ -1,4 +1,4 @@
-
+const bcryptjs = require ('bcryptjs');
 const User = require('../models/userModel');
 const generateToken = require('../utils/generateTokenAndSetCookie');
 const bcrypt = require('bcrypt');
@@ -31,8 +31,12 @@ const register = async (req, res) => {
       return res.status(400).json({ error: "Email already registered" });
     }
 
+
     console.log("✅ Email is available. Creating new user...");
     const verificationToken = crypto.randomBytes(20).toString("hex");
+
+    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+
 
     const newUser = new User({
       firstName,
@@ -175,8 +179,8 @@ const regestergoogle = async (req, res,role) => {
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
-
-    // Create new user object
+   
+    // Create user data object
     const newUserData = {
       firstName,
       lastName,
@@ -299,16 +303,16 @@ const verifyEmail = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid or expired verification code" });
     }
 
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    user.verificationTokenExpiresAt = undefined;
-    await user.save();
-
-
-  } catch (error) {
-    console.log("error in verifyEmail ", error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
+		user.isVerified = true;
+		user.verificationToken = undefined;
+		user.verificationTokenExpiresAt = undefined;
+		await user.save();
+    res.status(200).json({ success: true, user });
+		
+	} catch (error) {
+		console.log("error in verifyEmail ", error);
+		res.status(500).json({ success: false, message: "Server error" });
+	}
 };
 
 
@@ -499,9 +503,9 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid or expired reset token" });
     }
 
-    // update password
-    const hashedPassword = await bcryptjs.hash(password, 10);
-    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+		// update password
+		const hashedPassword = await bcryptjs.hash(password, 10);
+		
 
     user.password = hashedPassword;
     user.resetPasswordToken = undefined;

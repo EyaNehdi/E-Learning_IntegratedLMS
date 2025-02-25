@@ -48,7 +48,7 @@ function Signup() {
       });
   
       if (res.data) {
-        navigate('/');  // Redirect after successful signup
+        navigate('/verify-email');  // Redirect after successful signup
       }
       setLoading(false);
     } catch (err) {
@@ -220,7 +220,7 @@ function Signup() {
       );
 
       if (response.data) {
-        navigate('/'); 
+        navigate('/verify-email'); 
       }
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed. Please try again.');
