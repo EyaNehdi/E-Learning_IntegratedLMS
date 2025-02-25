@@ -14,7 +14,7 @@ pipeline {
             steps {
                 git branch: 'Devops',
                     url: 'https://github.com/EyaNehdi/E-Learning_IntegratedLMS.git',
-                    credentialsId: 'PiGIT'
+                    credentialsId: 'PI'
             }
         }
 
