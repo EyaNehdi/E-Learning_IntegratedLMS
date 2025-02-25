@@ -41,6 +41,7 @@ function Leave(){
         .then(() => {
           alert("User added successfully!");
           navigate("/admin/review"); // Redirect back
+          
         })
         .catch((err) => console.error("Error adding user:", err));
     }
@@ -194,7 +195,7 @@ function Leave(){
                             id="email"
                             name="email"
                             value={user.email}
-                            disabled
+                            onChange={handleChange}
                           />
                           </div>
                         </div>
