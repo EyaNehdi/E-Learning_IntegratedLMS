@@ -307,8 +307,15 @@ const verifyEmail = async (req, res) => {
 		user.verificationToken = undefined;
 		user.verificationTokenExpiresAt = undefined;
 		await user.save();
-    res.status(200).json({ success: true, user });
-		
+		res.status(201).json({
+      success: true,
+      message: "Registration successful",
+      user: {
+        ...user._doc,
+        password: undefined
+      }
+
+    });
 	} catch (error) {
 		console.log("error in verifyEmail ", error);
 		res.status(500).json({ success: false, message: "Server error" });
@@ -489,35 +496,43 @@ const forgotPassword = async (req, res) => {
 
 
 const resetPassword = async (req, res) => {
-
   try {
     const { token } = req.params;
     const { password } = req.body;
 
-    const user = await User.findOne({
-      resetPasswordToken: token,
-      resetPasswordExpiresAt: { $gt: Date.now() },
-    });
+    console.log("🔍 Requête reçue pour reset password");
+    console.log("📌 Token:", token);
+    console.log("📝 Nouveau mot de passe reçu:", password);
+
+    // Hash du mot de passe
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    console.log("🔑 Nouveau mot de passe hashé:", hashedPassword);
+
+    // Mise à jour de l'utilisateur avec findOneAndUpdate
+    const user = await User.findOneAndUpdate(
+      { resetPasswordToken: token, resetPasswordExpiresAt: { $gt: Date.now() } }, 
+      { 
+        password: hashedPassword, 
+        resetPasswordToken: null, 
+        resetPasswordExpiresAt: null 
+      }, 
+      { new: true } // Pour retourner l'utilisateur mis à jour
+    );
 
     if (!user) {
+      console.log("❌ Token invalide ou expiré");
       return res.status(400).json({ success: false, message: "Invalid or expired reset token" });
     }
 
-		// update password
-		const hashedPassword = await bcryptjs.hash(password, 10);
-		
+    console.log("✅ Utilisateur mis à jour:", user.email);
 
-    user.password = hashedPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpiresAt = undefined;
-    await user.save();
-
+    // Envoi d'un email de confirmation
     await sendResetSuccessEmail(user.email);
 
     res.status(200).json({ success: true, message: "Password reset successful" });
   } catch (error) {
-    console.log("Error in resetPassword ", error);
-    res.status(400).json({ success: false, message: error.message });
+    console.error("❌ Erreur dans resetPassword:", error);
+    res.status(500).json({ success: false, message: "Erreur interne du serveur" });
   }
 };
 

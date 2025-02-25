@@ -2,7 +2,18 @@ import "./App.css";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import ForgetPassword from './components/ForgetPassword';
+
+import SignupInstructor from './components/Instructor/InstructorRegister';
+import SignupStudent from './components/Student/StudentRegister';
+
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+
+import EmailVerificationPage from "./pages/EmailVerificationPage";
+import { Toaster } from "react-hot-toast";
+
+
+
 import Login from "./pages/SignIn/Login";
 import Index from "./components/index";
 import Profile from "./components/Profile";
@@ -25,9 +36,39 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Index />} />
+	  <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/forget" element={<ForgetPassword />} />
+
+       
+
+       
+        <Route path="/signup" element={<SignupInstructor/>} />
+        
+        
+        <Route path="/verify-email" element={<EmailVerificationPage />} />
+        <Route
+					path='/reset-password/:token'
+					element={
+						<RedirectAuthenticatedUser>
+							<ResetPasswordPage />
+						</RedirectAuthenticatedUser>
+					}
+				/>
+        <Route
+				path="/forgot-password" 
+					element={
+						<RedirectAuthenticatedUser>
+							<ForgotPasswordPage/>
+						</RedirectAuthenticatedUser>
+					}
+				/>
+        
+        
+        
+        
+	
+
+        
 
         <Route path="/CV" element={<CV />} />
         <Route path="/linkedin/callback" element={<LinkedInCallback />} />
@@ -50,7 +91,9 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
 
         <Route path="*" element={<NotFound />} />
+
       </Routes>
+<Toaster />
     </Router>
   );
 }

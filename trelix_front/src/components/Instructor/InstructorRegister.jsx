@@ -238,6 +238,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
         { withCredentials: true }
       );
       if (response.data) {
+        navigate('/verify-email');
         setisRegisterSuccess(true);
       }
     } catch (err) {
