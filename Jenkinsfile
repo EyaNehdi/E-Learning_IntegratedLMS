@@ -1,5 +1,8 @@
 
 pipeline {
+     tools {
+        maven 'N_NODE'
+    }
     agent any
    
 
@@ -15,6 +18,11 @@ pipeline {
                 git branch: 'Devops',
                     url: 'https://github.com/EyaNehdi/E-Learning_IntegratedLMS.git',
                     credentialsId: 'PI'
+            }
+        }
+         stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
             }
         }
 
