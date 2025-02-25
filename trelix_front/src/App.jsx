@@ -1,13 +1,13 @@
 import "./App.css";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from './components/Login';
-import SignupInstructor from './components/Instructor/Signup';
-import SignupStudent from './components/Student/Signup';
+import Login from './pages/SignIn/Login';
+import SignupInstructor from './components/Instructor/InstructorRegister';
+import SignupStudent from './components/Student/StudentRegister';
 import Index from './components/index';
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import Dashboard from './components/Admin/Dashboard';
+
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import { Toaster } from "react-hot-toast";
 
@@ -53,15 +53,15 @@ function App() {
     
     <Router>
       <Routes>
-        <Route path="/" element={<Index />} />
+	  <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/instructor" element={<SignupInstructor />} />
-        <Route path="/student" element={<SignupStudent />} />
        
+
+       
+        <Route path="/signup" element={<SignupInstructor/>} />
+        
+        
         <Route path="/verify-email" element={<EmailVerificationPage />} />
-
-
-
         <Route
 					path='/reset-password/:token'
 					element={
@@ -81,7 +81,7 @@ function App() {
         
         
         
-        <Route path="/Dashboard" element={<Dashboard/>} />
+        
 	
       </Routes>
       <Toaster />
