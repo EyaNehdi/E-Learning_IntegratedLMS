@@ -12,18 +12,31 @@ const { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail } =
 
 const axios = require('axios');
 //signup function
-const register = async (req, res, role) => {
-  const { firstName, lastName, email, password } = req.body;
+const register = async (req, res) => {
+  console.log("🔹 Received Request Body:", req.body); // Log request body
+
+  const { firstName, lastName, email, password, role } = req.body; // Ensure role is extracted
 
   try {
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || !lastName || !email || !password || !role) {
+      console.error("❌ Validation Failed: Missing Fields", { firstName, lastName, email, password, role });
       return res.status(400).json({ error: "All fields are required" });
     }
+
+    console.log("🔍 Checking if email already exists:", email);
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
+      console.error("❌ Validation Failed: Email already registered", email);
       return res.status(400).json({ error: "Email already registered" });
     }
+
+
+    console.log("✅ Email is available. Creating new user...");
+    const verificationToken = crypto.randomBytes(20).toString("hex");
+
     const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+
 
     const newUser = new User({
       firstName,
@@ -34,36 +47,70 @@ const register = async (req, res, role) => {
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
     });
+
     await newUser.save();
+    console.log("✅ User saved successfully:", newUser);
 
-
-
-
-    //jwt
+    // Generate JWT Token
     generateToken(res, newUser._id);
-    //dans utils
+    console.log("✅ JWT Token generated for user:", newUser._id);
+
+    // Send verification email
     await sendVerificationEmail(newUser.email, verificationToken);
+    console.log("📧 Verification email sent to:", newUser.email);
+
     res.status(201).json({
       success: true,
       message: "Registration successful",
       user: {
         ...newUser._doc,
-        password: undefined
-      }
-
+        password: undefined,
+      },
     });
 
   } catch (err) {
+    console.error("🔥 Unexpected Error:", err);
     res.status(500).json({ error: "Registration failed: " + err.message });
   }
 };
+
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const registerLinkedIn = async (req, res) => {
   const client_id = process.env.LINKEDIN_CLIENT_ID;
   const client_secret = process.env.LINKEDIN_CLIENT_SECRET;
   const redirect_uri = process.env.LINKEDIN_REDIRECT_URI;
   console.log("Delaying for 5 seconds...");
-      await delay(5000);
+      await delay(5000);// No selection was provided, so I'll generate a code snippet that can be inserted at the cursor position.
+// This snippet includes input validation and error handling for a hypothetical 'updateUser' function.
+
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firstName, lastName, email, role } = req.body;
+
+    if (!id || !firstName || !lastName || !email || !role) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email;
+    user.role = role;
+
+    await user.save();
+
+    res.status(200).json({ success: true, message: "User updated successfully" });
+  } catch (error) {
+    console.error("Error in updateUser ", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
   try {
       const authCode = req.body.code;

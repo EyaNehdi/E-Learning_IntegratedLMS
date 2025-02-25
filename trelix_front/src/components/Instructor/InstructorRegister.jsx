@@ -233,21 +233,24 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
 
     try {
       const response = await axios.post(
-        "/api/auth/register/instructor",
+        "http://localhost:5000/api/auth/register/instructor",
         formData,
         { withCredentials: true }
       );
-
       if (response.data) {
         navigate('/verify-email');
         setisRegisterSuccess(true);
       }
     } catch (err) {
+      console.error("Full Error Response:", err.response);
+      console.error("Error Status:", err.response?.status);
+      console.error("Error Data:", err.response?.data);
       setError(
         err.response?.data?.error || "Registration failed. Please try again."
       );
     } finally {
       setLoading(false);
+      console.log(formData);
     }
   };
   const handleMicrosoftLoginError = () => {
