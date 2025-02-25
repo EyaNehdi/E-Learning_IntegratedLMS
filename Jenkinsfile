@@ -3,7 +3,7 @@ pipeline {
   
     agent any
       tools {
-        maven "N_NODE"
+        maven 'N_NODE'
     }
 
     stages {
