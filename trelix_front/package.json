@@ -15,6 +15,7 @@
     "@mui/icons-material": "^6.4.4",
     "@mui/material": "^6.4.4",
     "@react-oauth/google": "^0.12.1",
+    "@tailwindcss/vite": "^4.0.7",
     "@tanstack/react-query": "^5.66.9",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
@@ -33,6 +34,7 @@
     "react-foundation": "^0.9.7",
     "react-github-login": "^1.0.3",
     "react-github-login-button": "^1.0.1",
+    "react-hot-toast": "^2.5.2",
     "react-icons": "^5.4.0",
     "react-linkedin-login-oauth2": "^2.0.1",
     "react-microsoft-login": "^2.0.1",
@@ -47,14 +49,12 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.20",
     "eslint": "^9.19.0",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
-    "postcss": "^8.5.2",
-    "tailwindcss": "^4.0.6",
+    "tailwindcss": "^4.0.7",
     "vite": "^6.1.0"
   }
 }
