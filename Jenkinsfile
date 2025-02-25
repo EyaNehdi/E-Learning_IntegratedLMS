@@ -1,43 +1,26 @@
-pipeline{ 
-agent any 
-stages { 
-stage('Install dependencies') { 
-steps{ 
-script { 
-sh('npm install') 
-} 
-} 
-} 
-stage('Unit Test') { 
-steps{
-    script { 
-sh('npm test') 
-} 
-} 
-} 
-stage('Build application') { 
-steps{ 
-script { 
-sh('npm run build-dev') 
-} 
-} 
-} 
-stage('SonarQube Analysis') { 
-steps{ 
-script {   
-def scannerHome = tool 'scanner' 
-withSonarQubeEnv { 
-sh "${scannerHome}/bin/sonar-scanner" 
-} 
-}  
-}   
-}
-stage('Building images (node and mongo)') { 
-steps{ 
-script { 
-sh('docker-compose build') 
-} 
-} 
-} 
-} 
+
+
+pipeline {
+    agent any
+    tools {
+        maven 'M2_HOME'
+    }
+
+    stages {
+        stage('Hello Test') {
+            steps {
+                echo 'Hi Trelix'
+            }
+        }
+
+        stage('Git Checkout') {
+            steps {
+                git branch: 'Devops',
+                    url: 'https://github.com/EyaNehdi/E-Learning_IntegratedLMS.git',
+                    credentialsId: 'PiGIT'
+            }
+        }
+
+       
+    
 }
