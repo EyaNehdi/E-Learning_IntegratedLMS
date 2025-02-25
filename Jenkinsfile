@@ -1,10 +1,10 @@
 
 pipeline {
-     tools {
-        maven 'N_NODE'
-    }
+  
     agent any
-   
+      tools {
+        maven "N_NODE"
+    }
 
     stages {
         stage('Hello Test') {
