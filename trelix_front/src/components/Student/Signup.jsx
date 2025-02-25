@@ -19,28 +19,30 @@ function Signup() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (user) {
+      setEditableUser({ ...user });
+    }
+  }, [user]);
 
-  const handleGoogleLoginSuccess = async (response) => {
-    try {
-      const decoded = jwtDecode(response.credential);  // Decode JWT token from Google
-      const googleUserData = {
-        firstName: decoded.given_name,
-        lastName: decoded.family_name,
-        email: decoded.email,
-        role: 'Student',  // Default role for Google sign-up
-      };
+  const handleEdit = async (field) => {
+    const newValue = prompt(`Enter new ${field}:`, editableUser[field]);
+    if (newValue !== null) {
+      const updatedUser = { ...editableUser, [field]: newValue };
+      setEditableUser(updatedUser);
 
-      // Send Google user data to the backend for registration
-      const res = await axios.post('http://localhost:5173/api/auth/register/googleStudent', googleUserData, {
-        withCredentials: true,
-      });
+      // Make API call to update the user's information in the backend using axios
+      try {
+        const res = await axios.post('/api/user/update', updatedUser, {
+          withCredentials: true, // Include credentials if needed
+        });
 
-      if (res.data) {
-        navigate('/');  // Redirect after successful signup
+        if (res.data) {
+          setEditableUser(res.data); // Update the local state with the new user data
+        }
+      } catch (error) {
+        console.error("Error updating user:", error);
       }
-    } catch (err) {
-      setError('Google signup failed. Please try again.');
-      console.error(err);
     }
   };
 

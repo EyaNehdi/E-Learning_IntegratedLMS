@@ -1,4 +1,28 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
+import { useProfileStore } from "../store/profileStore";
 function Aside() {
+  const { isAuthenticated, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const checkAuth = useAuthStore((state) => state.checkAuth);
+  const { user, fetchUser, clearUser } = useProfileStore();
+  useEffect(() => {
+    console.log("🟢 Checking authentication...");
+    checkAuth();
+    console.log("user avant fetch:" + user);
+    const fetchData = async () => {
+      await fetchUser(); // Ensure user data is fetched first
+      console.log("user after fetch", user);
+    };
+    fetchData();
+  }, [fetchUser]);
+
+  const handleLogout = () => {
+    logout(); // Clear user session
+    clearUser();
+    navigate("/"); // Redirect to home
+  };
                       return (
 <aside className="dashboard-sidebar shadow-1 border rounded-3">
 <div className="widget">
@@ -27,8 +51,16 @@ function Aside() {
   <nav className="dashboard-nav">
     <ul className="list-unstyled nav">
       <li><a className="nav-link" href="student-settings.html"><i className="feather-icon icon-settings" /><span>Settings</span></a></li>
-      <li><a className="nav-link" href="index-2.html"><i className="feather-icon icon-log-out" /><span>Logout</span></a>
-      </li>
+      <li>
+                            <a
+                              className="nav-link"
+                              href=""
+                              onClick={handleLogout}
+                            >
+                              <i className="feather-icon icon-log-out" />
+                              <span>Logout</span>
+                            </a>
+                          </li>
     </ul>
   </nav>
 </div>{/*  Widget End */}
