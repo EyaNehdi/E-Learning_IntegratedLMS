@@ -9,11 +9,12 @@ const schema = yup.object({
   .required("Last name is required."),
   email: yup.string()
   .matches(
-    /^[A-Za-z][A-Za-z0-9]*@[A-Za-z0-9]+\.[A-Za-z]+$/, 
-    "Email must start with a letter and can only contain '@' and '.' as special characters"
+    /^[A-Za-z][A-Za-z0-9._%+-]*@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/, 
+    "Email must start with a letter and can only contain '@', '.', '%', '+', '-', and '_' as special characters."
   )
   .email("Invalid email format.")
   .required("Email is required."),
+
   password: yup.string()
     .min(6, "Password must be at least 6 characters.")
     .matches(/[A-Z]/, "Password must contain at least one uppercase letter.")
