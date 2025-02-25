@@ -87,7 +87,6 @@ function Index() {
     <div className="container">
       <img src="assets/images/icons/dots1.png" alt="Dot 1" className="anim-img" />
       <div className="text-center sec-intro">
-        <span className="badge-lg bg-primary rounded-5">Popular Categories</span>
         <h2 className="sec-title">Find Your <span className="color">Category</span></h2>
       </div>
       <div className="row g-4">
@@ -257,7 +256,6 @@ function Index() {
     <div className="container">
       <div className="d-flex justify-content-between align-items-top">
         <div className="sec-intro">
-          <span className="badge-lg bg-primary rounded-5">Trending Courses</span>
           <h2 className="sec-title mb-4">Our Popular <span className="color">Courses</span></h2>
         </div>
         <div className="custom-nav d-flex gap-3 align-items-center">
@@ -726,7 +724,6 @@ function Index() {
     <span className="anim-img anim-right"><img src="assets/images/icons/instructor-shape.png" alt="Instructor" /></span>
     <div className="container">
       <div className="text-center sec-intro">
-        <span className="badge-lg bg-primary rounded-5">Professional Instructor</span>
         <h2 className="sec-title">Meet Our <span className="color">Instructors</span></h2>
       </div>
       <div className="row justify-content-center g-3 g-lg-4">
@@ -822,8 +819,7 @@ function Index() {
   <section className="choose-sec sec-padding overflow-hidden">
     <div className="container">
       <div className="text-center sec-intro">
-        <span className="badge-lg bg-primary rounded-5">Core Features</span>
-        <h2 className="sec-title">Why Choose <span className="color">Eduxo</span></h2>
+        <h2 className="sec-title">Why Choose <span className="color">Trelix</span></h2>
       </div>
       <div className="row">
         <div className="col-lg-12">
