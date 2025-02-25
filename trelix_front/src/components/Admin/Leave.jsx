@@ -1,11 +1,68 @@
 import Headeradmin from './Headeradmin';
-
-
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 function Leave(){
+  const { id } = useParams(); // Get user ID from URL
+  const navigate = useNavigate();
+  const isEditing = !!id; // If id exists, we're editing; otherwise, we're adding
+  const [user, setUser] = useState({ firstName: "", lastName: "", email: "", role: "student" });
+
+  useEffect(() => {
+    if (id) {
+      axios.get(`/api/admin/user/${id}`)  
+        .then((res) => setUser(res.data))
+        .catch((err) => console.error("Error fetching user:", err));
+    }
+  }, [id]);
+  
+  
+
+  // Handle form change
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
+
+  // Handle form submission (update or create)
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (isEditing) {
+      // Update existing user
+      axios.put(`/api/admin/updateUser/${id}`, user)
+        .then(() => {
+          alert("User updated successfully!");
+          navigate("/review"); // Redirect back to user management
+        })
+        .catch((err) => console.error("Error updating user:", err));
+    } else {
+      // Create new user
+      axios.post(`/api/admin/addUser`, user)
+        .then(() => {
+          alert("User added successfully!");
+          navigate("/admin/review"); // Redirect back
+        })
+        .catch((err) => console.error("Error adding user:", err));
+    }
+  };
+  //css and page
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "/assetss/js/custom.js"; // Adjust path if necessary
+    script.async = true;
+    document.body.appendChild(script);
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "/assetss/css/style.css"; // Adjust if needed
+    document.head.appendChild(link);
+      
+    return () => {
+      document.body.removeChild(script); // Clean up script when component unmounts
+      document.head.removeChild(link);
+    };
+  }, []);
+  
                       return(
-
-                      
-
 <div>
   {/* Mirrored from dleohr.dreamstechnologies.com/template-1/dleohr-horizontal/leave.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 21 Feb 2025 08:53:58 GMT */}
   {/* Required meta tags */}
@@ -30,16 +87,7 @@ function Leave(){
     <link rel="stylesheet" href="assetss/css/style.css" />
   </div>
 </div>
-
-
-		
-
-  
     <Headeradmin/>
-
-
-
-
     <div className="page-wrapper" style={{
     marginBlock: "2px"}}>
       <div className="container-fluid">
@@ -98,109 +146,93 @@ function Leave(){
               <div className="col-md-12">
                 <div className="card ctm-border-radius shadow-sm">
                   <div className="card-header">
-                    <h4 className="card-title mb-0">Apply Leaves</h4>
+                    <h4 className="card-title mb-0">Edit User</h4>
                   </div>
                   <div className="card-body">
-                    <form>
+                    <form onSubmit={handleSubmit}>
                       <div className="row">
                         <div className="col-sm-6">
                           <div className="form-group">
                             <label>
-                              Leave Type
+                              First Name
                               <span className="text-danger">*</span>
                             </label>
-                            <select className="form-control select">
-                              <option>Select Leave</option>
-                              <option>Working From Home</option>
-                              <option>Sick Leave</option>
-                              <option>Parental Leave</option>
-                              <option>Annual Leave</option>
-                              <option>Normal Leave</option>
-                            </select>
+                            <input
+                            type="text"
+                            className="form-control"
+                            id="firstName"
+                            name="firstName"
+                            value={user.firstName}
+                            onChange={handleChange}
+                          />
                           </div>
                         </div>
-                        <div className="col-sm-6 leave-col">
-                          <div className="form-group">
-                            <label>Remaining Leaves</label>
-                            <input type="text" className="form-control" placeholder={10} disabled />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-sm-6">
-                          <div className="form-group">
-                            <label>From</label>
-                            <input type="text" className="form-control datetimepicker" />
-                          </div>
-                        </div>
-                        <div className="col-sm-6 leave-col">
-                          <div className="form-group">
-                            <label>To</label>
-                            <input type="text" className="form-control datetimepicker" />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
                         <div className="col-sm-6">
                           <div className="form-group">
                             <label>
-                              Half Day
+                              Last Name
                               <span className="text-danger">*</span>
                             </label>
-                            <select className="form-control select">
-                              <option>Select</option>
-                              <option>First Half</option>
-                              <option>Second Half</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div className="col-sm-6 leave-col">
-                          <div className="form-group">
-                            <label>Number of Days Leave</label>
-                            <input type="text" className="form-control" placeholder={2} disabled />
+                            <input
+                            type="text"
+                            className="form-control"
+                            id="lastName"
+                            name="lastName"
+                            value={user.lastName}
+                            onChange={handleChange}
+                          />
                           </div>
                         </div>
                       </div>
                       <div className="row">
-                        <div className="col-sm-12">
-                          <div className="form-group mb-0">
-                            <label>Reason</label>
-                            <textarea className="form-control" rows={4} defaultValue={""} />
+                        <div className="col-sm-6">
+                          <div className="form-group">
+                            <label>E-mail</label>
+                            <input
+                            type="text"
+                            className="form-control"
+                            id="email"
+                            name="email"
+                            value={user.email}
+                            disabled
+                          />
+                          </div>
+                        </div>
+                        <div className="col-sm-6">
+                          <div className="form-group">
+                            <label>
+                              Role
+                              <span className="text-danger">*</span>
+                            </label>
+                            <select
+                            className="form-control"
+                            name="role"
+                            value={user.role}
+                            onChange={handleChange}
+                          >
+                            <option value="admin">Admin</option>
+                            <option value="instructor">Instructor</option>
+                            <option value="student">Student</option>
+                          </select>
                           </div>
                         </div>
                       </div>
                       <div className="text-center">
-                        <a href="javascript:void(0);" className="btn btn-theme button-1 text-white ctm-border-radius mt-4">Apply</a>
-                        <a href="javascript:void(0);" className="btn btn-danger text-white ctm-border-radius mt-4">Cancel</a>
+                        <button className="btn btn-theme button-1 text-white ctm-border-radius mt-4" type="submit">Apply</button>
+                        <a href="#" className="btn btn-danger text-white ctm-border-radius mt-4" onClick={() => navigate("/review")}>Cancel</a>
                       </div>
                     </form>
                   </div>
                 </div>
               </div>
-           
             </div>
           </div>
         </div>
       </div>
     </div>
-    {/*/Content*/}
-  
+ 
   {/* Inner Wrapper */}
   <div className="sidebar-overlay" id="sidebar_overlay" />
-  {/*Delete The Modal */}
-  <div className="modal fade" id="delete">
-    <div className="modal-dialog modal-dialog-centered">
-      <div className="modal-content">
-        {/* Modal body */}
-        <div className="modal-body">
-          <button type="button" className="close" data-dismiss="modal">×</button>
-          <h4 className="modal-title mb-3">Are You Sure Want to Delete?</h4>
-          <button type="button" className="btn btn-danger ctm-border-radius text-white text-center mb-2 mr-3" data-dismiss="modal">Cancel</button>
-          <button type="button" className="btn btn-theme button-1 ctm-border-radius text-white text-center mb-2" data-dismiss="modal">Delete</button>
-        </div>
-      </div>
-    </div>
-  </div>
   {/* jQuery */}
   {/* Bootstrap Core JS */}
   {/* Sticky sidebar JS */}

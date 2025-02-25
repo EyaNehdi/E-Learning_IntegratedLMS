@@ -208,7 +208,7 @@ function Headeradmin() {
                     <li className="mr-1 "><a className="text-dark btn-ctm-space" href="/leave"><span className="lnr lnr-briefcase pr-0 pr-lg-2" /><span className="d-none d-lg-inline">Leave</span></a></li>
                     <li className="mr-1"><a className="text-dark btn-ctm-space" href="/report"><span className="lnr lnr-rocket pr-0 pr-lg-2" /><span className="d-none d-lg-inline">Reports</span></a></li>
                     <li className="mr-1"><a className="text-dark btn-ctm-space" href="/manage"><span className="lnr lnr-sync pr-0 pr-lg-2" /><span className="d-none d-lg-inline">Manage</span></a></li>
-                    <li className="mr-1"><a className="text-dark btn-ctm-space" href="settings.html"><span className="lnr lnr-cog pr-0 pr-lg-2" /><span className="d-none d-lg-inline">Settings</span></a></li>
+                    <li className="mr-1"><a className="text-dark btn-ctm-space" href="/set"><span className="lnr lnr-cog pr-0 pr-lg-2" /><span className="d-none d-lg-inline">Settings</span></a></li>
                   </ul>
                 </div>
               </div>

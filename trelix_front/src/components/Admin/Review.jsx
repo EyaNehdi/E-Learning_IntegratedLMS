@@ -1,15 +1,45 @@
 import Headeradmin from './Headeradmin';
-function Review(){
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import axios from "axios"; 
+
+const fetchUsers = async () => {
+  const res = await axios.get("/api/admin/allUsers", { withCredentials: true });
+  return res.data;
+};
+function Review() {
+  const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
+  // Fetch users using React Query
+  const { data: users } = useQuery({
+    queryKey: ["users"],
+    queryFn: fetchUsers,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+  // Mutation to delete user
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      await axios.delete(`/api/admin/deleteUser/${id}`, { withCredentials: true });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["users"]); // Refetch users after delete
+    },
+  });
+   // Handle Delete User
+   const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      deleteMutation.mutate(id);
+    }
+  };
 
                       return(
-
-  
 <div>
   {/* Mirrored from dleohr.dreamstechnologies.com/template-1/dleohr-horizontal/reviews.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 21 Feb 2025 08:54:14 GMT */}
   {/* Required meta tags */}
   <meta charSet="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Reviews Page</title>
+  <title>Dashboard Admin</title>
   {/* Favicon */}
   <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
 <div>
@@ -28,15 +58,7 @@ function Review(){
     <link rel="stylesheet" href="assetss/css/style.css" />
   </div>
 </div>
-
-
-
-
-
 <Headeradmin/>
-
-
-
     <div className="page-wrapper" style={{
     marginBlock: "2px"}}
 >
@@ -51,10 +73,10 @@ function Review(){
                       <div className="custom-search input-group">
                         <div className="custom-breadcrumb">
                           <ol className="breadcrumb no-bg-color d-inline-block p-0 m-0 mb-2">
-                            <li className="breadcrumb-item d-inline-block"><a href="index.html" className="text-dark">Home</a></li>
-                            <li className="breadcrumb-item d-inline-block active">Reviews</li>
+                            <li className="breadcrumb-item d-inline-block"><a href="index.html" className="text-dark">Dashboard</a></li>
+                            <li className="breadcrumb-item d-inline-block active">Users</li>
                           </ol>
-                          <h4 className="text-dark">Reviews</h4>
+                          <h4 className="text-dark">User management</h4>
                         </div>
                       </div>
                     </div>
@@ -79,318 +101,56 @@ function Review(){
           <div className="col-xl-9 col-lg-8  col-md-12">
             <div className="card shadow-sm ctm-border-radius">
               <div className="card-body align-center">
-                <div className="tab-content" id="v-pills-tabContent">
-                  {/* Tab1*/}
                   <div className="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
                     <div className="employee-office-table">
-                      <div className="table-responsive">
-                        <table className="table custom-table table-hover">
-                          <thead>
-                            <tr>
-                              <th>Review Name</th>
-                              <th>Reviewers</th>
-                              <th>Begin On</th>
-                              <th>Due By</th>
-                              <th>Status</th>
-                              <th>Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Monthly Review</td>
-                              <td>
-                                <a href="employment.html" className="avatar"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></a>
-                                <h2><a href="employment.html"> Richard Wilson</a></h2>
-                              </td>
-                              <td>15 Dec 2019</td>
-                              <td>17 Dec 2019</td>
-                              <td>
-                                <div className="dropdown action-label drop-active">
-                                  <a href="javascript:void(0)" className="btn btn-white btn-sm dropdown-toggle" data-toggle="dropdown"> In Progress <i className="caret" /></a>
-                                  <div className="dropdown-menu">
-                                    <a className="dropdown-item" href="javascript:void(0)"> In Progress</a>
-                                    <a className="dropdown-item" href="javascript:void(0)"> Completed</a>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <div className="table-action">
-                                  <a href="edit-review.html" className="btn btn-sm btn-outline-success">
-                                    <span className="lnr lnr-pencil" /> Edit
-                                  </a>
-                                  <a href="javascript:void(0);" className="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#delete">
-                                    <span className="lnr lnr-trash" /> Delete
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>Employees Review</td>
-                              <td>
-                                <a href="employment.html" className="avatar"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></a>
-                                <h2><a href="employment.html"> Richard Wilson</a></h2>
-                              </td>
-                              <td>15 Dec 2019</td>
-                              <td>17 Dec 2019</td>
-                              <td>
-                                <div className="dropdown action-label drop-active">
-                                  <a href="javascript:void(0)" className="btn btn-white btn-sm dropdown-toggle" data-toggle="dropdown"> In Progress <i className="caret" /></a>
-                                  <div className="dropdown-menu">
-                                    <a className="dropdown-item" href="javascript:void(0)"> In Progress</a>
-                                    <a className="dropdown-item" href="javascript:void(0)"> Completed</a>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <div className="table-action">
-                                  <a href="edit-review.html" className="btn btn-sm btn-outline-success">
-                                    <span className="lnr lnr-pencil" /> Edit
-                                  </a>
-                                  <a href="javascript:void(0);" className="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#delete">
-                                    <span className="lnr lnr-trash" /> Delete
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>Employees Review</td>
-                              <td>
-                                <a href="employment.html" className="avatar"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></a>
-                                <h2><a href="employment.html"> Richard Wilson</a></h2>
-                              </td>
-                              <td>15 Dec 2019</td>
-                              <td>17 Dec 2019</td>
-                              <td>
-                                <div className="dropdown action-label drop-active">
-                                  <a href="javascript:void(0)" className="btn btn-white btn-sm dropdown-toggle" data-toggle="dropdown"> In Progress <i className="caret" /></a>
-                                  <div className="dropdown-menu">
-                                    <a className="dropdown-item" href="javascript:void(0)"> In Progress</a>
-                                    <a className="dropdown-item" href="javascript:void(0)"> Completed</a>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <div className="table-action">
-                                  <a href="edit-review.html" className="btn btn-sm btn-outline-success">
-                                    <span className="lnr lnr-pencil" /> Edit
-                                  </a>
-                                  <a href="javascript:void(0);" className="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#delete">
-                                    <span className="lnr lnr-trash" /> Delete
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>Employees Review</td>
-                              <td>
-                                <a href="employment.html" className="avatar"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></a>
-                                <h2><a href="employment.html"> Richard Wilson</a></h2>
-                              </td>
-                              <td>15 Dec 2019</td>
-                              <td>17 Dec 2019</td>
-                              <td>
-                                <div className="dropdown action-label drop-active">
-                                  <a href="javascript:void(0)" className="btn btn-white btn-sm dropdown-toggle" data-toggle="dropdown"> In Progress <i className="caret" /></a>
-                                  <div className="dropdown-menu">
-                                    <a className="dropdown-item" href="javascript:void(0)"> In Progress</a>
-                                    <a className="dropdown-item" href="javascript:void(0)"> Completed</a>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <div className="table-action">
-                                  <a href="edit-review.html" className="btn btn-sm btn-outline-success">
-                                    <span className="lnr lnr-pencil" /> Edit
-                                  </a>
-                                  <a href="javascript:void(0);" className="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#delete">
-                                    <span className="lnr lnr-trash" /> Delete
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>Employees Review</td>
-                              <td>
-                                <a href="employment.html" className="avatar"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></a>
-                                <h2><a href="employment.html"> Richard Wilson</a></h2>
-                              </td>
-                              <td>15 Dec 2019</td>
-                              <td>17 Dec 2019</td>
-                              <td>
-                                <div className="dropdown action-label drop-active">
-                                  <a href="javascript:void(0)" className="btn btn-white btn-sm dropdown-toggle" data-toggle="dropdown"> In Progress <i className="caret" /></a>
-                                  <div className="dropdown-menu">
-                                    <a className="dropdown-item" href="javascript:void(0)"> In Progress</a>
-                                    <a className="dropdown-item" href="javascript:void(0)"> Completed</a>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <div className="table-action">
-                                  <a href="edit-review.html" className="btn btn-sm btn-outline-success">
-                                    <span className="lnr lnr-pencil" /> Edit
-                                  </a>
-                                  <a href="javascript:void(0);" className="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#delete">
-                                    <span className="lnr lnr-trash" /> Delete
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                      <div className="table-responsive" style={{ maxHeight: "500px", overflowY: "auto" }}>
+                      <table className="table custom-table table-hover">
+        <thead>
+          <tr>
+            <th>User FirstName</th>
+            <th>User LastName</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users?.map((user) => (
+            <tr key={user._id}>
+              <td>{user.firstName}</td>
+              <td>{user.lastName}</td>
+              <td>{user.email}</td>
+              <td>
+                {user.role}
+              </td>
+              <td>
+              <button
+    className="btn btn-sm btn-outline-primary"
+    onClick={() => navigate(`/leave/${user._id}`)}
+  >
+    Update
+  </button>
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => handleDelete(user._id)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
                       </div>
                     </div>
                   </div>
-                  {/*/Tab 1*/}
-                  {/* Tab2*/}
-                  <div className="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-                    <div className="employee-office-table">
-                      <div className="table-responsive">
-                        <table className="table custom-table table-hover">
-                          <thead>
-                            <tr>
-                              <th>Name</th>
-                              <th>Created By</th>
-                              <th>Scheduled For</th>
-                              <th>Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Monthly Review</td>
-                              <td>
-                                <a href="employment.html" className="avatar"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></a>
-                                <h2><a href="employment.html"> Richard Wilson</a></h2>
-                              </td>
-                              <td>
-                                Everyone
-                              </td>
-                              <td>
-                                <div className="table-action">
-                                  <a href="edit-review.html" className="btn btn-sm btn-outline-success">
-                                    <span className="lnr lnr-pencil" /> Edit
-                                  </a>
-                                  <a href="javascript:void(0);" className="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#delete">
-                                    <span className="lnr lnr-trash" /> Delete
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>Employees Review</td>
-                              <td>
-                                <a href="employment.html" className="avatar"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></a>
-                                <h2><a href="employment.html"> Richard Wilson</a></h2>
-                              </td>
-                              <td>
-                                Everyone
-                              </td>
-                              <td>
-                                <div className="table-action">
-                                  <a href="edit-review.html" className="btn btn-sm btn-outline-success">
-                                    <span className="lnr lnr-pencil" /> Edit
-                                  </a>
-                                  <a href="javascript:void(0);" className="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#delete">
-                                    <span className="lnr lnr-trash" /> Delete
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>Employees Review</td>
-                              <td>
-                                <a href="employment.html" className="avatar"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></a>
-                                <h2><a href="employment.html"> Richard Wilson</a></h2>
-                              </td>
-                              <td>
-                                Everyone
-                              </td>
-                              <td>
-                                <div className="table-action">
-                                  <a href="edit-review.html" className="btn btn-sm btn-outline-success">
-                                    <span className="lnr lnr-pencil" /> Edit
-                                  </a>
-                                  <a href="javascript:void(0);" className="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#delete">
-                                    <span className="lnr lnr-trash" /> Delete
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>Employees Review</td>
-                              <td>
-                                <a href="employment.html" className="avatar"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></a>
-                                <h2><a href="employment.html"> Richard Wilson</a></h2>
-                              </td>
-                              <td>
-                                Everyone
-                              </td>
-                              <td>
-                                <div className="table-action">
-                                  <a href="edit-review.html" className="btn btn-sm btn-outline-success">
-                                    <span className="lnr lnr-pencil" /> Edit
-                                  </a>
-                                  <a href="javascript:void(0);" className="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#delete">
-                                    <span className="lnr lnr-trash" /> Delete
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>Employees Review</td>
-                              <td>
-                                <a href="employment.html" className="avatar"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></a>
-                                <h2><a href="employment.html"> Richard Wilson</a></h2>
-                              </td>
-                              <td>
-                                Everyone
-                              </td>
-                              <td>
-                                <div className="table-action">
-                                  <a href="edit-review.html" className="btn btn-sm btn-outline-success">
-                                    <span className="lnr lnr-pencil" /> Edit
-                                  </a>
-                                  <a href="javascript:void(0);" className="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#delete">
-                                    <span className="lnr lnr-trash" /> Delete
-                                  </a>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                  {/* /Tab 2*/}
-                </div>
-              </div>
+               
             </div>
           </div>
         </div>
       </div>
     </div>
-    {/*/Content*/}
-  
-  {/* Inner Wrapper */}
-  {/*Delete The Modal */}
-  <div className="modal fade" id="delete">
-    <div className="modal-dialog modal-dialog-centered">
-      <div className="modal-content">
-        {/* Modal body */}
-        <div className="modal-body">
-          <button type="button" className="close" data-dismiss="modal">×</button>
-          <h4 className="modal-title mb-4">Are You Sure Want to Delete?</h4>
-          <button type="button" className="btn btn-danger text-white text-center ctm-border-radius mb-2 mr-3" data-dismiss="modal">Cancel</button>
-          <button type="button" className="btn btn-theme button-1 text-white text-center ctm-border-radius mb-2" data-dismiss="modal">Delete</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div className="sidebar-overlay" id="sidebar_overlay" />
-  {/* Mirrored from dleohr.dreamstechnologies.com/template-1/dleohr-horizontal/reviews.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 21 Feb 2025 08:54:15 GMT */}
 </div>
-                    );
-}
-
+</div>
+                    );}
 export default Review;
-
