@@ -32,8 +32,24 @@ import { LinkedInCallback } from 'react-linkedin-login-oauth2';
 import CV from "./pages/cv";
 
 
+
+
+const RedirectAuthenticatedUser = ({ children }) => {
+	const { isAuthenticated, user } = useAuthStore();
+
+	if (isAuthenticated && user.isVerified) {
+		return <Navigate to='/' replace />;
+	}
+
+	return children;
+};
 function App() {
+
+
+
   return (
+
+
     <Router>
       <Routes>
 	  <Route path="/" element={<Index />} />

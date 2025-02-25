@@ -33,7 +33,7 @@ const register = async (req, res) => {
 
 
     console.log("✅ Email is available. Creating new user...");
-    const verificationToken = crypto.randomBytes(20).toString("hex");
+    
 
     const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
