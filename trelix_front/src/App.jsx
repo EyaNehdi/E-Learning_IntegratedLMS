@@ -1,13 +1,13 @@
 import "./App.css";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from './components/Login';
+import Login from './pages/SignIn/Login';
 import SignupInstructor from './components/Instructor/Signup';
 import SignupStudent from './components/Student/Signup';
 import Index from './components/index';
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import Dashboard from './components/Admin/Dashboard';
+import Dashboard from './components/Admin/Admin';
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import { Toaster } from "react-hot-toast";
 
