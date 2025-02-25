@@ -21,9 +21,12 @@ pipeline {
             }
         }
          stage('Install Dependencies') {
-            steps {
+              dir('') {  // Move into backend directory
+                  steps {
                 sh 'npm install'
             }
+                }
+           
         }
 
    
