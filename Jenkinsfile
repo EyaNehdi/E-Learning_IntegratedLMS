@@ -22,7 +22,7 @@ pipeline {
         }
          stage('Install Dependencies') {
              steps {
-              dir('') {  // Move into backend directory
+              dir('trelix_back') {  // Move into backend directory
                 
                 sh 'npm install'
             }
