@@ -179,7 +179,7 @@ function Login() {
                               Stay Logged In
                             </label>
                           </div>
-                          <a href="/forget" className="text-reset">
+                          <a href="/forgot-password" className="text-reset">
                             Forget Password?
                           </a>
                         </div>

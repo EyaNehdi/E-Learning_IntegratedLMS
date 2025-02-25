@@ -1,4 +1,4 @@
-
+const bcryptjs = require ('bcryptjs');
 const User = require('../models/userModel');
 const generateToken = require('../utils/generateTokenAndSetCookie');
 const bcrypt = require('bcrypt');
@@ -23,7 +23,7 @@ const register = async (req, res, role) => {
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
-	const verificationToken = crypto.randomBytes(20).toString('hex');
+    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
     const newUser = new User({
       firstName,
@@ -66,7 +66,7 @@ const regestergoogle = async (req, res, role) => {
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
-
+   
     // Create user data object
     const newUserData = {
       firstName,
@@ -171,7 +171,7 @@ const verifyEmail = async (req, res) => {
 		user.verificationToken = undefined;
 		user.verificationTokenExpiresAt = undefined;
 		await user.save();
-
+    res.status(200).json({ success: true, user });
 		
 	} catch (error) {
 		console.log("error in verifyEmail ", error);
@@ -369,7 +369,7 @@ const resetPassword = async (req, res) => {
 
 		// update password
 		const hashedPassword = await bcryptjs.hash(password, 10);
-		const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+		
 
 		user.password = hashedPassword;
 		user.resetPasswordToken = undefined;

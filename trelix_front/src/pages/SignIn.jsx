@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
+import { motion } from "framer-motion";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
