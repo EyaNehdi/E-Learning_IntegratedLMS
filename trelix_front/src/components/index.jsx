@@ -87,7 +87,7 @@ function Index() {
     <div className="container">
       <img src="assets/images/icons/dots1.png" alt="Dot 1" className="anim-img" />
       <div className="text-center sec-intro">
-      
+
         <h2 className="sec-title">Find Your <span className="color">Category</span></h2>
       </div>
       <div className="row g-4">
@@ -822,7 +822,6 @@ function Index() {
   <section className="choose-sec sec-padding overflow-hidden">
     <div className="container">
       <div className="text-center sec-intro">
-
         <h2 className="sec-title">Why Choose <span className="color">Trelix</span></h2>
       </div>
       <div className="row">
