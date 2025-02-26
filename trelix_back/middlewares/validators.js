@@ -26,7 +26,7 @@ const schema = yup.object({
 
 const validateInput = async (req, res, next) => {
   try {
-    await schema.validate(req.body, { abortEarly: false });  // `abortEarly: false` allows for all errors to be returned
+    await schema.validate(req.body, { abortEarly: false });  // abortEarly: false allows for all errors to be returned
     next();  // If validation passes, move to the next middleware
   } catch (error) {
     const errors = error.inner.reduce((acc, curr) => {

@@ -4,7 +4,8 @@ import { useAuthStore } from "../store/authStore";
 import Input from "../components/Input";
 import { ArrowLeft, Loader, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 const ForgotPasswordPage = () => {
 	const [email, setEmail] = useState("");
 	const [isSubmitted, setIsSubmitted] = useState(false);
@@ -18,7 +19,10 @@ const ForgotPasswordPage = () => {
 	};
 
 	return (
+		<div>
+			<Header />
 		<div className="min-h-screen flex items-center justify-center py-8">
+			
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
@@ -78,6 +82,8 @@ const ForgotPasswordPage = () => {
 					</Link>
 				</div>
 			</motion.div>
+		</div>
+		<Footer />
 		</div>
 	);
 };
