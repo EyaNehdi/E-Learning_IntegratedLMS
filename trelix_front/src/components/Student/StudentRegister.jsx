@@ -161,6 +161,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
       );
 
       if (responseData.data) {
+        
         navigate("/Home"); // Redirect after successful login
       }
     } catch (err) {
@@ -293,6 +294,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
       );
 
       if (response.data) {
+        navigate('/verify-email');
         setisRegisterSuccess(true);
       }
     } catch (err) {
