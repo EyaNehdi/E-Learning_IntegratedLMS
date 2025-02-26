@@ -1,3 +1,4 @@
+
 import { useGoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
 import GitHubLogin from "react-github-login";
 import MicrosoftLogin from "react-microsoft-login";
@@ -238,6 +239,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
         { withCredentials: true }
       );
       if (response.data) {
+        navigate('/verify-email');
         setisRegisterSuccess(true);
       }
     } catch (err) {
