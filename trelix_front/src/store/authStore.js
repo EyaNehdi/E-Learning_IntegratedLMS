@@ -14,20 +14,20 @@ export const useAuthStore = create((set) => ({
 	isCheckingAuth: true,
 	message: null,
 
-	signup: async (firstName,lastName,email,password) => {
+	signup: async (firstName, lastName, email, password) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.post(`${API_URL}/signup`, {firstName,lastName,email,password });
+			const response = await axios.post(`${API_URL}/signup`, { firstName, lastName, email, password });
 			set({ user: response.data.user, isAuthenticated: true, isLoading: false });
 		} catch (error) {
 			set({ error: error.response.data.message || "Error signing up", isLoading: false });
 			throw error;
 		}
 	},
-	login: async (email, password ,stayLoggedIn) => {
+	login: async (email, password, stayLoggedIn) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.post(`${API_URL}/login`, { email, password,stayLoggedIn}, { withCredentials: true });
+			const response = await axios.post(`${API_URL}/login`, { email, password, stayLoggedIn }, { withCredentials: true });
 			set({
 				isAuthenticated: true,
 				user: response.data.user,
@@ -39,10 +39,10 @@ export const useAuthStore = create((set) => ({
 			throw error;
 		}
 	},
-	logingoogle: async (email,stayLoggedIn) => {
+	logingoogle: async (email, stayLoggedIn) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.post(`${API_URL}/logingoogle`, { email,stayLoggedIn}, { withCredentials: true });
+			const response = await axios.post(`${API_URL}/logingoogle`, { email, stayLoggedIn }, { withCredentials: true });
 			set({
 				isAuthenticated: true,
 				user: response.data.user,
@@ -53,8 +53,8 @@ export const useAuthStore = create((set) => ({
 			set({ error: error.response?.data?.message || "Error logging in", isLoading: false });
 			throw error;
 		}
-	},  
-	  
+	},
+
 
 	logout: async () => {
 		set({ isLoading: true, error: null });
@@ -66,25 +66,72 @@ export const useAuthStore = create((set) => ({
 			throw error;
 		}
 	},
-	
+
+
+
+	verifyEmail: async (code) => {
+		set({ isLoading: true, error: null });
+
+		try {
+			const response = await axios.post(`${API_URL}/verify-email`, { code });
+			if (response.data.success) {
+				set({ user: response.data.user, isAuthenticated: true, isLoading: false });
+				return response.data;
+			}
+		} catch (error) {
+			set({ error: error.response.data.message || "Error verifying email", isLoading: false });
+			throw error;
+		}
+	},
+
+
+	forgotPassword: async (email) => {
+		set({ isLoading: true, error: null });
+		try {
+			const response = await axios.post(`${API_URL}/forgot-password`, { email });
+			set({ message: response.data.message, isLoading: false });
+		} catch (error) {
+			set({
+				isLoading: false,
+				error: error.response.data.message || "Error sending reset password email",
+			});
+			throw error;
+		}
+	},
+
+
+
+	resetPassword: async (token, password) => {
+		set({ isLoading: true, error: null });
+		try {
+			const response = await axios.post(`${API_URL}/reset-password/${token}`, { password });
+			set({ message: response.data.message, isLoading: false });
+		} catch (error) {
+			set({
+				isLoading: false,
+				error: error.response.data.message || "Error resetting password",
+			});
+			throw error;
+		}
+	},
 	checkAuth: async () => {
 		set({ isCheckingAuth: true, error: null });
 		try {
-			const response = await axios.get(`${API_URL}/check-auth`,  {credentials: 'include'});
+			const response = await axios.get(`${API_URL}/check-auth`, { credentials: 'include' });
 			if (response.status === 200) {
-				set({ 
-					user: response.data.user, 
+				set({
+					user: response.data.user,
 					isAuthenticated: true,
-					isCheckingAuth: false 
+					isCheckingAuth: false
 				});
 			} else {
-				set({ 
+				set({
 					isAuthenticated: false,
-					isCheckingAuth: false 
+					isCheckingAuth: false
 				});
 			}
 		} catch (error) {
-			set({ 
+			set({
 				isAuthenticated: false,
 				isCheckingAuth: false,
 				error: "Authentication check failed"
@@ -93,5 +140,8 @@ export const useAuthStore = create((set) => ({
 		}
 	},
 
-	
+
+
+
+
 }));

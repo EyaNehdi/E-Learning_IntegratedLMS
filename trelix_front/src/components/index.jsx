@@ -11,7 +11,7 @@ function Index() {
   <meta name="description" content="An ideal tempalte for online education, e-Learning, Course School, Online School, Kindergarten, Classic LMS, University, Language Academy, Coaching, Online Course, Single Course, and Course marketplace." />
   <meta name="keywords" content="bootstrap 5, online course, education, creative, gulp, business, minimal, modern, course, one page, responsive, saas, e-Learning, seo, startup, html5, site template" />
   <meta name="author" content="theme-village" />
-  <title>Trelix</title>
+  <title>Trelix - Online Courses and Education HTML5 Template</title>
   <link rel="apple-touch-icon" href="assets/images/favicon.png" />
   <link rel="shortcut icon" href="assets/images/favicon.ico" />
   <link rel="stylesheet" href="assets/css/feather.css" />
@@ -87,7 +87,7 @@ function Index() {
     <div className="container">
       <img src="assets/images/icons/dots1.png" alt="Dot 1" className="anim-img" />
       <div className="text-center sec-intro">
-        <span className="badge-lg bg-primary rounded-5">Popular Categories</span>
+
         <h2 className="sec-title">Find Your <span className="color">Category</span></h2>
       </div>
       <div className="row g-4">
@@ -257,7 +257,7 @@ function Index() {
     <div className="container">
       <div className="d-flex justify-content-between align-items-top">
         <div className="sec-intro">
-          <span className="badge-lg bg-primary rounded-5">Trending Courses</span>
+
           <h2 className="sec-title mb-4">Our Popular <span className="color">Courses</span></h2>
         </div>
         <div className="custom-nav d-flex gap-3 align-items-center">
@@ -726,7 +726,7 @@ function Index() {
     <span className="anim-img anim-right"><img src="assets/images/icons/instructor-shape.png" alt="Instructor" /></span>
     <div className="container">
       <div className="text-center sec-intro">
-        <span className="badge-lg bg-primary rounded-5">Professional Instructor</span>
+
         <h2 className="sec-title">Meet Our <span className="color">Instructors</span></h2>
       </div>
       <div className="row justify-content-center g-3 g-lg-4">
@@ -822,8 +822,7 @@ function Index() {
   <section className="choose-sec sec-padding overflow-hidden">
     <div className="container">
       <div className="text-center sec-intro">
-        <span className="badge-lg bg-primary rounded-5">Core Features</span>
-        <h2 className="sec-title">Why Choose <span className="color">Eduxo</span></h2>
+        <h2 className="sec-title">Why Choose <span className="color">Trelix</span></h2>
       </div>
       <div className="row">
         <div className="col-lg-12">
