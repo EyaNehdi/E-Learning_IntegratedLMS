@@ -3,7 +3,10 @@ const router = express.Router();
 const { registerStudent,
      registerInstructor,
       checkAuth,
-       signIn,signOut,verifyEmail,forgotPassword,resetPassword,registerInstructorgoogle,registerInstructorgithub,registerStudentgithub,registerStudentgoogle, signIngoogle, signIngithub , registerLinkedIn} = require('../controllers/authController');
+       signIn,signOut,verifyEmail,forgotPassword,resetPassword,registerInstructorgoogle,registerInstructorgithub,registerStudentgithub,registerStudentgoogle, signIngoogle, signIngithub , registerLinkedIn,
+       registerInstructorLinkedin,
+       registerStudentLinkedin,
+       signInlinkedin} = require('../controllers/authController');
 const { verifyToken } = require ('../middlewares/verifyToken.js');
 const { validateInput } = require ('../middlewares/validators.js');
 
@@ -17,8 +20,10 @@ router.post('/register/google', registerInstructorgoogle);
 router.post('/register/github', registerInstructorgithub);
 router.post('/register/githubStudent', registerStudentgithub);
 router.post('/register/googleStudent', registerStudentgoogle);
+router.post('/register/linkedinInstructor', registerInstructorLinkedin);
+router.post('/register/linkedinStudent', registerStudentLinkedin);
 
-router.post("/register/linkedin", registerLinkedIn);
+router.post("/loginLinkedIn", signInlinkedin);
 router.post("/login", signIn);
 router.post("/logingoogle", signIngoogle);
 router.post("/loginGit", signIngithub);
