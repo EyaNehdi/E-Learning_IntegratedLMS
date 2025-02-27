@@ -9,8 +9,15 @@ import { useState, useEffect, useRef } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { motion } from "framer-motion";
 import PasswordStrengthMeter from "../PasswordStrengthMeter";
+import { useLinkedIn, LinkedIn } from 'react-linkedin-login-oauth2';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
+
 const InstructorRegister = ({ setisRegisterSuccess }) => {
   const navigate = useNavigate();
+ 
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -21,6 +28,8 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { isAuthenticated, checkAuth } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRegisterSuccess, setIsRegisterSuccess] = useState(false); 
   useEffect(() => {
     console.log("🟢 isAuthenticated state:", isAuthenticated);
     if (isAuthenticated) {
@@ -31,6 +40,50 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
     console.log("🟢 Checking authentication on mount...");
     checkAuth();
   }, [checkAuth]);
+
+  const { linkedInLogin } = useLinkedIn({
+    clientId: "86un9qr2kersxv",
+    redirectUri: "http://localhost:5173/linkedin/callback",
+    scope: "openid profile w_member_social email",
+    onSuccess: async (code, state) => {
+        console.log("LinkedIn code:", code);
+        setIsLoading(true); // Start loading
+
+        try {
+            const response = await axios.post(
+                "http://localhost:5000/api/auth/register/linkedinInstructor",
+                { code }
+            );
+
+            if (response.data) {
+               
+                setIsRegisterSuccess(true);
+                setisRegisterSuccess(true);
+            } else {
+                throw new Error("No token received from backend");
+            }
+        } catch (error) {
+          
+          toast.error("This LinkedIn account already exists. Redirecting to login...");
+            
+
+
+
+            setTimeout(() => {
+              window.location.href = "http://localhost:5173/login";
+          }, 2000);
+          console.error("Error:", error)
+        } finally {
+            // Simulate a 5-second wait
+            setTimeout(() => {
+                setIsLoading(false); // Stop loading
+            }, 2000);
+        }
+    },
+    onError: (error) => {
+        console.error("LinkedIn Error:", error);
+    },
+});
 
   const handleGoogleLoginSuccess = async (response) => {
     try {
@@ -57,7 +110,10 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
       }
       setLoading(false);
     } catch (err) {
-      setError("Google signup failed. Please try again.");
+      toast.error("This Google account already exists. Redirecting to login...");
+      setTimeout(() => {
+        window.location.href = "http://localhost:5173/login";
+    }, 2000);
       console.error(err);
     }
   };
@@ -82,7 +138,12 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
         setisRegisterSuccess(true);
       }
     } catch (err) {
-      setError("GitHub signup failed. Please try again.");
+      
+      toast.error("This Github account already exists. Redirecting to login...");
+      setTimeout(() => {
+        window.location.href = "http://localhost:5173/login";
+    }, 2000);
+      
       console.error(err);
     }
   };
@@ -285,7 +346,9 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
   };
 
   return (
+    
     <>
+    <ToastContainer position="top-right" autoClose={2000} />
       <div className="signup-form m-0">
         <h1 className="display-3 text-center mb-5">Let’s Sign Up Instructor</h1>
         {error && <div className="error-message">{error}</div>}
@@ -431,6 +494,16 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
                 width="24"
                 height="24"
                 onClick={triggerGitHubLogin}
+                style={{ cursor: "pointer" }}
+              />
+            </div>
+            <div className="">
+              <img
+                src="/assets/icons/linkedin.png"
+                alt="Linkdine"
+                width="30"
+                height="30"
+                onClick={linkedInLogin}
                 style={{ cursor: "pointer" }}
               />
             </div>
