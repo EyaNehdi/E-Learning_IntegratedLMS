@@ -32,7 +32,7 @@ import Settings from './components/Admin/Settings';
 
 import { LinkedInCallback } from 'react-linkedin-login-oauth2';
 import CV from "./pages/cv";
-
+import ProtectedRoute from "./pages/ProtectedRoute"; 
 
 
 
