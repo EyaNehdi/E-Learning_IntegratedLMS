@@ -12,8 +12,8 @@ import { useState, useEffect, useRef } from "react";
 import PasswordStrengthMeter from "../PasswordStrengthMeter";
 import { motion } from "framer-motion";
 import { useLinkedIn, LinkedIn } from 'react-linkedin-login-oauth2';
-// You can use provided image shipped by this package or using your own
-import linkedin from 'react-linkedin-login-oauth2/assets/linkedin.png';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const StudentRegister = ({ setisRegisterSuccess }) => {
   const location = useLocation();
@@ -46,18 +46,22 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/auth/register/linkedin",
+                "http://localhost:5000/api/auth/register/linkedinStudent",
                 { code }
             );
 
-            if (response.data.token) {
-                localStorage.setItem("token", response.data.token);
+            if (response.data) {
+               
                 setIsRegisterSuccess(true);
                 setisRegisterSuccess(true);
             } else {
                 throw new Error("No token received from backend");
             }
         } catch (error) {
+          toast.error("This Linkedin account already exists. Redirecting to login...");
+          setTimeout(() => {
+            window.location.href = "http://localhost:5173/login";
+        }, 2000);
             console.error("Error:", error);
         } finally {
             // Simulate a 5-second wait
@@ -110,7 +114,10 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
         setisRegisterSuccess(true);
       }
     } catch (err) {
-      setError("Google signup failed. Please try again.");
+      toast.error("This Google account already exists. Redirecting to login...");
+      setTimeout(() => {
+        window.location.href = "http://localhost:5173/login";
+    }, 2000);
       console.error(err);
     }
   };
@@ -139,7 +146,10 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
         setisRegisterSuccess(true);
       }
     } catch (err) {
-      setError("GitHub signup failed. Please try again.");
+      toast.error("This Github account already exists. Redirecting to login...");
+      setTimeout(() => {
+        window.location.href = "http://localhost:5173/login";
+    }, 2000);
       console.error(err);
     }
   };
@@ -331,6 +341,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
 
   return (
     <>
+      <ToastContainer position="top-right" autoClose={2000} />
       <div className="signup-form m-0">
         <h1 className="display-3 text-center mb-5">Let’s Sign Up Student</h1>
         {error && <div className="error-message">{error}</div>}
@@ -480,6 +491,17 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
                 style={{ cursor: "pointer" }}
               />
             </div>
+            <div className="">
+              <img
+                src="/assets/icons/linkedin.png"
+                alt="Linkdine"
+                width="30"
+                height="30"
+                onClick={linkedInLogin}
+                style={{ cursor: "pointer" }}
+              />
+            </div>
+           
           </div>
           <p>
             Already have an account?{" "}
@@ -488,11 +510,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
             </a>
           </p>
         </div>
-        <div>
-            <button onClick={linkedInLogin}>Login with LinkedIn</button>
-            {isLoading && <div>Loading... Please wait.</div>} {/* Show loading message */}
-            {isRegisterSuccess && <div>Registration Successful!</div>}
-        </div>
+      
       </div>
     </>
   );

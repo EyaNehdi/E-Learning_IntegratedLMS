@@ -39,6 +39,7 @@
     "react-linkedin-login-oauth2": "^2.0.1",
     "react-microsoft-login": "^2.0.1",
     "react-router-dom": "^7.1.5",
+    "react-toastify": "^11.0.5",
     "recharts": "^2.15.1",
     "styled-components": "^6.1.15",
     "trelix_front": "file:",
