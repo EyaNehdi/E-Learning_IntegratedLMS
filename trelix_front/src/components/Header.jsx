@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useProfileStore } from "../store/profileStore";
@@ -6,6 +6,7 @@ import Buttons from "./Buttons";
 
 
 function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, logout } = useAuthStore();
   const navigate = useNavigate();
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -33,7 +34,7 @@ function Header() {
         <div className="header-top bg-primary text-info text-uppercase">
           <div className="marquee">
             <p>
-      
+
               <span>Learn Today Lead Tomorrow</span>
               <span>Education is the dreams</span>
               <span>Education is a Way to Success in Life</span>
@@ -204,9 +205,9 @@ function Header() {
 
         <div className="header-nav-wrapper header-sticky">
           <nav className="navbar nav-center navbar-expand-xl">
-            <img src="/assets/images/ss.png" alt="Logo" style={{ marginTop: "-33px" ,marginLeft: "104px" }} />
+            <img src="/assets/images/ss.png" alt="Logo" style={{ marginTop: "-33px", marginLeft: "104px" }} />
 
-            <div className="container navbar-line px-3"  style={{marginLeft: "45px" }} >
+            <div className="container navbar-line px-3" style={{ marginLeft: "45px" }} >
               <a className="navbar-brand d-xl-none" href="index-2.html">
 
               </a>
@@ -232,33 +233,16 @@ function Header() {
                     <ul className="navbar-nav align-items-lg-center">
                       <li className="nav-item dropdown"  >
                         <a
-                          className="nav-link dropdown-toggle"
-                          href="#"
+
+                          href="/"
                           role="button"
-                          data-bs-toggle="dropdown"
+
                           aria-expanded="false"
-                          style={{ marginRight: "46px"  ,fontWeight: "bold",fontSize: "23px" }} 
+                          style={{ marginRight: "46px", fontWeight: "bold", fontSize: "23px" }}
                         >
                           Home
                         </a>
-                        <ul className="dropdown-menu">
-                          <li>
-                            <a className="dropdown-item" href="index-2.html">
-                              Home 1
-                            </a>
-                          </li>
-                          <li>
-                            <a className="dropdown-item" href="index-3.html">
-                              Home 2
-                            </a>
-                          </li>
-                          <li>
-                            <a className="dropdown-item" href="index-4.html">
-                              Home 3
-                              <span className="badge bg-primary ms-2">New</span>
-                            </a>
-                          </li>
-                        </ul>
+
                       </li>
                       <li className="nav-item dropdown">
                         <a
@@ -266,7 +250,7 @@ function Header() {
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
-                          aria-expanded="false"  style={{ marginRight: "46px" ,fontWeight: "bold" ,fontSize: "23px" }} 
+                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "23px" }}
                         >
                           Dashboard
                         </a>
@@ -422,7 +406,7 @@ function Header() {
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
-                          aria-expanded="false"  style={{ marginRight: "46px" ,fontWeight: "bold"  ,fontSize: "23px"}} 
+                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "23px" }}
                         >
                           Courses
                         </a>
@@ -478,7 +462,7 @@ function Header() {
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
-                          aria-expanded="false"  style={{ marginRight: "46px" ,fontWeight: "bold" ,fontSize: "23px" }} 
+                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "23px" }}
                         >
                           Pages
                         </a>
@@ -664,171 +648,134 @@ function Header() {
                 >
                   <i className="feather-icon icon-search" />
                 </a>
-                <div className="d-flex align-items-center ms-auto">
+
+                <div className="d-flex align-items-center ms-3.5  position-relative">
                   {isAuthenticated ? (
                     <div>
                       <a
                         className="text-reset icon rounded-5 bg-shade"
-                        data-bs-toggle="collapse"
-                        href="#collapseAdminMenu"
+                        href="#"
                         role="button"
-                        aria-expanded="false"
-                        aria-controls="collapseAdminMenu"
+                        onClick={() => setMenuOpen(!menuOpen)} // Toggle menu on click
                       >
                         <i className="feather-icon icon-user" />
                       </a>
-                      <div
-                        className="admin-menu pt-3 bg-white collapse"
-                        id="collapseAdminMenu"
-                      >
-                        <div className="d-flex avatar border-bottom pb-3">
-                          <img
-                            className="img-fluid border rounded-circle"
-                            src="assets/images/ava-sm1.jpg"
-                            width={50}
-                            alt="avatar"
-                          />
-                          <div className="grettings ps-3">
-                            {user ? (
-                              <h6 className="mb-0">
-                                {user.firstName} {user.lastName}
-                              </h6>
-                            ) : (
-                              <h6 className="mb-0">Unknown</h6>
-                            )}
-                            <small>Founder</small>
+                      {menuOpen && ( // Show menu if state is true
+                        <div className="admin-menu pt-3 bg-white">
+                          <div className="d-flex avatar border-bottom pb-3">
+                            <img
+                              className="img-fluid border rounded-circle"
+                              src="assets/images/ava-sm1.jpg"
+                              width={50}
+                              alt="avatar"
+                            />
+                            <div className="d-flex avatar border-bottom pb-3">
+                              {user ? (
+                                <h6 className="mb-0">
+                                  {user.firstName} {user.lastName}
+                                </h6>
+                              ) : (
+                                <h6 className="mb-0">Pleas login you dont have account </h6>
+                              )}
+                              <small>Founder</small>
+                            </div>
                           </div>
+                          <nav className="dashboard-nav mt-1">
+                            <ul className="list-unstyled nav">
+                              <li>
+                                <a className="nav-link" href="/admin">
+                                  <i className="feather-icon icon-home" />
+                                  <span>Dashboard</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a className="nav-link" href="/profile">
+                                  <i className="feather-icon icon-user" />
+                                  <span>My Profile</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a className="nav-link" href="instructor-enrolled-courses.html">
+                                  <i className="feather-icon icon-book-open" />
+                                  <span>Enrolled Courses</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a className="nav-link" href="instructor-wishlist.html">
+                                  <i className="feather-icon icon-gift" />
+                                  <span>Wishlist</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a className="nav-link" href="instructor-reviews.html">
+                                  <i className="feather-icon icon-star" />
+                                  <span>Reviews</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a className="nav-link" href="instructor-my-quiz-attempts.html">
+                                  <i className="feather-icon icon-box" />
+                                  <span>My Quiz Attempts</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a className="nav-link" href="instructor-order-history.html">
+                                  <i className="feather-icon icon-shopping-bag" />
+                                  <span>Order History</span>
+                                </a>
+                              </li>
+                              <li className="border-bottom" />
+                              <li>
+                                <a className="nav-link active" href="instructor-courses.html">
+                                  <i className="feather-icon icon-book" />
+                                  <span>My Courses</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a className="nav-link" href="instructor-assignments.html">
+                                  <i className="feather-icon icon-briefcase" />
+                                  <span>Assignments</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a className="nav-link" href="instructor-quiz-attempts.html">
+                                  <i className="feather-icon icon-cpu" />
+                                  <span>Quiz Attempts</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a className="nav-link" href="instructor-announcements.html">
+                                  <i className="feather-icon icon-bell" />
+                                  <span>Announcements</span>
+                                </a>
+                              </li>
+                              <li className="border-bottom" />
+                              <li>
+                                <a className="nav-link" href="instructor-settings.html">
+                                  <i className="feather-icon icon-settings" />
+                                  <span>Settings</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a className="nav-link" href="#" onClick={handleLogout}>
+                                  <i className="feather-icon icon-log-out" />
+                                  <span>Logout</span>
+                                </a>
+                              </li>
+                            </ul>
+                          </nav>
                         </div>
-                        <nav className="dashboard-nav mt-1">
-                          <ul className="list-unstyled nav">
-                            <li>
-                              <a
-                                className="nav-link"
-                                href="instructor-dashboard.html"
-                              >
-                                <i className="feather-icon icon-home" />
-                                <span>Dashboard</span>
-                              </a>
-                            </li>
-                            <li>
-                              <a className="nav-link" href="/profile">
-                                <i className="feather-icon icon-user" />
-                                <span>My Profile</span>
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="nav-link"
-                                href="instructor-enrolled-courses.html"
-                              >
-                                <i className="feather-icon icon-book-open" />
-                                <span>Enrolled Courses</span>
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="nav-link"
-                                href="instructor-wishlist.html"
-                              >
-                                <i className="feather-icon icon-gift" />
-                                <span>Wishlist</span>
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="nav-link"
-                                href="instructor-reviews.html"
-                              >
-                                <i className="feather-icon icon-star" />
-                                <span>Reviews</span>
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="nav-link"
-                                href="instructor-my-quiz-attempts.html"
-                              >
-                                <i className="feather-icon icon-box" />
-                                <span>My Quiz Attempts</span>
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="nav-link"
-                                href="instructor-order-history.html"
-                              >
-                                <i className="feather-icon icon-shopping-bag" />
-                                <span>Order History</span>
-                              </a>
-                            </li>
-                            <li className="border-bottom" />
-                            <li>
-                              <a
-                                className="nav-link active"
-                                href="instructor-courses.html"
-                              >
-                                <i className="feather-icon icon-book" />
-                                <span>My Courses</span>
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="nav-link"
-                                href="instructor-assignments.html"
-                              >
-                                <i className="feather-icon icon-briefcase" />
-                                <span>Assignments</span>
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="nav-link"
-                                href="instructor-quiz-attemps.html"
-                              >
-                                <i className="feather-icon icon-cpu" />
-                                <span>Quiz Attempts</span>
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="nav-link"
-                                href="instructor-announcements.html"
-                              >
-                                <i className="feather-icon icon-bell" />
-                                <span>Announcements</span>
-                              </a>
-                            </li>
-                            <li className="border-bottom" />
-                            <li>
-                              <a
-                                className="nav-link"
-                                href="instructor-settings.html"
-                              >
-                                <i className="feather-icon icon-settings" />
-                                <span>Settings</span>
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                className="nav-link"
-                                href=""
-                                onClick={handleLogout}
-                              >
-                                <i className="feather-icon icon-log-out" />
-                                <span>Logout</span>
-                              </a>
-                            </li>
-                          </ul>
-                        </nav>
-                      </div>
+                      )}
                     </div>
                   ) : (
                     <div className="d-flex buttons-container">
                       <Buttons />
                     </div>
-
-                  )}</div>
+                  )}
+                </div>
+               
               </div>
+              
             </div>
           </nav>
         </div>

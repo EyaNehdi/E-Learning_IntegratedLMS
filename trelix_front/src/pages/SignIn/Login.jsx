@@ -6,16 +6,20 @@ import { GoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
 import GitHubLogin from "react-github-login";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-
+import { useLinkedIn, LinkedIn } from 'react-linkedin-login-oauth2';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setLoading] = useState("");
+  const [isLoading, setLoading,] = useState("");
+  
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const navigate = useNavigate();
   const { logingoogle, login, isAuthenticated, checkAuth } = useAuthStore();
   const [error, setError] = useState("");
+  
 
   // Effect to check authentication only once on mount
   useEffect(() => {
@@ -47,7 +51,44 @@ function Login() {
       }
     }
   };
+  const { linkedInLogin } = useLinkedIn({
+    clientId: "86un9qr2kersxv",
+    redirectUri: "http://localhost:5173/linkedin/callback",
+    scope: "openid profile w_member_social email",
+    onSuccess: async (code, state) => {
+        console.log("LinkedIn code:", code);
+      
 
+        try {
+            const res = await axios.post(
+                "http://localhost:5000/api/auth/loginLinkedIn",
+                { code }
+            );
+
+            if (res.data?.email) {
+              await logingoogle(res.data.email, stayLoggedIn);
+              setLoading(false);
+            
+            } else {
+                throw new Error("No token received from backend");
+            }
+        } catch (error) {
+          toast.error("This Linkedin account dosn't exists. Redirecting to signup...");
+          setTimeout(() => {
+            window.location.href = "http://localhost:5173/signup";
+        }, 2000);
+            console.error("Error:", error);
+        } finally { 
+            // Simulate a 5-second wait
+            setTimeout(() => {
+              setLoading(false); // Stop loading
+            }, 5000);
+        }
+    },
+    onError: (error) => {
+        console.error("LinkedIn Error:", error);
+    },
+});
   const handleStayLogged = () => {
     setStayLoggedIn(!stayLoggedIn);
   };
@@ -61,6 +102,10 @@ function Login() {
     } catch (error) {
       setLoading(false);
       if (error.response?.data?.message === "Account does not exist") {
+        toast.error("This Google account dosn't exists. Redirecting to signup...");
+        setTimeout(() => {
+          window.location.href = "http://localhost:5173/signup";
+      }, 2000);
         setErrorMessage("Account does not exist");
       } else {
         setErrorMessage(error.response?.data?.message || "Error logging in");
@@ -93,8 +138,12 @@ function Login() {
         setLoading(false);
       }
     } catch (err) {
+
       setLoading(false);
-      setError("GitHub signup failed. Please try again.");
+       toast.error("This Github account dosn't exists. Redirecting to signup...");
+          setTimeout(() => {
+            window.location.href = "http://localhost:5173/signup";
+        }, 2000);
       console.error(err);
     }
   };
@@ -122,6 +171,7 @@ function Login() {
 
   return (
     <>
+    <ToastContainer position="top-right" autoClose={2000} />
       {isLoading ? (
         <Preloader />
       ) : (
@@ -248,6 +298,16 @@ function Login() {
                             onFailure={handleGitHubLoginError}
                           />
                         </div>
+                        <div className="">
+              <img
+                src="/assets/icons/linkedin.png"
+                alt="Linkdine"
+                width="30"
+                height="30"
+                onClick={linkedInLogin}
+                style={{ cursor: "pointer" }}
+              />
+            </div>
                       </div>
                     </div>
                   </div>

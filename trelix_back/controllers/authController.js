@@ -12,18 +12,31 @@ const { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail } =
 
 const axios = require('axios');
 //signup function
-const register = async (req, res, role) => {
-  const { firstName, lastName, email, password } = req.body;
+const register = async (req, res) => {
+  console.log("🔹 Received Request Body:", req.body); // Log request body
+
+  const { firstName, lastName, email, password, role } = req.body; // Ensure role is extracted
 
   try {
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || !lastName || !email || !password || !role) {
+      console.error("❌ Validation Failed: Missing Fields", { firstName, lastName, email, password, role });
       return res.status(400).json({ error: "All fields are required" });
     }
+
+    console.log("🔍 Checking if email already exists:", email);
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
+      console.error("❌ Validation Failed: Email already registered", email);
       return res.status(400).json({ error: "Email already registered" });
     }
+
+
+    console.log("✅ Email is available. Creating new user...");
+    
+
     const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+
 
     const newUser = new User({
       firstName,
@@ -34,141 +47,105 @@ const register = async (req, res, role) => {
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
     });
+
     await newUser.save();
+    console.log("✅ User saved successfully:", newUser);
 
-
-
-
-    //jwt
+    // Generate JWT Token
     generateToken(res, newUser._id);
-    //dans utils
+    console.log("✅ JWT Token generated for user:", newUser._id);
+
+    // Send verification email
     await sendVerificationEmail(newUser.email, verificationToken);
+    console.log("📧 Verification email sent to:", newUser.email);
+
     res.status(201).json({
       success: true,
       message: "Registration successful",
       user: {
         ...newUser._doc,
-        password: undefined
-      }
-
+        password: undefined,
+      },
     });
 
   } catch (err) {
+    console.error("🔥 Unexpected Error:", err);
     res.status(500).json({ error: "Registration failed: " + err.message });
   }
 };
+
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-const registerLinkedIn = async (req, res) => {
+const registerLinkedIn = async (req, res, role) => {
   const client_id = process.env.LINKEDIN_CLIENT_ID;
   const client_secret = process.env.LINKEDIN_CLIENT_SECRET;
   const redirect_uri = process.env.LINKEDIN_REDIRECT_URI;
+
   console.log("Delaying for 5 seconds...");
-      await delay(5000);
+  await delay(5000);
 
   try {
-      const authCode = req.body.code;
-      // Exchange auth code for access token
-      
-      const response = await axios.post(
-          "https://www.linkedin.com/oauth/v2/accessToken",
-          null,
-          {
-              params: {
-                  grant_type: "authorization_code",
-                  code: authCode,
-                  redirect_uri,
-                  client_id,
-                  client_secret,
-              },
-              headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-              },
-          }
-      );
-
-      // Decode the id_token to get user details
-      const idToken = response.data.id_token;
-      const decodedToken = jwt.decode(idToken);
-
-      // Extract user information
-      const { email, given_name: firstName, family_name: lastName } = decodedToken;
-
-      // Check if user exists in your database or create a new one
-      let user = await User.findOne({ email });
-      if (!user) {
-        const randomPassword = crypto.randomBytes(16).toString('hex');
-    const hashedPassword = await bcrypt.hash(randomPassword, 10);
-          user = new User({
-              email,
-              firstName,
-              lastName,
-              password: hashedPassword, 
-              role: 'student' // Add other fields as needed
-          });
-          await user.save();
+    const authCode = req.body.code;
+    
+    // Exchange auth code for access token
+    const response = await axios.post(
+      "https://www.linkedin.com/oauth/v2/accessToken",
+      null,
+      {
+        params: {
+          grant_type: "authorization_code",
+          code: authCode,
+          redirect_uri,
+          client_id,
+          client_secret,
+        },
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
       }
+    );
 
-      // Generate your application's JWT
-      const appToken = jwt.sign(
-          { userId: user._id },
-          process.env.JWT_SECRET,
-          { expiresIn: '1h' }
-      );
+    const idToken = response.data.id_token;
+    const decodedToken = jwt.decode(idToken);
 
-      // Send the token to the frontend
-      res.json({ token: appToken });
+    // Extract user information
+    const { email, given_name: firstName, family_name: lastName } = decodedToken;
 
-  } catch (error) {
-      console.error("LinkedIn Token Error:", error.response?.data || error.message);
-      res.status(500).json({ error: "LinkedIn authentication failed" });
-  }
-};
-const regestergoogle = async (req, res,role) => {
-  const { firstName, lastName, email, image, password} = req.body;
-
-  try {
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: "Email already registered" });
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ success: false, message: "User with this email already exists" });
     }
-   
-    // Create user data object
-    const newUserData = {
+
+    // Generate random password and hash it
+    const randomPassword = crypto.randomBytes(16).toString('hex');
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+    // Create new user
+    user = new User({
+      email,
       firstName,
       lastName,
-      email,
-      image,
-      role  
-    };
+      password: hashedPassword,
+      role: role
+    });
+    await user.save();
 
-    // If normal signup (not Google), include password
-    if (password) {
-      newUserData.password = password;
-    }
+    await generateToken(res, user._id);
 
-    // Save user to database
-    const newUser = new User(newUserData);
-    await newUser.save();
-
-    // Generate authentication token
-    await generateToken(res, newUser._id);
-
-    // Send success response (hide password)
     res.json({
       success: true,
       message: "Registration successful",
       user: {
-        ...newUser._doc,
-        password: undefined  // Exclude password from response
+        ...user._doc,
+        password: undefined
       }
     });
-
-  } catch (err) {
-    console.error("Google Signup Error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+  } catch (error) {
+    console.error("LinkedIn Token Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "LinkedIn authentication failed" });
   }
 };
+
 
 const regestergithub = async (req, res, role) => {
   const { code } = req.body;
@@ -260,8 +237,15 @@ const verifyEmail = async (req, res) => {
 		user.verificationToken = undefined;
 		user.verificationTokenExpiresAt = undefined;
 		await user.save();
-    res.status(200).json({ success: true, user });
-		
+		res.status(201).json({
+      success: true,
+      message: "Registration successful",
+      user: {
+        ...user._doc,
+        password: undefined
+      }
+
+    });
 	} catch (error) {
 		console.log("error in verifyEmail ", error);
 		res.status(500).json({ success: false, message: "Server error" });
@@ -291,6 +275,12 @@ const registerStudentgoogle = async (req, res) => {
 };
 const registerStudentgithub = async (req, res) => {
   await regestergithub(req, res, "student");
+};
+const registerInstructorLinkedin = async (req, res) => {
+  await registerLinkedIn(req, res, "instructor");
+};
+const registerStudentLinkedin = async (req, res) => {
+  await registerLinkedIn(req, res, "student");
 };
 
 const signIn = async (req, res) => {
@@ -406,6 +396,62 @@ const signIngithub = async (req, res) => {
     res.status(500).json({ error: 'GitHub authentication failed' });
   }
 };
+const signInlinkedin = async (req, res) => {
+  const client_id = process.env.LINKEDIN_CLIENT_ID;
+  const client_secret = process.env.LINKEDIN_CLIENT_SECRET;
+  const redirect_uri = process.env.LINKEDIN_REDIRECT_URI;
+
+  console.log("Delaying for 5 seconds...");
+  await delay(5000);
+
+  try {
+    const authCode = req.body.code;
+    
+    // Exchange auth code for access token
+    const response = await axios.post(
+      "https://www.linkedin.com/oauth/v2/accessToken",
+      null,
+      {
+        params: {
+          grant_type: "authorization_code",
+          code: authCode,
+          redirect_uri,
+          client_id,
+          client_secret,
+        },
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    const idToken = response.data.id_token;
+    const decodedToken = jwt.decode(idToken);
+
+    // Extract user information
+    const { email, given_name: firstName, family_name: lastName } = decodedToken;
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ success: false, message: "User with this email doses not exist" });
+    }
+
+   
+
+    // Create new user
+   
+    
+
+    await generateToken(res, user._id);
+
+    res.json({ email: email });
+  } catch (error) {
+    console.error("LinkedIn Authentication Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "LinkedIn authentication failed" });
+  }
+};
+
 
 
 const forgotPassword = async (req, res) => {
@@ -442,35 +488,43 @@ const forgotPassword = async (req, res) => {
 
 
 const resetPassword = async (req, res) => {
-
   try {
     const { token } = req.params;
     const { password } = req.body;
 
-    const user = await User.findOne({
-      resetPasswordToken: token,
-      resetPasswordExpiresAt: { $gt: Date.now() },
-    });
+    console.log("🔍 Requête reçue pour reset password");
+    console.log("📌 Token:", token);
+    console.log("📝 Nouveau mot de passe reçu:", password);
+
+    // Hash du mot de passe
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    console.log("🔑 Nouveau mot de passe hashé:", hashedPassword);
+
+    // Mise à jour de l'utilisateur avec findOneAndUpdate
+    const user = await User.findOneAndUpdate(
+      { resetPasswordToken: token, resetPasswordExpiresAt: { $gt: Date.now() } }, 
+      { 
+        password: hashedPassword, 
+        resetPasswordToken: null, 
+        resetPasswordExpiresAt: null 
+      }, 
+      { new: true } // Pour retourner l'utilisateur mis à jour
+    );
 
     if (!user) {
+      console.log("❌ Token invalide ou expiré");
       return res.status(400).json({ success: false, message: "Invalid or expired reset token" });
     }
 
-		// update password
-		const hashedPassword = await bcryptjs.hash(password, 10);
-		
+    console.log("✅ Utilisateur mis à jour:", user.email);
 
-    user.password = hashedPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpiresAt = undefined;
-    await user.save();
-
+    // Envoi d'un email de confirmation
     await sendResetSuccessEmail(user.email);
 
     res.status(200).json({ success: true, message: "Password reset successful" });
   } catch (error) {
-    console.log("Error in resetPassword ", error);
-    res.status(400).json({ success: false, message: error.message });
+    console.error("❌ Erreur dans resetPassword:", error);
+    res.status(500).json({ success: false, message: "Erreur interne du serveur" });
   }
 };
 
@@ -494,5 +548,9 @@ module.exports = { signIngithub,
        verifyEmail,
         forgotPassword,
          resetPassword ,
-         registerLinkedIn};
+         registerLinkedIn,
+          registerInstructorLinkedin,
+           registerStudentLinkedin,
+           signInlinkedin
+        };
 

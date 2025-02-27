@@ -2,9 +2,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate, useParams } from "react-router-dom";
-
+import Header from "../components/Header";
 import { Lock } from "lucide-react";
 import toast from "react-hot-toast";
+import Footer from "../components/Footer";
 
 const ResetPasswordPage = () => {
 	const [password, setPassword] = useState("");
@@ -35,6 +36,8 @@ const ResetPasswordPage = () => {
 	};
 
 	return (
+		<div>
+			<Header />
 		<div className="flex justify-center items-center min-h-screen">
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
@@ -86,6 +89,8 @@ const ResetPasswordPage = () => {
 					</form>
 				</div>
 			</motion.div>
+		</div>
+		<Footer />
 		</div>
 	);
 };
