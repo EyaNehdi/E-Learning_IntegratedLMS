@@ -675,7 +675,7 @@ function Header() {
                                   {user.firstName} {user.lastName}
                                 </h6>
                               ) : (
-                                <h6 className="mb-0">Unknown</h6>
+                                <h6 className="mb-0">Pleas login you dont have account </h6>
                               )}
                               <small>Founder</small>
                             </div>
@@ -773,7 +773,9 @@ function Header() {
                     </div>
                   )}
                 </div>
+               
               </div>
+              
             </div>
           </nav>
         </div>
