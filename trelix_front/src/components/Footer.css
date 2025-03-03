@@ -34,6 +34,12 @@ color: inherit; /* Ensure email address inherits color */
 .footer-widget i.icon-mail {
   color: inherit; /* Inherits default color */
 }
+.social-share-alt {
+  display: flex; /* Ensures items are in a row */
+  gap: 10px; /* Adjust spacing between icons */
+  
+
+}
 .social-share-alt a img {
 width: 19px;  /* Set a consistent width */
 height: 19px; /* Set a consistent height */
