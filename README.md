@@ -21,6 +21,13 @@ MERN is a full-stack web development framework, composed of four technologies Mo
 <img src="https://raw.githubusercontent.com/EyaNehdi/E-Learning_IntegratedLMS/refs/heads/f/Front/trelix_front/public/assets/images/architecture.png">
 </p>
 
+## :wrench: Installation & Usage
+
+- Clone the Main branch
+- Go to trelix_front directory by typing "cd trelix_front" and run "npm run dev"
+- Go to trelix_back directory by typing "cd trelix_back" and run "node app.js"
+- Go to [http://localhost:5173](http://localhost:5173/) and Enjoy 
+
 ## :man_astronaut: Show your support
 
-Give a ⭐️ if this project helped you!
+Give this repository a ⭐️ if it helped you!
