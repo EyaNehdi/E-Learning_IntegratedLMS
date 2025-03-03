@@ -1,4 +1,3 @@
-# E-Learning Platform 
 <p align="center">
 <img  src="https://raw.githubusercontent.com/EyaNehdi/E-Learning_IntegratedLMS/refs/heads/f/Front/trelix_front/public/assets/images/logoo.png" width="20%">
 </p>
@@ -6,7 +5,7 @@
 ## Summary
 Trelix is an advanced e-learning platform designed to revolutionize the way students engage with digital education.This intelligent platform goes beyond traditional LMS solutions by dynamically adjusting to individual learning styles, pacing, and preferences. Whether students need structured courses, real-time feedback, or interactive assessments.
 
-#### First, what MERN stack stands for?
+#### Technologies and Architecture
 
 MERN is a full-stack web development framework, composed of four technologies MongoDB, ExpressJS, ReactJS, NodeJS
 
@@ -20,3 +19,4 @@ MERN is a full-stack web development framework, composed of four technologies Mo
 <p align="center">
 <img src="https://raw.githubusercontent.com/EyaNehdi/E-Learning_IntegratedLMS/refs/heads/f/Front/trelix_front/public/assets/images/architecture.png">
 </p>
+**[⬆ Back to Top](#summary)**
