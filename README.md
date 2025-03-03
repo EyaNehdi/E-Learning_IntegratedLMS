@@ -1,2 +1,2 @@
 # Trelix
-<img src="/assets/images/trelix_log.svg" width="80%">
+<img src="/assets/images/logoo.png" width="80%">
