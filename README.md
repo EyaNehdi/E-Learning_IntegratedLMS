@@ -19,4 +19,3 @@ MERN is a full-stack web development framework, composed of four technologies Mo
 <p align="center">
 <img src="https://raw.githubusercontent.com/EyaNehdi/E-Learning_IntegratedLMS/refs/heads/f/Front/trelix_front/public/assets/images/architecture.png">
 </p>
-**[⬆ Back to Top](#summary)**
