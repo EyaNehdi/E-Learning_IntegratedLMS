@@ -11,9 +11,16 @@ const User = new Schema({
     mfaEnabled: { type: Boolean, default: false }, 
     mfaSecret: { type: String, default: null },
     phone: { type: String, default: null },
+    badges: [{
+      name: { type: String, required: true },  
+      description: { type: String, default: "" }, 
+      earnedAt: { type: Date, default: Date.now } ,
+      image: { type: String, default: null } 
+  }],
     backupCodes: { type: [String], default: [] }, 
-    profilePhoto: { type: String, default: null },  // Added profile photo
-    coverPhoto: { type: String, default: null },  // Added cover photo
+    skils: { type: [String], default: [] },
+    profilePhoto: { type: String, default: null },  
+    coverPhoto: { type: String, default: null },  
     resetPasswordToken: String,
 		resetPasswordExpiresAt: Date,
 		verificationToken: String,
