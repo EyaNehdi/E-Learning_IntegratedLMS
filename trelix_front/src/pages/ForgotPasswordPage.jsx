@@ -20,7 +20,7 @@ const ForgotPasswordPage = () => {
 
 	return (
 		<div>
-			<Header />
+			{/* <Header /> */}
 		<div className="min-h-screen flex items-center justify-center py-8">
 			
 			<motion.div
@@ -83,7 +83,7 @@ const ForgotPasswordPage = () => {
 				</div>
 			</motion.div>
 		</div>
-		<Footer />
+		{/* <Footer /> */}
 		</div>
 	);
 };
