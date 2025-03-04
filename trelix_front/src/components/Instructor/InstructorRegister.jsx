@@ -1,4 +1,3 @@
-
 import { useGoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
 import GitHubLogin from "react-github-login";
 import MicrosoftLogin from "react-microsoft-login";
@@ -20,17 +19,6 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { isAuthenticated, checkAuth } = useAuthStore();
-  useEffect(() => {
-    console.log("🟢 isAuthenticated state:", isAuthenticated);
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
-  useEffect(() => {
-    console.log("🟢 Checking authentication on mount...");
-    checkAuth();
-  }, [checkAuth]);
 
   const handleGoogleLoginSuccess = async (response) => {
     try {
@@ -105,7 +93,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
       );
 
       if (responseData.data) {
-        navigate("/Home"); // Redirect after successful login
+        navigate("/home"); // Redirect after successful login
       }
     } catch (err) {
       setError(
@@ -239,7 +227,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
         { withCredentials: true }
       );
       if (response.data) {
-        navigate('/verify-email');
+        navigate("/verify-email");
         setisRegisterSuccess(true);
       }
     } catch (err) {
@@ -257,12 +245,6 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
   const handleMicrosoftLoginError = () => {
     setError("Microsoft login failed.");
   };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
 
   const githubRef = useRef(null);
   const triggerGitHubLogin = () => {

@@ -7,20 +7,21 @@ const crypto = require("crypto");
 
 const generateMFA = async (userId) => {
   try {
+    const user = await User.findById(userId);
+    if (!user) throw new Error("User not found");
+
     const secret = speakeasy.generateSecret({
-      name: `${process.env.AppIssuer} (${userId})`,
+      name: `${process.env.AppIssuer} (${user.email})`,
       issuer: process.env.AppIssuer,
     });
 
     const encryptedSecret = encryptSecret(secret.base32);
 
-    const user = await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
       userId,
       { mfaSecret: encryptedSecret, mfaEnabled: true },
       { new: true }
     );
-
-    if (!user) throw new Error("User not found");
 
     const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url);
 
@@ -60,7 +61,6 @@ function generateCodes() {
   const codes = new Set();
   while (codes.size < 8) {
     const newCode = generateSingleCode();
-    console.log(newCode);
     codes.add(newCode);
   }
   return Array.from(codes);

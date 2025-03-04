@@ -2,32 +2,12 @@ import InstructorRegister from "../../components/Instructor/InstructorRegister";
 import StudentRegister from "../../components/Student/StudentRegister";
 import MfaSetup from "../../components/MfaSetup/MfaSetup";
 import React, { useState } from "react";
-import { useProfileStore } from "../../store/profileStore";
-import { useEffect } from "react";
 import "./signupStyle.css";
 
 function SignUpPage() {
   const [isInstructor, setIsInstructor] = useState(true);
   const [isRegisterSuccess, setisRegisterSuccess] = useState(false);
-  const [userId, setUserId] = useState(null);
-  const { user, fetchUser } = useProfileStore();
 
-  useEffect(() => {
-    if (isRegisterSuccess) {
-      fetchUser();
-    }
-  }, [isRegisterSuccess]);
-
-  useEffect(() => {
-    if (user) {
-      console.log("User after fetch:", user);
-      setUserId(user._id);
-    }
-  }, [user]);
-
-  const toggleSignup = () => {
-    setIsInstructor((prevState) => !prevState);
-  };
   return (
     <div className="vh-100 d-flex align-items-center justify-content-center m-0 p-0">
       <title>Sign up to Trelix . Trelix</title>
