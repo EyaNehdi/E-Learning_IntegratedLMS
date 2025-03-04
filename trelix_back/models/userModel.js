@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
 const User = new Schema({
+
     id:String,
     firstName: String,
     lastName: String,
@@ -17,7 +18,13 @@ const User = new Schema({
       earnedAt: { type: Date, default: Date.now } ,
       image: { type: String, default: null } 
   }],
-    backupCodes: { type: [String], default: [] }, 
+      
+     backupCodes: [
+    {
+      code: { type: String, required: true },
+      used: { type: Boolean, default: false },
+    },
+  ], 
     skils: { type: [String], default: [] },
     profilePhoto: { type: String, default: null },  
     coverPhoto: { type: String, default: null },  
@@ -29,23 +36,26 @@ const User = new Schema({
         type: String, 
         enum: ["superAdmin","admin", "student", "instructor"]
       }
+
+
+
 });
 // Hashing Password
-User.pre('save', async function(next) {
-    if (!this.isModified('password')) return next();
-    
-    try {
-      const salt = await bcrypt.genSalt(10);
-      this.password = await bcrypt.hash(this.password, salt);
-      next();
-    } catch (err) {
-      next(err);
-    }
-  });
+User.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
-  // Compare Password while login
-  User.methods.comparePassword = async function(userPassword) {
-    return await bcrypt.compare(userPassword, this.password);
-  };
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
-module.exports =mongoose.model('User', User);
+// Compare Password while login
+User.methods.comparePassword = async function (userPassword) {
+  return await bcrypt.compare(userPassword, this.password);
+};
+
+module.exports = mongoose.model('User', User);

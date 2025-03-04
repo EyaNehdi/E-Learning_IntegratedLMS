@@ -1,4 +1,3 @@
-
 import { useGoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
 import GitHubLogin from "react-github-login";
 import MicrosoftLogin from "react-microsoft-login";
@@ -27,19 +26,6 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { isAuthenticated, checkAuth } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRegisterSuccess, setIsRegisterSuccess] = useState(false); 
-  useEffect(() => {
-    console.log("🟢 isAuthenticated state:", isAuthenticated);
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
-  useEffect(() => {
-    console.log("🟢 Checking authentication on mount...");
-    checkAuth();
-  }, [checkAuth]);
 
   const { linkedInLogin } = useLinkedIn({
     clientId: "86un9qr2kersxv",
@@ -166,7 +152,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
       );
 
       if (responseData.data) {
-        navigate("/Home"); // Redirect after successful login
+        navigate("/home"); // Redirect after successful login
       }
     } catch (err) {
       setError(
@@ -193,45 +179,45 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
   //Controle de saisie
   const validateForm = () => {
     const newErrors = {};
-
-    if (formData.firstName.trim().length < 2) {
-      newErrors.firstName = "First name must be at least 2 characters.";
+  
+    // Validate first name: strictly letters and minimum 3 characters
+    if (!/^[A-Za-z]{3,}$/.test(formData.firstName.trim())) {
+      newErrors.firstName = "First name must be at least 3 letters and contain only letters.";
     }
-
-    if (formData.lastName.trim().length < 2) {
-      newErrors.lastName = "Last name must be at least 2 characters.";
+  
+    // Validate last name: strictly letters and minimum 3 characters
+    if (!/^[A-Za-z]{3,}$/.test(formData.lastName.trim())) {
+      newErrors.lastName = "Last name must be at least 3 letters and contain only letters.";
     }
-
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Invalid email format.";
+  
+    // Validate email: letters/numbers / optional period + @ + letters only + . + letters only
+    if (!/^[A-Za-z]+(?:\.[A-Za-z0-9]+)?@[A-Za-z]+\.[A-Za-z]+$/
+.test(formData.email.trim())) {
+      newErrors.email = "Invalid email format (e.g., example@domain.com).";
     }
-
+  
+    // Validate password: min 6 chars, at least one uppercase, one lowercase, one number, one special character
     if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters.";
+    } else {
+      if (!/[A-Z]/.test(formData.password)) {
+        newErrors.password = "Password must contain at least one uppercase letter.";
+      }
+      if (!/[a-z]/.test(formData.password)) {
+        newErrors.password = "Password must contain at least one lowercase letter.";
+      }
+      if (!/\d/.test(formData.password)) {
+        newErrors.password = "Password must contain at least one number.";
+      }
+      if (!/[^A-Za-z0-9]/.test(formData.password)) {
+        newErrors.password = "Password must contain at least one special character.";
+      }
     }
-
-    if (!/[A-Z]/.test(formData.password)) {
-      newErrors.password =
-        "Password must contain at least one uppercase letter.";
-    }
-
-    if (!/[a-z]/.test(formData.password)) {
-      newErrors.password =
-        "Password must contain at least one lowercase letter.";
-    }
-
-    if (!/\d/.test(formData.password)) {
-      newErrors.password = "Password must contain at least one number.";
-    }
-
-    if (!/[^A-Za-z0-9]/.test(formData.password)) {
-      newErrors.password =
-        "Password must contain at least one special character.";
-    }
-
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // Returns true if no errors
   };
+  
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -241,47 +227,47 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
       // Field-specific validation
       switch (name) {
         case "firstName":
-          newErrors.firstName =
-            value.trim().length < 2
-              ? "First name must be at least 2 characters."
-              : "";
-          break;
-        case "lastName":
-          newErrors.lastName =
-            value.trim().length < 2
-              ? "Last name must be at least 2 characters."
-              : "";
-          break;
-        case "email":
-          newErrors.email = !/\S+@\S+\.\S+/.test(value)
-            ? "Invalid email format."
+          newErrors.firstName = !/^[A-Za-z]{3,}$/.test(value.trim())
+            ? "First name must be at least 3 letters and contain only letters."
             : "";
           break;
+      
+        case "lastName":
+          newErrors.lastName = !/^[A-Za-z]{3,}$/.test(value.trim())
+            ? "Last name must be at least 3 letters and contain only letters."
+            : "";
+          break;
+      
+        case "email":
+          newErrors.email = !/^[A-Za-z]+(?:\.[A-Za-z0-9]+)?@[A-Za-z]+\.[A-Za-z]+$/
+.test(value.trim())
+            ? "Invalid email format (e.g., example@domain.com)."
+            : "";
+          break;
+      
         case "password":
           if (value.length < 6) {
             newErrors.password = "Password must be at least 6 characters.";
           } else if (!/[A-Z]/.test(value)) {
-            newErrors.password =
-              "Password must contain at least one uppercase letter.";
+            newErrors.password = "Password must contain at least one uppercase letter.";
           } else if (!/[a-z]/.test(value)) {
-            newErrors.password =
-              "Password must contain at least one lowercase letter.";
+            newErrors.password = "Password must contain at least one lowercase letter.";
           } else if (!/\d/.test(value)) {
             newErrors.password = "Password must contain at least one number.";
           } else if (!/[^A-Za-z0-9]/.test(value)) {
-            newErrors.password =
-              "Password must contain at least one special character.";
+            newErrors.password = "Password must contain at least one special character.";
           } else {
             newErrors.password = ""; // No errors
           }
           break;
+      
         default:
           break;
       }
-
+      
       return newErrors;
     });
-  };
+  };      
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -300,7 +286,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
         { withCredentials: true }
       );
       if (response.data) {
-        navigate('/verify-email');
+        navigate("/verify-email");
         setisRegisterSuccess(true);
       }
     } catch (err) {
@@ -318,12 +304,6 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
   const handleMicrosoftLoginError = () => {
     setError("Microsoft login failed.");
   };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
 
   const githubRef = useRef(null);
   const triggerGitHubLogin = () => {
