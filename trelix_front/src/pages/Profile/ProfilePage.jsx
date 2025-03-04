@@ -1,9 +1,11 @@
 import { useProfileStore } from "../../store/profileStore";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../../components/Profile/Sidebar";
 import Preloader from "../../components/Preloader/Preloader";
+import { ToastContainer } from "react-toastify";
+
 
 const ProfilePage = () => {
   const { user, fetchUser, updateUser, isLoadingUser } = useProfileStore();
@@ -11,6 +13,35 @@ const ProfilePage = () => {
   const [profilePhoto, setProfilePhoto] = useState(user?.profilePhoto);
   const [coverPhoto, setCoverPhoto] = useState(user?.coverPhoto);
   const [profile, setProfile] = useState({ user });
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+  const bgColor = useMemo(() => getRandomColor(), [user?.firstName]);
+  const [completion, setCompletion] = useState(0);
+  const calculateCompletion = (profileData) => {
+    const fields = [
+      "firstName",
+      "lastName",
+      "email",
+      "profilePhoto",
+      "coverPhoto",
+      "phone",
+    ];
+    const filledFields = fields.filter((field) => profileData[field]);
+    const percentage = Math.round((filledFields.length / fields.length) * 100);
+    setCompletion(percentage);
+  };
+
+  useEffect(() => {
+    if (completion === 100) {
+      awardBadge();
+    }
+  }, [completion]);
 
   useEffect(() => {
     fetchUser();
@@ -21,6 +52,7 @@ const ProfilePage = () => {
       setProfile(user);
       setProfilePhoto(user.profilePhoto || profilePhoto);
       setCoverPhoto(user.coverPhoto || coverPhoto);
+      calculateCompletion(user);
     }
   }, [user]);
 
@@ -63,10 +95,27 @@ const ProfilePage = () => {
       console.error("Error updating cover photo:", error);
     }
   };
+  
+  const awardBadge = async () => {
+    const badgeImageUrl = "/assets/Badges/WelcomeBadge.png"; 
 
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/info/profile/badge",
+        {
+          badge: " Welcome to Trelix Badge 🏅",
+          email: user.email, // Send the user's email
+          badgeImage: badgeImageUrl, // Send the badge image URL
+        }
+      );
+      console.log("Badge awarded:", response.data);
+    } catch (error) {
+      console.error("Error awarding badge:", error);
+    }
+  };
   return (
     <>
-      {/* hethya vvvvvvv s barka hya chnya lfaza tal3et*/}
+      <ToastContainer position="top-right" autoClose={2000} />
       <link rel="stylesheet" href="assets/css/style.css" />
       <div>
         <div className="dashbaord-promo position-relative" />
@@ -80,25 +129,44 @@ const ProfilePage = () => {
                   style={{
                     backgroundImage: coverPhoto
                       ? `url(http://localhost:5000${coverPhoto})`
-                      : `url('/default-cover.jpg')`,
+                      : `url('/assets/icons/COVER.png')`,
                   }}
                 >
                   <div className="dash-cover-info d-sm-flex justify-content-between align-items-center">
                     <div className="ava-wrap d-flex align-items-center">
-                      <div className="avatar me-3 rounded-circle">
-                        <img
-                          src={`http://localhost:5000${profilePhoto}`}
-                          className="rounded-circle"
-                          alt="Avatar"
-                          style={{
-                            width: "100px",
-                            height: "100px",
-                            objectFit: "cover",
-                          }}
-                        />
+                      <div
+                        className="avatar me-3 rounded-circle d-flex align-items-center justify-content-center"
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          backgroundColor: profilePhoto
+                            ? "transparent"
+                            : bgColor,
+                          fontSize: "40px",
+                          fontWeight: "bold",
+                          color: "#fff",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {profilePhoto ? (
+                          <img
+                            src={`http://localhost:5000${profilePhoto}`}
+                            className="rounded-circle"
+                            alt="Avatar"
+                            style={{
+                              width: "100px",
+                              height: "100px",
+                              objectFit: "cover",
+                            }}
+                          />
+                        ) : (
+                          <span>
+                            {user?.firstName ? user.firstName.charAt(0) : "?"}
+                          </span>
+                        )}
                       </div>
                       <div className="ava-info">
-                        <h4 className="display-5 text-black mb-0">
+                        <h4 className="display-5 text-white mb-0">
                           {user?.firstName} {user?.lastName}
                         </h4>
                       </div>
@@ -129,6 +197,35 @@ const ProfilePage = () => {
                 </div>
               </div>
             </div>
+            <div className="user-profile">
+              <h2>
+                {user?.firstName} {user?.lastName}
+              </h2>
+
+              {/* Check if the user has badges */}
+              {user?.badges && user.badges.length > 0 ? (
+                <div className="mt-2 p-2 bg-yellow-500 text-white rounded-lg">
+                  <p>
+                    🏆 Congratulations! You have earned the following badges:
+                  </p>
+                  {user?.badges.map((badge, index) => (
+                    <div key={index} className="badge-item">
+                      <img
+                        src="/assets/Badges/WelcomeBadge.png"
+                        alt={badge.name}
+                        className="badge-image"
+                        style={{ width: "100px", height: "auto" }} // Adjust width to 100px, height auto to keep aspect ratio
+                      />
+                      <span className="badge-name">🏅 {badge.name}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-2 text-gray-500">
+                  You haven't earned any badges yet. Keep going! 🚀
+                </p>
+              )}
+            </div>
             {/* Dashboard Inner Start */}
             <div className="row mt-5">
               <div className="col-lg-3">
@@ -140,7 +237,14 @@ const ProfilePage = () => {
                   {isLoadingUser ? (
                     <Preloader />
                   ) : (
-                    <Outlet context={{ user, profile, setProfile }} />
+                    <Outlet
+                      context={{
+                        user,
+                        profile,
+                        setProfile,
+                        completion,
+                      }}
+                    />
                   )}
                 </section>
               </div>
