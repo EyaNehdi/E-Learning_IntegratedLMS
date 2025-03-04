@@ -73,6 +73,45 @@ const register = async (req, res) => {
     res.status(500).json({ error: "Registration failed: " + err.message });
   }
 };
+const regestergoogle = async (req, res, role) => {
+  const { firstName, lastName, email, password } = req.body;
+
+  try {
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "Email already registered" });
+    }
+
+    // Create user data object
+    const newUserData = {
+      firstName,
+      lastName,
+      email,
+      role
+    };
+    
+    // If the request contains a password (i.e., normal signup), add it to the user data
+    if (password) {
+      newUserData.password = password;
+    }
+
+    const newUser = new User(newUserData);
+    await newUser.save();
+    await generateToken(res, newUser._id);
+    res.json({
+      success: true,
+      message: "Registration successful",
+      user: {
+        ...newUser._doc,
+        password: undefined
+      }
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: "Registration failed: " + err.message });
+  }
+};
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const registerLinkedIn = async (req, res, role) => {
