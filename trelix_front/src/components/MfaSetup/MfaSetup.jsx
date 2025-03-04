@@ -10,6 +10,10 @@ import Tooltip from "@mui/material/Tooltip";
 import { IconButton, Typography, Box, Grid } from "@mui/material";
 import { useEffect } from "react";
 import { useProfileStore } from "../../store/profileStore";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { toast } from "react-hot-toast";
 
 const MfaSetup = () => {
   const [qrCodeUrl, setQrCodeUrl] = useState("");
@@ -30,7 +34,6 @@ const MfaSetup = () => {
 
   useEffect(() => {
     if (user) {
-      console.log("User after fetch:", user);
       enableMfaButton(user._id);
     }
   }, [user]);
@@ -88,12 +91,6 @@ const MfaSetup = () => {
     }
   };
 
-  const cancelMfa = () => {
-    setQrCodeUrl("");
-    setMfaEnabled(false);
-    navigate("/");
-  };
-
   const fetchBackupCodes = async () => {
     try {
       const response = await axios.get(
@@ -102,30 +99,64 @@ const MfaSetup = () => {
           params: { userId: userId },
         }
       );
-      console.log(response.data);
-
-      setBackupCodes(response.data.backupCodes);
+      console.log(response.data.ResponseBackupCodes);
+      setBackupCodes(response.data.ResponseBackupCodes);
     } catch (error) {
       console.error("Error fetching backup codes:", error);
     }
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(backupCodes.join("\n"));
-    alert("Backup codes copied to clipboard!");
+    const codeText = backupCodes.map((codeObj) => codeObj.code).join("\n");
+    navigator.clipboard.writeText(codeText);
+    toast.success("Backup codes copied to clipboard!");
   };
 
   const downloadBackupCodes = () => {
+    if (!backupCodes || backupCodes.length === 0) {
+      console.error("No backup codes available to download.");
+      return;
+    }
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
+    const formattedDate = today.toISOString().split("T")[0];
     const filename = `backup_codes_Trelix_${formattedDate}.txt`;
+    const fileContent = backupCodes
+      .map((codeObj) => `${codeObj.code} ${codeObj.used ? "(used)" : ""}`)
+      .join("\n");
+
     const element = document.createElement("a");
-    const file = new Blob([backupCodes.join("\n")], { type: "text/plain" });
+    const file = new Blob([fileContent], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
     element.download = filename;
     document.body.appendChild(element);
     element.click();
+    document.body.removeChild(element);
   };
+
+  const handleCancelMfa = async () => {
+    try {
+      const response = await axios.put(
+        "http://localhost:5000/signup/mfa/disable-mfa",
+        { userId },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.status !== 200) {
+        throw new Error(response.data.message || "Failed to cancel MFA");
+      }
+
+      navigate("/home");
+    } catch (error) {
+      console.error(
+        "Error canceling MFA:",
+        error.response?.data?.message || error.message
+      );
+      alert("Failed to cancel MFA. Please try again.");
+    }
+  };
+
   return (
     <>
       <div className="signup-form m-0">
@@ -146,14 +177,37 @@ const MfaSetup = () => {
               If you wish to start setting up your Multi-Factor Authentication
               Press the button below
             </p>
-            <Button
-              disabled={!buttonMfa}
-              variant="contained"
-              onClick={enableMfa}
-              style={{ marginBottom: "20px" }}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+              }}
             >
-              Enable MFA
-            </Button>{" "}
+              <Button
+                disabled={!buttonMfa}
+                variant="contained"
+                onClick={enableMfa}
+              >
+                Enable MFA
+              </Button>
+
+              <Tooltip title="Skip or enable MFA later">
+                <Link
+                  to="/home"
+                  style={{
+                    textDecoration: "none",
+                    color: "blue",
+                    fontSize: "0.85rem",
+                    marginLeft: "auto",
+                  }}
+                >
+                  Skip for Now
+                </Link>
+              </Tooltip>
+            </div>
           </>
         )}
 
@@ -195,42 +249,55 @@ const MfaSetup = () => {
               <h3 style={{ fontSize: "1.1rem", opacity: "0.8" }}>
                 Enter the code from your Authenticator app:
               </h3>
-              <Paper
-                component="form"
-                sx={{
-                  p: "2px 4px",
+              <div
+                style={{
                   display: "flex",
                   alignItems: "center",
-                  width: 230,
+                  gap: "10px",
+                  flexWrap: "wrap",
+                  justifyContent: "start",
                 }}
-                onSubmit={(e) => e.preventDefault()}
               >
-                <InputBase
-                  sx={{ ml: 1, flex: 1 }}
-                  placeholder="e.g., XXXXXX"
-                  inputProps={{
-                    "aria-label": "verify code",
-                    maxLength: 6,
-                    pattern: "\\d*",
+                <Paper
+                  component="form"
+                  sx={{
+                    p: "2px 4px",
+                    display: "flex",
+                    alignItems: "center",
+                    width: 230,
                   }}
-                  value={token}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                />
-                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                <Tooltip title="Verify">
-                  <Button
-                    loading={loading}
-                    sx={{ p: "10px" }}
-                    aria-label="verify"
-                    variant=""
-                    onClick={verifyMfa}
-                    endIcon={<LockIcon />}
-                  >
-                    {loading ? "Verifying..." : "Verify"}
-                  </Button>
-                </Tooltip>
-              </Paper>
+                  onSubmit={(e) => e.preventDefault()}
+                >
+                  <InputBase
+                    sx={{ ml: 1, flex: 1 }}
+                    placeholder="e.g., XXXXXX"
+                    inputProps={{
+                      "aria-label": "verify code",
+                      maxLength: 6,
+                      pattern: "\\d*",
+                    }}
+                    value={token}
+                    onChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
+                  />
+                  <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+                  <Tooltip title="Verify">
+                    <Button
+                      loading={loading}
+                      sx={{ p: "10px" }}
+                      aria-label="verify"
+                      variant=""
+                      onClick={verifyMfa}
+                      endIcon={<LockIcon />}
+                    >
+                      {loading ? "Verifying..." : "Verify"}
+                    </Button>
+                  </Tooltip>
+                </Paper>
+                <Button variant="outlined" onClick={handleCancelMfa}>
+                  Cancel
+                </Button>
+              </div>
             </div>
           )}
 
@@ -257,15 +324,23 @@ const MfaSetup = () => {
             </div>
             <Button
               variant="contained"
-              sx={{ m: "5px" }}
+              sx={{ m: "5px", marginLeft: "auto" }}
               fullWidth
               onClick={fetchBackupCodes}
             >
               Get Backup Codes
             </Button>
-            <Link to="/" style={{ textDecoration: "none" }}>
-              <Button variant="outlined" sx={{ m: "5px" }} fullWidth>
-                skip
+            <Link to="/home" style={{ textDecoration: "none" }}>
+              <Button
+                variant="outlined"
+                sx={{
+                  m: "5px",
+                  fontSize: "0.85rem",
+                  marginLeft: "auto",
+                }}
+                fullWidth
+              >
+                Skip for Now
               </Button>
             </Link>
           </>
@@ -292,54 +367,108 @@ const MfaSetup = () => {
                 borderRadius: "8px",
               }}
             >
-              {backupCodes.map((code, index) => (
+              {backupCodes.map((codeObj, index) => (
                 <Paper key={index} sx={{ p: 1, textAlign: "center" }}>
-                  {code}
+                  {codeObj.code} {codeObj.used && "(used)"}
                 </Paper>
               ))}
             </Box>
 
-            <Grid container spacing={2} sx={{ mt: 2 }}>
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  onClick={copyToClipboard}
-                >
-                  Copy to Clipboard
-                </Button>
-              </Grid>
-              <Grid item xs={4}>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  fullWidth
-                  onClick={downloadBackupCodes}
-                >
-                  Download as TXT
-                </Button>
-              </Grid>
-              <Grid item xs={4}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "16px",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                marginTop: "16px",
+              }}
+            >
+              {/* Grouped Box for Secondary Actions */}
+              <div
+                style={{
+                  flex: "1 1 100%",
+                  minWidth: "200px",
+                  padding: "10px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "8px",
+                }}
+              >
+                {/* Copy to Clipboard Button*/}
                 <Button
                   variant="outlined"
-                  fullWidth
-                  onClick={() => navigate("/")}
+                  color="primary"
+                  onClick={copyToClipboard}
+                  sx={{
+                    flex: 1,
+                    fontSize: "0.875rem",
+                    padding: "8px 16px",
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
                 >
-                  Finish
+                  <FileCopyIcon />
+                  Copy Backup Codes
                 </Button>
-              </Grid>
-            </Grid>
+
+                {/* Divider */}
+                <div
+                  style={{
+                    width: "1px",
+                    backgroundColor: "#ddd",
+                    height: "100%",
+                  }}
+                ></div>
+
+                {/* Download as TXT Button*/}
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={downloadBackupCodes}
+                  sx={{
+                    flex: 1,
+                    fontSize: "0.875rem",
+                    padding: "8px 16px",
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <GetAppIcon />
+                  Download Backup Codes
+                </Button>
+              </div>
+
+              {/* Complete Account Setup Button */}
+              <div style={{ flex: "1 1 100%", minWidth: "200px" }}>
+                <Button
+                  variant="contained"
+                  color="success"
+                  fullWidth
+                  onClick={() => navigate("/home")}
+                  sx={{
+                    backgroundColor: "#28a745",
+                    "&:hover": {
+                      backgroundColor: "#218838",
+                    },
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <CheckCircleIcon />
+                  Complete Account Setup
+                </Button>
+              </div>
+            </div>
           </>
         )}
 
         {message && (!backupCodes || backupCodes.length === 0) && (
           <p style={{ fontSize: "1rem", opacity: "0.6" }}>{message}</p>
         )}
-        <br />
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <Button>Cancel</Button>
-        </Link>
       </div>
     </>
   );

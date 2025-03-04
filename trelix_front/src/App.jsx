@@ -1,117 +1,70 @@
 import "./App.css";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-
-import SignupInstructor from './components/Instructor/InstructorRegister';
-import SignupStudent from './components/Student/StudentRegister';
-
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import { Toaster } from "react-hot-toast";
-
-
-
 import Login from "./pages/SignIn/Login";
-import Index from "./components/index";
-import Profile from "./components/Profile";
 import SignUpPage from "./pages/SignUpPage/SignUpPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicy/PrivacyPolicyPage";
-import Review from './components/Admin/Review';
-import Leave from './components/Admin/Leave';
-import Manage from './components/Admin/Manage';
-import Reports from './components/Admin/Reports';
-
-import { useAuthStore } from "./store/authStore";
-
-
+import Review from "./components/Admin/Review";
+import Leave from "./components/Admin/Leave";
+import Manage from "./components/Admin/Manage";
+import Reports from "./components/Admin/Reports";
 import NotFound from "./components/Notfound";
-import Settings from './components/Admin/Settings';
-
-import { LinkedInCallback } from 'react-linkedin-login-oauth2';
+import Settings from "./components/Admin/Settings";
+import { LinkedInCallback } from "react-linkedin-login-oauth2";
 import CV from "./pages/cv";
-import ProtectedRoute from "./pages/ProtectedRoute"; 
+import ProtectedRoute from "./layout/ProtectedRoute";
+import HomeUser from "./pages/Home/HomeUser";
+import ProfilePage from "./pages/Profile/ProfilePage";
+import ProfileDetails from "./components/Profile/ProfileDetails";
+import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
+import PublicRoute from "./layout/PublicRoute";
+import Index from "./components";
 
-
-
-const RedirectAuthenticatedUser = ({ children }) => {
-	const { isAuthenticated, user } = useAuthStore();
-
-	if (isAuthenticated && user.isVerified) {
-		return <Navigate to='/' replace />;
-	}
-
-	return children;
-};
 function App() {
-
-
-
   return (
-
-
     <Router>
       <Routes>
-	  <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
-
-       
-
-       
-       
-        
-        
-        <Route path="/verify-email" element={<EmailVerificationPage />} />
-        <Route
-					path='/reset-password/:token'
-					element={
-						<RedirectAuthenticatedUser>
-							<ResetPasswordPage />
-						</RedirectAuthenticatedUser>
-					}
-				/>
-        <Route
-				path="/forgot-password" 
-					element={
-						<RedirectAuthenticatedUser>
-							<ForgotPasswordPage/>
-						</RedirectAuthenticatedUser>
-					}
-				/>
-        
-        
-        
-        
-	
-
-        
-
+        {/* **************** */}
+        {/* Public routes */}
+        <Route element={<PublicRoute />}>
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/verify-email" element={<EmailVerificationPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPasswordPage />}
+          />
+        </Route>
+        {/* **************** */}
+        {/* Protected routes  */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/home" element={<HomeUser />} />
+          <Route path="/profile" element={<ProfilePage />}>
+            <Route path="details" element={<ProfileDetails />} />
+            <Route path="settings" element={<MultiFactorAuth />} />
+          </Route>
+        </Route>
         <Route path="/CV" element={<CV />} />
-        <Route path="/linkedin/callback" element={<LinkedInCallback />} />
-        <Route path="/signup" element={<SignUpPage />} />
-       
-       
-        <Route path="/profile" element={<Profile />} />
+        {/* **************** */}
+        {/* Admin routes */}
         <Route path="/Review" element={<Review />} />
-        <Route path="/admin" element={<Review />} />
-        <Route path="/leave" element={<Leave />} /> {/* Add User Route */}
-        <Route path="/leave/:id" element={<Leave />} /> {/* Edit User Route */}
+        <Route path="/leave" element={<Leave />} />
+        <Route path="/leave/:id" element={<Leave />} />
         <Route path="/manage" element={<Manage />} />
         <Route path="/report" element={<Reports />} />
         <Route path="/set" element={<Settings />} />
-
-
-        
-
-
-        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-
+        {/* **************** */}
+        <Route path="/linkedin/callback" element={<LinkedInCallback />} />
+        {/* Not found route */}
         <Route path="*" element={<NotFound />} />
-
       </Routes>
-<Toaster />
+      <Toaster />
     </Router>
   );
 }
