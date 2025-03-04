@@ -1,5 +1,5 @@
 <p align="center">
-<img  src="https://raw.githubusercontent.com/EyaNehdi/E-Learning_IntegratedLMS/refs/heads/f/Front/trelix_front/public/assets/images/logoo.png" width="20%">
+<img  src="https://raw.githubusercontent.com/EyaNehdi/E-Learning_IntegratedLMS/refs/heads/main/trelix_front/public/assets/images/logoo.png" width="20%">
 </p>
 <h2 align="center">
  Learning that adapts to you !
@@ -18,7 +18,7 @@ MERN is a full-stack web development framework, composed of four technologies Mo
 
 `ReactJS`: It is a library created by Facebook. It is used to build UI components that create the user interface of the single page web application.
 <p align="center">
-<img src="https://raw.githubusercontent.com/EyaNehdi/E-Learning_IntegratedLMS/refs/heads/f/Front/trelix_front/public/assets/images/architecture.png">
+<img src="https://raw.githubusercontent.com/EyaNehdi/E-Learning_IntegratedLMS/refs/heads/main/trelix_front/public/assets/images/architecture.png">
 </p>
 
 ## :wrench: Installation & Usage
