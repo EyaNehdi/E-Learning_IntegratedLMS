@@ -7,7 +7,7 @@ import GitHubLogin from "react-github-login";
 import MicrosoftLogin from "react-microsoft-login";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import { useNavigate , useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import PasswordStrengthMeter from "../PasswordStrengthMeter";
 import { motion } from "framer-motion";
@@ -19,7 +19,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [isRegisterSuccess, setIsRegisterSuccess] = useState(false); 
+  const [isRegisterSuccess, setIsRegisterSuccess] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -28,12 +28,14 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
     role: "instructor",
   });
   const handleLinkedInError = (error) => {
-    if (error.error === 'user_closed_popup') {
+    if (error.error === "user_closed_popup") {
       console.warn("User closed the popup. Please try again.");
       alert("It seems you closed the login popup. Please try again.");
     } else {
       console.error("LinkedIn Authentication Error:", error);
-      alert("An error occurred during LinkedIn authentication. Please try again.");
+      alert(
+        "An error occurred during LinkedIn authentication. Please try again."
+      );
     }
   };
   const { linkedInLogin } = useLinkedIn({
@@ -41,8 +43,8 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
     redirectUri: "http://localhost:5173/linkedin/callback",
     scope: "openid profile w_member_social email",
     onSuccess: async (code, state) => {
-        console.log("LinkedIn code:", code);
-        setIsLoading(true); // Start loading
+      console.log("LinkedIn code:", code);
+      setIsLoading(true); // Start loading
 
         try {
             const response = await axios.post(
@@ -69,19 +71,17 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
                 setIsLoading(false); // Stop loading
             }, 5000);
         }
+     
     },
     onError: (error) => {
-        console.error("LinkedIn Error:", error);
+      console.error("LinkedIn Error:", error);
     },
-});
+  });
 
-// Example of how to test with the provided code (replace the below line in the appropriate context)
-
-  
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const code = queryParams.get("code");
-  
+
     if (code) {
       linkedInLogin.onSuccess(code); // Ensure this is correctly called
     }
@@ -90,8 +90,6 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleLoginSuccess = async (response) => {
-    console.log("****console.log(response);****");
-    console.log(response);
     try {
       const decoded = jwtDecode(response.credential); // Decode JWT token from Google
       // Decode JWT token from Google
@@ -100,7 +98,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
         lastName: decoded.family_name,
         email: decoded.email,
         image: decoded.picture,
-        role: 'Student',  // Default role for Google sign-up
+        role: "Student", // Default role for Google sign-up
       };
       // Send Google user data to the backend for registration
       const res = await axios.post(
@@ -121,7 +119,6 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
       console.error(err);
     }
   };
-
 
   const handleGoogleLoginFailure = () => {
     console.error("Google login failed");
@@ -171,7 +168,6 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
       );
 
       if (responseData.data) {
-        
         navigate("/Home"); // Redirect after successful login
       }
     } catch (err) {
@@ -304,7 +300,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
       );
 
       if (response.data) {
-        navigate('/verify-email');
+        navigate("/verify-email");
         setisRegisterSuccess(true);
       }
     } catch (err) {
@@ -332,7 +328,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
   useGoogleOneTapLogin({
     onSuccess: handleGoogleLoginSuccess,
     onError: handleGoogleLoginError,
-    disabled: !enableGoogleLogin
+    disabled: !enableGoogleLogin,
   });
 
   const triggerGoogleLogin = () => {

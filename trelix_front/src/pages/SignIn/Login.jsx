@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
 import Preloader from "../../components/Preloader/Preloader";
-import { GoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
+import { useGoogleOneTapLogin } from "@react-oauth/google";
 import GitHubLogin from "react-github-login";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
@@ -17,23 +17,9 @@ function Login() {
   
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const navigate = useNavigate();
-  const { logingoogle, login, isAuthenticated, checkAuth } = useAuthStore();
+  const { logingoogle, login } = useAuthStore();
   const [error, setError] = useState("");
   
-
-  // Effect to check authentication only once on mount
-  useEffect(() => {
-    console.log("🟢 Checking authentication on mount...");
-    checkAuth();
-  }, [checkAuth]);
-
-  // Effect to redirect when authentication state changes
-  useEffect(() => {
-    console.log("🟢 isAuthenticated state:", isAuthenticated);
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -112,12 +98,6 @@ function Login() {
       }
     }
   };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
 
   const handleGoogleLoginError = () => {
     setError("Google login failed.");
