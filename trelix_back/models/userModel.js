@@ -2,43 +2,38 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
 const User = new Schema({
-
-    id:String,
-    firstName: String,
-    lastName: String,
-    email:{type:String, unique:true},
-    password:String,
-    image: { type: String, default: null },
-    mfaEnabled: { type: Boolean, default: false }, 
-    mfaSecret: { type: String, default: null },
-    phone: { type: String, default: null },
-    badges: [{
-      name: { type: String, required: true },  
-      description: { type: String, default: "" }, 
-      earnedAt: { type: Date, default: Date.now } ,
-      image: { type: String, default: null } 
+  id: String,
+  firstName: String,
+  lastName: String,
+  email: { type: String, unique: true },
+  password: String,
+  image: { type: String, default: null },
+  mfaEnabled: { type: Boolean, default: false },
+  mfaSecret: { type: String, default: null },
+  phone: { type: String, default: null },
+  badges: [{
+    name: { type: String, required: true },
+    description: { type: String, default: "" },
+    earnedAt: { type: Date, default: Date.now },
+    image: { type: String, default: null }
   }],
-      
-     backupCodes: [
+  backupCodes: [
     {
       code: { type: String, required: true },
       used: { type: Boolean, default: false },
     },
-  ], 
-    skils: { type: [String], default: [] },
-    profilePhoto: { type: String, default: null },  
-    coverPhoto: { type: String, default: null },  
-    resetPasswordToken: String,
-		resetPasswordExpiresAt: Date,
-		verificationToken: String,
-		verificationTokenExpiresAt: Date,
-    role: { 
-        type: String, 
-        enum: ["superAdmin","admin", "student", "instructor"]
-      }
-
-
-
+  ],
+  skils: { type: [String], default: [] },
+  profilePhoto: { type: String, default: null },
+  coverPhoto: { type: String, default: null },
+  resetPasswordToken: String,
+  resetPasswordExpiresAt: Date,
+  verificationToken: String,
+  verificationTokenExpiresAt: Date,
+  role: {
+    type: String,
+    enum: ["superAdmin", "admin", "student", "instructor"]
+  }
 });
 // Hashing Password
 User.pre('save', async function (next) {
