@@ -4,28 +4,20 @@ import { useAuthStore } from "../store/authStore";
 import { useProfileStore } from "../store/profileStore";
 import Buttons from "./Buttons";
 
-
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, logout } = useAuthStore();
   const navigate = useNavigate();
-  const checkAuth = useAuthStore((state) => state.checkAuth);
   const { user, fetchUser, clearUser } = useProfileStore();
+
   useEffect(() => {
-    console.log("🟢 Checking authentication...");
-    checkAuth();
-    console.log("user avant fetch:" + user);
-    const fetchData = async () => {
-      await fetchUser(); // Ensure user data is fetched first
-      console.log("user after fetch", user);
-    };
-    fetchData();
+    fetchUser();
   }, [fetchUser]);
 
   const handleLogout = () => {
-    logout(); // Clear user session
+    logout();
     clearUser();
-    navigate("/"); // Redirect to home
+    navigate("/");
   };
   return (
     <>
@@ -34,13 +26,11 @@ function Header() {
         <div className="header-top bg-primary text-info text-uppercase">
           <div className="marquee">
             <p>
-
               <span>Learn Today Lead Tomorrow</span>
               <span>Education is the dreams</span>
               <span>Education is a Way to Success in Life</span>
               <span>Better Education Improves The Nation</span>
               <span>Learn Today Lead Tomorrow</span>
-
             </p>
           </div>
         </div>
@@ -84,19 +74,34 @@ function Header() {
                           <div className="d-flex align-items-center small">
                             <div className="ratings me-2">
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                             </div>
                             <span className="rating-count">(15)</span>
@@ -127,19 +132,34 @@ function Header() {
                           <div className="d-flex align-items-center small">
                             <div className="ratings me-2">
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                             </div>
                             <span className="rating-count">(5)</span>
@@ -170,19 +190,34 @@ function Header() {
                           <div className="d-flex align-items-center small">
                             <div className="ratings me-2">
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                               <a href="#">
-                                <img src="assets/images/icons/star.png" alt />
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="star_icon"
+                                />
                               </a>
                             </div>
                             <span className="rating-count">(09)</span>
@@ -205,12 +240,17 @@ function Header() {
 
         <div className="header-nav-wrapper header-sticky">
           <nav className="navbar nav-center navbar-expand-xl">
-            <img src="/assets/images/ss.png" alt="Logo" style={{ marginTop: "-33px", marginLeft: "104px" }} />
+            <img
+              src="/assets/images/ss.png"
+              alt="Logo"
+              style={{ marginTop: "-33px", marginLeft: "104px" }}
+            />
 
-            <div className="container navbar-line px-3" style={{ marginLeft: "45px" }} >
-              <a className="navbar-brand d-xl-none" href="index-2.html">
-
-              </a>
+            <div
+              className="container navbar-line px-3"
+              style={{ marginLeft: "45px" }}
+            >
+              <a className="navbar-brand d-xl-none" href="index-2.html"></a>
               <div className="header-actions position-relative order-xl-2 d-flex align-items-center justify-content-between">
                 <button
                   className="navbar-toggler offcanvas-nav-btn"
@@ -220,7 +260,6 @@ function Header() {
                 </button>
                 <div className="offcanvas offcanvas-start offcanvas-nav">
                   <div className="offcanvas-header">
-
                     <button
                       type="button"
                       className="btn-close bg-primary"
@@ -231,18 +270,17 @@ function Header() {
 
                   <div className="offcanvas-body pt-0 align-items-center justify-content-between">
                     <ul className="navbar-nav align-items-lg-center">
-                      <li className="nav-item dropdown"  >
+                      <li className="nav-item dropdown">
                         <a
-
                           href="/"
                           role="button"
-
                           aria-expanded="false"
+
                           style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
+
                         >
                           Home
                         </a>
-
                       </li>
                       <li className="nav-item dropdown">
                         <a
@@ -250,7 +288,9 @@ function Header() {
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
+
                           aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
+
                         >
                           Dashboard
                         </a>
@@ -262,7 +302,9 @@ function Header() {
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
+
                           aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
+
                         >
                           Courses
                         </a>
@@ -274,19 +316,19 @@ function Header() {
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
+
                           aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
                         >
                           Pages
                         </a>
                        
+
                       </li>
                     </ul>
                     <a
                       className="navbar-brand d-none d-xl-block m-0"
                       href="index-2.html"
-                    >
-
-                    </a>
+                    ></a>
                   </div>
                 </div>
 
@@ -325,7 +367,7 @@ function Header() {
                                   {user.firstName} {user.lastName}
                                 </h6>
                               ) : (
-                                <h6 className="mb-0">Unknown</h6>
+                                <h6 className="mb-0">Pleas login you dont have account </h6>
                               )}
                               <small>Founder</small>
                             </div>
@@ -345,69 +387,103 @@ function Header() {
                                 </a>
                               </li>
                               <li>
-                                <a className="nav-link" href="instructor-enrolled-courses.html">
+                                <a
+                                  className="nav-link"
+                                  href="instructor-enrolled-courses.html"
+                                >
                                   <i className="feather-icon icon-book-open" />
                                   <span>Enrolled Courses</span>
                                 </a>
                               </li>
                               <li>
-                                <a className="nav-link" href="instructor-wishlist.html">
+                                <a
+                                  className="nav-link"
+                                  href="instructor-wishlist.html"
+                                >
                                   <i className="feather-icon icon-gift" />
                                   <span>Wishlist</span>
                                 </a>
                               </li>
                               <li>
-                                <a className="nav-link" href="instructor-reviews.html">
+                                <a
+                                  className="nav-link"
+                                  href="instructor-reviews.html"
+                                >
                                   <i className="feather-icon icon-star" />
                                   <span>Reviews</span>
                                 </a>
                               </li>
                               <li>
-                                <a className="nav-link" href="instructor-my-quiz-attempts.html">
+                                <a
+                                  className="nav-link"
+                                  href="instructor-my-quiz-attempts.html"
+                                >
                                   <i className="feather-icon icon-box" />
                                   <span>My Quiz Attempts</span>
                                 </a>
                               </li>
                               <li>
-                                <a className="nav-link" href="instructor-order-history.html">
+                                <a
+                                  className="nav-link"
+                                  href="instructor-order-history.html"
+                                >
                                   <i className="feather-icon icon-shopping-bag" />
                                   <span>Order History</span>
                                 </a>
                               </li>
                               <li className="border-bottom" />
                               <li>
-                                <a className="nav-link active" href="instructor-courses.html">
+                                <a
+                                  className="nav-link active"
+                                  href="instructor-courses.html"
+                                >
                                   <i className="feather-icon icon-book" />
                                   <span>My Courses</span>
                                 </a>
                               </li>
                               <li>
-                                <a className="nav-link" href="instructor-assignments.html">
+                                <a
+                                  className="nav-link"
+                                  href="instructor-assignments.html"
+                                >
                                   <i className="feather-icon icon-briefcase" />
                                   <span>Assignments</span>
                                 </a>
                               </li>
                               <li>
-                                <a className="nav-link" href="instructor-quiz-attempts.html">
+                                <a
+                                  className="nav-link"
+                                  href="instructor-quiz-attempts.html"
+                                >
                                   <i className="feather-icon icon-cpu" />
                                   <span>Quiz Attempts</span>
                                 </a>
                               </li>
                               <li>
-                                <a className="nav-link" href="instructor-announcements.html">
+                                <a
+                                  className="nav-link"
+                                  href="instructor-announcements.html"
+                                >
                                   <i className="feather-icon icon-bell" />
                                   <span>Announcements</span>
                                 </a>
                               </li>
                               <li className="border-bottom" />
                               <li>
-                                <a className="nav-link" href="instructor-settings.html">
+                                <a
+                                  className="nav-link"
+                                  href="instructor-settings.html"
+                                >
                                   <i className="feather-icon icon-settings" />
                                   <span>Settings</span>
                                 </a>
                               </li>
                               <li>
-                                <a className="nav-link" href="#" onClick={handleLogout}>
+                                <a
+                                  className="nav-link"
+                                  href="#"
+                                  onClick={handleLogout}
+                                >
                                   <i className="feather-icon icon-log-out" />
                                   <span>Logout</span>
                                 </a>
@@ -423,7 +499,9 @@ function Header() {
                     </div>
                   )}
                 </div>
+               
               </div>
+              
             </div>
           </nav>
         </div>

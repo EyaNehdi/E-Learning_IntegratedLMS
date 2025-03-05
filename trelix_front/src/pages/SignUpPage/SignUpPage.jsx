@@ -1,15 +1,16 @@
 import InstructorRegister from "../../components/Instructor/InstructorRegister";
 import StudentRegister from "../../components/Student/StudentRegister";
 import MfaSetup from "../../components/MfaSetup/MfaSetup";
+
 import React, { useState, useEffect } from "react";
 import { useProfileStore } from "../../store/profileStore";
+
 import "./signupStyle.css";
 
 function SignUpPage() {
   const [isInstructor, setIsInstructor] = useState(true);
   const [isRegisterSuccess, setisRegisterSuccess] = useState(false);
-  const [userId, setUserId] = useState(null);
-  const { user, fetchUser } = useProfileStore();
+
 
   useEffect(() => {
     if (isRegisterSuccess) {
@@ -23,6 +24,7 @@ function SignUpPage() {
       setUserId(user._id);
     }
   }, [user]);
+
 
   return (
     <div className="vh-100 d-flex align-items-center justify-content-center m-0 p-0">

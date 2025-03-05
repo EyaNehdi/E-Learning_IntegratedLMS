@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URL || "/api/auth";
 
@@ -8,11 +9,12 @@ axios.defaults.withCredentials = true;
 
 export const useAuthStore = create((set) => ({
 	user: null,
-	isAuthenticated: false,
+	isAuthenticated: null,
 	error: null,
 	isLoading: false,
 	isCheckingAuth: true,
 	message: null,
+
 
 	signup: async (firstName, lastName, email, password) => {
 		set({ isLoading: true, error: null });
@@ -99,8 +101,6 @@ export const useAuthStore = create((set) => ({
 		}
 	},
 
-
-
 	resetPassword: async (token, password) => {
 		set({ isLoading: true, error: null });
 		try {
@@ -117,7 +117,7 @@ export const useAuthStore = create((set) => ({
 	checkAuth: async () => {
 		set({ isCheckingAuth: true, error: null });
 		try {
-			const response = await axios.get(`${API_URL}/check-auth`, { credentials: 'include' });
+			const response = await axios.get(`${API_URL}/check-auth`, { credentials : 'include' });
 			if (response.status === 200) {
 				set({
 					user: response.data.user,
@@ -131,17 +131,20 @@ export const useAuthStore = create((set) => ({
 				});
 			}
 		} catch (error) {
-			set({
-				isAuthenticated: false,
-				isCheckingAuth: false,
-				error: "Authentication check failed"
-			});
-			console.log(error);
+			if (error.response?.status === 401) {
+				set({
+					isAuthenticated: false,
+					isCheckingAuth: false,
+					error: "Session expired. Please log in again."
+				});
+			} else {
+				console.error("Authentication check failed:", error);
+				set({
+					isAuthenticated: false,
+					isCheckingAuth: false,
+					error: "An error occurred while checking authentication."
+				});
+			}
 		}
 	},
-
-
-
-
-
 }));
