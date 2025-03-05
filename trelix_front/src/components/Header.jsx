@@ -275,415 +275,46 @@ function Header() {
                           href="/"
                           role="button"
                           aria-expanded="false"
-                          style={{
-                            marginRight: "46px",
-                            fontWeight: "bold",
-                            fontSize: "23px",
-                          }}
+                          style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
                         >
                           Home
                         </a>
                       </li>
                       <li className="nav-item dropdown">
                         <a
-                          className="nav-link dropdown-toggle"
+                         
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                          style={{
-                            marginRight: "46px",
-                            fontWeight: "bold",
-                            fontSize: "23px",
-                          }}
+                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
                         >
                           Dashboard
                         </a>
-                        <ul className="dropdown-menu">
-                          <li className="dropdown-submenu dropend">
-                            <a
-                              className="dropdown-item dropdown-toggle"
-                              href="#"
-                            >
-                              Instructor Dashboard
-                            </a>
-                            <ul className="dropdown-menu">
-                              <li className="dropdown-header">Instructor</li>
-                              <li>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-dashboard.html"
-                                >
-                                  Dashbaord
-                                </a>
-                                <a className="dropdown-item" href="/profile">
-                                  Profile
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-enrolled-courses.html"
-                                >
-                                  Enrolled Courses
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-wishlist.html"
-                                >
-                                  Wishlist
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-reviews.html"
-                                >
-                                  Reviews
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-my-quiz-attempts.html"
-                                >
-                                  My Quiz Attempts
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-order-history.html"
-                                >
-                                  Order History
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-courses.html"
-                                >
-                                  My Course
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-announcements.html"
-                                >
-                                  Announcements
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-quiz-attemps.html"
-                                >
-                                  Quiz Attempts
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-assignments.html"
-                                >
-                                  Assignments
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructor-settings.html"
-                                >
-                                  Settings
-                                </a>
-                              </li>
-                            </ul>
-                          </li>
-                          <li className="dropdown-submenu dropend">
-                            <a
-                              className="dropdown-item dropdown-toggle"
-                              href="#"
-                            >
-                              Student Dashboard
-                            </a>
-                            <ul className="dropdown-menu">
-                              <li className="dropdown-header">Student</li>
-                              <li>
-                                <a
-                                  className="dropdown-item"
-                                  href="student-dashboard.html"
-                                >
-                                  Dashbaord
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="student-profile.html"
-                                >
-                                  Profile
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="student-enrolled-courses.html"
-                                >
-                                  Enrolled Courses
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="student-wishlist.html"
-                                >
-                                  Wishlist
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="student-reviews.html"
-                                >
-                                  Reviews
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="student-order-history.html"
-                                >
-                                  Order History
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="student-my-quiz-attempts.html"
-                                >
-                                  My Quiz Attempts
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="student-settings.html"
-                                >
-                                  Settings
-                                </a>
-                              </li>
-                            </ul>
-                          </li>
-                        </ul>
+                       
                       </li>
                       <li className="nav-item dropdown">
                         <a
-                          className="nav-link dropdown-toggle"
+                         
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                          style={{
-                            marginRight: "46px",
-                            fontWeight: "bold",
-                            fontSize: "23px",
-                          }}
+                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
                         >
                           Courses
                         </a>
-                        <ul className="dropdown-menu">
-                          <li>
-                            <a className="dropdown-item" href="courses.html">
-                              All Courses
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              className="dropdown-item"
-                              href="courses-list.html"
-                            >
-                              Courses List
-                            </a>
-                          </li>
-                          <li className="dropdown-submenu dropend">
-                            <a
-                              className="dropdown-item dropdown-toggle"
-                              href="#"
-                            >
-                              Course Details
-                            </a>
-                            <ul className="dropdown-menu">
-                              <li className="dropdown-header">Single Course</li>
-                              <li>
-                                <a
-                                  className="dropdown-item"
-                                  href="single-course.html"
-                                >
-                                  Course Details 01
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="single-course-2.html"
-                                >
-                                  Course Details 02
-                                </a>
-                              </li>
-                            </ul>
-                          </li>
-                          <li>
-                            <a className="dropdown-item" href="lesson.html">
-                              Course Lesson
-                            </a>
-                          </li>
-                        </ul>
+                       
                       </li>
                       <li className="nav-item dropdown dropdown-fullwidth">
                         <a
-                          className="nav-link dropdown-toggle"
+                        
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                          style={{
-                            marginRight: "46px",
-                            fontWeight: "bold",
-                            fontSize: "23px",
-                          }}
+                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
                         >
                           Pages
                         </a>
-                        <div className="dropdown-menu">
-                          <div className="row row-cols-xl-4 row-cols-1">
-                            <div className="col">
-                              <div>
-                                <div>
-                                  <div className="dropdown-header">
-                                    Get Started
-                                  </div>
-                                  <a
-                                    className="dropdown-item"
-                                    href="about.html"
-                                  >
-                                    About Us
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="event-grid.html"
-                                  >
-                                    Event Grid
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="event-list.html"
-                                  >
-                                    Event List
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="event-sidebar.html"
-                                  >
-                                    Event Sidebar
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="single-event.html"
-                                  >
-                                    Event Details
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="pricing.html"
-                                  >
-                                    Pricing Plan
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="admission-guide.html"
-                                  >
-                                    Admision Guide
-                                  </a>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="col">
-                              <div>
-                                <div className="dropdown-header">
-                                  Get Started
-                                </div>
-                                <a
-                                  className="dropdown-item"
-                                  href="contact.html"
-                                >
-                                  Contact Us
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="instructors.html"
-                                >
-                                  Instructors
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="profile.html"
-                                >
-                                  Profile
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="become-instructor.html"
-                                >
-                                  Become a instructor
-                                </a>
-                                <a className="dropdown-item" href="faq.html">
-                                  FAQ
-                                </a>
-                                <a className="dropdown-item" href="404.html">
-                                  404 error
-                                </a>
-                                <a
-                                  className="dropdown-item"
-                                  href="comming-soon.html"
-                                >
-                                  Maintenance
-                                </a>
-                              </div>
-                            </div>
-                            <div className="col">
-                              <div className="mt-3 mt-lg-0">
-                                <div>
-                                  <div className="dropdown-header">
-                                    Shop Pages
-                                  </div>
-                                  <a className="dropdown-item" href="shop.html">
-                                    Shop
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="single-product.html"
-                                  >
-                                    Single Product
-                                  </a>
-                                  <a className="dropdown-item" href="cart.html">
-                                    Cart
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="checkout.html"
-                                  >
-                                    Checkout
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="my-account.html"
-                                  >
-                                    My Account
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="login.html"
-                                  >
-                                    Login
-                                  </a>
-                                  <a
-                                    className="dropdown-item"
-                                    href="signup.html"
-                                  >
-                                    Register
-                                  </a>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="col">
-                              <div className="mt-3 mt-lg-0">
-                                <a
-                                  href="login.html"
-                                  className="assets/banner-ads d-flex justify-content-between"
-                                >
-                                  <div className="b-content">
-                                    <h5>Online Learning Platform</h5>
-                                    <span className="badge-lg bg-primary text-small mt-2">
-                                      All Courses
-                                    </span>
-                                  </div>
-                                  <img
-                                    src="assets/images/banner-ads.png"
-                                    alt="banner_img"
-                                    className="img-fluid banner-img"
-                                  />
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                       
                       </li>
                     </ul>
                     <a
