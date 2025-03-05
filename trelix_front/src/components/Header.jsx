@@ -243,7 +243,7 @@ function Header() {
             <img
               src="/assets/images/ss.png"
               alt="Logo"
-              style={{ marginTop: "-33px", marginLeft: "104px" }}
+              style={{ marginLeft: "104px" }}
             />
 
             <div
@@ -275,46 +275,59 @@ function Header() {
                           href="/"
                           role="button"
                           aria-expanded="false"
-                          style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
+                          style={{
+                            marginRight: "46px",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                          }}
                         >
                           Home
                         </a>
                       </li>
                       <li className="nav-item dropdown">
                         <a
-                         
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
-                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
+                          aria-expanded="false"
+                          style={{
+                            marginRight: "46px",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                          }}
                         >
                           Dashboard
                         </a>
-                       
                       </li>
                       <li className="nav-item dropdown">
                         <a
-                         
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
-                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
+                          aria-expanded="false"
+                          style={{
+                            marginRight: "46px",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                          }}
                         >
                           Courses
                         </a>
-                       
                       </li>
                       <li className="nav-item dropdown dropdown-fullwidth">
                         <a
-                        
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
-                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
+                          aria-expanded="false"
+                          style={{
+                            marginRight: "46px",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                          }}
                         >
                           Pages
                         </a>
-                       
                       </li>
                     </ul>
                     <a
@@ -359,7 +372,9 @@ function Header() {
                                   {user.firstName} {user.lastName}
                                 </h6>
                               ) : (
-                                <h6 className="mb-0">Pleas login you dont have account </h6>
+                                <h6 className="mb-0">
+                                  Pleas login you dont have account{" "}
+                                </h6>
                               )}
                               <small>Founder</small>
                             </div>
@@ -491,9 +506,7 @@ function Header() {
                     </div>
                   )}
                 </div>
-               
               </div>
-              
             </div>
           </nav>
         </div>
