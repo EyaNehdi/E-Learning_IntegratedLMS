@@ -1,4 +1,4 @@
-const Quiz = require ('../models/quizzModel.js');
+const Quiz = require ('../models/quizzLeaderboardModel.js');
 // Admin adds a new quiz
 const addQuizz = async (req, res) => {
     try {
@@ -23,6 +23,22 @@ const getDailyQuizz = async (req, res) => {
 
     res.json(quiz);
 };
+
+//fetch scores on leaderboard 
+const getScoresLeaderBoard = async (req,res) =>{
+    const today = new Date().toISOString().split("T")[0];
+
+    const leaderboard = await UserAttempt.aggregate([
+        { $lookup: { from: "users", localField: "userId", foreignField: "_id", as: "user" } },
+        { $unwind: "$user" },
+        { $match: { quizId: today } },
+        { $group: { _id: "$userId", name: { $first: "$user.name" }, totalScore: { $sum: "$score" } } },
+        { $sort: { totalScore: -1 } },
+        { $limit: 10 }
+    ]);
+
+    res.json(leaderboard);
+}
 
 
 //daily task 
@@ -51,5 +67,6 @@ cron.schedule("0 0 * * *", async () => {
 });
 
 module.exports = { addQuizz,
-    getDailyQuizz
+    getDailyQuizz,
+    getScoresLeaderBoard
  };

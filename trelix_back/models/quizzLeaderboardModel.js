@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const quizSchema = new mongoose.Schema({
+const quizLeaderboardSchema = new mongoose.Schema({
     date: { type: String, unique: true }, // YYYY-MM-DD format
     questions: [
         {
@@ -13,4 +13,4 @@ const quizSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: false },
 });
 
-export default mongoose.model("Quiz", quizSchema);
+export default mongoose.model("QuizLeaderboard", quizLeaderboardSchema);
