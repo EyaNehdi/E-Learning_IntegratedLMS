@@ -53,12 +53,14 @@ function App() {
         <Route path="/CV" element={<CV />} />
         {/* **************** */}
         {/* Admin routes */}
-        <Route path="/Review" element={<Review />} />
-        <Route path="/leave" element={<Leave />} />
-        <Route path="/leave/:id" element={<Leave />} />
-        <Route path="/manage" element={<Manage />} />
-        <Route path="/report" element={<Reports />} />
-        <Route path="/set" element={<Settings />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/Review" element={<Review />} />
+          <Route path="/leave" element={<Leave />} />
+          <Route path="/leave/:id" element={<Leave />} />
+          <Route path="/manage" element={<Manage />} />
+          <Route path="/report" element={<Reports />} />
+          <Route path="/set" element={<Settings />} />
+        </Route>
         {/* **************** */}
         <Route path="/linkedin/callback" element={<LinkedInCallback />} />
         {/* Not found route */}
