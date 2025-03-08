@@ -272,20 +272,27 @@ function Header() {
                     <ul className="navbar-nav align-items-lg-center">
                       <li className="nav-item dropdown">
                         <a
-                          href="/"
+                          href="/home"
                           role="button"
                           aria-expanded="false"
+
+
+                       
+
+
                           style={{
                             marginRight: "46px",
                             fontWeight: "bold",
                             fontSize: "20px",
                           }}
+
                         >
                           Home
                         </a>
                       </li>
                       <li className="nav-item dropdown">
                         <a
+
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
@@ -328,6 +335,7 @@ function Header() {
                         >
                           Pages
                         </a>
+
                       </li>
                     </ul>
                     <a
@@ -506,7 +514,9 @@ function Header() {
                     </div>
                   )}
                 </div>
+
               </div>
+
             </div>
           </nav>
         </div>
