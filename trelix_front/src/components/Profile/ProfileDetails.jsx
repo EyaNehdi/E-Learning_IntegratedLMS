@@ -13,7 +13,7 @@ const ProfileDetails = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -50,16 +50,38 @@ const ProfileDetails = () => {
     setCvFile(event.target.files[0]);
     setError(null); // Reset error on file change
   };
+  const updateskilsWithEntities = async (entities) => {
+    try {
+     
+        const filteredSkills = entities
+            .filter(ent => ent.label === "PRODUCT")
+            .map(ent => ent.text);
 
+        
+        if (filteredSkills.length === 0) {
+            console.warn("No relevant skills found.");
+            return;
+        }
+
+        const response = await axios.put("http://localhost:5000/api/info/profile/updateskils", {
+            userId: user._id, 
+            skills: filteredSkills, 
+        });
+
+        console.log("Skills updated successfully:", response.data);
+    } catch (error) {
+        console.error("Failed to update profile:", error.response?.data || error.message);
+    }
+};
   const handleSubmit = async () => {
     const file = cvFile;
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("cvFile", file); // Use the raw file from the input
+    formData.append("cvFile", file); 
 
-    setIsLoading(true); // Start loading
-    setError(null); // Reset error message
+    setIsLoading(true); 
+    setError(null); 
 
     try {
       const response = await axios.post(
@@ -75,6 +97,7 @@ const ProfileDetails = () => {
       // Join them as a single string
 
       setEntities(response.data.entities);
+      updateskilsWithEntities(response.data.entities);
     } catch (error) {
       setError(error.response?.data?.error || error.message); // Capture error message
       console.error("Error:", error.response?.data || error.message);
@@ -82,7 +105,7 @@ const ProfileDetails = () => {
       setIsLoading(false); // End loading regardless of success or failure
     }
   };
-  
+
 
   return (
     <div className="profile-info border rounded-3">
@@ -148,24 +171,24 @@ const ProfileDetails = () => {
               <span className="font-semibold">Phone Number:</span>
               {isEditing ? (
                 <input
-                  type="text"
+                  type="number"
                   name="phone"
                   value={profile.phone}
                   onChange={handleInputChange}
                   className="ml-2 border p-1 rounded"
                 />
               ) : (
-                ` ${profile.phone || user?.phone}`
+                ` ${user?.phone || profile.phone || "No phone number provided"}` // ✅ Use user.phone first
               )}
             </li>
             <li>
               <span className="font-semibold">Skill/Occupation:</span>
               <div className="entities-container">
-                {entities.length > 0 ? (
+                {user?.skils?.length > 0 ? ( // ✅ Use user.skils first
+                  user.skils.map((skill, index) => <p key={index}>{skill}</p>)
+                ) : entities.length > 0 ? ( // ✅ Fallback to entities if user has no skills
                   entities.map((ent, index) =>
-                    ent.label === "PRODUCT" ? ( // ✅ Only display text when label is "Product"
-                      <p key={index}>{ent.text}</p>
-                    ) : null
+                    ent.label === "PRODUCT" ? <p key={index}>{ent.text}</p> : null
                   )
                 ) : (
                   <p>No skills found.</p>
@@ -180,16 +203,15 @@ const ProfileDetails = () => {
               <span className="font-semibold">Biography:</span>
               {isEditing ? (
                 <textarea
-                  name="biography"
-                  value={profile.biography}
+                  name="Bio"
+                  value={profile.Bio}
                   onChange={handleInputChange}
                   className="ml-2 border p-1 rounded w-full"
                 />
               ) : (
-                ` ${
-                  profile.biography ||
-                  user?.biography ||
-                  "No biography provided"
+                ` ${profile.Bio ||
+                user?.Bio ||
+                "No biography provided"
                 }`
               )}
             </li>
