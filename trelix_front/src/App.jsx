@@ -22,12 +22,16 @@ import ProfileDetails from "./components/Profile/ProfileDetails";
 import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
 import PublicRoute from "./layout/PublicRoute";
 import Index from "./components";
+import AdminRoute from "./layout/AdminRoute";
+import Leaderboard from "./pages/Leaderboard/Leaderboard";
+import DailyQuizzes from "./pages/Admin/DailyQuizzes";
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* **************** */}
+        <Route path="/addQuizzL" element={<DailyQuizzes />}/>
         {/* Public routes */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<Index />} />
@@ -36,6 +40,8 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/verify-email" element={<EmailVerificationPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          
+          
           <Route
             path="/reset-password/:token"
             element={<ResetPasswordPage />}
@@ -45,10 +51,14 @@ function App() {
         {/* Protected routes  */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
+          
           <Route path="/profile" element={<ProfilePage />}>
             <Route path="details" element={<ProfileDetails />} />
             <Route path="settings" element={<MultiFactorAuth />} />
+            
+            
           </Route>
+          <Route path="/leaderboard" element={<Leaderboard />} />
         </Route>
         <Route path="/CV" element={<CV />} />
         {/* **************** */}
