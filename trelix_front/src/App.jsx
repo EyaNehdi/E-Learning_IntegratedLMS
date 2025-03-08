@@ -23,6 +23,10 @@ import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
 import PublicRoute from "./layout/PublicRoute";
 import Index from "./components";
 import AdminRoute from "./layout/AdminRoute";
+import ListChapters from "./components/Student/ListChapters";
+import AddChapter from "./components/Instructor/addChapter";
+import ChapterContent from "./components/Student/chapterContent";
+import AddQuiz from "./components/Instructor/addQuiz";
 
 function App() {
   return (
@@ -42,12 +46,18 @@ function App() {
             element={<ResetPasswordPage />}
           />
         </Route>
+        
         {/* **************** */}
         {/* Protected routes  */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
+          <Route path="/chapters" element={<ListChapters />} >
+            <Route path="content/:id" element={<ChapterContent />} />
+          </Route>
           <Route path="/profile" element={<ProfilePage />}>
             <Route path="details" element={<ProfileDetails />} />
+            <Route path="addchapter" element={<AddChapter />} />
+            <Route path="addquiz" element={<AddQuiz />} />
             <Route path="settings" element={<MultiFactorAuth />} />
           </Route>
         </Route>
@@ -65,6 +75,8 @@ function App() {
         {/* **************** */}
         <Route path="/linkedin/callback" element={<LinkedInCallback />} />
         {/* Not found route */}
+       
+       
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />

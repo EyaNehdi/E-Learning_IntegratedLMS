@@ -243,7 +243,7 @@ function Header() {
             <img
               src="/assets/images/ss.png"
               alt="Logo"
-              style={{ marginTop: "-33px", marginLeft: "104px" }}
+              style={{ marginLeft: "104px" }}
             />
 
             <div
@@ -272,7 +272,7 @@ function Header() {
                     <ul className="navbar-nav align-items-lg-center">
                       <li className="nav-item dropdown">
                         <a
-                          href="/"
+                          href="/home"
                           role="button"
                           aria-expanded="false"
 
@@ -284,35 +284,35 @@ function Header() {
                       </li>
                       <li className="nav-item dropdown">
                         <a
-                         
+
                           href="#"
                           role="button"
-                          data-bs-toggle="dropdown"
+                          
 
                           aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
 
                         >
                           Dashboard
                         </a>
-                       
+
                       </li>
                       <li className="nav-item dropdown">
                         <a
-                         
-                          href="#"
+
+                          href="/chapters"
                           role="button"
-                          data-bs-toggle="dropdown"
+                         
 
                           aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
 
                         >
                           Courses
                         </a>
-                       
+
                       </li>
                       <li className="nav-item dropdown dropdown-fullwidth">
                         <a
-                        
+
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
@@ -321,7 +321,7 @@ function Header() {
                         >
                           Pages
                         </a>
-                       
+
 
                       </li>
                     </ul>
@@ -499,9 +499,11 @@ function Header() {
                     </div>
                   )}
                 </div>
-               
+                <div className="text-black text-lg font-semibold">
+                  Welcome, {user?.firstName} {user?.lastName}
+                </div>
               </div>
-              
+
             </div>
           </nav>
         </div>

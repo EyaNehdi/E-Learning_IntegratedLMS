@@ -12,18 +12,7 @@ function SignUpPage() {
   const [isRegisterSuccess, setisRegisterSuccess] = useState(false);
 
 
-  useEffect(() => {
-    if (isRegisterSuccess) {
-      fetchUser();
-    }
-  }, [isRegisterSuccess]);
-
-  useEffect(() => {
-    if (user) {
-      console.log("User after fetch:", user);
-      setUserId(user._id);
-    }
-  }, [user]);
+  
 
 
   return (
