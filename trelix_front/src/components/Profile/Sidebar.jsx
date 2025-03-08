@@ -9,7 +9,7 @@ function Sidebar() {
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
-
+  
   const handleLogout = () => {
     logout();
     clearUser();
@@ -58,10 +58,14 @@ function Sidebar() {
               </a>
             </li>
             <li>
-              <a className="nav-link" href="student-order-history.html">
-                <i className="feather-icon icon-shopping-bag" />
-                <span>Order History</span>
-              </a>
+            <Link className="nav-link" to="/profile/addchapter">
+                <i className="feather-icon icon-plus" />
+                <span>AddChapter</span>
+              </Link>
+              <Link className="nav-link" to="/profile/addquiz">
+                <i className="feather-icon icon-plus" />
+                <span>AddQuiz</span>
+              </Link>
             </li>
           </ul>
         </nav>

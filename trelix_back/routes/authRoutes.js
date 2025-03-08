@@ -6,6 +6,7 @@ const { registerStudent,
        signIn,signOut,verifyEmail,forgotPassword,resetPassword,registerInstructorgoogle,registerInstructorgithub,registerStudentgithub,registerStudentgoogle, signIngoogle, signIngithub , registerLinkedIn,
        registerInstructorLinkedin,
        registerStudentLinkedin,
+       markChapterAsCompleted,
        signInlinkedin} = require('../controllers/authController');
 const { verifyToken } = require ('../middlewares/verifyToken.js');
 const { validateInput } = require ('../middlewares/validators.js');
@@ -31,5 +32,5 @@ router.post("/logout", signOut);
 router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", forgotPassword );
 router.post("/reset-password/:token", resetPassword);
-
+router.get("/completedchapters", markChapterAsCompleted);
 module.exports = router;

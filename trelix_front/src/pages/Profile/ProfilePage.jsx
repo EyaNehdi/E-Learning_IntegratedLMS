@@ -31,6 +31,8 @@ const ProfilePage = () => {
       "profilePhoto",
       "coverPhoto",
       "phone",
+      
+      "Bio"
     ];
     const filledFields = fields.filter((field) => profileData[field]);
     const percentage = Math.round((filledFields.length / fields.length) * 100);
