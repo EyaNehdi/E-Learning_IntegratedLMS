@@ -276,7 +276,15 @@ function Header() {
                           role="button"
                           aria-expanded="false"
 
-                          style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
+
+                       
+
+
+                          style={{
+                            marginRight: "46px",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                          }}
 
                         >
                           Home
@@ -287,41 +295,46 @@ function Header() {
 
                           href="#"
                           role="button"
-                          
-
-                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
-
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                          style={{
+                            marginRight: "46px",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                          }}
                         >
                           Dashboard
                         </a>
-
                       </li>
                       <li className="nav-item dropdown">
                         <a
-
-                          href="/chapters"
-                          role="button"
-                         
-
-                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
-
-                        >
-                          Courses
-                        </a>
-
-                      </li>
-                      <li className="nav-item dropdown dropdown-fullwidth">
-                        <a
-
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
-
-                          aria-expanded="false" style={{ marginRight: "46px", fontWeight: "bold", fontSize: "20px" }}
+                          aria-expanded="false"
+                          style={{
+                            marginRight: "46px",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                          }}
+                        >
+                          Courses
+                        </a>
+                      </li>
+                      <li className="nav-item dropdown dropdown-fullwidth">
+                        <a
+                          href="#"
+                          role="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                          style={{
+                            marginRight: "46px",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                          }}
                         >
                           Pages
                         </a>
-
 
                       </li>
                     </ul>
@@ -367,7 +380,9 @@ function Header() {
                                   {user.firstName} {user.lastName}
                                 </h6>
                               ) : (
-                                <h6 className="mb-0">Pleas login you dont have account </h6>
+                                <h6 className="mb-0">
+                                  Pleas login you dont have account{" "}
+                                </h6>
                               )}
                               <small>Founder</small>
                             </div>
@@ -499,9 +514,7 @@ function Header() {
                     </div>
                   )}
                 </div>
-                <div className="text-black text-lg font-semibold">
-                  Welcome, {user?.firstName} {user?.lastName}
-                </div>
+
               </div>
 
             </div>

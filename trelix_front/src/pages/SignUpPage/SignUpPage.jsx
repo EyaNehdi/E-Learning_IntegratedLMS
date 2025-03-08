@@ -1,7 +1,7 @@
 import InstructorRegister from "../../components/Instructor/InstructorRegister";
 import StudentRegister from "../../components/Student/StudentRegister";
-import MfaSetup from "../../components/MfaSetup/MfaSetup";
 
+import MfaSetup from "../../components/MfaSetup/MfaSetup"
 import React, { useState, useEffect } from "react";
 import { useProfileStore } from "../../store/profileStore";
 
