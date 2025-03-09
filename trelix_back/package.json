@@ -33,6 +33,7 @@
     "qrcode": "^1.5.4",
     "react-linkedin-login": "^1.0.4",
     "simple-oauth2": "^5.1.0",
+    "socket.io": "^4.8.1",
     "speakeasy": "^2.0.0",
     "trelix-back": "file:",
     "yup": "^1.6.1"
