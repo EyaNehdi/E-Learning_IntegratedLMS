@@ -21,6 +21,7 @@ import ProfilePage from "./pages/Profile/ProfilePage";
 import ProfileDetails from "./components/Profile/ProfileDetails";
 import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
 import PublicRoute from "./layout/PublicRoute";
+import AdminRoute from "./layout/AdminRoute";
 import Index from "./components";
 import AdminRoute from "./layout/AdminRoute";
 
@@ -72,6 +73,7 @@ function App() {
           </Route>
 
           <Route path="/profile" element={<ProfilePage />}>
+            <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addquiz" element={<AddQuiz />} />

@@ -4,6 +4,7 @@ const User = require("../models/userModel");
 require("dotenv").config();
 const { encryptSecret, decryptSecret } = require("./encryptionService");
 const crypto = require("crypto");
+const bcrypt = require('bcrypt');
 
 const generateMFA = async (userId) => {
   try {
@@ -66,4 +67,27 @@ function generateCodes() {
   return Array.from(codes);
 }
 
-module.exports = { generateMFA, verifyMFA, generateCodes };
+const verifyPassword = async (req, res, next) => {
+  try {
+    const { userId, password } = req.body;
+    if (!userId || !password) {
+      return res.status(400).json({ message: "User ID and password are required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, isNotPass: true, message: "Incorrect password" });
+    }
+
+    next();
+  } catch (error) {
+    console.error("Error verifying password:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = { generateMFA, verifyMFA, generateCodes, verifyPassword };
