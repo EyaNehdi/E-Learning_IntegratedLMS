@@ -16,7 +16,6 @@ export const useProfileStore = create((set) => ({
         },
         withCredentials: true,  // Ensure cookies are sent with the request
       });
-
       set({ user: res.data, isLoadingUser: false });
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -26,5 +25,5 @@ export const useProfileStore = create((set) => ({
   clearUser: () => set({ user: null }),
   updateUser: (updatedData) => set((state) => ({
     user: { ...state.user, ...updatedData },
-  })),// To clear user on logout
+  })),
 }));
