@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
-import Footer from "../Footer";
 
 function Allcourse() {
   const [courses, setCourses] = useState([]);
