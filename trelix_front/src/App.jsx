@@ -23,7 +23,6 @@ import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
 import PublicRoute from "./layout/PublicRoute";
 import AdminRoute from "./layout/AdminRoute";
 import Index from "./components";
-import AdminRoute from "./layout/AdminRoute";
 
 import Module from "./components/Instructor/Module";
 import Courses from "./components/Instructor/Courses";
@@ -40,9 +39,6 @@ function App() {
   return (
     <Router>
       <Routes>
-
-
-
         {/* **************** */}
         {/* Public routes */}
         <Route element={<PublicRoute />}>
@@ -52,40 +48,34 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/verify-email" element={<EmailVerificationPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-
-
-
           <Route
             path="/reset-password/:token"
             element={<ResetPasswordPage />}
           />
         </Route>
-        
+
         {/* **************** */}
         {/* Protected routes  */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
-
           <Route path="/allcours" element={<Allcourse />} />
-
-          <Route path="/chapters" element={<ListChapters />} >
+          <Route path="/chapters" element={<ListChapters />}>
             <Route path="content/:id" element={<ChapterContent />} />
           </Route>
-
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addquiz" element={<AddQuiz />} />
             <Route path="settings" element={<MultiFactorAuth />} />
-            <Route path="Course" element={<Courses/>} />
-            <Route path="list" element={<Listecourse/>} />
+            <Route path="Course" element={<Courses />} />
+            <Route path="list" element={<Listecourse />} />
             <Route path="module" element={<Module />} />
-            <Route path="/profile/edit-course/:courseId" element={<EditCourse />} />
+            <Route
+              path="/profile/edit-course/:courseId"
+              element={<EditCourse />}
+            />
             <Route path="/profile/allcours" element={<Allcourse />} />
-
-
-
           </Route>
         </Route>
         <Route path="/CV" element={<CV />} />
@@ -102,8 +92,7 @@ function App() {
         {/* **************** */}
         <Route path="/linkedin/callback" element={<LinkedInCallback />} />
         {/* Not found route */}
-       
-       
+
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />

@@ -99,7 +99,8 @@ const disableMFA = async (req, res) => {
     const { userId } = req.body;
     if (!userId) return res.status(400).json({ message: "User ID is required" });
     const user = await User.findById(userId);
-    if (!user.mfaSecret || user.mfaSecret.length === 0 || !user.backupCodes || user.backupCodes.length === 0) {
+    if (!user.mfaSecret || user.mfaSecret.length === 0 || !user.mfaEnabled) {
+      console.log("MFA is already disabled");
       return res.status(400).json({ message: "MFA is already disabled" });
     }
 
