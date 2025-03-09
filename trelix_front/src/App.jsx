@@ -25,6 +25,7 @@ import Index from "./components";
 import AdminRoute from "./layout/AdminRoute";
 import Leaderboard from "./pages/Leaderboard/Leaderboard";
 import DailyQuizzes from "./pages/Admin/DailyQuizzes";
+import QuizzLeaderboard from "./pages/Leaderboard/QuizzLeaderboard";
 
 function App() {
   return (
@@ -51,14 +52,15 @@ function App() {
         {/* Protected routes  */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
-          
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/quiz" element={<QuizzLeaderboard />}/>
           <Route path="/profile" element={<ProfilePage />}>
             <Route path="details" element={<ProfileDetails />} />
             <Route path="settings" element={<MultiFactorAuth />} />
             
             
           </Route>
-          <Route path="/leaderboard" element={<Leaderboard />} />
+          
         </Route>
         <Route path="/CV" element={<CV />} />
         {/* **************** */}

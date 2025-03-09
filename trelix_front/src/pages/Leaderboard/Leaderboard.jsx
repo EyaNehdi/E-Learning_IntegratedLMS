@@ -6,75 +6,93 @@ import { useState,useEffect } from "react";
 import io from 'socket.io-client';
 
 
-
 function Leaderboard() {
   const [quiz, setQuiz] = useState(null);
-  const [countdown, setCountdown] = useState(60); // Default 60 seconds
-  const [nextResetTime, setNextResetTime] = useState(null);
+  const [countdown, setCountdown] = useState(60);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Fetch the active quiz when the component mounts
   const fetchActiveQuiz = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/quiz/active'); 
-      setQuiz(response.data.quiz); 
-      if (response.data.nextResetTime) {
-        const nextReset = new Date(response.data.nextResetTime).getTime();
-        const now = Date.now();
-        const timeLeft = Math.max((nextReset - now) / 1000, 0);
-        setCountdown(timeLeft);
-        setNextResetTime(nextReset);
+      setLoading(true);
+      const response = await axios.get('http://localhost:5000/api/quiz/active');
+      
+      if (response.data.quiz) {
+        setQuiz(response.data.quiz);
+        
+        // Set countdown if we have a nextResetTime
+        if (response.data.nextResetTime) {
+          const nextReset = new Date(response.data.nextResetTime).getTime();
+          const now = Date.now();
+          const timeLeft = Math.max((nextReset - now) / 1000, 0);
+          setCountdown(timeLeft);
+        }
       }
+      setLoading(false);
     } catch (error) {
-      console.error('Error fetching active quiz:', error);
+      console.error('Error fetching active quiz:', error.response ? error.response.data : error.message);
+      setError(error.response?.data?.message ||"Failed to load the quiz. Please try again later.");
+      setLoading(false);
     }
   };
-// Initialize socket connection
+
+// Establish socket connection
 useEffect(() => {
-  const socket = io("http://localhost:5000"); // Replace with your backend URL
+  console.log("Setting up socket connection...");
+  const socket = io("http://localhost:5000", {
+    transports: ['websocket', 'polling']
+  });
+
+  // Connection status monitoring
+  socket.on('connect', () => {
+    console.log('Socket connected!', socket.id);
+    fetchActiveQuiz(); // Fetch quiz when connected
+  });
+
+  socket.on('connect_error', (err) => {
+    console.error('Socket connection error:', err);
+    setError("Connection error. Trying to reconnect...");
+  });
 
   // Listen for active quiz updates
   socket.on("activeQuizUpdate", (data) => {
-      console.log("Received active quiz update:", data);
-      setQuiz({ title: data.title, nextResetTime: data.nextResetTime });
+    console.log("Received active quiz update:", data);
+    if (data.title) {
+      setQuiz(prevQuiz => ({
+        ...prevQuiz,
+        title: data.title ||prevQuiz?.title,
+        nextResetTime: data.nextResetTime || prevQuiz?.nextResetTime
+      }));
+    }
 
-      // Calculate countdown based on reset time
+    if (data.nextResetTime) {
       const nextReset = new Date(data.nextResetTime).getTime();
       const now = Date.now();
       const timeLeft = Math.max((nextReset - now) / 1000, 0);
       setCountdown(timeLeft);
+    }
   });
 
-  // Listen for timer updates (every second)
-  socket.on("timerUpdate", (data) => {
-      setCountdown(data.timeLeft);
-  });
+    // Listen for timer updates
+    socket.on("timerUpdate", (data) => {
+      // console.log("Timer update:", data.timeLeft);
+      // Only update countdown if we get a valid time
+      if (data.timeLeft !== null) {
+        setCountdown(data.timeLeft);
+      }
+    });
 
-  // Cleanup on component unmount
-  return () => {
+    // Clean up on component unmount
+    return () => {
+      console.log("Disconnecting socket");
       socket.disconnect();
-  };
-}, []);
-  useEffect(() => {
-    
-    fetchActiveQuiz();
-    const intervalId = setInterval(() => {
-      setCountdown((prevCountdown) => {
-        if (prevCountdown > 1) {
-          return prevCountdown - 1;
-        } else {
-          clearInterval(intervalId);
-          fetchActiveQuiz(); // Fetch new quiz when countdown reaches 0
-          return 0;
-        }
-      });
-    }, 1000); // Update every second
+    };
+  }, []); 
 
-    return () => clearInterval(intervalId);
-  }, []);
-
- // Convert seconds to HH:MM:SS format
-const formatTime = (seconds) => {
-  if (isNaN(seconds) || seconds < 0) return "00:00:00"; // Handle NaN cases
+ // Format the countdown time as HH:MM:SS
+ const formatTime = (seconds) => {
+  if (isNaN(seconds) || seconds < 0) return "00:00:00";
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -82,6 +100,8 @@ const formatTime = (seconds) => {
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 };
+
+
   return (
     <>
     <Leader />
@@ -104,19 +124,21 @@ const formatTime = (seconds) => {
         fontWeight: "bold",
         color: countdown <= 10 ? "red" : "black", // Red when time is low
       }}>
-      {quiz ? (
-        <>
-          <div>
-            <h3>{quiz.title}</h3>
-             <h4> ⏳ Time Left: 
-              {formatTime(countdown)}</h4>
-          </div>
-        </>
-      ) : (
+      {loading ? (
+          <p>Loading quiz...</p>
+        ) : error ? (
+          <p style={{ color: "red" }}>{error}</p>
+        ) : quiz ? (
+          <>
+            <div>
+              <h3>{quiz.title}</h3>
+              <h4> ⏳ Time Left: {formatTime(countdown)}</h4>
+            </div>
+          </>
+        ) : (
         <p>Loading quiz...</p>
       )}
     </div>
-    <Footer />
 
     </>
   )
