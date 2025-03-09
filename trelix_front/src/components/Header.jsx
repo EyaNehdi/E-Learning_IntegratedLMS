@@ -307,20 +307,47 @@ function Header() {
                         </a>
                       </li>
                       <li className="nav-item dropdown">
-                        <a
-                          href="#"
-                          role="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                          style={{
-                            marginRight: "46px",
-                            fontWeight: "bold",
-                            fontSize: "20px",
-                          }}
-                        >
-                          Courses
-                        </a>
-                      </li>
+          <a
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            style={{
+              marginRight: "46px",
+              fontWeight: "bold",
+              fontSize: "20px",
+            }}
+          >
+            Courses
+          </a>
+          {/* Dropdown menu for Courses */}
+          <ul className="dropdown-menu">
+            <li>
+              <a className="dropdown-item" href="/courses/web-development">
+                Web Development
+              </a>
+            </li>
+            <li>
+              <a className="dropdown-item" href="/courses/mobile-development">
+                Mobile Development
+              </a>
+            </li>
+            <li>
+              <a className="dropdown-item" href="/courses/data-science">
+                Data Science
+              </a>
+            </li>
+            <li>
+              <a className="dropdown-item" href="/allcours">
+              All Cours
+              </a>
+            </li>
+            <li>
+              <hr className="dropdown-divider" />
+            </li>
+          
+          </ul>
+        </li>
                       <li className="nav-item dropdown dropdown-fullwidth">
                         <a
                           href="#"
