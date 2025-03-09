@@ -14,6 +14,8 @@ var usersRouter = require('./routes/users');
 var mfaRoutes = require('./routes/mfaRoutes');
 const profileRoutes = require("./routes/profileRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const Module =require("./routes/module");
+const Course =require("./routes/course");
 
 var app = express();
 require('dotenv').config();
@@ -43,6 +45,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/ia', require('./routes/ia'));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/module', Module);
+app.use('/course', Course);
+app.use('/courses', Course);
+app.use('/delete', Course);
+
+
 //auth routes
 const quizRoutes = require('./routes/quizRoutes');
 const authRouteschapter = require('./routes/chapterRoutes'); 

@@ -47,6 +47,21 @@ function Aside() {
   </nav>
 </div>
 <div className="widget">
+              <p className="grettings">instructor</p>
+              <nav className="dashboard-nav">
+                <ul className="list-unstyled nav">
+                  <li><a className="nav-link active" href="instructor-courses.html"><i className="feather-icon icon-book" /><span>My
+                        Courses</span></a></li>
+                  <li><a className="nav-link" href="instructor-assignments.html"><i className="feather-icon icon-briefcase" /><span>Assignments</span></a></li>
+                  <li><a className="nav-link" href="instructor-quiz-attemps.html"><i className="feather-icon icon-cpu" /><span>Quiz
+                        Attempts</span></a>
+                  </li>
+                  <li><a className="nav-link" href="instructor-announcements.html"><i className="feather-icon icon-bell" /><span>Announcements</span></a>
+                  </li>
+                </ul>
+              </nav>
+            </div>{/*  Widget End */}
+<div className="widget">
   <p className="grettings">User</p>
   <nav className="dashboard-nav">
     <ul className="list-unstyled nav">
