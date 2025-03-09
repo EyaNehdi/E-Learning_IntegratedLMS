@@ -11,15 +11,22 @@ const getUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id).select("firstName lastName email role");
+        const { id } = req.params; // Extracting ID from request params
+
+        if (!id) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        const user = await User.findById(id).select("firstName lastName email role skils profilePhoto Bio");
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        res.status(200).json(user);
+        return res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({ message: "Server error" });
+        console.error("Error fetching user:", error);
+        return res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 

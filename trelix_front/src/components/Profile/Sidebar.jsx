@@ -9,14 +9,17 @@ function Sidebar() {
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
-
+  
   const handleLogout = () => {
     logout();
     clearUser();
     navigate("/");
   };
+
   return (
+    
     <aside className="dashboard-sidebar shadow-1 border rounded-3">
+      
       <div className="widget">
         <p className="grettings">Welcome, Maria Carey</p>
         <nav className="dashboard-nav">
@@ -31,13 +34,16 @@ function Sidebar() {
               <Link className="nav-link" to="/profile/details">
                 <i className="feather-icon icon-user" />
                 <span>My Profile</span>
+
               </Link>
             </li>
-            <li>
-              <a className="nav-link" href="student-enrolled-courses.html">
-                <i className="feather-icon icon-book-open" />
-                <span>Enrolled Courses</span>
-              </a>
+
+
+             <li>
+              <Link className="nav-link" to="/profile/list">
+                <i className="feather-icon icon-settings" />
+                <span>Cours</span>
+              </Link>
             </li>
             <li>
               <a className="nav-link" href="student-wishlist.html">
@@ -58,10 +64,17 @@ function Sidebar() {
               </a>
             </li>
             <li>
-              <a className="nav-link" href="student-order-history.html">
-                <i className="feather-icon icon-shopping-bag" />
-                <span>Order History</span>
-              </a>
+
+
+            <Link className="nav-link" to="/profile/addchapter">
+                <i className="feather-icon icon-plus" />
+                <span>AddChapter</span>
+              </Link>
+              <Link className="nav-link" to="/profile/addquiz">
+                <i className="feather-icon icon-plus" />
+                <span>AddQuiz</span>
+              </Link>
+
             </li>
           </ul>
         </nav>
