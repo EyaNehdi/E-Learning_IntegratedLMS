@@ -55,14 +55,28 @@ function QuizzLeaderboard() {
     // Submit quiz
     const handleSubmit = async () => {
         try {
+            // Calculate score based on the answers
+            let score = 0;
+            let passed = false;
+    
+            questions.forEach((question) => {
+                if (answers[question._id] === question.correctAnswer) {
+                    score += 1;
+                }
+            });
+    
+            // Set passed condition (for example, passed if score > 50% of questions)
+            passed = score / questions.length >= 0.5;
+    
             const res = await axios.post("http://localhost:5000/api/quiz/submit", {
                 quizId,
-                answers
+                score,
+                passed
             }, {
                 headers: { Authorization: `Bearer ${user?.token}` }
             });
-
-            alert(`Quiz completed! Your score: ${res.data.score}`);
+    
+            alert(`Quiz completed! Your score: ${res.data.attempt.score}`);
             navigate("/leaderboard");
         } catch (error) {
             console.error("Error submitting quiz:", error);

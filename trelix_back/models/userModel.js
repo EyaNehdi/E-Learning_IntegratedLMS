@@ -30,6 +30,7 @@ const User = new Schema({
   resetPasswordExpiresAt: Date,
   verificationToken: String,
   verificationTokenExpiresAt: Date,
+  totalScore: { type: Number, default: 0 },
   role: {
     type: String,
     enum: ["superAdmin", "admin", "student", "instructor"]

@@ -1,5 +1,19 @@
 import "./css/Leader.css";
+import { useEffect,useState } from "react";
+import axios from "axios";
 function Leader() {
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  useEffect(() => {
+      axios.get("http://localhost:5000/api/quiz/leaderboard") 
+        .then(response => {
+          setLeaderboard(response.data);
+        })
+        .catch(error => {
+          console.error("Error fetching leaderboard:", error);
+        });
+   
+  }, []);
   return (
     <div>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,38 +28,23 @@ function Leader() {
       <div id="leaderboard">
         <div className="ribbon" />
         <table>
-          <tbody><tr>
-              <td className="number">1</td>
-              <td className="name">Lee Taeyong</td>
-              <td className="points">
-                258.244 <img className="gold-medal" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal" />
-              </td>
-            </tr>
-            <tr>
-              <td className="number">2</td>
-              <td className="name">Mark Lee</td>
-              <td className="points">258.242</td>
-            </tr>
-            <tr>
-              <td className="number">3</td>
-              <td className="name">Xiao Dejun</td>
-              <td className="points">258.223</td>
-            </tr>
-            <tr>
-              <td className="number">4</td>
-              <td className="name">Qian Kun</td>
-              <td className="points">258.212</td>
-            </tr>
-            <tr>
-              <td className="number">5</td>
-              <td className="name">Johnny Suh</td>
-              <td className="points">258.208</td>
-            </tr>
-          </tbody></table>
-        <div id="buttons">
-          <button className="exit">Exit</button>
-          
-        </div>
+        <tbody>
+              {leaderboard.map((user, index) => (
+                <tr key={user._id}>
+                  <td className="number">{index + 1}</td>
+                  <td className="name">
+                    {user.image ? <img src={user.image} alt="profile" className="profile-pic" /> : null}
+                    {user.firstName} {user.lastName}
+                  </td>
+                  <td className="points">
+                    {user.totalScore.toFixed(2)}
+                    {index === 0 && (
+                      <img className="gold-medal" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal" />
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody></table>
       </div>
     </main>
   </div>

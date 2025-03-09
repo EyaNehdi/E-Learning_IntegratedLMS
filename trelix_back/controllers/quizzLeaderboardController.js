@@ -1,6 +1,7 @@
 const cron = require('node-cron')
 const QuizLeaderboard = require ('../models/quizzLeaderboardModel.js');
 const QuizLeaderboardAttempt = require('../models/quizzLeaderboardAttemptsModel.js');
+const User = require('../models/userModel');
 
 
 // Declare io instance for emitting events
@@ -173,7 +174,7 @@ const activeQuizQuestions = async (req, res) => {
 const submitQuiz = async (req, res) => {
     try {
         const { quizId, score, passed } = req.body;
-        const userId = req.user._id;
+        const userId = req.userId;
 
         // 1. Check if the user has already passed the quiz (before they even attempt)
         const existingPassedAttempt = await QuizLeaderboardAttempt.findOne({ userId, quizId, passed: true });
@@ -204,6 +205,44 @@ const submitQuiz = async (req, res) => {
     }
 }
 
+//Leaderboard
+const leaderboard = async (req, res) => {
+    try {
+      const leaderboardData = await User.find({ totalScore: { $gt: 0 } }) // Ensure users with score are included
+        .sort({ totalScore: -1 }) // Sort by total score in descending order
+        .select('id firstName lastName profilePhoto totalScore');
+  console.log(leaderboardData);
+      res.json(leaderboardData);
+    } catch (error) {
+      console.error("Leaderboard error:", error);
+      res.status(500).json({ message: "Error fetching leaderboard", error });
+    }
+  };
+// Cron job to update totalScore in users collection daily
+const leaderTask = cron.schedule('0 0 * * *', async () => { // Runs every day at midnight
+    console.log("Running cron job to update total scores...");
+  
+    try {
+      const users = await QuizLeaderboardAttempt.aggregate([
+        { $match: { passed: true } }, // Only include passed quizzes
+        { $group: { _id: "$userId", totalScore: { $sum: "$score" } } },
+      ]);
+  
+      for (const user of users) {
+        await User.findOneAndUpdate(
+          { id: user._id.toString() },
+          { totalScore: user.totalScore },
+          { new: true }
+        );
+      }
+  
+      console.log("User total scores updated successfully.");
+    } catch (error) {
+      console.error("Error updating user total scores:", error);
+    }
+  });
+  leaderTask.start();
+  console.log("Cron job for totalscore started...");
 //daily task 
 const task = cron.schedule('* * * * *', () => {
     console.log("Running cron job to shuffle quiz...");
@@ -214,12 +253,13 @@ const task = cron.schedule('* * * * *', () => {
     shuffleQuiz();
 });
 task.start(); // Start the cron job once, outside the function
-console.log("Cron job started...");
+console.log("Cron job for daily quizz started...");
 module.exports = { shuffleQuiz,
     addQuizz,
     activeQuizz,
     initializeSocket,
     checkUserAttempt,
     activeQuizQuestions,
-    submitQuiz
+    submitQuiz,
+    leaderboard
  };

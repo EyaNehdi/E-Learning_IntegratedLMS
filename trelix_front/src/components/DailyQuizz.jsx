@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useEffect,useState } from 'react';
 import axios from 'axios';
+import io from 'socket.io-client';
 function DailyQuizz() {
     const { user, isAuthenticated } = useAuthStore();
     const navigate = useNavigate();
@@ -11,36 +12,52 @@ function DailyQuizz() {
     const [loading, setLoading] = useState(true);
   
     useEffect(() => {
-      const fetchActiveQuiz = async () => {
-          try {
-              const response = await axios.get('http://localhost:5000/api/quiz/active');
-              if (response.data.quiz) {
-                  setActiveQuiz(response.data.quiz);
+    //   const fetchActiveQuiz = async () => {
+    //       try {
+    //           const response = await axios.get('http://localhost:5000/api/quiz/active');
+    //           if (response.data.quiz) {
+    //               setActiveQuiz(response.data.quiz);
                   
-                  // Check if user has already attempted this quiz
-                  if (isAuthenticated && user) {
-                    const token = user?.token; // Fetch the token from state
-                    if (!token) return;
+    //               // Check if user has already attempted this quiz
+    //               if (isAuthenticated && user) {
+    //                 const token = user?.token; // Fetch the token from state
+    //                 if (!token) return;
                 
-                    const attemptRes = await axios.get(
-                        `http://localhost:5000/api/quiz/check-attempt/${response.data.quiz._id}`,
-                        {
-                            headers: { Authorization: `Bearer ${token}` }
-                        }
-                    );
+    //                 const attemptRes = await axios.get(
+    //                     `http://localhost:5000/api/quiz/check-attempt/${response.data.quiz._id}`,
+    //                     {
+    //                         headers: { Authorization: `Bearer ${token}` }
+    //                     }
+    //                 );
                 
-                    setHasAttempted(attemptRes.data.attempted);
-                    console.log("setHasAttempted"+ attemptRes.data.attempted);
-                }
-              }
-          } catch (error) {
-              console.error('Error fetching active quiz:', error.response?.data?.message);
-          } finally {
-              setLoading(false);
-          }
-      };
-      fetchActiveQuiz();
-  }, [isAuthenticated, user]);
+    //                 setHasAttempted(attemptRes.data.attempted);
+    //                 console.log("setHasAttempted"+ attemptRes.data.attempted);
+    //             }
+    //           }
+    //       } catch (error) {
+    //           console.error('Error fetching active quiz:', error.response?.data?.message);
+    //       } finally {
+    //           setLoading(false);
+    //       }
+    //   };
+      
+    //   fetchActiveQuiz();
+    //   // Poll every 30 seconds
+    // const intervalId = setInterval(fetchActiveQuiz, 30000);
+
+    // // Cleanup on unmount
+    // return () => clearInterval(intervalId);
+    const socket = io('http://localhost:5000'); // Adjust to your backend URL
+        
+        socket.on('activeQuizUpdate', (quizData) => {
+            console.log("Received active quiz update:", quizData);
+            setActiveQuiz(quizData);
+        });
+
+        return () => {
+            socket.disconnect(); // Clean up the socket connection on unmount
+        };
+  }, []);
 
   const handleJoinQuiz = async () => {
     if (isAuthenticated && user) {
@@ -55,11 +72,13 @@ function DailyQuizz() {
                 console.log("API Response:", res.data);
 
                 // Check if the user has already passed the quiz
-                if (res.data.alreadyPassed) {
-                    alert("You have already passed this quiz! Come back tomorrow for a new one.");
-                } else {
-                    navigate("/quiz");
-                }
+                if (res.data.passed) {
+                  alert("You have already passed this quiz! Come back tomorrow for a new one.");
+              } else if (res.data.attempted) {
+                  alert("You have already attempted this quiz today. Come back tomorrow.");
+              } else {
+                  navigate("/quiz");
+              }
               }else {
                 console.error("Active quiz ID is invalid");
             }
