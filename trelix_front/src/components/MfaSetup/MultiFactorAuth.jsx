@@ -1,11 +1,8 @@
 import { useState } from "react";
-import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
 import { useOutletContext } from "react-router-dom";
 import axios from "axios";
-import { Divider, InputBase, Paper, Tooltip, Typography } from "@mui/material";
-import Button from "@mui/material/Button";
-import { LockIcon } from "lucide-react";
+import Swal from "sweetalert2";
+import Paper from "@mui/material/Paper";
 
 const MultiFactorAuth = () => {
   const { user } = useOutletContext();
@@ -13,13 +10,9 @@ const MultiFactorAuth = () => {
   const [mfaEnabled, setMfaEnabled] = useState(user?.mfaEnabled);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [token, setToken] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [backupCodes, setBackupCodes] = useState([]);
   const [showBackupCodes, setShowBackupCodes] = useState(false);
-  const [showRemoveAuthenticatorModal, setShowRemoveAuthenticatorModal] =
-    useState(false);
 
   const handleEnableMfa = async () => {
     try {
@@ -34,7 +27,6 @@ const MultiFactorAuth = () => {
     }
   };
 
-  // Verify MFA Token
   const verifyMfa = async () => {
     try {
       const response = await axios.post(
@@ -50,7 +42,6 @@ const MultiFactorAuth = () => {
     }
   };
 
-  // Handle input change for the token
   const handleInputChange = (event) => {
     const value = event.target.value;
     if (/^\d*$/.test(value) && value.length <= 6) {
@@ -58,7 +49,6 @@ const MultiFactorAuth = () => {
     }
   };
 
-  // Handle Enter key press for token verification
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -74,10 +64,50 @@ const MultiFactorAuth = () => {
           params: { userId: user._id },
         }
       );
-      setBackupCodes(response.data.backupCodes);
-      console.log(response.data.backupCodes);
+      const { promptUser } = response.data;
+      if (promptUser) {
+        const result = await Swal.fire({
+          title: "No Backup Codes Found",
+          text: "You don’t have any backup codes. Would you like to generate new ones?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, generate codes",
+          cancelButtonText: "No, thanks",
+        });
+        if (result.isConfirmed) {
+          const generateResponse = await axios.get(
+            "http://localhost:5000/signup/mfa/backup-codes",
+            {
+              params: { userId: user._id },
+            }
+          );
 
-      setShowBackupCodes(true);
+          if (generateResponse.data.success) {
+            setBackupCodes(generateResponse.data.backupCodes);
+            setShowBackupCodes(true);
+            Swal.fire({
+              title: "Success!",
+              text: "New backup codes have been generated.",
+              icon: "success",
+            });
+          } else {
+            Swal.fire({
+              title: "Error",
+              text: "Failed to generate backup codes. Please try again.",
+              icon: "error",
+            });
+          }
+        } else {
+          Swal.fire({
+            title: "Cancelled",
+            text: "You can generate backup codes anytime later.",
+            icon: "info",
+          });
+        }
+      } else {
+        setBackupCodes(response.data.backupCodes);
+        setShowBackupCodes(true);
+      }
     } catch (error) {
       console.error("Error fetching backup codes:", error);
     }
@@ -91,7 +121,6 @@ const MultiFactorAuth = () => {
     }
   };
 
-  // Download backup codes as a text file
   const downloadBackupCodes = () => {
     if (!backupCodes || backupCodes.length === 0) {
       console.error("No backup codes available to download.");
@@ -113,24 +142,60 @@ const MultiFactorAuth = () => {
     document.body.removeChild(element);
   };
 
-  // Remove Authenticator App
   const handleRemoveAuthenticator = async () => {
-    try {
-      // Make request to the backend to disable MFA with the entered password
-      const response = await axios.put("/disable-mfa-profile", { password });
-      
-      if (response.data.success) {
-        setSuccess(true);
-        setMfaEnabled(false);
-        setError("");
-        setTimeout(() => setShowRemoveAuthenticatorModal(false), 2000); // Close modal after 2 seconds
-      } else {
-        setError("Password is incorrect. Please try again.");
+    const userId = user._id;
+    Swal.fire({
+      title: "Disable MFA",
+      text: "Enter your password to remove the authenticator app.",
+      input: "password",
+      inputPlaceholder: "Enter your password",
+      inputAttributes: {
+        autocapitalize: "off",
+        autocomplete: "current-password",
+      },
+      showCancelButton: true,
+      confirmButtonText: "Disable MFA",
+      cancelButtonText: "Cancel",
+      showLoaderOnConfirm: true,
+      preConfirm: async (password) => {
+        if (!password) {
+          Swal.showValidationMessage("Password is required.");
+          return;
+        }
+        try {
+          const response = await axios.put(
+            "http://localhost:5000/signup/mfa/disable-mfa-profile",
+            {
+              userId,
+              password,
+            }
+          );
+
+          if (response.data.success) {
+            return true;
+          } else {
+            Swal.showValidationMessage("Incorrect password. Please try again.");
+          }
+        } catch (error) {
+          if (error.response.data.isNotPass && error.response.status === 401) {
+            Swal.showValidationMessage("Incorrect password. Please try again.");
+          } else {
+            Swal.showValidationMessage(
+              "Something went wrong. Please try again."
+            );
+          }
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          "MFA Disabled",
+          "Your authenticator app has been removed.",
+          "success"
+        );
       }
-    } catch (error) {
-      console.error("Error disabling MFA:", error);
-      setError("Something went wrong. Please try again.");
-    }
+    });
   };
 
   return (
@@ -199,7 +264,7 @@ const MultiFactorAuth = () => {
                     </button>
                     <button
                       className="btn btn-outline-danger shadow mt-3 rounded-5 flex-fill"
-                      onClick={() => setShowRemoveAuthenticatorModal(true)}
+                      onClick={() => handleRemoveAuthenticator()}
                     >
                       Remove Authenticator App
                     </button>
@@ -224,7 +289,7 @@ const MultiFactorAuth = () => {
 
                       <ul className="list-group mb-3">
                         <div className="row">
-                          {backupCodes.map((codeObj, index) => (
+                          {backupCodes?.map((codeObj, index) => (
                             <div key={index} className="col-6 mb-2">
                               <li className="text-center fw-bold">
                                 <Paper
@@ -262,8 +327,6 @@ const MultiFactorAuth = () => {
             </div>
           </>
         )}
-
-       
       </div>
     </>
   );
