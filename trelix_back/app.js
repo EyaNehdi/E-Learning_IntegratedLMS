@@ -52,14 +52,17 @@ app.use('/delete', Course);
 
 
 //auth routes
+const quizRoutes = require('./routes/quizRoutes');
+const authRouteschapter = require('./routes/chapterRoutes'); 
 const authRoutes = require('./routes/authRoutes');
 const authRoutesIA = require('./routes/ia');
 app.use('/api/auth', authRoutes);
 app.use('/ia/auth', authRoutesIA);
-
+app.use('/chapter', authRouteschapter);
 app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/quiz", quizRoutes);
 
 app.use((err, req, res, next) => {
   console.error('Upload Error:', err.message);
