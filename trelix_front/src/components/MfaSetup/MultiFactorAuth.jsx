@@ -1,17 +1,15 @@
 import { useState } from "react";
-import { useOutletContext } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import Paper from "@mui/material/Paper";
+import { useProfileStore } from "../../store/profileStore";
 
 const MultiFactorAuth = () => {
-  const { user } = useOutletContext();
+  const { user, toggleMFA, setBackupCodes } = useProfileStore();
 
-  const [mfaEnabled, setMfaEnabled] = useState(user?.mfaEnabled);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [token, setToken] = useState("");
   const [success, setSuccess] = useState(false);
-  const [backupCodes, setBackupCodes] = useState([]);
   const [showBackupCodes, setShowBackupCodes] = useState(false);
 
   const handleEnableMfa = async () => {
@@ -21,7 +19,7 @@ const MultiFactorAuth = () => {
         { userId: user._id }
       );
       setQrCodeUrl(response.data.qrCodeUrl);
-      setMfaEnabled(true);
+      toggleMFA();
     } catch (error) {
       console.error("Error enabling MFA:", error);
     }
@@ -83,7 +81,7 @@ const MultiFactorAuth = () => {
           );
 
           if (generateResponse.data.success) {
-            setBackupCodes(generateResponse.data.backupCodes);
+            setBackupCodes(generateResponse.data.ResponseBackupCodes);
             setShowBackupCodes(true);
             Swal.fire({
               title: "Success!",
@@ -122,14 +120,14 @@ const MultiFactorAuth = () => {
   };
 
   const downloadBackupCodes = () => {
-    if (!backupCodes || backupCodes.length === 0) {
+    if (!user?.backupCodes || user?.backupCodes.length === 0) {
       console.error("No backup codes available to download.");
       return;
     }
     const today = new Date();
     const formattedDate = today.toISOString().split("T")[0];
     const filename = `backup_codes_Trelix_${formattedDate}.txt`;
-    const fileContent = backupCodes
+    const fileContent = user?.backupCodes
       .map((codeObj) => `${codeObj.code} ${codeObj.used ? "(used)" : ""}`)
       .join("\n");
 
@@ -144,6 +142,7 @@ const MultiFactorAuth = () => {
 
   const handleRemoveAuthenticator = async () => {
     const userId = user._id;
+    setShowBackupCodes(false);
     Swal.fire({
       title: "Disable MFA",
       text: "Enter your password to remove the authenticator app.",
@@ -172,6 +171,8 @@ const MultiFactorAuth = () => {
           );
 
           if (response.data.success) {
+            await toggleMFA();
+            console.log("updated mfaEnabled state");
             return true;
           } else {
             Swal.showValidationMessage("Incorrect password. Please try again.");
@@ -217,12 +218,12 @@ const MultiFactorAuth = () => {
                 marginBottom: 0,
               }}
             >
-              {mfaEnabled
+              {user?.mfaEnabled
                 ? "Multi-Factor Authentication Enabled"
                 : "Multi-Factor Authentication Disabled"}
             </p>
           </div>
-          {!mfaEnabled && (
+          {!user?.mfaEnabled && (
             <button
               className="btn btn-success shadow mt-3 rounded-5"
               onClick={handleEnableMfa}
@@ -232,7 +233,7 @@ const MultiFactorAuth = () => {
           )}
         </div>
 
-        {mfaEnabled && (
+        {user?.mfaEnabled && (
           <>
             {/* Authenticator App Section */}
             <div className="card p-3 mb-4">
@@ -247,7 +248,7 @@ const MultiFactorAuth = () => {
                 to your account. This ensures only you can log in.
               </p>
 
-              {mfaEnabled && (
+              {user?.mfaEnabled && (
                 <>
                   <div className="d-flex gap-2 flex-wrap">
                     <button
@@ -289,7 +290,7 @@ const MultiFactorAuth = () => {
 
                       <ul className="list-group mb-3">
                         <div className="row">
-                          {backupCodes?.map((codeObj, index) => (
+                          {user?.backupCodes?.map((codeObj, index) => (
                             <div key={index} className="col-6 mb-2">
                               <li className="text-center fw-bold">
                                 <Paper
