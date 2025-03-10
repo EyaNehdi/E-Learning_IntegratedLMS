@@ -52,6 +52,7 @@ app.use('/delete', Course);
 
 
 //auth routes
+const ExamRoutes = require('./routes/ExamRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const authRouteschapter = require('./routes/chapterRoutes'); 
 const authRoutes = require('./routes/authRoutes');
@@ -63,7 +64,7 @@ app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/quiz", quizRoutes);
-
+app.use("/Exam", ExamRoutes);
 app.use((err, req, res, next) => {
   console.error('Upload Error:', err.message);
   res.status(400).json({ error: err.message });

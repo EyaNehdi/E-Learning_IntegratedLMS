@@ -2,10 +2,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "../components/Header";
+import Header from "../components/Header/Header";
 import { Lock } from "lucide-react";
 import toast from "react-hot-toast";
-import Footer from "../components/Footer";
+import Footer from "../components/Footer/Footer";
 
 const ResetPasswordPage = () => {
 	const [password, setPassword] = useState("");

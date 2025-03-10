@@ -110,7 +110,7 @@ function Editcourse() {
       setSuccess("Cours mis à jour avec succès!")
 
       setTimeout(() => {
-        navigate("/list")
+        navigate("/profile/list")
       }, 2000)
     } catch (error) {
       console.error("Erreur lors de la mise à jour:", error)
@@ -136,8 +136,8 @@ function Editcourse() {
   }
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Modifier un cours</h2>
+                      <>
+      <h2>Modifier un cours</h2>
 
       {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
@@ -147,7 +147,7 @@ function Editcourse() {
 
     
 
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow">
+      <form onSubmit={handleSubmit} className="space-y-6" >
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">
             Titre du cours
@@ -255,9 +255,8 @@ function Editcourse() {
           Mettre à jour le cours
         </button>
       </form>
-
-     
-    </div>
+      </>
+  
   )
 }
 
