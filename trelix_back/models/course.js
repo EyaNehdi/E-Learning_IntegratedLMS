@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
+const { number } = require('yup');
 const Schema = mongoose.Schema;
 
 
 const Course = new Schema({
                       title:String,
                       description:String,
-                      price:String,
+                      price:Number,
                       level:String,
                       categorie:String,
                       module: { type: Schema.Types.ObjectId, ref: 'Module', required: true },
