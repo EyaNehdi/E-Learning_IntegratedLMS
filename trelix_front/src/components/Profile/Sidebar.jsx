@@ -57,15 +57,17 @@ function Sidebar() {
                 <span>Reviews</span>
               </a>
             </li>
+          
             <li>
-              <a className="nav-link" href="student-my-quiz-attempts.html">
-                <i className="feather-icon icon-box" />
-                <span>My Quiz Attempts</span>
-              </a>
-            </li>
-            <li>
+            <Link className="nav-link" to="/profile/Allexams">
+                <i className="feather-icon icon-book" />
+                <span>My Exams</span>
+              </Link>
 
-
+            <Link className="nav-link" to="/profile/allquiz">
+                <i className="feather-icon icon-book" />
+                <span>My Quizs</span>
+              </Link>
             <Link className="nav-link" to="/profile/addchapter">
                 <i className="feather-icon icon-plus" />
                 <span>AddChapter</span>
@@ -74,7 +76,10 @@ function Sidebar() {
                 <i className="feather-icon icon-plus" />
                 <span>AddQuiz</span>
               </Link>
-
+              <Link className="nav-link" to="/profile/addExam">
+                <i className="feather-icon icon-plus" />
+                <span>addExam</span>
+              </Link>
             </li>
           </ul>
         </nav>

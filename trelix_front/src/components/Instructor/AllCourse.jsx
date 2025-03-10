@@ -27,6 +27,7 @@ function Allcourse() {
 
   return (
     <div>
+      <link rel="stylesheet" href="assets/css/style.css"/>
       <section
         className="promo-sec"
         style={{ background: 'url("images/promo-bg.jpg")no-repeat center center / cover' }}
@@ -239,7 +240,7 @@ function Allcourse() {
                     <div className="col-xl-6 col-md-6" key={course._id}>
                       <div className="course-entry-3 card rounded-2 bg-white border">
                         <div className="card-media position-relative">
-                          <a href={`/single-course/${course._id}`}>
+                        <a href={`/chapters/${course._id}`}>
                             <img className="card-img-top" src="assets/images/crs.png" alt={course.title} />
                           </a>
                           <a href="#" className="action-wishlist position-absolute text-white icon-xs rounded-circle">
