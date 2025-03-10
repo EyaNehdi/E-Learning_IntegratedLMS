@@ -6,13 +6,16 @@ import Sidebar from "../../components/Profile/Sidebar";
 import Preloader from "../../components/Preloader/Preloader";
 import { ToastContainer } from "react-toastify";
 
-
 const ProfilePage = () => {
-  const { user, fetchUser, updateUser, isLoadingUser } = useProfileStore();
-
-  const [profilePhoto, setProfilePhoto] = useState(user?.profilePhoto);
-  const [coverPhoto, setCoverPhoto] = useState(user?.coverPhoto);
-  const [profile, setProfile] = useState({ user });
+  const {
+    user,
+    fetchUser,
+    updateUser,
+    isLoadingUser,
+    toggleMFA,
+    setBackupCodes,
+    accountCompletion,
+  } = useProfileStore();
   const getRandomColor = () => {
     const letters = "0123456789ABCDEF";
     let color = "#";
@@ -22,41 +25,16 @@ const ProfilePage = () => {
     return color;
   };
   const bgColor = useMemo(() => getRandomColor(), [user?.firstName]);
-  const [completion, setCompletion] = useState(0);
-  const calculateCompletion = (profileData) => {
-    const fields = [
-      "firstName",
-      "lastName",
-      "email",
-      "profilePhoto",
-      "coverPhoto",
-      "phone",
-      
-      "Bio"
-    ];
-    const filledFields = fields.filter((field) => profileData[field]);
-    const percentage = Math.round((filledFields.length / fields.length) * 100);
-    setCompletion(percentage);
-  };
 
   useEffect(() => {
-    if (completion === 100) {
+    if (accountCompletion === 100) {
       awardBadge();
     }
-  }, [completion]);
+  }, [accountCompletion]);
 
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
-
-  useEffect(() => {
-    if (user) {
-      setProfile(user);
-      setProfilePhoto(user.profilePhoto || profilePhoto);
-      setCoverPhoto(user.coverPhoto || coverPhoto);
-      calculateCompletion(user);
-    }
-  }, [user]);
 
   const handleProfilePhotoChange = async (event) => {
     const file = event.target.files[0];
@@ -70,8 +48,6 @@ const ProfilePage = () => {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true, // if using cookies for auth
       });
-
-      setProfilePhoto(URL.createObjectURL(file)); // Update preview
       updateUser({ profilePhoto: response.data.profilePhoto }); // Update state with server response
     } catch (error) {
       console.error("Error updating profile photo:", error);
@@ -90,16 +66,14 @@ const ProfilePage = () => {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
-
-      setCoverPhoto(URL.createObjectURL(file));
       updateUser({ coverPhoto: response.data.coverPhoto });
     } catch (error) {
       console.error("Error updating cover photo:", error);
     }
   };
-  
+
   const awardBadge = async () => {
-    const badgeImageUrl = "/assets/Badges/WelcomeBadge.png"; 
+    const badgeImageUrl = "/assets/Badges/WelcomeBadge.png";
 
     try {
       const response = await axios.post(
@@ -129,8 +103,8 @@ const ProfilePage = () => {
                 <div
                   className="dash-cover-bg rounded-3"
                   style={{
-                    backgroundImage: coverPhoto
-                      ? `url(http://localhost:5000${coverPhoto})`
+                    backgroundImage: user?.coverPhoto
+                      ? `url(http://localhost:5000${user?.coverPhoto})`
                       : `url('/assets/icons/COVER.png')`,
                   }}
                 >
@@ -141,7 +115,7 @@ const ProfilePage = () => {
                         style={{
                           width: "100px",
                           height: "100px",
-                          backgroundColor: profilePhoto
+                          backgroundColor: user?.profilePhoto
                             ? "transparent"
                             : bgColor,
                           fontSize: "40px",
@@ -150,9 +124,9 @@ const ProfilePage = () => {
                           textTransform: "uppercase",
                         }}
                       >
-                        {profilePhoto ? (
+                        {user?.profilePhoto ? (
                           <img
-                            src={`http://localhost:5000${profilePhoto}`}
+                            src={`http://localhost:5000${user?.profilePhoto}`}
                             className="rounded-circle"
                             alt="Avatar"
                             style={{
@@ -235,16 +209,16 @@ const ProfilePage = () => {
               </div>
               <div className="col-lg-9 ps-lg-4">
                 <section className="dashboard-sec">
-                  <h3 className="widget-title mb-4">My Profile</h3>
                   {isLoadingUser ? (
                     <Preloader />
                   ) : (
                     <Outlet
                       context={{
                         user,
-                        profile,
-                        setProfile,
-                        completion,
+                        updateUser,
+                        accountCompletion,
+                        toggleMFA,
+                        setBackupCodes,
                       }}
                     />
                   )}

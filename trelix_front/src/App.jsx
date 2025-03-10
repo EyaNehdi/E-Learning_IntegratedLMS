@@ -21,8 +21,8 @@ import ProfilePage from "./pages/Profile/ProfilePage";
 import ProfileDetails from "./components/Profile/ProfileDetails";
 import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
 import PublicRoute from "./layout/PublicRoute";
-import Index from "./components";
 import AdminRoute from "./layout/AdminRoute";
+import Index from "./components";
 
 import Module from "./components/Instructor/Module";
 import Courses from "./components/Instructor/Courses";
@@ -47,9 +47,6 @@ function App() {
   return (
     <Router>
       <Routes>
-
-
-
         {/* **************** */}
         {/* Public routes */}
         <Route element={<PublicRoute />}>
@@ -59,9 +56,6 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/verify-email" element={<EmailVerificationPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-
-
-
           <Route
             path="/reset-password/:token"
             element={<ResetPasswordPage />}
@@ -80,8 +74,8 @@ function App() {
           <Route path="/chapters/:courseid" element={<ListChapters />} >
             <Route path="content/:id" element={<ChapterContent />} />
           </Route>
-
           <Route path="/profile" element={<ProfilePage />}>
+            <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addExam" element={<AddExam />} />
@@ -95,11 +89,11 @@ function App() {
             <Route path="course-chapter/:courseId" element={<CourseChapter/>} />
             <Route path="list" element={<Listecourse/>} />
             <Route path="module" element={<Module />} />
-            <Route path="/profile/edit-course/:courseId" element={<EditCourse />} />
+            <Route
+              path="/profile/edit-course/:courseId"
+              element={<EditCourse />}
+            />
             <Route path="/profile/allcours" element={<Allcourse />} />
-
-
-
           </Route>
         </Route>
         <Route path="/CV" element={<CV />} />
@@ -116,8 +110,7 @@ function App() {
         {/* **************** */}
         <Route path="/linkedin/callback" element={<LinkedInCallback />} />
         {/* Not found route */}
-       
-       
+
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
