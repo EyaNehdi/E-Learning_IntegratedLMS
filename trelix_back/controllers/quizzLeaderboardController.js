@@ -47,94 +47,103 @@ const addQuizz = async (req, res) => {
     }
 }
 //shuffle random quizz for today :
+// Shuffle and activate a random quiz
 async function shuffleQuiz() {
     try {
-            // Deactivate all quizzes before selecting one
-            await QuizLeaderboard.updateMany({}, { $set: { isActive: false } });
-            // Fetch all quizzes 
+        // Deactivate all quizzes before selecting one
+        await QuizLeaderboard.updateMany({}, { $set: { isActive: false } });
+
+        // Fetch all quizzes
         const quizzes = await QuizLeaderboard.find({});
         if (quizzes.length === 0) {
             console.log("No quizzes found...");
-        } else {
+            return;
+        }
 
-            // Select a random quiz to activate
-            const randomIndex = Math.floor(Math.random() * quizzes.length);
-            const selectedQuiz = quizzes[randomIndex];
+        // Select a random quiz to activate
+        const randomIndex = Math.floor(Math.random() * quizzes.length);
+        const selectedQuiz = quizzes[randomIndex];
 
-            // Set the selected quiz as active
-            selectedQuiz.isActive = true;
-            // Set the quiz activation time (next minute)
+        // Set the selected quiz as active
+        selectedQuiz.isActive = true;
+
+        // Set the quiz activation time (next minute)
         const now = new Date();
         now.setMinutes(now.getMinutes() + 1); // Next minute
         now.setSeconds(0, 0);
         selectedQuiz.nextResetTime = now; // Store this in DB
-            await selectedQuiz.save();
+        await selectedQuiz.save();
 
-            console.log(`All quizzes have been deactivated. Quiz titled "${selectedQuiz.title}" is now active!`);
-      // Emit the updated quiz data to the front-end
-      if (io) {
-        io.emit('activeQuizUpdate', {
-            title: selectedQuiz.title,
-            nextResetTime: selectedQuiz.nextResetTime
-        });
+        console.log(`All quizzes have been deactivated. Quiz titled "${selectedQuiz.title}" is now active!`);
 
-        // Emit timer updates every second until reset time
-        const interval = setInterval(() => {
-            const timeLeft = Math.max((new Date(selectedQuiz.nextResetTime).getTime() - Date.now()) / 1000, 0);
-            io.emit('timerUpdate', { timeLeft });
+        // Emit the updated quiz data to the front-end
+        if (io) {
+            io.emit('activeQuizUpdate', {
+                _id: selectedQuiz._id,
+                title: selectedQuiz.title,
+                nextResetTime: selectedQuiz.nextResetTime
+            });
 
-            if (timeLeft <= 0) {
-                clearInterval(interval);
-            }
-        }, 1000);
-    }
-}
-        } catch (err) {
+            // Emit timer updates every second until reset time
+            const interval = setInterval(() => {
+                const timeLeft = Math.max((new Date(selectedQuiz.nextResetTime).getTime() - Date.now()) / 1000, 0);
+                io.emit('timerUpdate', { timeLeft });
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+
+    } catch (err) {
         console.error("Error shuffling quiz:", err);
     }
 }
-//get active quizz
+
+// Get active quiz
 const activeQuizz = async (req, res) => {
     console.log('Fetching active quiz...');
     try {
-      const now = new Date();
-      const currentMinute = now.getMinutes(); // Get current minute
-      const today = now.toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-  
-      // Find the quiz that's active for today
-      const activeQuiz = await QuizLeaderboard.findOne({ isActive: true });
-  
-      if (!activeQuiz) {
-        return res.status(404).json({ message: 'No active quiz for today.' });
-      }
-  
-      res.json({
-        quiz: activeQuiz,
-        nextResetTime: activeQuiz.nextResetTime, // Send reset time to frontend
-    });
-   // Emit the quiz and countdown to all clients
-   if (io) {
-    io.emit('activeQuizUpdate', {
-        title: activeQuiz.title, // Changed from selectedQuiz to activeQuiz
-        nextResetTime: activeQuiz.nextResetTime
-    });
+        const now = new Date();
 
-    // Emit timer updates every second until reset time
-    const interval = setInterval(() => {
-        const timeLeft = Math.max((new Date(activeQuiz.nextResetTime).getTime() - Date.now()) / 1000, 0);
-        io.emit('timerUpdate', { timeLeft });
+        // Find the active quiz
+        const activeQuiz = await QuizLeaderboard.findOne({ isActive: true });
 
-        // Stop emitting when the time is up
-        if (timeLeft <= 0) {
-            clearInterval(interval);
+        if (!activeQuiz) {
+            return res.status(404).json({ message: 'No active quiz for today.' });
         }
-    }, 1000);
-  }
-} catch (err) {
-      console.error('Error fetching active quiz:', err);
-      res.status(500).json({ message: 'Error fetching active quiz' });
+
+        // Send response before emitting events to avoid "headers sent" error
+        res.json({
+            quiz: activeQuiz,
+            nextResetTime: activeQuiz.nextResetTime,
+        });
+
+        // Emit the quiz and countdown timer only if io exists
+        if (io) {
+            io.emit('activeQuizUpdate', {
+                _id: activeQuiz._id,
+                title: activeQuiz.title,
+                nextResetTime: activeQuiz.nextResetTime
+            });
+
+            // Emit timer updates every second until reset time
+            const interval = setInterval(() => {
+                const timeLeft = Math.max((new Date(activeQuiz.nextResetTime).getTime() - Date.now()) / 1000, 0);
+                io.emit('timerUpdate', { timeLeft });
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+
+    } catch (err) {
+        console.error('Error fetching active quiz:', err);
+        res.status(500).json({ message: 'Error fetching active quiz' });
     }
-  }
+};
+
 //Check User Attempt
 const checkUserAttempt = async (req, res) => {
     console.log("Request received for quiz attempt check:", req.params.quizId);
@@ -187,18 +196,33 @@ const submitQuiz = async (req, res) => {
         if (existingAttempt) {
             return res.status(400).json({ message: "You have already attempted this quiz." });
         }
-
+        console.log("Submitting quiz:", { quizId, userId, score, passed });
         // 3. Save the new attempt, whether they pass or not
         const newAttempt = new QuizLeaderboardAttempt({
             userId,
             quizId,
             score,
             completed: true,
-            passed
+            passed: true
         });
+        // If user passed, update totalScore immediately
+        let updatedUser = null ;
+        console.log("Passed status:", passed);
+        if (passed) {
+            updatedUser = await User.findByIdAndUpdate(
+                userId,
+                { $inc: { totalScore: score } }, // Increment the totalScore
+                { new: true }
+            );
+            
+             // Emit event to update leaderboard
+             io.emit("leaderboardUpdate", updatedUser);
+        }
 
         await newAttempt.save();
-        res.json({ message: "Quiz submitted successfully!", attempt: newAttempt });
+        console.log("Quiz attempt saved:", newAttempt);
+        res.json({ message: "Quiz submitted successfully!", attempt: newAttempt, updatedUser });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error submitting quiz." });
@@ -208,41 +232,19 @@ const submitQuiz = async (req, res) => {
 //Leaderboard
 const leaderboard = async (req, res) => {
     try {
-      const leaderboardData = await User.find({ totalScore: { $gt: 0 } }) // Ensure users with score are included
-        .sort({ totalScore: -1 }) // Sort by total score in descending order
-        .select('id firstName lastName profilePhoto totalScore');
-  console.log(leaderboardData);
-      res.json(leaderboardData);
+        const leaderboardData = await User.find({ totalScore: { $gt: 0 } }) // Only users with score > 0
+            .sort({ totalScore: -1 }) // Sort from highest to lowest
+            .select('_id firstName lastName profilePhoto totalScore');
+
+        console.log(leaderboardData);
+        res.json(leaderboardData);
     } catch (error) {
-      console.error("Leaderboard error:", error);
-      res.status(500).json({ message: "Error fetching leaderboard", error });
+        console.error("Leaderboard error:", error);
+        res.status(500).json({ message: "Error fetching leaderboard", error });
     }
-  };
-// Cron job to update totalScore in users collection daily
-const leaderTask = cron.schedule('0 0 * * *', async () => { // Runs every day at midnight
-    console.log("Running cron job to update total scores...");
-  
-    try {
-      const users = await QuizLeaderboardAttempt.aggregate([
-        { $match: { passed: true } }, // Only include passed quizzes
-        { $group: { _id: "$userId", totalScore: { $sum: "$score" } } },
-      ]);
-  
-      for (const user of users) {
-        await User.findOneAndUpdate(
-          { id: user._id.toString() },
-          { totalScore: user.totalScore },
-          { new: true }
-        );
-      }
-  
-      console.log("User total scores updated successfully.");
-    } catch (error) {
-      console.error("Error updating user total scores:", error);
-    }
-  });
-  leaderTask.start();
-  console.log("Cron job for totalscore started...");
+};
+
+
 //daily task 
 const task = cron.schedule('* * * * *', () => {
     console.log("Running cron job to shuffle quiz...");

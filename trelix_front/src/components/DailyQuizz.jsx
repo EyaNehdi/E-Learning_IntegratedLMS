@@ -12,54 +12,30 @@ function DailyQuizz() {
     const [loading, setLoading] = useState(true);
   
     useEffect(() => {
-    //   const fetchActiveQuiz = async () => {
-    //       try {
-    //           const response = await axios.get('http://localhost:5000/api/quiz/active');
-    //           if (response.data.quiz) {
-    //               setActiveQuiz(response.data.quiz);
-                  
-    //               // Check if user has already attempted this quiz
-    //               if (isAuthenticated && user) {
-    //                 const token = user?.token; // Fetch the token from state
-    //                 if (!token) return;
-                
-    //                 const attemptRes = await axios.get(
-    //                     `http://localhost:5000/api/quiz/check-attempt/${response.data.quiz._id}`,
-    //                     {
-    //                         headers: { Authorization: `Bearer ${token}` }
-    //                     }
-    //                 );
-                
-    //                 setHasAttempted(attemptRes.data.attempted);
-    //                 console.log("setHasAttempted"+ attemptRes.data.attempted);
-    //             }
-    //           }
-    //       } catch (error) {
-    //           console.error('Error fetching active quiz:', error.response?.data?.message);
-    //       } finally {
-    //           setLoading(false);
-    //       }
-    //   };
-      
-    //   fetchActiveQuiz();
-    //   // Poll every 30 seconds
-    // const intervalId = setInterval(fetchActiveQuiz, 30000);
-
-    // // Cleanup on unmount
-    // return () => clearInterval(intervalId);
     const socket = io('http://localhost:5000'); // Adjust to your backend URL
         
         socket.on('activeQuizUpdate', (quizData) => {
             console.log("Received active quiz update:", quizData);
             setActiveQuiz(quizData);
-        });
+            setLoading(false);
+        
 
-        return () => {
-            socket.disconnect(); // Clean up the socket connection on unmount
-        };
+      // Ensure the quiz data is valid before setting it
+      if (quizData && quizData._id) {
+        setActiveQuiz(quizData);
+        setLoading(false);
+    } else {
+        console.error("Invalid quiz data received:", quizData);
+    }
+
+});
+return () => {
+    socket.disconnect(); // Clean up the socket connection on unmount
+};
   }, []);
 
   const handleJoinQuiz = async () => {
+    console.log('Active Quiz ID:', activeQuiz?._id);
     if (isAuthenticated && user) {
         console.log('Active Quiz ID:', activeQuiz?._id);
         try {

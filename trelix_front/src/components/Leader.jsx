@@ -1,19 +1,34 @@
 import "./css/Leader.css";
 import { useEffect,useState } from "react";
+import io from "socket.io-client";
 import axios from "axios";
+
 function Leader() {
   const [leaderboard, setLeaderboard] = useState([]);
-
+  
   useEffect(() => {
-      axios.get("http://localhost:5000/api/quiz/leaderboard") 
-        .then(response => {
-          setLeaderboard(response.data);
-        })
-        .catch(error => {
-          console.error("Error fetching leaderboard:", error);
-        });
-   
-  }, []);
+    axios.get("http://localhost:5000/api/quiz/leaderboard") 
+      .then(response => {
+        setLeaderboard(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching leaderboard:", error);
+      });
+// Correct socket connection (only to the base URL)
+const socket = io("http://localhost:5000");
+    
+// Listen for real-time updates - updated to handle full leaderboard
+socket.on("leaderboardUpdate", (updatedLeaderboard) => {
+  setLeaderboard(updatedLeaderboard);
+});
+
+// Clean up socket connection when component unmounts
+return () => {
+  socket.off("leaderboardUpdate");
+  socket.disconnect();
+};
+
+}, []);
   return (
     <div>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,22 +44,24 @@ function Leader() {
         <div className="ribbon" />
         <table>
         <tbody>
-              {leaderboard.map((user, index) => (
-                <tr key={user._id}>
-                  <td className="number">{index + 1}</td>
-                  <td className="name">
-                    {user.image ? <img src={user.image} alt="profile" className="profile-pic" /> : null}
-                    {user.firstName} {user.lastName}
-                  </td>
-                  <td className="points">
-                    {user.totalScore.toFixed(2)}
-                    {index === 0 && (
-                      <img className="gold-medal" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal" />
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody></table>
+          {leaderboard.length > 0 ? (
+            leaderboard.map((user, index) => (
+              <tr key={user._id}>
+                <td className="number">{index + 1}</td>
+                <td className="name">
+                  {user.profilePhoto ? <img src={user.profilePhoto} alt="profile" className="profile-pic" /> : null}
+                  {user.firstName} {user.lastName}
+                </td>
+                <td className="points">{user.totalScore.toFixed(2)}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3">No users with scores yet.</td>
+            </tr>
+          )}
+        </tbody>
+            </table>
       </div>
     </main>
   </div>

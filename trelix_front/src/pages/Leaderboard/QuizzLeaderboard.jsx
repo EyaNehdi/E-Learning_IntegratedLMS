@@ -57,7 +57,7 @@ function QuizzLeaderboard() {
         try {
             // Calculate score based on the answers
             let score = 0;
-            let passed = false;
+            let passed = true;
     
             questions.forEach((question) => {
                 if (answers[question._id] === question.correctAnswer) {
@@ -65,13 +65,12 @@ function QuizzLeaderboard() {
                 }
             });
     
-            // Set passed condition (for example, passed if score > 50% of questions)
-            passed = score / questions.length >= 0.5;
     
             const res = await axios.post("http://localhost:5000/api/quiz/submit", {
                 quizId,
                 score,
-                passed
+                passed: true
+                
             }, {
                 headers: { Authorization: `Bearer ${user?.token}` }
             });
