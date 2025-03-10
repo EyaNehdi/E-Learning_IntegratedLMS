@@ -1,4 +1,5 @@
 const Chapter = require("../models/chapterModels");
+const Course = require("../models/course");
 const multer = require("multer");
 const path = require("path");
 
@@ -85,6 +86,48 @@ const updateChapter = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+const assignChapters = async (req, res) => {
+    try {
+        const { courseId, chapters } = req.body;
+
+        if (!courseId || !chapters || chapters.length === 0) {
+            return res.status(400).json({ message: "Course ID and chapters are required" });
+        }
+
+        // Check if course exists
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
+        // Update the course document by adding selected chapters
+        course.chapters = [...new Set([...course.chapters, ...chapters])]; // Avoid duplicate chapters
+        await course.save();
+
+        res.status(200).json({ message: "Chapters assigned successfully", course });
+    } catch (error) {
+        console.error("Error in assignChapters:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+const getChaptersByCourse = async (req, res) => {
+    try {
+        const { courseId } = req.params;
+
+        // Check if the course exists
+        const course = await Course.findById(courseId).populate('chapters'); 
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
+        // Send back only the chapters from this course
+        res.status(200).json({ chapters: course.chapters });
+    } catch (error) {
+        console.error("Error fetching chapters:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 
 // Delete a chapter
 const deleteChapter = async (req, res) => {
@@ -103,4 +146,4 @@ const deleteChapter = async (req, res) => {
     }
   };
 
-module.exports = { getChapters,upload, createChapter, updateChapter, deleteChapter };
+module.exports = { getChapters,upload, createChapter, updateChapter, deleteChapter ,assignChapters ,getChaptersByCourse};
