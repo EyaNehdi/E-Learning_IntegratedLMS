@@ -6,7 +6,8 @@ import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
 
 const ProfileDetails = () => {
-  const { user, profile, setProfile, completion } = useOutletContext();
+  const { user, accountCompletion, updateUser } = useOutletContext();
+
   const [isEditing, setIsEditing] = useState(false);
   let timeoutId;
   const [showPopup, setShowPopup] = useState(false);
@@ -17,10 +18,8 @@ const ProfileDetails = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    setProfile((prevProfile) => ({
-      ...prevProfile,
-      [name]: value,
-    }));
+    updateUser({ [name]: value });
+
     clearTimeout(timeoutId); // Clear the timeout if it's set
     timeoutId = setTimeout(async () => {
       try {
@@ -52,36 +51,40 @@ const ProfileDetails = () => {
   };
   const updateskilsWithEntities = async (entities) => {
     try {
-     
-        const filteredSkills = entities
-            .filter(ent => ent.label === "PRODUCT")
-            .map(ent => ent.text);
+      const filteredSkills = entities
+        .filter((ent) => ent.label === "PRODUCT")
+        .map((ent) => ent.text);
 
-        
-        if (filteredSkills.length === 0) {
-            console.warn("No relevant skills found.");
-            return;
+      if (filteredSkills.length === 0) {
+        console.warn("No relevant skills found.");
+        return;
+      }
+
+      const response = await axios.put(
+        "http://localhost:5000/api/info/profile/updateskils",
+        {
+          userId: user._id,
+          skills: filteredSkills,
         }
+      );
 
-        const response = await axios.put("http://localhost:5000/api/info/profile/updateskils", {
-            userId: user._id, 
-            skills: filteredSkills, 
-        });
-
-        console.log("Skills updated successfully:", response.data);
+      console.log("Skills updated successfully:", response.data);
     } catch (error) {
-        console.error("Failed to update profile:", error.response?.data || error.message);
+      console.error(
+        "Failed to update profile:",
+        error.response?.data || error.message
+      );
     }
-};
+  };
   const handleSubmit = async () => {
     const file = cvFile;
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("cvFile", file); 
+    formData.append("cvFile", file);
 
-    setIsLoading(true); 
-    setError(null); 
+    setIsLoading(true);
+    setError(null);
 
     try {
       const response = await axios.post(
@@ -105,7 +108,6 @@ const ProfileDetails = () => {
       setIsLoading(false); // End loading regardless of success or failure
     }
   };
-
 
   return (
     <div className="profile-info border rounded-3">
@@ -136,7 +138,7 @@ const ProfileDetails = () => {
                   className="ml-2 border p-1 rounded"
                 />
               ) : (
-                ` ${profile.email || user?.email}`
+                ` ${user?.email}`
               )}
             </li>
             <li>
@@ -145,12 +147,12 @@ const ProfileDetails = () => {
                 <input
                   type="text"
                   name="firstName"
-                  value={profile.firstName}
+                  value={user?.firstName}
                   onChange={handleInputChange}
                   className="ml-2 border p-1 rounded"
                 />
               ) : (
-                ` ${profile.firstName || user?.firstName}`
+                ` ${user?.firstName}`
               )}
             </li>
             <li>
@@ -159,12 +161,12 @@ const ProfileDetails = () => {
                 <input
                   type="text"
                   name="lastName"
-                  value={profile.lastName}
+                  value={user?.lastName}
                   onChange={handleInputChange}
                   className="ml-2 border p-1 rounded"
                 />
               ) : (
-                ` ${profile.lastName || user?.lastName}`
+                ` ${user?.lastName}`
               )}
             </li>
             <li>
@@ -173,12 +175,12 @@ const ProfileDetails = () => {
                 <input
                   type="number"
                   name="phone"
-                  value={profile.phone}
+                  value={user?.phone}
                   onChange={handleInputChange}
                   className="ml-2 border p-1 rounded"
                 />
               ) : (
-                ` ${user?.phone || profile.phone || "No phone number provided"}` // ✅ Use user.phone first
+                ` ${user?.phone || "No phone number provided"}` // ✅ Use user.phone first
               )}
             </li>
             <li>
@@ -188,7 +190,9 @@ const ProfileDetails = () => {
                   user.skils.map((skill, index) => <p key={index}>{skill}</p>)
                 ) : entities.length > 0 ? ( // ✅ Fallback to entities if user has no skills
                   entities.map((ent, index) =>
-                    ent.label === "PRODUCT" ? <p key={index}>{ent.text}</p> : null
+                    ent.label === "PRODUCT" ? (
+                      <p key={index}>{ent.text}</p>
+                    ) : null
                   )
                 ) : (
                   <p>No skills found.</p>
@@ -204,32 +208,29 @@ const ProfileDetails = () => {
               {isEditing ? (
                 <textarea
                   name="Bio"
-                  value={profile.Bio}
+                  value={user?.Bio}
                   onChange={handleInputChange}
                   className="ml-2 border p-1 rounded w-full"
                 />
               ) : (
-                ` ${profile.Bio ||
-                user?.Bio ||
-                "No biography provided"
-                }`
+                ` ${user?.Bio || "No biography provided"}`
               )}
             </li>
           </ul>
           <div className="flex flex-col items-center p-4">
             <div className="relative w-24 h-24 mb-4">
               <CircularProgressbar
-                value={completion}
-                text={`${completion}%`}
+                value={accountCompletion}
+                text={`${accountCompletion}%`}
                 styles={buildStyles({
                   textSize: "16px",
-                  pathColor: completion === 100 ? "#4CAF50" : "#FF9800",
+                  pathColor: accountCompletion === 100 ? "#4CAF50" : "#FF9800",
                   textColor: "#333",
                   trailColor: "#ddd",
                 })}
               />
             </div>
-            {completion === 100 && (
+            {accountCompletion === 100 && (
               <div className="mt-2 p-2 bg-green-500 text-white rounded-lg">
                 🎉 Congratulations! You have completed your profile and earned a
                 special badge! 🏅

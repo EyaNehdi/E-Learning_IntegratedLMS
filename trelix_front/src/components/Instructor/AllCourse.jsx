@@ -1,8 +1,7 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import axios from "axios"
-import Footer from "../Footer";
 
 function Allcourse() {
   const [courses, setCourses] = useState([]);
@@ -28,6 +27,7 @@ function Allcourse() {
 
   return (
     <div>
+      <link rel="stylesheet" href="assets/css/style.css"/>
       <section
         className="promo-sec"
         style={{ background: 'url("images/promo-bg.jpg")no-repeat center center / cover' }}
@@ -240,11 +240,11 @@ function Allcourse() {
                     <div className="col-xl-6 col-md-6" key={course._id}>
                       <div className="course-entry-3 card rounded-2 bg-white border">
                         <div className="card-media position-relative">
-                          <a href={`/single-course/${course._id}`}>
-                            <img className="card-img-top" src="assets/images/course6.jpg" alt={course.title} />
+                        <a href={`/chapters/${course._id}`}>
+                            <img className="card-img-top" src="assets/images/crs.png" alt={course.title} />
                           </a>
                           <a href="#" className="action-wishlist position-absolute text-white icon-xs rounded-circle">
-                            <img src="assets/images/icons/heart-fill.svg" alt="Wishlist" />
+                            <img src="assets/images/icons/heart-fill.svg" alt="Wishlist" style={{marginTop: "10px",marginLeft: "9px"}} />
                           </a>
                         </div>
                         <div className="card-body">
@@ -274,10 +274,11 @@ function Allcourse() {
                                 Instructor
                               </a>
                             </span>
-                            <span>Students</span>
+                            <span>{course.module ? course.module.name : "No module assigned"}</span>
+
                           </div>
                           <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                            <div className="price">{course.price}<del>$35.00</del></div>
+                            <div className="price">{course.price}$<del>$35.00</del></div>
                             <a href={`/enroll/${course._id}`}>
                               Enroll Now <i className="feather-icon icon-arrow-right" />
                             </a>

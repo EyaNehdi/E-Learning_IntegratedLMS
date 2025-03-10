@@ -2,8 +2,8 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useEffect } from "react";
 import Preloader from "../components/Preloader/Preloader";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Header from "../components/Header/Header";
+import Footer from "../components/Footer/Footer";
 
 const ProtectedRoute = () => {
   const { isAuthenticated, isCheckingAuth, checkAuth } = useAuthStore();

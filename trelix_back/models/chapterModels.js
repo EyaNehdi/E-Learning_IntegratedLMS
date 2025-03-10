@@ -5,7 +5,7 @@ const ChapterSchema = new Schema({
  id: { type: String, required: true, unique: true, default: uuidv4 }, 
   title: { type: String, required: true },
   description: { type: String },
-  courseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+  courseId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   userid: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   pdf: { type: String }, 
   video: { type: String }, 
