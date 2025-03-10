@@ -223,7 +223,7 @@ function Courses() {
           />
         </div>
 
-        <div>
+          <div>
           <label htmlFor="modules" className="block text-sm font-medium mb-1">
             Modules ({modules.length} disponibles) <a href="/profile/module">Ajouter Module</a>
           </label>

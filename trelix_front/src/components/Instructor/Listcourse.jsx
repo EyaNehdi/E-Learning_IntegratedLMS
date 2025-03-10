@@ -6,7 +6,7 @@ import { useOutletContext } from "react-router-dom";
 function Listcourse() {
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
-  const { user} = useOutletContext();
+  const { user } = useOutletContext();
 
   // Fonction pour récupérer les cours
   const fetchCourses = async () => {
@@ -62,28 +62,28 @@ function Listcourse() {
             >
               Ajouter
             </button>
-            
+
           </li>
-          
-          <li> <a href="/profile/course" class="btn btn-sm btn-info rounded-5" style={{marginLeft: "205px" }}><i
-                        class="feather-icon icon-plus me-2"  ></i>Add New
-                     Course</a></li>
+
+          <li> <a href="/profile/course" class="btn btn-sm btn-info rounded-5" style={{ marginLeft: "205px" }}><i
+            class="feather-icon icon-plus me-2"  ></i>Add New
+            Course</a></li>
         </ul>
-        
+
       </div>
       <div className="tab-content inner-sec" id="myTabContent">
         <div className="tab-pane fade show active" id="home" role="tabpanel">
           <div className="row g-4">
             {/* Génération dynamique des cours */}
             {courses.length > 0 ? (
-              courses.filter((course)=>course.user===user._id).map((course) => (
+              courses.filter((course) => course.user === user._id).map((course) => (
                 <div key={course._id} className="col-xl-4 col-sm-6">
                   <div className="course-entry-3 card rounded-2 bg-info border shadow-1">
                     <div className="card-media position-relative">
-                      <a href="single-course.html">
+                      <a href={`/profile/course-chapter/${course._id}`}>
                         <img
                           className="card-img-top"
-                          src="/assets/images/course5.jpg" // Remplace avec une image dynamique si disponible
+                          src="/assets/images/course5.jpg" // Replace with a dynamic image if available
                           alt={course.title}
                         />
                       </a>
