@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
-
-const quizLeaderboardSchema = new mongoose.Schema({
-    date: { type: String, unique: true }, // YYYY-MM-DD format
+const Schema = mongoose.Schema;
+const quizLeaderboardSchema = new Schema({
+    date: String , // YYYY-MM-DD format
+    title: {type : String,unique: true},
     questions: [
         {
             question: String,
@@ -13,4 +14,4 @@ const quizLeaderboardSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: false },
 });
 
-export default mongoose.model("QuizLeaderboard", quizLeaderboardSchema);
+module.exports = mongoose.model("QuizLeaderboard", quizLeaderboardSchema);

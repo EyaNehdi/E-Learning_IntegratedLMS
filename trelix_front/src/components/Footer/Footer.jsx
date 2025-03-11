@@ -1,4 +1,4 @@
-import "./Footer.css";
+import "../css/Footer.css";
 function Footer() {
   return (
     <footer className="footer bg-dark py-2">
