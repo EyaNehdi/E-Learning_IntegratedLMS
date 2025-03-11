@@ -22,6 +22,7 @@ import ProfileDetails from "./components/Profile/ProfileDetails";
 import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
 import PublicRoute from "./layout/PublicRoute";
 import Index from "./components";
+import ChangePassword from "./pages/Profile/ChangePassword";
 
 function App() {
   return (
@@ -42,12 +43,14 @@ function App() {
           />
         </Route>
         {/* **************** */}
-        {/* Protected routes  */}
+        {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
           <Route path="/profile" element={<ProfilePage />}>
             <Route path="details" element={<ProfileDetails />} />
             <Route path="settings" element={<MultiFactorAuth />} />
+            {/* Ajout de la route pour changer le mot de passe */}
+            <Route path="change-password" element={<ChangePassword />} />
           </Route>
         </Route>
         <Route path="/CV" element={<CV />} />

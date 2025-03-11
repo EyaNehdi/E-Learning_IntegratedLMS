@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaSave } from "react-icons/fa";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";  // Add useNavigate hook
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
@@ -13,7 +13,9 @@ const ProfileDetails = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
+  const navigate = useNavigate();  // Initialize the navigate function for redirection
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -73,7 +75,6 @@ const ProfileDetails = () => {
         }
       );
       // Join them as a single string
-
       setEntities(response.data.entities);
     } catch (error) {
       setError(error.response?.data?.error || error.message); // Capture error message
@@ -82,7 +83,11 @@ const ProfileDetails = () => {
       setIsLoading(false); // End loading regardless of success or failure
     }
   };
-  
+
+  // Function to navigate to the password change page
+  const handleChangePassword = () => {
+    navigate("/profile/change-password");  // Corrected path
+  };
 
   return (
     <div className="profile-info border rounded-3">
@@ -214,11 +219,9 @@ const ProfileDetails = () => {
               </div>
             )}
           </div>
+
           {/* Edit/Save Button */}
-          <button
-            onClick={toggleEdit}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center"
-          >
+          <button onClick={toggleEdit} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center">
             {isEditing ? (
               <>
                 <FaSave className="mr-2" /> Save Profile
@@ -229,6 +232,15 @@ const ProfileDetails = () => {
               </>
             )}
           </button>
+
+          {/* New "Change Password" Button */}
+          <button
+            onClick={handleChangePassword}
+            className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded-lg flex items-center"
+          >
+            Change Password
+          </button>
+
         </div>
       ) : (
         <p>Loading user data...</p>
