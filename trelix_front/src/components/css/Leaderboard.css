@@ -1,0 +1,13 @@
+@media (max-width: 768px) {
+    .leaderboard-container {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .leaderboard-title {
+      font-size: 1.4rem;
+    }
+  }
+  
