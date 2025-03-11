@@ -34,6 +34,7 @@ import ListChapters from "./components/Student/ListChapters";
 import AddChapter from "./components/Instructor/addChapter";
 import ChapterContent from "./components/Student/chapterContent";
 import AddQuiz from "./components/Instructor/addQuiz";
+import Achievements from "./components/Profile/Achievements";
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
+            <Route path="achievements" element={<Achievements />} />
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addquiz" element={<AddQuiz />} />
             <Route path="settings" element={<MultiFactorAuth />} />

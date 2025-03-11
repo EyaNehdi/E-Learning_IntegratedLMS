@@ -5,6 +5,10 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../../components/Profile/Sidebar";
 import Preloader from "../../components/Preloader/Preloader";
 import { ToastContainer } from "react-toastify";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import "./profilestyle.css";
+import { Tooltip } from "@mui/material";
+import { siderbarProfileLinks } from "../../config/siderbarProfileLinks";
 
 const ProfilePage = () => {
   const {
@@ -25,6 +29,13 @@ const ProfilePage = () => {
     return color;
   };
   const bgColor = useMemo(() => getRandomColor(), [user?.firstName]);
+  const [activePage, setActivePage] = useState("My Profile");
+  useEffect(() => {
+    const matchedPage = siderbarProfileLinks.find(
+      (link) => link.path === location.pathname
+    );
+    setActivePage(matchedPage ? matchedPage.label : "My Profile");
+  }, [location.pathname]);
 
   useEffect(() => {
     if (accountCompletion === 100) {
@@ -92,26 +103,39 @@ const ProfilePage = () => {
   return (
     <>
       <ToastContainer position="top-right" autoClose={2000} />
-      <link rel="stylesheet" href="assets/css/style.css" />
-      <div>
-        <div className="dashbaord-promo position-relative" />
+      <div className="">
         {/* Dashboard Cover Start */}
-        <div className="dashbaord-cover bg-shade sec-padding">
+        <div className="dashbaord-cover bg-shade pt-15 pb-15">
           <div className="container">
             <div className="row">
               <div className="col-lg-12 position-relative">
+                {/* Cover Photo */}
                 <div
-                  className="dash-cover-bg rounded-3"
+                  className="cover-photo-container"
                   style={{
                     backgroundImage: user?.coverPhoto
                       ? `url(http://localhost:5000${user?.coverPhoto})`
                       : `url('/assets/icons/COVER.png')`,
                   }}
                 >
-                  <div className="dash-cover-info d-sm-flex justify-content-between align-items-center">
-                    <div className="ava-wrap d-flex align-items-center">
+                  {/* Change Cover Photo Button */}
+                  <label className="change-cover-icon">
+                    <ModeEditIcon fontSize="small" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleCoverPhotoChange}
+                      className="d-none"
+                    />
+                  </label>
+                </div>
+
+                {/* Profile Photo */}
+                <div className="dash-cover-info d-sm-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center position-relative">
+                    <div className="profile-photo-container">
                       <div
-                        className="avatar me-3 rounded-circle d-flex align-items-center justify-content-center"
+                        className="d-flex align-items-center justify-content-center"
                         style={{
                           width: "100px",
                           height: "100px",
@@ -137,79 +161,108 @@ const ProfilePage = () => {
                           />
                         ) : (
                           <span>
-                            {user?.firstName ? user.firstName.charAt(0) : "?"}
+                            {user?.firstName ? (
+                              <>
+                                {user.firstName.charAt(0)}
+                                {user.lastName.charAt(0)}
+                              </>
+                            ) : (
+                              "?"
+                            )}
                           </span>
                         )}
                       </div>
-                      <div className="ava-info">
-                        <h4 className="display-5 text-white mb-0">
-                          {user?.firstName} {user?.lastName}
-                        </h4>
-                      </div>
+                      <label className="edit-icon">
+                        <div className="edit-button">
+                          <ModeEditIcon fontSize="small" />
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleProfilePhotoChange}
+                          className="d-none"
+                        />
+                      </label>
                     </div>
                   </div>
                 </div>
-                <div className="photo-upload-buttons d-flex flex-column align-items-center mt-3">
-                  <label className="btn btn-primary mb-2 d-flex align-items-center">
-                    <i className="feather-icon icon-image me-2"></i> Change
-                    Cover Photo
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleCoverPhotoChange}
-                      className="d-none"
-                    />
-                  </label>
-                  <label className="btn btn-secondary d-flex align-items-center">
-                    <i className="feather-icon icon-user me-2"></i> Change
-                    Profile Photo
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfilePhotoChange}
-                      className="d-none"
-                    />
-                  </label>
+              </div>
+              <div
+                className="ava-info d-flex justify-content-between align-items-start flex-wrap"
+                style={{ paddingTop: "8px" }}
+              >
+                <div style={{ marginInlineStart: "130px" }}>
+                  <h4
+                    className="display-5 text-black mb-0"
+                    style={{ fontWeight: "bold", textTransform: "capitalize" }}
+                  >
+                    {user?.firstName} {user?.lastName}
+                  </h4>
+                  <div className="ava-meta text-black mt-1">
+                    <span>
+                      <i className="feather-icon icon-book" /> 0 Courses
+                      Enrolled{" "}
+                    </span>
+                    <span>
+                      <i className="feather-icon icon-award" />0 Certificates
+                    </span>
+                  </div>
+                </div>
+                <div
+                  className={`${
+                    location.pathname !== "/profile/achievements"
+                      ? ""
+                      : "d-none"
+                  }`}
+                >
+                  {/* Check if the user has badges */}
+                  {user?.badges && user.badges.length > 0 ? (
+                    <div
+                      className="pt-2 px-2 text-white rounded-lg"
+                      style={{ backgroundColor: "#A3A3A3" }}
+                    >
+                      {user?.badges.map((badge, index) => (
+                        <div key={index} className="badge-item">
+                          <Tooltip
+                            title={
+                              <div>
+                                <div>Name: {badge?.name}</div>
+                              </div>
+                            }
+                            arrow
+                            placement="top"
+                          >
+                            <img
+                              src="/assets/Badges/WelcomeBadge.png"
+                              alt={badge.name}
+                              className="badge-image"
+                              style={{ width: "80px", height: "auto" }} // Adjust width to 100px, height auto to keep aspect ratio
+                            />
+                          </Tooltip>
+                        </div>
+                      ))}
+                      <p style={{ color: "#F3F4F7" }}>
+                        🏆 Congratulations! You have earned these badges keep
+                        earning more
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-gray-500">
+                      You haven't earned any badges yet. Keep going! 🚀
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
-            <div className="user-profile">
-              <h2>
-                {user?.firstName} {user?.lastName}
-              </h2>
 
-              {/* Check if the user has badges */}
-              {user?.badges && user.badges.length > 0 ? (
-                <div className="mt-2 p-2 bg-yellow-500 text-white rounded-lg">
-                  <p>
-                    🏆 Congratulations! You have earned the following badges:
-                  </p>
-                  {user?.badges.map((badge, index) => (
-                    <div key={index} className="badge-item">
-                      <img
-                        src="/assets/Badges/WelcomeBadge.png"
-                        alt={badge.name}
-                        className="badge-image"
-                        style={{ width: "100px", height: "auto" }} // Adjust width to 100px, height auto to keep aspect ratio
-                      />
-                      <span className="badge-name">🏅 {badge.name}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-2 text-gray-500">
-                  You haven't earned any badges yet. Keep going! 🚀
-                </p>
-              )}
-            </div>
             {/* Dashboard Inner Start */}
-            <div className="row mt-5">
+            <div className="row">
               <div className="col-lg-3">
-                <Sidebar />
+                <Sidebar setActivePage={setActivePage} />
               </div>
               <div className="col-lg-9 ps-lg-4">
                 <section className="dashboard-sec">
-                  <h3 className="widget-title mb-4">My Profile</h3>
+                  <h2 className="">{activePage}</h2>
                   {isLoadingUser ? (
                     <Preloader />
                   ) : (

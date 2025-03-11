@@ -375,7 +375,7 @@ function Header() {
                           >
                             <div className="d-flex avatar border-bottom">
                               <div
-                                className="avatar me-2 rounded-circle d-flex align-items-center justify-content-center"
+                                className="avatar p-2 rounded-circle d-flex align-items-center justify-content-center"
                                 style={{
                                   width: "50px",
                                   height: "50px",
@@ -401,13 +401,18 @@ function Header() {
                                   />
                                 ) : (
                                   <span>
-                                    {user?.firstName
-                                      ? user.firstName.charAt(0)
-                                      : "?"}
+                                    {user?.firstName ? (
+                                      <>
+                                        {user.firstName.charAt(0)}
+                                        {user.lastName.charAt(0)}
+                                      </>
+                                    ) : (
+                                      "?"
+                                    )}
                                   </span>
                                 )}
                               </div>
-                              <div className="d-flex avatar border-bottom pb-3">
+                              <div className="d-flex avatar border-bottom ps-2 pb-3">
                                 {user ? (
                                   <h6 className="mb-0">
                                     {user.firstName} {user.lastName}
