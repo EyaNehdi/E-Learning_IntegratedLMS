@@ -1,0 +1,52 @@
+.footer a:hover {
+  color: #007bff !important; /* Change to blue */
+}
+.footer feSpotLight:hover {
+  color: #007bff !important; /* Change to blue */
+}
+
+/* Ensure the icon only turns blue when hovered */
+.footer-widget i.feather-icon.icon-mail {
+color: inherit; /* Default color */
+transition: color 0.3s; /* Smooth transition */
+}
+
+.footer-widget i.feather-icon.icon-mail:hover {
+color: #007bff !important; /* Icon turns blue on hover */
+}
+
+/* Prevent the email address from changing color on hover */
+.footer-widget a:hover span {
+color: inherit !important; /* Prevent address text from changing color */
+}
+
+/* Ensures the icon stays unaffected on link hover */
+.footer-widget a:hover i.feather-icon.icon-mail {
+color: inherit !important; /* Prevent the icon from turning blue */
+}
+
+/* Specific styles for the address span */
+.footer-widget a span {
+color: inherit; /* Ensure email address inherits color */
+}
+
+/* Specific style for the mail icon */
+.footer-widget i.icon-mail {
+  color: inherit; /* Inherits default color */
+}
+.social-share-alt {
+  display: flex; /* Ensures items are in a row */
+  gap: 10px; /* Adjust spacing between icons */
+  
+
+}
+.social-share-alt a img {
+width: 19px;  /* Set a consistent width */
+height: 19px; /* Set a consistent height */
+object-fit: contain; /* Ensures the image aspect ratio is preserved */
+transition: transform 0.3s ease-in-out; /* Optional: adds a smooth hover effect */
+}
+
+.social-share-alt a:hover img {
+transform: scale(1.1); /* Optional: zoom effect on hover */
+}

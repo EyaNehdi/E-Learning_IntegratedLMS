@@ -273,20 +273,27 @@ function Header() {
                     <ul className="navbar-nav align-items-lg-center">
                       <li className="nav-item dropdown">
                         <a
-                          href="/"
+                          href="/home"
                           role="button"
                           aria-expanded="false"
+
+
+
+
+
                           style={{
                             marginRight: "46px",
                             fontWeight: "bold",
                             fontSize: "20px",
                           }}
+
                         >
                           Home
                         </a>
                       </li>
                       <li className="nav-item dropdown">
                         <a
+
                           href="#"
                           role="button"
                           data-bs-toggle="dropdown"
@@ -314,6 +321,23 @@ function Header() {
                         >
                           Courses
                         </a>
+                        {/* Dropdown menu for Courses */}
+                        <ul className="dropdown-menu">
+                          <li>
+                            <a className="dropdown-item" href="/chapters  ">
+                              All Chapters
+                            </a>
+                          </li>
+                          <li>
+                            <a className="dropdown-item" href="/allcours">
+                              All Cours
+                            </a>
+                          </li>
+                          <li>
+                            <hr className="dropdown-divider" />
+                          </li>
+
+                        </ul>
                       </li>
                       <li className="">
                         <a
@@ -328,6 +352,7 @@ function Header() {
                         >
                           Leaderboard
                         </a>
+
                       </li>
                     </ul>
                     <a
@@ -506,7 +531,9 @@ function Header() {
                     </div>
                   )}
                 </div>
+
               </div>
+
             </div>
           </nav>
         </div>

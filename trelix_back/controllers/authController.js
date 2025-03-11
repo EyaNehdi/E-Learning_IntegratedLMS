@@ -243,6 +243,7 @@ const regestergithub = async (req, res, role) => {
   }
 };
 
+
 const checkAuth = async (req, res) => {
 
   try {
@@ -569,6 +570,46 @@ const resetPassword = async (req, res) => {
 };
 
 
+const markChapterAsCompleted = async (req, res) => {
+  const { userId, chapterId } = req.query; // Retrieving query params
+
+  try {
+    // Ensure both userId and chapterId are provided
+    if (!userId || !chapterId) {
+      return res.status(400).json({ error: "UserId and chapterId are required" });
+    }
+
+    // Find the user by userId
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check if the chapterId is already in the completedChapters array
+    const completedChapters = user.completedChapters || [];
+
+    // If the chapter is not already completed, add it to the completedChapters array
+    if (!completedChapters.includes(chapterId)) {
+      completedChapters.push(chapterId);
+
+      // Update the user's completedChapters array in the database
+      user.completedChapters = completedChapters;
+      await user.save();
+    }
+
+    // Return the updated completedChapters array
+    return res.status(200).json({ completedChapters });
+    
+  } catch (err) {
+    console.error("Error marking chapter as completed:", err);
+    return res.status(500).json({ error: "An error occurred while marking the chapter as completed" });
+  }
+};
+
+
+
+
 
 const signOut = async (req, res) => {
   res.clearCookie("token");
@@ -591,6 +632,7 @@ module.exports = { signIngithub,
          registerLinkedIn,
           registerInstructorLinkedin,
            registerStudentLinkedin,
-           signInlinkedin
+           signInlinkedin,
+           markChapterAsCompleted
         };
 

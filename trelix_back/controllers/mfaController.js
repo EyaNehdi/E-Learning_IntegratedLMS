@@ -72,7 +72,11 @@ const getBackupCodes = async (req, res) => {
     const backupCodes = user.backupCodes;
 
     if (!backupCodes || backupCodes.length === 0) {
-      return res.status(404).json({ success: false, message: "No backup codes found" });
+      return res.status(200).json({
+        success: false,
+        message: "You don't have any backup codes. Would you like to generate new backup codes?",
+        promptUser: true, // Flag to indicate the user should be prompted
+      });
     }
 
     const decryptedCodes = backupCodes.map((codeObj) => ({
@@ -94,14 +98,19 @@ const disableMFA = async (req, res) => {
   try {
     const { userId } = req.body;
     if (!userId) return res.status(400).json({ message: "User ID is required" });
+    const user = await User.findById(userId);
+    if (!user.mfaSecret || user.mfaSecret.length === 0 || !user.mfaEnabled) {
+      console.log("MFA is already disabled");
+      return res.status(400).json({ message: "MFA is already disabled" });
+    }
 
-    const user = await User.findByIdAndUpdate(
+    const userUpdated = await User.findByIdAndUpdate(
       userId,
-      { mfaEnabled: false, mfaSecret: null },
+      { mfaEnabled: false, mfaSecret: null, backupCodes: [] },
       { new: true }
     );
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!userUpdated) return res.status(404).json({ message: "User not found" });
 
     res.json({ success: true, message: "MFA has been disabled" });
   } catch (error) {
