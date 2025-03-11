@@ -105,7 +105,7 @@ const ListChapters = () => {
     // Navigate to the exam page
     navigate(`/exams`)
   }
-t b
+
   return (
     <div>
       {/* Course Section */}
