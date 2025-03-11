@@ -1,4 +1,28 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
 const HomeUser = () => {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch courses from API
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          "http://localhost:5000/course/courses"
+        );
+        console.log("Courses fetched:", response.data);
+        setCourses(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
   return (
     <>
       <div>
@@ -14,7 +38,7 @@ const HomeUser = () => {
         <link rel="shortcut icon" href="assets/images/favicon.ico" />
         <link rel="stylesheet" href="assets/css/feather.css" />
         <link rel="stylesheet" href="assets/css/nice-select2.css" />
-         
+
         {/* Style css */}
         <link rel="stylesheet" href="assets/css/style.css" />
 
@@ -412,7 +436,7 @@ const HomeUser = () => {
             <div className="d-flex justify-content-between align-items-top">
               <div className="sec-intro">
                 <h2 className="sec-title mb-4">
-                  Our Popular <span className="color">Courses</span>
+                  Our <span className="color">Courses</span>
                 </h2>
               </div>
               <div className="custom-nav d-flex gap-3 align-items-center">
@@ -428,698 +452,98 @@ const HomeUser = () => {
           </div>
           <div className="swiper course-slider">
             <div className="swiper-wrapper py-5">
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course6.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
+              <div className="swiper course-slider">
+                <div className="swiper-wrapper py-5">
+                  {loading ? (
+                    // Loading state
+                    <div className="swiper-slide">
+                      <div
+                        className="d-flex justify-content-center align-items-center"
+                        style={{ height: "300px" }}
+                      >
+                        <div
+                          className="spinner-border text-primary"
+                          role="status"
+                        >
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
                       </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
                     </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        React JS Zero to Mastery Front End Essentails.
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Brad Traversy
-                        </a>
-                      </span>
-                      <span>12,580 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $20.00<del>$35.00</del>
+                  ) : courses.length > 0 ? (
+                    // Map through courses to create slides
+                    courses.map((course) => (
+                      <div className="swiper-slide" key={course._id}>
+                        <div className="course-entry-3 card rounded-2 bg-white border">
+                          <div className="card-media position-relative">
+                            <a href={`/single-course/${course._id}`}>
+                              <img
+                                className="card-img-top"
+                                src={course.image || "assets/images/crs.png"}
+                                alt={course.title}
+                              />
+                            </a>
+                          </div>
+                          <div className="card-body">
+                            <div className="course-meta d-flex justify-content-between align-items-center mb-2">
+                              <div className="d-flex align-items-center">
+                                <img
+                                  src="assets/images/icons/star.png"
+                                  alt="Rating"
+                                />
+                                <strong>4.7</strong>
+                                <span className="rating-count">
+                                  (2k reviews)
+                                </span>
+                              </div>
+                              <span>
+                                <i className="feather-icon icon-layers me-2" />
+                                {course.level}
+                              </span>
+                            </div>
+                            <h3 className="sub-title mb-0">
+                              <a href={`/single-course/${course._id}`}>
+                                {course.title}
+                              </a>
+                            </h3>
+                            <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
+                              <span>
+                                By:{" "}
+                                <a href="#" className="text-reset">
+                                  {course.instructor || " Instracteur"}
+                                </a>
+                              </span>
+                            </div>
+
+
+                              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
+                              <div className="price">
+                                ${course.price}
+                                <del>$35.00</del>
+                              </div>
+                              <a href={`/enroll/${course._id}`}>
+                                Enroll Now{" "}
+                                <i className="feather-icon icon-arrow-right" />
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Course Entry End */}
                       </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
+                    ))
+                  ) : (
+                    // No courses found
+                    <div className="swiper-slide">
+                      <div
+                        className="d-flex justify-content-center align-items-center"
+                        style={{ height: "300px" }}
+                      >
+                        <p>No courses available.</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
-                {/* Course Entry End */}
               </div>
-              {/* Slide Item End */}
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course5.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
-                      </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
-                    </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        React JS Zero to Mastery Front End Essentails.
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Brad Traversy
-                        </a>
-                      </span>
-                      <span>12,580 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $20.00<del>$35.00</del>
-                      </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                {/* Course Entry End */}
-              </div>
-              {/* Slide Item End */}
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course4.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
-                      </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
-                    </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        React JS Zero to Mastery Front End Essentails.
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Brad Traversy
-                        </a>
-                      </span>
-                      <span>2,580 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $20.00<del>$35.00</del>
-                      </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                {/* Course Entry End */}
-              </div>
-              {/* Slide Item End */}
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course3.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
-                      </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
-                    </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        React JS Zero to Mastery Front End Essentails.
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Brad Traversy
-                        </a>
-                      </span>
-                      <span>4,510 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $20.00<del>$35.00</del>
-                      </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                {/* Course Entry End */}
-              </div>
-              {/* Slide Item End */}
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course2.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
-                      </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
-                    </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        React JS Zero to Mastery Front End Essentails.
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Brad Traversy
-                        </a>
-                      </span>
-                      <span>280 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $80.00<del>$105.00</del>
-                      </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                {/* Course Entry End */}
-              </div>
-              {/* Slide Item End */}
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course1.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
-                      </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
-                    </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        React JS Zero to Mastery Front End Essentails.
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Brad Traversy
-                        </a>
-                      </span>
-                      <span>5,280 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $20.00<del>$35.00</del>
-                      </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                {/* Course Entry End */}
-              </div>
-              {/* Slide Item End */}
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course2.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
-                      </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
-                    </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        Comprehensive Introduction to Programming
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Brad Traversy
-                        </a>
-                      </span>
-                      <span>3,280 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $20.00<del>$35.00</del>
-                      </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                {/* Course Entry End */}
-              </div>
-              {/* Slide Item End */}
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course6.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
-                      </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
-                    </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        React JS Zero to Mastery Front End Essentails.
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Mark Joe
-                        </a>
-                      </span>
-                      <span>12,580 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $20.00<del>$35.00</del>
-                      </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                {/* Course Entry End */}
-              </div>
-              {/* Slide Item End */}
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course5.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
-                      </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
-                    </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        React JS Zero to Mastery Front End Essentails.
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Brad Traversy
-                        </a>
-                      </span>
-                      <span>5,580 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $20.00<del>$35.00</del>
-                      </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                {/* Course Entry End */}
-              </div>
-              {/* Slide Item End */}
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course4.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
-                      </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
-                    </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        React JS Zero to Mastery Front End Essentails.
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Brad Traversy
-                        </a>
-                      </span>
-                      <span>12,580 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $20.00<del>$35.00</del>
-                      </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                {/* Course Entry End */}
-              </div>
-              {/* Slide Item End */}
-              <div className="swiper-slide">
-                <div className="course-entry-3 card rounded-2 bg-white border">
-                  <div className="card-media position-relative">
-                    <a href="single-course.html">
-                      <img
-                        className="card-img-top"
-                        src="assets/images/course3.jpg"
-                        alt="Course"
-                      />
-                    </a>
-                  </div>
-                  <div className="card-body">
-                    <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex align-items-center">
-                        <img
-                          src="assets/images/icons/star.png"
-                          alt="asset_link_alt"
-                        />
-                        <strong>4.7</strong>
-                        <span className="rating-count">(2k reviews)</span>
-                      </div>
-                      <span>
-                        <i className="feather-icon icon-video me-2" />
-                        25 hours 22m
-                      </span>
-                      <span className="lead">
-                        <a href="#" className="text-reset">
-                          <i className="feather-icon icon-bookmark" />
-                        </a>
-                      </span>
-                    </div>
-                    <h3 className="sub-title mb-0">
-                      <a href="single-course.html">
-                        React JS Zero to Mastery Front End Essentails.
-                      </a>
-                    </h3>
-                    <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                      <span>
-                        By:{" "}
-                        <a href="profile.html" className="text-reset">
-                          Brad Traversy
-                        </a>
-                      </span>
-                      <span>22,580 Students</span>
-                    </div>
-                    <p>
-                      Learn JavaScript fundamentals then build a React website
-                      from scratch.
-                    </p>
-                    <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                      <div className="price">
-                        $20.00<del>$35.00</del>
-                      </div>
-                      <a href="#">
-                        Enroll Now{" "}
-                        <i className="feather-icon icon-arrow-right" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                {/* Course Entry End */}
-              </div>
+
               {/* Slide Item End */}
             </div>
             {/* wrapper end */}
