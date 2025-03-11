@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import '../../components/css/QuizzLeaderboard.css';
 import { useAuthStore } from "../../store/authStore";
 function QuizzLeaderboard() {
     const navigate = useNavigate();
@@ -87,8 +88,8 @@ function QuizzLeaderboard() {
 
     const currentQuestion = questions[currentQuestionIndex];
     return (
-        <div className="quiz-container">
-            <h2>Question {currentQuestionIndex + 1} / {questions.length}</h2>
+        <div className="quiz-container" >
+            <h2>Question Number :  {currentQuestionIndex + 1} / {questions.length}</h2>
             <p>{currentQuestion?.question}</p>
 
             <div className="options">
