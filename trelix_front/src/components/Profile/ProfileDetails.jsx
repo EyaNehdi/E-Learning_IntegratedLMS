@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaSave } from "react-icons/fa";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom"; // Add useNavigate hook
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
@@ -15,6 +15,8 @@ const ProfileDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const readonlyFields = ["email", "userName"];
+
+  const navigate = useNavigate(); // Initialize the navigate function for redirection
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -99,7 +101,6 @@ const ProfileDetails = () => {
         }
       );
       // Join them as a single string
-
       setEntities(response.data.entities);
       updateskilsWithEntities(response.data.entities);
     } catch (error) {
@@ -108,6 +109,11 @@ const ProfileDetails = () => {
     } finally {
       setIsLoading(false); // End loading regardless of success or failure
     }
+  };
+
+  // Function to navigate to the password change page
+  const handleChangePassword = () => {
+    navigate("/profile/change-password"); // Corrected path
   };
 
   return (
@@ -269,7 +275,7 @@ const ProfileDetails = () => {
                 onClick={() => setShowPopup(true)}
                 className="btn fs-6 fs-md-5 fs-lg-4 px-6 py-2 rounded-lg flex items-center justify-center"
                 style={{
-                  border: "2px solid #6045FF", 
+                  border: "2px solid #6045FF",
                   color: "#6045FF",
                   backgroundColor: "transparent",
                   cursor: "pointer",
@@ -285,6 +291,13 @@ const ProfileDetails = () => {
                 }}
               >
                 Import Your CV
+              </button>
+              {/* Change Password Button */}
+              <button
+                onClick={handleChangePassword}
+                className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded-lg flex items-center"
+              >
+                Change Password
               </button>
             </div>
           </>

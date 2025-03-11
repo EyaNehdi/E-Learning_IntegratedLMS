@@ -85,6 +85,7 @@ function Sidebar({ setActivePage }) {
                 <span>Reviews</span>
               </Link>
             </li>
+
             <li>
               <Link
                 className={`nav-link ${
@@ -95,6 +96,36 @@ function Sidebar({ setActivePage }) {
               >
                 <i className="feather-icon icon-box" />
                 <span>My Quiz Attempts</span>
+              </Link>
+            </li>
+            <li>
+              <Link className="nav-link" to="/profile/Allexams">
+                <i className="feather-icon icon-book" />
+                <span>My Exams</span>
+              </Link>
+            </li>
+            <li>
+              <Link className="nav-link" to="/profile/allquiz">
+                <i className="feather-icon icon-book" />
+                <span>My Quizs</span>
+              </Link>
+            </li>
+            <li>
+              <Link className="nav-link" to="/profile/addchapter">
+                <i className="feather-icon icon-plus" />
+                <span>AddChapter</span>
+              </Link>
+            </li>
+            <li>
+              <Link className="nav-link" to="/profile/addquiz">
+                <i className="feather-icon icon-plus" />
+                <span>AddQuiz</span>
+              </Link>
+            </li>
+            <li>
+              <Link className="nav-link" to="/profile/addExam">
+                <i className="feather-icon icon-plus" />
+                <span>addExam</span>
               </Link>
             </li>
           </ul>
