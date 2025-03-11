@@ -23,7 +23,6 @@ import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
 import PublicRoute from "./layout/PublicRoute";
 import AdminRoute from "./layout/AdminRoute";
 import Index from "./components";
-import AdminRoute from "./layout/AdminRoute";
 import Leaderboard from "./pages/Leaderboard/Leaderboard";
 import DailyQuizzes from "./pages/Admin/DailyQuizzes";
 import QuizzLeaderboard from "./pages/Leaderboard/QuizzLeaderboard";

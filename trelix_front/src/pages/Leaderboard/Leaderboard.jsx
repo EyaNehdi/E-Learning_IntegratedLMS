@@ -1,5 +1,5 @@
 import DailyQuizz from "../../components/dailyQuizz"
-import Footer from "../../components/Footer"
+import Footer from "../../components/Footer/Footer"
 import Leader from "../../components/Leader"
 import axios from 'axios';
 import { useState,useEffect } from "react";
@@ -152,7 +152,7 @@ useEffect(() => {
                 <li>You will get 5 questions</li>
                 <li>Play and earn points to have access to our paid courses</li>
               </ul>
-
+<Footer />
     </>
   )
 }
