@@ -1,15 +1,13 @@
-import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { useProfileStore } from "../../store/profileStore";
-function Sidebar() {
+
+function Sidebar({ setActivePage }) {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
-  const { fetchUser, clearUser } = useProfileStore();
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
-  
+  const { user, clearUser } = useProfileStore();
+  const location = useLocation();
+
   const handleLogout = () => {
     logout();
     clearUser();
@@ -17,65 +15,114 @@ function Sidebar() {
   };
 
   return (
-    
     <aside className="dashboard-sidebar shadow-1 border rounded-3">
-      
       <div className="widget">
-        <p className="grettings">Welcome, Maria Carey</p>
+        {/* Welcome Message */}
+        <p className="greetings">
+          Welcome, {user?.firstName} {user?.lastName}
+        </p>
+
+        {/* Navigation */}
         <nav className="dashboard-nav">
           <ul className="list-unstyled nav">
             <li>
-              <a className="nav-link" href="student-dashboard.html">
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/dashboard" ? "active" : ""
+                }`}
+                to="/dashboard"
+                onClick={() => setActivePage("Dashboard")}
+              >
                 <i className="feather-icon icon-home" />
                 <span>Dashboard</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <Link className="nav-link" to="/profile/details">
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/profile" ? "active" : ""
+                }`}
+                to="/profile"
+                onClick={() => setActivePage("User Account")}
+              >
                 <i className="feather-icon icon-user" />
-                <span>My Profile</span>
-
-              </Link>
-            </li>
-
-
-             <li>
-              <Link className="nav-link" to="/profile/list">
-                <i className="feather-icon icon-settings" />
-                <span>Cours</span>
+                <span>User Account</span>
               </Link>
             </li>
             <li>
-              <a className="nav-link" href="student-wishlist.html">
-                <i className="feather-icon icon-gift" />
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/courses" ? "active" : ""
+                }`}
+                to="/profile/list"
+                onClick={() => setActivePage("My Courses")}
+              >
+                <i className="feather-icon icon-book" />
+                <span>My Courses</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/wishlist" ? "active" : ""
+                }`}
+                to="/wishlist"
+                onClick={() => setActivePage("Wishlist")}
+              >
+                <i className="feather-icon icon-heart" />
                 <span>Wishlist</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="nav-link" href="student-reviews.html">
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/reviews" ? "active" : ""
+                }`}
+                to="/reviews"
+                onClick={() => setActivePage("Reviews")}
+              >
                 <i className="feather-icon icon-star" />
                 <span>Reviews</span>
-              </a>
+              </Link>
             </li>
-          
+
             <li>
-            <Link className="nav-link" to="/profile/Allexams">
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/quizzes" ? "active" : ""
+                }`}
+                to="/quizzes"
+                onClick={() => setActivePage("My Quiz Attempts")}
+              >
+                <i className="feather-icon icon-box" />
+                <span>My Quiz Attempts</span>
+              </Link>
+            </li>
+            <li>
+              <Link className="nav-link" to="/profile/Allexams">
                 <i className="feather-icon icon-book" />
                 <span>My Exams</span>
               </Link>
-
-            <Link className="nav-link" to="/profile/allquiz">
+            </li>
+            <li>
+              <Link className="nav-link" to="/profile/allquiz">
                 <i className="feather-icon icon-book" />
                 <span>My Quizs</span>
               </Link>
-            <Link className="nav-link" to="/profile/addchapter">
+            </li>
+            <li>
+              <Link className="nav-link" to="/profile/addchapter">
                 <i className="feather-icon icon-plus" />
                 <span>AddChapter</span>
               </Link>
+            </li>
+            <li>
               <Link className="nav-link" to="/profile/addquiz">
                 <i className="feather-icon icon-plus" />
                 <span>AddQuiz</span>
               </Link>
+            </li>
+            <li>
               <Link className="nav-link" to="/profile/addExam">
                 <i className="feather-icon icon-plus" />
                 <span>addExam</span>
@@ -84,18 +131,95 @@ function Sidebar() {
           </ul>
         </nav>
       </div>
+
+      {/* Course Management */}
       <div className="widget">
-        <p className="grettings">User</p>
+        <p className="greetings">Course Management</p>
         <nav className="dashboard-nav">
           <ul className="list-unstyled nav">
             <li>
-              <Link className="nav-link" to="/profile/settings">
-                <i className="feather-icon icon-settings" />
-                <span>Settings</span>
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/courses/add-chapter" ? "active" : ""
+                }`}
+                to="/profile/addchapter"
+                onClick={() => setActivePage("Add Chapter")}
+              >
+                <i className="feather-icon icon-plus" />
+                <span>Add Chapter</span>
               </Link>
             </li>
             <li>
-              <a className="nav-link" href="" onClick={handleLogout}>
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/courses/add-quiz" ? "active" : ""
+                }`}
+                to="/profile/addquiz"
+                onClick={() => setActivePage("Add Quiz")}
+              >
+                <i className="feather-icon icon-plus" />
+                <span>Add Quiz</span>
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      {/* Account Settings */}
+      <div className="widget">
+        <p className="greetings">Account Settings</p>
+        <nav className="dashboard-nav">
+          <ul className="list-unstyled nav">
+            <li>
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/profile/details" ? "active" : ""
+                }`}
+                to="/profile/details"
+                onClick={() => setActivePage("Profile Information")}
+              >
+                <i className="feather-icon icon-user-check" />
+                <span>Profile Information</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/profile/settings" ? "active" : ""
+                }`}
+                to="/profile/settings"
+                onClick={() => setActivePage("Security & Privacy")}
+              >
+                <i className="feather-icon icon-shield" />
+                <span>Security & Privacy</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/profile/achievements" ? "active" : ""
+                }`}
+                to="/profile/achievements"
+                onClick={() => setActivePage("Achievements")}
+              >
+                <i className="feather-icon icon-award" />
+                <span>Achievements</span>
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div className="widget">
+        <hr className="my-3" />
+        <nav className="dashboard-nav">
+          <ul className="list-unstyled nav">
+            <li>
+              <a
+                className="nav-link text-danger"
+                href="#"
+                onClick={handleLogout}
+              >
                 <i className="feather-icon icon-log-out" />
                 <span>Logout</span>
               </a>
@@ -103,8 +227,8 @@ function Sidebar() {
           </ul>
         </nav>
       </div>
-      {/*  Widget End */}
     </aside>
   );
 }
+
 export default Sidebar;
