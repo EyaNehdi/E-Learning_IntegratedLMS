@@ -1,14 +1,14 @@
-"use client"
-
 import { useState, useEffect } from "react"
-import { Clock, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Save, Flag, Send } from "lucide-react"
+import { Clock, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Save, Flag, Send ,RefreshCw} from "lucide-react"
+import axios from "axios"
+import { useParams  ,useNavigate} from "react-router-dom"; 
 
 const ExamStudent = () => {
   // State for exam data
   const [exam, setExam] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
+  const navigate = useNavigate()
   // State for student's answers
   const [answers, setAnswers] = useState({})
   const [flaggedQuestions, setFlaggedQuestions] = useState([])
@@ -26,110 +26,50 @@ const ExamStudent = () => {
   const [confirmSubmit, setConfirmSubmit] = useState(false)
 
   // Mock exam data - replace with actual API call
-  useEffect(() => {
-    const fetchExam = async () => {
-      try {
-        setLoading(true)
-        // Replace with your actual API endpoint
-        // const response = await axios.get(`http://localhost:5000/Exam/${examId}`);
-        // setExam(response.data);
+ // Get ID from URL
+ const {  courseid } = useParams()
+ const fetchExam = async () => {
+  // The course ID that you want to fetch the exam from
+  try {
+    setLoading(true);
+    // Make the request to get a random exam from the course
+    const response = await axios.get(`http://localhost:5000/Exam/random/${courseid}`);
 
-        // Mock data for demonstration
-        const mockExam = {
-          _id: "exam123",
-          title: "Introduction to Computer Science",
-          description: "This exam tests your knowledge of basic computer science concepts.",
-          duration: 60, // minutes
-          passingScore: 70,
-          totalPoints: 100,
-          questions: [
-            {
-              id: 1,
-              type: "multiple_choice",
-              question: "What does CPU stand for?",
-              options: [
-                "Central Processing Unit",
-                "Computer Personal Unit",
-                "Central Process Utility",
-                "Central Processor Unifier",
-              ],
-              points: 10,
-            },
-            {
-              id: 2,
-              type: "true_false",
-              question: "HTML is a programming language.",
-              points: 5,
-            },
-            {
-              id: 3,
-              type: "multiple_choice",
-              question: "Which of the following is not a JavaScript framework?",
-              options: ["React", "Angular", "Vue", "Java"],
-              points: 10,
-            },
-            {
-              id: 4,
-              type: "short_answer",
-              question: "What does CSS stand for?",
-              points: 15,
-            },
-            {
-              id: 5,
-              type: "essay",
-              question: "Explain the difference between frontend and backend development.",
-              points: 20,
-            },
-            {
-              id: 6,
-              type: "multiple_choice",
-              question: "Which of the following is a NoSQL database?",
-              options: ["MySQL", "PostgreSQL", "MongoDB", "Oracle"],
-              points: 10,
-            },
-            {
-              id: 7,
-              type: "true_false",
-              question: "JavaScript can be used for server-side programming.",
-              points: 5,
-            },
-            {
-              id: 8,
-              type: "short_answer",
-              question: "What is the purpose of an API?",
-              points: 15,
-            },
-            {
-              id: 9,
-              type: "multiple_choice",
-              question: "Which protocol is used for secure web browsing?",
-              options: ["HTTP", "HTTPS", "FTP", "SMTP"],
-              points: 10,
-            },
-          ],
-        }
+    console.log("Random Exam API response:", response.data); // Debugging
 
-        setExam(mockExam)
-        setTimeRemaining(mockExam.duration * 60) // Convert minutes to seconds
-        setTimerActive(true)
+    if (response.data) {
+      setExam(response.data); // Set the exam
+      setTimeRemaining(response.data.duration * 60); // Set the time remaining
+      setTimerActive(true); // Start the timer
 
-        // Initialize answers object
-        const initialAnswers = {}
-        mockExam.questions.forEach((q) => {
-          initialAnswers[q.id] = q.type === "essay" || q.type === "short_answer" ? "" : null
-        })
-        setAnswers(initialAnswers)
-
-        setLoading(false)
-      } catch (err) {
-        console.error("Error fetching exam:", err)
-        setError("Failed to load exam. Please try again later.")
-        setLoading(false)
+      // Ensure the questions exist
+      if (response.data.questions && Array.isArray(response.data.questions)) {
+        const initialAnswers = {};
+        response.data.questions.forEach((q) => {
+          initialAnswers[q._id] = q.type === "essay" || q.type === "short_answer" ? "" : null;
+        });
+        setAnswers(initialAnswers);
+      } else {
+        console.warn("Questions data is missing or not an array");
       }
+    } else {
+      console.warn("Invalid API response format");
     }
 
-    fetchExam()
-  }, [])
+    setLoading(false);
+  } catch (err) {
+    console.error("Error fetching exam:", err);
+    setError("No exams available.");
+    setLoading(false);
+  }
+};
+  useEffect(() => {
+    
+    fetchExam();
+    fetchExam();
+  }, []);
+  
+  
 
   // Timer effect
   useEffect(() => {
@@ -272,16 +212,29 @@ console.log(answers)
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center p-6 max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Error Loading Exam</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Try Again
-          </button>
+        <div className="text-center p-8 max-w-md bg-white rounded-lg shadow-md">
+          <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Oops! Something went wrong</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <div className="space-y-4">
+            <button
+              onClick={() => {
+                setError(null)
+                fetchExam()
+              }}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+            >
+              <RefreshCw className="w-5 h-5 mr-2" />
+              Try Again
+            </button>
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            >
+              Return to Dashboard
+            </button>
+          </div>
+          <p className="mt-6 text-sm text-gray-500">If the problem persists, please contact support.</p>
         </div>
       </div>
     )
