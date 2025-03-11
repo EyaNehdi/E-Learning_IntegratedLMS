@@ -1,17 +1,17 @@
 const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const path = require("path");
 
-// Configure multer storage
+// Configure multer storage for file uploads (profile and cover photos)
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../uploads'));
+        cb(null, path.join(__dirname, '../uploads')); // Set upload directory
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+        cb(null, Date.now() + "-" + file.originalname); // Generate unique filename
     }
 });
-
 
 const upload = multer({ storage });
 
@@ -61,6 +61,8 @@ const updateCoverPhoto = async (req, res) => {
         res.status(500).json({ message: "Error updating cover photo" });
     }
 };
+
+// Update User Badges
 const updatebadge = async (req, res) => {
     const { badge, email, badgeImage } = req.body; // Get badge, email, and badgeImage from request body
 
@@ -97,19 +99,17 @@ const updatebadge = async (req, res) => {
 
 const editUserProfile = async (req, res) => {
     try {
-        const { email, ...updateFields } = req.body; // Extract email and changed field(s)
+        const { email, ...updateFields } = req.body;
 
         if (!email) {
             return res.status(400).json({ message: "Email is required" });
         }
 
-        // Find user by email
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Update only the changed field(s)
         const updatedUser = await User.findOneAndUpdate(
             { email },    // Find user by email
             { $set: updateFields }, // Update only the changed field(s)
@@ -118,10 +118,54 @@ const editUserProfile = async (req, res) => {
 
         res.status(200).json(updatedUser);
     } catch (error) {
-        console.error("Error updating profile:", error);
         res.status(500).json({ message: "Error updating profile" });
     }
 };
+
+// Update User Password
+const updateUserPassword = async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+
+        // Vérification des mots de passe
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({ message: "Old and new passwords are required" });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ message: "Password must be at least 8 characters long" });
+        }
+
+        // Recherche de l'utilisateur par ID
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Comparaison du mot de passe actuel
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Incorrect old password" });
+        }
+
+        // Hachage du nouveau mot de passe
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // Mise à jour du mot de passe de l'utilisateur
+        user.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        console.error("❌ Error updating password:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+
+
 const editSkils = async (req, res) => {
     try {
         const { userId, skills } = req.body; // Extract userId and new skills from request
@@ -155,5 +199,6 @@ module.exports = {
     editUserProfile,
     upload,
     updatebadge,
+    updateUserPassword,
     editSkils// Export multer upload configuration
 };

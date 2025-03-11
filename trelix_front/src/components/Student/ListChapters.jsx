@@ -1,4 +1,3 @@
-"use client"
 
 import { useState, useEffect } from "react"
 import axios from "axios"
@@ -14,6 +13,17 @@ const ListChapters = () => {
   const { user, fetchUser, clearUser } = useProfileStore()
   const [loading, setLoading] = useState(true)
 
+  // Store courseid in localStorage if it's not already there
+  useEffect(() => {
+    if (courseid) {
+      localStorage.setItem('courseid', courseid)
+    }
+  }, [courseid])
+
+  // Retrieve courseid from localStorage if it's not available from useParams
+  const storedCourseId = localStorage.getItem('courseid')
+  const finalCourseId = courseid || storedCourseId
+
   // Fetch the user data on mount
   useEffect(() => {
     fetchUser()
@@ -23,18 +33,18 @@ const ListChapters = () => {
     console.log("user after fetch", user)
   }, [user])
 
-  console.log("Course ID:", id)
+  console.log("Course ID:", finalCourseId)
 
   useEffect(() => {
     const fetchChapters = async () => {
-      console.log("Course ID:", courseid)
-      if (!courseid) {
+      console.log("Course ID:", finalCourseId)
+      if (!finalCourseId) {
         console.error("Course ID is not defined")
         return
       }
 
       try {
-        const response = await axios.get(`http://localhost:5000/chapter/course/${courseid}`)
+        const response = await axios.get(`http://localhost:5000/chapter/course/${finalCourseId}`)
         setChapters(response.data.chapters)
         setLoading(false)
       } catch (error) {
@@ -44,8 +54,7 @@ const ListChapters = () => {
     }
 
     fetchChapters()
-  }, [courseid])
-
+  }, [finalCourseId]) 
   useEffect(() => {
     // Ensure that user is available before making the request
     if (user && user._id) {
@@ -103,9 +112,8 @@ const ListChapters = () => {
     }
 
     // Navigate to the exam page
-    navigate(`/exams`)
+    navigate(`/exams/${storedCourseId}`)
   }
-t b
   return (
     <div>
       {/* Course Section */}
@@ -128,7 +136,7 @@ t b
                               ? "bg-green-50 hover:bg-green-100 border border-green-200 text-green-800"
                               : "bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 hover:border-blue-300"
                           } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
-                        to={`/chapters/${id}/content/${chapter._id}`}
+                        to={`/chapters/${finalCourseId}/content/${chapter._id}`}
                       >
                         <span className="font-medium">{chapter.title}</span>
 
