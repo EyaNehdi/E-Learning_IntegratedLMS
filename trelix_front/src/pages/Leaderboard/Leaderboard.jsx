@@ -123,22 +123,35 @@ useEffect(() => {
         fontSize: "24px",
         fontWeight: "bold",
         color: countdown <= 10 ? "red" : "black", // Red when time is low
-      }}>
-      {loading ? (
+        }}>
+        {loading ? (
           <p>Loading quiz...</p>
         ) : error ? (
           <p style={{ color: "red" }}>{error}</p>
         ) : quiz ? (
           <>
             <div>
+            
               <h3>{quiz.title}</h3>
               <h4> ⏳ Time Left: {formatTime(countdown)}</h4>
             </div>
+            
           </>
         ) : (
         <p>Loading quiz...</p>
-      )}
+        )}
     </div>
+    <ul style={{
+        position: "absolute",
+        right: "300px",
+        top: "700px",
+        listStyle: "circle",
+        textAlign:"left",
+        fontWeight:"bold"
+        }}>
+                <li>You will get 5 questions</li>
+                <li>Play and earn points to have access to our paid courses</li>
+              </ul>
 
     </>
   )
