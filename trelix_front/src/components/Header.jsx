@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useProfileStore } from "../store/profileStore";
 import Buttons from "./Buttons";
+import './css/Header.css';
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -310,7 +311,7 @@ function Header() {
                         <a
                           href="#"
                           role="button"
-                          data-bs-toggle="dropdown"
+                         
                           aria-expanded="false"
                           style={{
                             marginRight: "46px",
@@ -338,11 +339,10 @@ function Header() {
 
                         </ul>
                       </li>
-                      <li className="nav-item dropdown dropdown-fullwidth">
+                      <li className="">
                         <a
-                          href="#"
+                          href="/leaderboard"
                           role="button"
-                          data-bs-toggle="dropdown"
                           aria-expanded="false"
                           style={{
                             marginRight: "46px",
@@ -350,7 +350,7 @@ function Header() {
                             fontSize: "20px",
                           }}
                         >
-                          Pages
+                          Leaderboard
                         </a>
 
                       </li>
