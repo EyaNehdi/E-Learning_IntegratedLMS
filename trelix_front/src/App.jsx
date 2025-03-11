@@ -76,7 +76,7 @@ function App() {
           <Route path="/home" element={<HomeUser />} />
          
           <Route path="/allcours" element={<Allcourse />} />
-          <Route path="/exams" element={<ExamStudent />} />
+          <Route path="/exams/:courseid" element={<ExamStudent />} />
 
           <Route path="/chapters/:courseid" element={<ListChapters />} >
             <Route path="content/:id" element={<ChapterContent />} />
