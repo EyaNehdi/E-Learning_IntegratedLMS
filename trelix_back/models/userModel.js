@@ -32,7 +32,8 @@
     resetPasswordExpiresAt: Date,
     verificationToken: String,
     verificationTokenExpiresAt: Date,
-    role: {
+    totalScore: { type: Number, default: 0 },
+  role: {
       type: String,
       enum: ["superAdmin", "admin", "student", "instructor"]
     }

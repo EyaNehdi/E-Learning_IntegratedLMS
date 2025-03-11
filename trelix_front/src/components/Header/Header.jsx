@@ -343,10 +343,8 @@ function Header() {
                       </li>
                         <li className="nav-item dropdown">
                           <a
-                            href="#"
+                            href="/leaderboard"
                             role="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
                             className="nav-link px-3 px-xl-4"
                             style={{
                               paddingInline: "40px",
