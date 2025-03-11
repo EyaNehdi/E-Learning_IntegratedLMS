@@ -114,7 +114,6 @@ const ListChapters = () => {
     // Navigate to the exam page
     navigate(`/exams/${storedCourseId}`)
   }
-
   return (
     <div>
       {/* Course Section */}
