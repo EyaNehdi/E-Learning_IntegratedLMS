@@ -19,6 +19,7 @@ const quizzRoutes = require("./routes/quizzRoutes");
 const Module =require("./routes/module");
 const Course =require("./routes/course");
 
+
 var app = express();
 require('dotenv').config();
 console.log("MONGO_URI:", process.env.MONGO_URI);  // Debug
@@ -73,6 +74,8 @@ app.use((err, req, res, next) => {
   console.error('Upload Error:', err.message);
   res.status(400).json({ error: err.message });
 });
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
