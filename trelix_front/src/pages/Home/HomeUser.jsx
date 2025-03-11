@@ -39,9 +39,6 @@ const HomeUser = () => {
         <link rel="stylesheet" href="assets/css/feather.css" />
         <link rel="stylesheet" href="assets/css/nice-select2.css" />
 
-        {/* Style css */}
-        <link rel="stylesheet" href="assets/css/style.css" />
-
         {/* Banner Section Start */}
         <section className="banner-sec position-relative overflow-hidden">
           <div className="container">

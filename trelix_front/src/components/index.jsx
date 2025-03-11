@@ -19,7 +19,6 @@ function Index() {
   <link href="assets/css/glightbox.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/swiper-bundle.min.css" />
   {/* Style css */}
-  <link rel="stylesheet" href="assets/css/style.css" />
 
 
   {/* Header  */}
