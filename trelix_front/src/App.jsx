@@ -23,6 +23,7 @@ import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
 import PublicRoute from "./layout/PublicRoute";
 import AdminRoute from "./layout/AdminRoute";
 import Index from "./components";
+import ChangePassword from "./pages/Profile/ChangePassword";
 
 import Module from "./components/Instructor/Module";
 import Courses from "./components/Instructor/Courses";
@@ -63,11 +64,10 @@ function App() {
         </Route>
         <Route path="/test" element={<CourseLearningPlatform />} />
         {/* **************** */}
-        {/* Protected routes  */}
+        {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
          
-
           <Route path="/allcours" element={<Allcourse />} />
           <Route path="/exams" element={<ExamStudent />} />
 
@@ -85,6 +85,8 @@ function App() {
             <Route path="edit/:id" element={<QuizEdit />} />
             <Route path="addquiz" element={<AddQuiz />} />
             <Route path="settings" element={<MultiFactorAuth />} />
+            {/* Ajout de la route pour changer le mot de passe */}
+            <Route path="change-password" element={<ChangePassword />} />
             <Route path="Course" element={<Courses/>} />
             <Route path="course-chapter/:courseId" element={<CourseChapter/>} />
             <Route path="list" element={<Listecourse/>} />
