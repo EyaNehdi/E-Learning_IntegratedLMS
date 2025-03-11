@@ -56,7 +56,7 @@ const register = async (req, res) => {
     console.log("✅ JWT Token generated for user:", newUser._id);
 
     // Send verification email
-    await sendVerificationEmail(newUser.email, verificationToken);
+    // await sendVerificationEmail(newUser.email, verificationToken);
     console.log("📧 Verification email sent to:", newUser.email);
 
     res.status(201).json({
