@@ -6,6 +6,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 const cors = require('cors');
 const multer = require('multer');
+const socketIo = require('socket.io');
 
 
 
@@ -14,6 +15,7 @@ var usersRouter = require('./routes/users');
 var mfaRoutes = require('./routes/mfaRoutes');
 const profileRoutes = require("./routes/profileRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const quizzRoutes = require("./routes/quizzRoutes");
 const Module =require("./routes/module");
 const Course =require("./routes/course");
 
@@ -63,6 +65,8 @@ app.use('/chapter', authRouteschapter);
 app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
 app.use("/api/admin", adminRoutes);
+app.use ("/api/quiz",quizzRoutes);
+
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
 app.use((err, req, res, next) => {
@@ -85,7 +89,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
+// Set up the socket connection
 
 //testing connectivity 
 const { connectDB } = require("./config/db");
@@ -105,8 +109,24 @@ async function startApp() {
 startApp();
 //port number from .env
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+// app.listen(PORT, () => {
+//   console.log("Server is running on port " + PORT);
+// });
+// 1. Get the server instance from Express
+const server = app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
 });
+
+// 2. Attach Socket.IO to the existing Express server
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
+// Socket Initialization
+const { initializeSocket } = require('./controllers/quizzLeaderboardController'); 
+initializeSocket(io);  // Pass the socket instance to the controller
 module.exports = app;
 

@@ -23,6 +23,9 @@ import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
 import PublicRoute from "./layout/PublicRoute";
 import AdminRoute from "./layout/AdminRoute";
 import Index from "./components";
+import Leaderboard from "./pages/Leaderboard/Leaderboard";
+import DailyQuizzes from "./pages/Admin/DailyQuizzes";
+import QuizzLeaderboard from "./pages/Leaderboard/QuizzLeaderboard";
 import ChangePassword from "./pages/Profile/ChangePassword";
 
 import Module from "./components/Instructor/Module";
@@ -49,6 +52,7 @@ function App() {
     <Router>
       <Routes>
         {/* **************** */}
+        <Route path="/addQuizzL" element={<DailyQuizzes />}/>
         {/* Public routes */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<Index />} />
@@ -57,6 +61,8 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/verify-email" element={<EmailVerificationPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          
+          
           <Route
             path="/reset-password/:token"
             element={<ResetPasswordPage />}
@@ -74,6 +80,8 @@ function App() {
           <Route path="/chapters/:courseid" element={<ListChapters />} >
             <Route path="content/:id" element={<ChapterContent />} />
           </Route>
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/quiz" element={<QuizzLeaderboard />}/>
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
@@ -96,7 +104,10 @@ function App() {
               element={<EditCourse />}
             />
             <Route path="/profile/allcours" element={<Allcourse />} />
+            
+            
           </Route>
+          
         </Route>
         <Route path="/CV" element={<CV />} />
         {/* **************** */}
