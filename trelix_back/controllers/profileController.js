@@ -18,9 +18,7 @@ const upload = multer({ storage });
 // Get User Profile
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select(
-            "firstName lastName email mfaEnabled image profilePhoto coverPhoto phone skils badges"
-        ); // Include photos
+        const user = await User.findById(req.userId).select("firstName lastName email mfaEnabled image profilePhoto coverPhoto phone skils badges role Bio");
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -66,35 +64,39 @@ const updateCoverPhoto = async (req, res) => {
 
 // Update User Badges
 const updatebadge = async (req, res) => {
-    const { badge, email, badgeImage } = req.body;
+    const { badge, email, badgeImage } = req.body; // Get badge, email, and badgeImage from request body
 
     try {
+        // Find user by email
         const user = await User.findOne({ email });
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
+        // Check if the badge already exists in the user's badges
         const badgeExists = user.badges.some(b => b.name === badge);
 
         if (badgeExists) {
             return res.status(400).json({ error: "You have already earned this badge." });
         }
 
+        // Add the badge with the image to the user's profile
         user.badges.push({
             name: badge,
             description: "Earned for completing profile",
-            image: badgeImage
+            image: badgeImage // Add the badge image URL
         });
 
+        // Save the updated user profile
         await user.save();
+
         res.json({ success: true, user });
     } catch (err) {
         res.status(500).json({ error: "Badge update failed", message: err.message });
     }
 };
 
-// Edit User Profile
 const editUserProfile = async (req, res) => {
     try {
         const { email, ...updateFields } = req.body;
@@ -109,10 +111,10 @@ const editUserProfile = async (req, res) => {
         }
 
         const updatedUser = await User.findOneAndUpdate(
-            { email },
-            { $set: updateFields },
-            { new: true, runValidators: true }
-        ).select("firstName lastName email mfaEnabled profilePhoto coverPhoto phone skils");
+            { email },    // Find user by email
+            { $set: updateFields }, // Update only the changed field(s)
+            { new: true, runValidators: true } // Return updated user and apply validation
+        ).select("firstName lastName email mfaEnabled profilePhoto coverPhoto phone skils Bio");
 
         res.status(200).json(updatedUser);
     } catch (error) {
@@ -164,6 +166,32 @@ const updateUserPassword = async (req, res) => {
 
 
 
+const editSkils = async (req, res) => {
+    try {
+        const { userId, skills } = req.body; // Extract userId and new skills from request
+
+        // Validate request data
+        if (!userId || !skills || !Array.isArray(skills)) {
+            return res.status(400).json({ message: "Invalid request data" });
+        }
+
+        // Find the user and update their skills
+        const updatedUser = await User.findByIdAndUpdate(
+            userId, 
+            { skils: skills }, 
+            { new: true } // Return updated document
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.error("Error updating skills:", error);
+        res.status(500).json({ message: "Error updating skills" });
+    }
+};
 module.exports = {
     getUserProfile,
     updateProfilePhoto,
@@ -171,5 +199,6 @@ module.exports = {
     editUserProfile,
     upload,
     updatebadge,
-    updateUserPassword
+    updateUserPassword,
+    editSkils// Export multer upload configuration
 };
