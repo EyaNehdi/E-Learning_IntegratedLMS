@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useProfileStore } from "../store/profileStore";
 import Buttons from "./Buttons";
-import './css/Header.css';
+// import './css/Header.css';
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
