@@ -84,7 +84,7 @@ const getExamById = async (req, res) => {
 // Create new exam
 const createExam = async (req, res) => {
     try {
-        const { title, description, duration, passingScore, startDate, endDate, questions, totalPoints, isPublished } = req.body;
+        const { title, description, duration, passingScore, startDate, endDate, questions, totalPoints, isPublished,user} = req.body;
         
         const originalFile = req.file
             ? {
@@ -105,6 +105,7 @@ const createExam = async (req, res) => {
             questions,
             totalPoints,
             isPublished,
+            user,    
             originalFile,
         });
 

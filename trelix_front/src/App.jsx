@@ -54,7 +54,7 @@ function App() {
     <Router>
       <Routes>
         {/* **************** */}
-        <Route path="/addQuizzL" element={<DailyQuizzes />}/>
+        
         {/* Public routes */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<Index />} />
@@ -121,7 +121,7 @@ function App() {
           <Route path="/leave" element={<Leave />} />
           <Route path="/leave/:id" element={<Leave />} />
           <Route path="/manage" element={<Manage />} />
-          <Route path="/report" element={<Reports />} />
+          <Route path="/report" element={<DailyQuizzes />} />
           <Route path="/set" element={<Settings />} />
         </Route>
         {/* **************** */}

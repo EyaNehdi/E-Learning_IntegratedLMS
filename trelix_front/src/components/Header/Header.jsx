@@ -26,8 +26,6 @@ function Header() {
   const { user, fetchUser, clearUser } = useProfileStore()
   const location = useLocation()
 
-  
-
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
@@ -41,8 +39,7 @@ function Header() {
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
-
-
+  
   // Fetch courses from API
   useEffect(() => {
     const fetchCourses = async () => {
@@ -79,6 +76,7 @@ function Header() {
       }
     }
   }, [searchQuery, courses]);
+
   return (
     <>
       <header className="header header-1">
@@ -134,7 +132,7 @@ function Header() {
                         <div className="col-sm-4 mb-4" key={course._id || course.id}>
                           <div className="course-entry-3 card rounded-2 border shadow-1">
                             <div className="card-media position-relative">
-                              <a href={`/courses/${course._id || course.id}`}>
+                            <a href={`/chapters/${course._id}`}>
                                 <img
                                   className="card-img-top"
                                   src={course.image || "assets/images/course1.jpg"}
@@ -225,37 +223,20 @@ function Header() {
                           </a>
                         </li>
                         <li className="nav-item dropdown">
-                        <a
-                          href="#"
-                          role="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                          style={{
-                            marginRight: "46px",
-                            fontWeight: "bold",
-                            fontSize: "20px",
-                          }}
-                        >
-                          Courses
-                        </a>
-                        {/* Dropdown menu for Courses */}
-                        <ul className="dropdown-menu">
-                          <li>
-                            <a className="dropdown-item" href="/chapters  ">
-                              All Chapters
-                            </a>
-                          </li>
-                          <li>
-                            <a className="dropdown-item" href="/allcours">
-                              All Cours
-                            </a>
-                          </li>
-                          <li>
-                            <hr className="dropdown-divider" />
-                          </li>
-
-                        </ul>
-                      </li>
+                          <a
+                            href="/allcours"
+                            role="button"
+                            aria-expanded="false"
+                            className="nav-link px-3 px-xl-4"
+                            style={{
+                              paddingInline: "40px",
+                              fontWeight: "bold",
+                              fontSize: "20px",
+                            }}
+                          >
+                            Courses
+                          </a>
+                        </li>
                         <li className="nav-item dropdown">
                           <a
                             href="/leaderboard"
@@ -298,9 +279,8 @@ function Header() {
                         </a>
                         {menuOpen && (
                           <div
-                            className={`admin-menu pt-3 bg-white ${
-                              menuOpen ? "open" : ""
-                            }`}
+                            className={`admin-menu pt-3 bg-white ${menuOpen ? "open" : ""
+                              }`}
                           >
                             <div className="d-flex avatar border-bottom">
                               <div
@@ -370,7 +350,7 @@ function Header() {
                                     <span>My Profile</span>
                                   </a>
                                 </li>
-                                <li>
+                                {/* <li>
                                   <a
                                     className="nav-link"
                                     href="instructor-enrolled-courses.html"
@@ -378,8 +358,8 @@ function Header() {
                                     <i className="feather-icon icon-book-open" />
                                     <span>Enrolled Courses</span>
                                   </a>
-                                </li>
-                                <li>
+                                </li> */}
+                                {/* <li>
                                   <a
                                     className="nav-link"
                                     href="instructor-wishlist.html"
@@ -387,8 +367,8 @@ function Header() {
                                     <i className="feather-icon icon-gift" />
                                     <span>Wishlist</span>
                                   </a>
-                                </li>
-                                <li>
+                                </li> */}
+                                {/* <li>
                                   <a
                                     className="nav-link"
                                     href="instructor-reviews.html"
@@ -396,8 +376,8 @@ function Header() {
                                     <i className="feather-icon icon-star" />
                                     <span>Reviews</span>
                                   </a>
-                                </li>
-                                <li>
+                                </li> */}
+                                {/* <li>
                                   <a
                                     className="nav-link"
                                     href="instructor-my-quiz-attempts.html"
@@ -405,42 +385,14 @@ function Header() {
                                     <i className="feather-icon icon-box" />
                                     <span>My Quiz Attempts</span>
                                   </a>
-                                </li>
+                                </li> */}
                                 <li>
                                   <a
                                     className="nav-link"
-                                    href="instructor-order-history.html"
+                                    href="/profile/settings"
                                   >
                                     <i className="feather-icon icon-shopping-bag" />
-                                    <span>Order History</span>
-                                  </a>
-                                </li>
-                                <li className="border-bottom" />
-                                <li>
-                                  <a
-                                    className="nav-link active"
-                                    href="instructor-courses.html"
-                                  >
-                                    <i className="feather-icon icon-book" />
-                                    <span>My Courses</span>
-                                  </a>
-                                </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-assignments.html"
-                                  >
-                                    <i className="feather-icon icon-briefcase" />
-                                    <span>Assignments</span>
-                                  </a>
-                                </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-quiz-attempts.html"
-                                  >
-                                    <i className="feather-icon icon-cpu" />
-                                    <span>Quiz Attempts</span>
+                                    <span>Security</span>
                                   </a>
                                 </li>
                                 <li>
@@ -448,19 +400,40 @@ function Header() {
                                     className="nav-link"
                                     href="/certificates"
                                   >
-                                    <i className="feather-icon icon-bell" />
+                                    <i className="feather-icon icon-award" />
                                     <span>View Certificates</span>
                                   </a>
                                 </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-announcements.html"
-                                  >
-                                    <i className="feather-icon icon-bell" />
-                                    <span>Announcements</span>
-                                  </a>
-                                </li>
+                                <ul>
+                                  {user?.role === "instructor" && (
+                                    <>
+                                      <li>
+                                        <a className="nav-link active" href="/profile/list">
+                                          <i className="feather-icon icon-book" />
+                                          <span>My Courses</span>
+                                        </a>
+                                      </li>
+                                      <li>
+                                        <a className="nav-link" href="/profile/allquiz">
+                                          <i className="feather-icon icon-briefcase" />
+                                          <span>My Quizs</span>
+                                        </a>
+                                      </li>
+                                      <li>
+                                        <a className="nav-link" href="/profile/Allexams">
+                                          <i className="feather-icon icon-cpu" />
+                                          <span>My Exams</span>
+                                        </a>
+                                      </li>
+                                      <li>
+                                        <a className="nav-link" href="/profile/addchapter">
+                                          <i className="feather-icon icon-bell" />
+                                          <span>My Chapters</span>
+                                        </a>
+                                      </li>
+                                    </>
+                                  )}
+                                </ul>
                                 <li className="border-bottom" />
                                 <li>
                                   <a
