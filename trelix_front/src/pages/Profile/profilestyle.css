@@ -33,7 +33,7 @@
 }
 
 .edit-button:hover {
-  background-color: rgba(0, 0, 0, 0.9); /* Darker on hover */
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 .cover-photo-container {
@@ -48,8 +48,8 @@
 
 .change-cover-icon {
   position: absolute;
-  top: 10px; /* Adjusted for better alignment */
-  right: 10px; /* Adjusted for better alignment */
+  top: 10px;
+  right: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
