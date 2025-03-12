@@ -446,6 +446,15 @@ function Header() {
                                 <li>
                                   <a
                                     className="nav-link"
+                                    href="/certificates"
+                                  >
+                                    <i className="feather-icon icon-bell" />
+                                    <span>View Certificates</span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a
+                                    className="nav-link"
                                     href="instructor-announcements.html"
                                   >
                                     <i className="feather-icon icon-bell" />
