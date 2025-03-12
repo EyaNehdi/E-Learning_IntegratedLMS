@@ -26,6 +26,7 @@ function Header() {
   const { user, fetchUser, clearUser } = useProfileStore()
   const location = useLocation()
 
+
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
@@ -77,6 +78,43 @@ function Header() {
     }
   }, [searchQuery, courses]);
 
+
+  // Fetch courses from API
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true)
+        const response = await axios.get("http://localhost:5000/course/courses")
+        setCourses(response.data)
+        setFilteredCourses(response.data)
+        setLoading(false)
+      } catch (err) {
+        console.error("Erreur lors du chargement des cours:", err)
+        setError("Impossible de charger les cours. Veuillez réessayer plus tard.")
+        setLoading(false)
+      }
+    }
+
+    fetchCourses()
+    fetchUser()
+  }, [fetchUser])
+  
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredCourses(courses);
+    } else {
+      const filtered = courses.filter((course) =>
+        course.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredCourses(filtered);
+  
+      // Vérifie que l'objet global est défini avant de l'utiliser
+      if (window.courseSearchState) {
+        window.courseSearchState.query = searchQuery;
+        window.courseSearchState.notifyListeners(searchQuery);
+      }
+    }
+  }, [searchQuery, courses]);
   return (
     <>
       <header className="header header-1">
@@ -132,7 +170,9 @@ function Header() {
                         <div className="col-sm-4 mb-4" key={course._id || course.id}>
                           <div className="course-entry-3 card rounded-2 border shadow-1">
                             <div className="card-media position-relative">
+
                             <a href={`/chapters/${course._id}`}>
+
                                 <img
                                   className="card-img-top"
                                   src={course.image || "assets/images/course1.jpg"}
@@ -392,6 +432,7 @@ function Header() {
                                     href="/profile/settings"
                                   >
                                     <i className="feather-icon icon-shopping-bag" />
+
                                     <span>Security</span>
                                   </a>
                                 </li>
@@ -402,6 +443,7 @@ function Header() {
                                   >
                                     <i className="feather-icon icon-award" />
                                     <span>View Certificates</span>
+
                                   </a>
                                 </li>
                                 <ul>
