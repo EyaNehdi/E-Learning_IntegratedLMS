@@ -89,7 +89,7 @@ function Listcourse() {
                   <div key={course._id} className="col-xl-4 col-sm-6" style={{width: "fit-content"}}>
                     <div className="course-entry-3 card rounded-2 bg-info border shadow-1">
                       <div className="card-media position-relative">
-                        <a href="single-course.html">
+                        <a href={`/profile/course-chapter/${course._id}`}>
                           <img
                             className="card-img-top"
                             src="/assets/images/course.png"
