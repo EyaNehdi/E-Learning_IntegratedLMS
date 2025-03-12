@@ -19,6 +19,7 @@ const ExamSchema = new Schema({
     isPublished: { type: Boolean, default: false },
     totalPoints: { type: Number, required: true },
     questions: { type: [QuestionSchema], required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     originalFile: {
         name: { type: String },
         path: { type: String },
