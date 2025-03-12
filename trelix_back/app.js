@@ -19,6 +19,7 @@ const quizzRoutes = require("./routes/quizzRoutes");
 const Module =require("./routes/module");
 const Course =require("./routes/course");
 
+
 var app = express();
 require('dotenv').config();
 console.log("MONGO_URI:", process.env.MONGO_URI);  // Debug
@@ -59,6 +60,7 @@ const quizRoutes = require('./routes/quizRoutes');
 const authRouteschapter = require('./routes/chapterRoutes'); 
 const authRoutes = require('./routes/authRoutes');
 const authRoutesIA = require('./routes/ia');
+const certifRoutes = require('./routes/certif.routes');
 app.use('/api/auth', authRoutes);
 app.use('/ia/auth', authRoutesIA);
 app.use('/chapter', authRouteschapter);
@@ -66,6 +68,7 @@ app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
 app.use("/api/admin", adminRoutes);
 app.use ("/api/quiz",quizzRoutes);
+app.use ("/certificates",certifRoutes);
 
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
@@ -73,6 +76,8 @@ app.use((err, req, res, next) => {
   console.error('Upload Error:', err.message);
   res.status(400).json({ error: err.message });
 });
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -47,6 +47,7 @@ import AddExam from "./components/Exam/addExam";
 import AllExamsInstructor from "./components/Exam/AllExamsInstractor";
 import ExamStudent from "./components/Exam/ExamStudent";
 import CourseLearningPlatform from "./components/Quiz/test";
+import CertificateBrowser from "./pages/Certification/CertificateBrowser";
 
 function App() {
   return (
@@ -74,6 +75,7 @@ function App() {
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
+          <Route path="/certificates" element={<CertificateBrowser />} />
          
           <Route path="/allcours" element={<Allcourse />} />
           <Route path="/exams/:courseid" element={<ExamStudent />} />
