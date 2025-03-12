@@ -2,6 +2,8 @@ const Exam = require("../models/ExamModel");
 const multer = require("multer");
 const path = require("path");
 const { Parser } = require("json2csv");
+const Course = require("../models/course");
+const mongoose = require('mongoose');
 
 // Configure multer storage
 const storage = multer.diskStorage({
@@ -36,17 +38,45 @@ const getExams = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+const getExamss = async (req, res) => {
+    try {
+        const { page = 1, limit = 10 } = req.query;
+
+        const pageNumber = parseInt(page, 10);
+        const limitNumber = parseInt(limit, 10);
+        const skip = (pageNumber - 1) * limitNumber;
+
+        const totalExams = await Exam.countDocuments(); // Count total exams
+        const exams = await Exam.find()
+            .populate("questions") // Populate questions
+            .skip(skip)
+            .limit(limitNumber);
+
+        res.status(200).json({
+            exams,
+            totalPages: Math.ceil(totalExams / limitNumber) || 1, // Calculate total pages
+        });
+    } catch (error) {
+        console.error("Error fetching exams:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 
 
 // Get exam by ID
 const getExamById = async (req, res) => {
     try {
-        const exam = await Exam.findById(req.params.id);
-        if (!exam) return res.status(404).json({ message: "Exam not found" });
+        const { id } = req.params; // Extract ID from request parameters
+        const exam = await Exam.findById(id).populate("questions"); // Fetch the exam and populate questions
+
+        if (!exam) {
+            return res.status(404).json({ message: "Exam not found" });
+        }
 
         res.status(200).json(exam);
     } catch (error) {
-        console.error("Error fetching exam:", error);
+        console.error("Error fetching exam by ID:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
@@ -195,6 +225,62 @@ const exportAllExamResults = async (req, res) => {
     res.status(500).json({ message: "Failed to export all exam results" });
   }
 };
+const assignExamsToCourse = async (req, res) => {
+    try {
+        const { courseId, examIds } = req.body;
+
+        if (!courseId || !examIds || examIds.length === 0) {
+            return res.status(400).json({ message: "Course ID and at least one exam ID are required." });
+        }
+
+        // Ensure course exists
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ message: "Course not found." });
+        }
+
+        // Ensure exams exist
+        const exams = await Exam.find({ _id: { $in: examIds } });
+        if (exams.length !== examIds.length) {
+            return res.status(404).json({ message: "One or more exams not found." });
+        }
+
+        // Add exams to the course
+        course.exams = [...new Set([...course.exams, ...examIds])]; // Avoid duplicates
+        await course.save();
+
+        res.status(200).json({ message: "Exams assigned successfully!", course });
+    } catch (error) {
+        console.error("Error assigning exams to course:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+const getRandomExamFromCourse = async (req, res) => {
+    try {
+        const { courseId } = req.params;
+
+        // Check if the course exists and populate the 'exams' field
+        const course = await Course.findById(courseId).populate('exams');
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
+        // Filter the exams to only include those where isPublished = true
+        const publishedExams = course.exams.filter(exam => exam.isPublished === true);
+
+        // If there are published exams, select a random one
+        if (publishedExams.length > 0) {
+            const randomExam = publishedExams[Math.floor(Math.random() * publishedExams.length)];
+            res.status(200).json(randomExam); // Send back the random published exam
+        } else {
+            return res.status(404).json({ message: "No published exams available for this course" });
+        }
+    } catch (error) {
+        console.error("Error fetching random exam:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 
 
 module.exports = {
@@ -206,5 +292,8 @@ module.exports = {
     publishExam,
     duplicateExam,
     exportAllExamResults,
+    getExamss,
+    assignExamsToCourse,
+    getRandomExamFromCourse,
     upload
 };

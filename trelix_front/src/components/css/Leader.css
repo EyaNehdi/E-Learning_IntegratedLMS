@@ -1,0 +1,165 @@
+.leaderboard-container {
+  width: 100%;
+  display: flex;
+
+}
+
+.leaderboard-main {
+  width: 40rem;
+  height: 43rem;
+  background-color: #ffffff;
+  box-shadow: 0px 5px 15px 8px #e4e7fb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 0.5rem;
+}
+
+.leaderboard-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+}
+
+.leaderboard-title {
+  font-family: "Rubik", sans-serif;
+  font-size: 1.7rem;
+  color: #141a39;
+  text-transform: uppercase;
+}
+
+.leaderboard-content {
+  width: 100%;
+  position: relative;
+  overflow-y: auto;
+  
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #141a39;
+}
+
+.leaderboard-row {
+  transition: all 0.2s ease-in-out;
+  border-radius: 0.2rem;
+}
+
+.leaderboard-row:not(:first-child):hover {
+  background-color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0px 5px 15px 8px #e4e7fb;
+}
+
+
+.leaderboard-row:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.leaderboard-rank {
+  font-size: 2.2rem;
+  font-weight: bold;
+  text-align: left;
+  padding: 1rem 2rem;
+}
+
+.leaderboard-name {
+  text-align: left;
+  font-size: 1.2rem;
+  padding: 1rem 2rem;
+}
+
+.leaderboard-score {
+  font-weight: bold;
+  font-size: 1.3rem;
+  text-align: right;
+  padding: 1rem 2rem;
+}
+
+.leaderboard-empty {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #7e7f86;
+  padding: 1rem 2rem;
+}
+
+.leaderboard-profile-pic {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+.leaderboard-row:first-child {
+  position: relative;
+  z-index: 10; /* Ensures it appears above the ribbon */
+  background-color: gold; /* Highlight first place */
+  color: #141a39; /* Keep text readable */
+  font-weight: bold;
+  transform: scale(1.1); /* Make it slightly larger */
+  box-shadow: 0px 5px 20px 5px rgba(255, 215, 0, 0.5); /* Glowing effect */
+  border-radius: 0.5rem;
+}
+.leaderboard-row:first-child:hover {
+  background-color: #ffd700; /* Slightly lighter gold */
+  transform: scale(1.15); /* Increase size a bit */
+  box-shadow: 0px 10px 25px 8px rgba(255, 215, 0, 0.6); /* Stronger glow */
+  transition: all 0.3s ease-in-out;
+  cursor: pointer; /* Indicate it's interactive */
+}
+
+
+
+/* Styling for the top ribbon */
+.leaderboard-ribbon {
+  width: 42rem;
+  height: 5.5rem;
+  top: -0.5rem;
+  background-color: #5c5be5;
+  position: absolute;
+  left: -1rem;
+  box-shadow: 0px 15px 11px -6px #7a7a7d;
+}
+
+.leaderboard-ribbon::before,
+.leaderboard-ribbon::after {
+  content: "";
+  height: 1.5rem;
+  width: 1.5rem;
+  bottom: -0.8rem;
+  background-color: #5c5be5;
+  position: absolute;
+  z-index: -1;
+}
+
+.leaderboard-ribbon::before {
+  left: 0.35rem;
+  transform: rotate(45deg);
+}
+
+.leaderboard-ribbon::after {
+  right: 0.35rem;
+  transform: rotate(45deg);
+} 
+
+/* Responsive Design */
+@media (max-width: 740px) {
+  .leaderboard-main {
+    width: 90%;
+  }
+}
+
+@media (max-width: 500px) {
+  .leaderboard-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .leaderboard-title {
+    font-size: 1.3rem;
+  }
+}

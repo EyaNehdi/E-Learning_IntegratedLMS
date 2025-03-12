@@ -1,0 +1,82 @@
+.profile-photo-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-photo-container:hover .edit-icon {
+  opacity: 1;
+}
+
+.edit-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.edit-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.cover-photo-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.change-cover-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+  color: white;
+  font-size: 14px;
+  opacity: 0;
+}
+
+.cover-photo-container:hover .change-cover-icon {
+  opacity: 1;
+}
+
+.change-cover-icon:hover {
+  width: auto;
+  padding: 10px 15px;
+  border-radius: 20px;
+}
+
+.change-cover-icon:hover::after {
+  content: " Change Cover";
+  font-size: 14px;
+  margin-left: 5px;
+}

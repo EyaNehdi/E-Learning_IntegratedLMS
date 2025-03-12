@@ -7,14 +7,26 @@ import CloseIcon from "@mui/icons-material/Close";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import Tooltip from "@mui/material/Tooltip";
 import MobileMenu from "./MobileMenu";
+import axios from "axios";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuthStore();
-  const navigate = useNavigate();
-  const { user, fetchUser, clearUser } = useProfileStore();
-  const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+ 
+  const [filteredCourses, setFilteredCourses] = useState([])
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null)
+  const { isAuthenticated, logout } = useAuthStore()
+  const navigate = useNavigate()
+  const { user, fetchUser, clearUser } = useProfileStore()
+  const location = useLocation()
+
+  
 
   useEffect(() => {
     fetchUser();
@@ -30,6 +42,43 @@ function Header() {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+
+  // Fetch courses from API
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true)
+        const response = await axios.get("http://localhost:5000/course/courses")
+        setCourses(response.data)
+        setFilteredCourses(response.data)
+        setLoading(false)
+      } catch (err) {
+        console.error("Erreur lors du chargement des cours:", err)
+        setError("Impossible de charger les cours. Veuillez réessayer plus tard.")
+        setLoading(false)
+      }
+    }
+
+    fetchCourses()
+    fetchUser()
+  }, [fetchUser])
+  
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredCourses(courses);
+    } else {
+      const filtered = courses.filter((course) =>
+        course.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredCourses(filtered);
+  
+      // Vérifie que l'objet global est défini avant de l'utiliser
+      if (window.courseSearchState) {
+        window.courseSearchState.query = searchQuery;
+        window.courseSearchState.notifyListeners(searchQuery);
+      }
+    }
+  }, [searchQuery, courses]);
   return (
     <>
       <header className="header header-1">
@@ -48,11 +97,7 @@ function Header() {
         </div>
 
         {/* Search panel offcanvas */}
-        <div
-          className="search-popup offcanvas offcanvas-top"
-          id="offcanvas-search"
-          data-bs-scroll="true"
-        >
+        <div className="search-popup offcanvas offcanvas-top" id="offcanvas-search" data-bs-scroll="true">
           <div className="container d-flex flex-row py-5 align-items-center position-relative">
             <button
               type="button"
@@ -67,187 +112,57 @@ function Header() {
                   type="text"
                   className="form-control shadow-1"
                   placeholder="Type keyword and hit enter"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </form>
-              <div className="product-wrap d-none d-sm-block">
-                <h6>Our Best Selling Courses</h6>
-                <div className="row mt-3">
-                  <div className="col-sm-4">
-                    <div className="course-entry-3 card rounded-2 border shadow-1">
-                      <div className="card-media position-relative">
-                        <a href="single-course.html">
-                          <img
-                            className="card-img-top"
-                            src="assets/images/course1.jpg"
-                            alt="Course"
-                          />
-                        </a>
-                      </div>
-                      <div className="card-body p-3">
-                        <div className="d-flex justify-content-between align-items-center small">
-                          <div className="d-flex align-items-center small">
-                            <div className="ratings me-2">
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                            </div>
-                            <span className="rating-count">(15)</span>
-                          </div>
-                        </div>
-                        <h3 className="display-6 mt-1">
-                          <a href="single-course.html">
-                            Python Bootcamp Canada
-                          </a>
-                        </h3>
-                        <span className="fw-bold">$75.00</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-sm-4">
-                    <div className="course-entry-3 card rounded-2 border shadow-1">
-                      <div className="card-media position-relative">
-                        <a href="single-course.html">
-                          <img
-                            className="card-img-top"
-                            src="assets/images/course2.jpg"
-                            alt="Course"
-                          />
-                        </a>
-                      </div>
-                      <div className="card-body p-3">
-                        <div className="d-flex justify-content-between align-items-center small">
-                          <div className="d-flex align-items-center small">
-                            <div className="ratings me-2">
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                            </div>
-                            <span className="rating-count">(5)</span>
-                          </div>
-                        </div>
-                        <h3 className="display-6 mt-1">
-                          <a href="single-course.html">
-                            Building wealth &amp; security
-                          </a>
-                        </h3>
-                        <span className="fw-bold">$75.00</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-sm-4">
-                    <div className="course-entry-3 card rounded-2 border shadow-1">
-                      <div className="card-media position-relative">
-                        <a href="single-course.html">
-                          <img
-                            className="card-img-top"
-                            src="assets/images/course3.jpg"
-                            alt="Course"
-                          />
-                        </a>
-                      </div>
-                      <div className="card-body p-3">
-                        <div className="d-flex justify-content-between align-items-center small">
-                          <div className="d-flex align-items-center small">
-                            <div className="ratings me-2">
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                              <a href="#">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="star_icon"
-                                />
-                              </a>
-                            </div>
-                            <span className="rating-count">(09)</span>
-                          </div>
-                        </div>
-                        <h3 className="display-6 mt-1">
-                          <a href="single-course.html">
-                            Python Bootcamp Canada
-                          </a>
-                        </h3>
-                        <span className="fw-bold">$75.00</span>
-                      </div>
-                    </div>
+
+              {loading ? (
+                <div className="text-center">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
                   </div>
                 </div>
-              </div>
+              ) : error ? (
+                <div className="alert alert-danger">{error}</div>
+              ) : (
+                <div className="product-wrap d-block">
+                  <h6>{searchQuery ? `Résultats pour "${searchQuery}"` : "Our Best Selling Courses"}</h6>
+                  {filteredCourses.length > 0 ? (
+                    <div className="row mt-3">
+                      {filteredCourses.map((course) => (
+                        <div className="col-sm-4 mb-4" key={course._id || course.id}>
+                          <div className="course-entry-3 card rounded-2 border shadow-1">
+                            <div className="card-media position-relative">
+                              <a href={`/courses/${course._id || course.id}`}>
+                                <img
+                                  className="card-img-top"
+                                  src={course.image || "assets/images/course1.jpg"}
+                                  alt={course.title}
+                                />
+                              </a>
+                            </div>
+                            <div className="card-body p-3">
+                              <div className="d-flex justify-content-between align-items-center small">
+                                <div className="d-flex align-items-center small">
+                                  
+                                  <span className="rating-count">({course.reviews || 0})</span>
+                                </div>
+                              </div>
+                              <h3 className="display-6 mt-1">
+                                <a href={`/courses/${course._id || course.id}`}>{course.title}</a>
+                              </h3>
+                              <span className="fw-bold">${course.price?.toFixed(2) || "0.00"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="alert alert-info mt-3">Aucun cours ne correspond à votre recherche.</div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -343,10 +258,8 @@ function Header() {
                       </li>
                         <li className="nav-item dropdown">
                           <a
-                            href="#"
+                            href="/leaderboard"
                             role="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
                             className="nav-link px-3 px-xl-4"
                             style={{
                               paddingInline: "40px",
@@ -391,7 +304,7 @@ function Header() {
                           >
                             <div className="d-flex avatar border-bottom">
                               <div
-                                className="avatar me-2 rounded-circle d-flex align-items-center justify-content-center"
+                                className="avatar p-2 rounded-circle d-flex align-items-center justify-content-center"
                                 style={{
                                   width: "50px",
                                   height: "50px",
@@ -417,13 +330,18 @@ function Header() {
                                   />
                                 ) : (
                                   <span>
-                                    {user?.firstName
-                                      ? user.firstName.charAt(0)
-                                      : "?"}
+                                    {user?.firstName ? (
+                                      <>
+                                        {user.firstName.charAt(0)}
+                                        {user.lastName.charAt(0)}
+                                      </>
+                                    ) : (
+                                      "?"
+                                    )}
                                   </span>
                                 )}
                               </div>
-                              <div className="d-flex avatar border-bottom pb-3">
+                              <div className="d-flex avatar border-bottom ps-2 pb-3">
                                 {user ? (
                                   <h6 className="mb-0">
                                     {user.firstName} {user.lastName}
@@ -523,6 +441,15 @@ function Header() {
                                   >
                                     <i className="feather-icon icon-cpu" />
                                     <span>Quiz Attempts</span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a
+                                    className="nav-link"
+                                    href="/certificates"
+                                  >
+                                    <i className="feather-icon icon-bell" />
+                                    <span>View Certificates</span>
                                   </a>
                                 </li>
                                 <li>
