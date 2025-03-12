@@ -43,7 +43,7 @@ function Leader() {
                     <td className="leaderboard-rank">{index + 1}</td>
                     <td className="leaderboard-name">
                       {user.profilePhoto && (
-                        <img src={user.profilePhoto} alt="profile" className="leaderboard-profile-pic" />
+                        <img src={`http://localhost:5000${user.profilePhoto}`} alt="profile" className="leaderboard-profile-pic" />
                       )}
                       {user.firstName} {user.lastName}
                     </td>
