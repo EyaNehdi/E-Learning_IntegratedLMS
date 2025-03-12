@@ -1,60 +1,61 @@
-
-import { useState, useEffect } from "react"
-import axios from "axios"
-import { useProfileStore } from "../../store/profileStore"
-import { Link, Outlet, useParams, useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useProfileStore } from "../../store/profileStore";
+import { Link, Outlet, useParams, useNavigate } from "react-router-dom";
 
 const ListChapters = () => {
-  const { id, courseid } = useParams()
-  const navigate = useNavigate()
+  const { id, courseid } = useParams();
+  const navigate = useNavigate();
 
-  const [chapters, setChapters] = useState([])
-  const [completedChapters, setCompletedChapters] = useState([])
-  const { user, fetchUser, clearUser } = useProfileStore()
-  const [loading, setLoading] = useState(true)
+  const [chapters, setChapters] = useState([]);
+  const [completedChapters, setCompletedChapters] = useState([]);
+  const { user, fetchUser, clearUser } = useProfileStore();
+  const [loading, setLoading] = useState(true);
 
   // Store courseid in localStorage if it's not already there
   useEffect(() => {
     if (courseid) {
-      localStorage.setItem('courseid', courseid)
+      localStorage.setItem("courseid", courseid);
     }
-  }, [courseid])
+  }, [courseid]);
 
   // Retrieve courseid from localStorage if it's not available from useParams
-  const storedCourseId = localStorage.getItem('courseid')
-  const finalCourseId = courseid || storedCourseId
+  const storedCourseId = localStorage.getItem("courseid");
+  const finalCourseId = courseid || storedCourseId;
 
   // Fetch the user data on mount
   useEffect(() => {
-    fetchUser()
-  }, [fetchUser])
+    fetchUser();
+  }, [fetchUser]);
 
   useEffect(() => {
-    console.log("user after fetch", user)
-  }, [user])
+    console.log("user after fetch", user);
+  }, [user]);
 
-  console.log("Course ID:", finalCourseId)
+  console.log("Course ID:", finalCourseId);
 
   useEffect(() => {
     const fetchChapters = async () => {
-      console.log("Course ID:", finalCourseId)
+      console.log("Course ID:", finalCourseId);
       if (!finalCourseId) {
-        console.error("Course ID is not defined")
-        return
+        console.error("Course ID is not defined");
+        return;
       }
 
       try {
-        const response = await axios.get(`http://localhost:5000/chapter/course/${finalCourseId}`)
-        setChapters(response.data.chapters)
-        setLoading(false)
+        const response = await axios.get(
+          `http://localhost:5000/chapter/course/${finalCourseId}`
+        );
+        setChapters(response.data.chapters);
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching chapters:", error)
-        setLoading(false)
+        console.error("Error fetching chapters:", error);
+        setLoading(false);
       }
-    }
+    };
 
-    fetchChapters()
-  }, [finalCourseId]) 
+    fetchChapters();
+  }, [finalCourseId]);
   useEffect(() => {
     // Ensure that user is available before making the request
     if (user && user._id) {
@@ -66,19 +67,19 @@ const ListChapters = () => {
           },
         })
         .then((response) => {
-          setCompletedChapters(response.data.completedChapters)
-          console.log("Completed chapters data: ", response.data)
+          setCompletedChapters(response.data.completedChapters);
+          console.log("Completed chapters data: ", response.data);
         })
         .catch((error) => {
-          console.error("Error fetching completed chapters:", error)
-        })
+          console.error("Error fetching completed chapters:", error);
+        });
     }
-  }, [user, id])
+  }, [user, id]);
 
   const handleCompleteChapter = (chapterId) => {
     if (!user || !user._id) {
-      console.error("User is not logged in")
-      return
+      console.error("User is not logged in");
+      return;
     }
 
     // When a chapter is completed, update the backend
@@ -90,30 +91,52 @@ const ListChapters = () => {
       .then((response) => {
         // Check if the response contains updated completed chapters
         if (response.data.completedChapters) {
-          setCompletedChapters(response.data.completedChapters)
+          setCompletedChapters(response.data.completedChapters);
         }
       })
       .catch((error) => {
-        console.error("Error marking chapter as completed:", error)
-      })
-  }
+        console.error("Error marking chapter as completed:", error);
+      });
+  };
 
   // Check if all chapters are completed
   const areAllChaptersCompleted = () => {
-    if (chapters.length === 0) return false
-    return chapters.every((chapter) => completedChapters.includes(chapter._id))
-  }
+    if (chapters.length === 0) return false;
+    return chapters.every((chapter) => completedChapters.includes(chapter._id));
+  };
 
   // Handle starting the exam
   const handleStartExam = () => {
     if (!areAllChaptersCompleted()) {
-      alert("Please complete all chapters before starting the exam.")
-      return
+      alert("Please complete all chapters before starting the exam.");
+      return;
     }
 
     // Navigate to the exam page
-    navigate(`/exams/${storedCourseId}`)
-  }
+    navigate(`/exams/${storedCourseId}`);
+  };
+
+  const handleEarnCertificate = async (provider) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/certificates/issueCertificate",
+        {
+          userId: user._id,
+          courseId: finalCourseId,
+          provider,
+        }
+      );
+
+      console.log("Certificate Earned Successfully:", response.data);
+      alert("Congratulations! You have earned a certificate.");
+    } catch (error) {
+      console.error(
+        "Error earning certificate:",
+        error.response?.data || error
+      );
+      alert(error.response?.data?.error || "An error occurred.");
+    }
+  };
   return (
     <div>
       {/* Course Section */}
@@ -123,10 +146,12 @@ const ListChapters = () => {
             {/* Sidebar on the left */}
             <div className="lg:w-1/3 mb-6 lg:mb-0 lg:pr-6">
               <aside className="bg-white rounded-lg shadow-md p-6">
-                <h1 className="text-3xl font-bold mb-6 text-gray-800">Chapter Content</h1>
+                <h1 className="text-3xl font-bold mb-6 text-gray-800">
+                  Chapter Content
+                </h1>
                 <div className="space-y-3">
                   {chapters.map((chapter) => {
-                    const isCompleted = completedChapters.includes(chapter._id)
+                    const isCompleted = completedChapters.includes(chapter._id);
                     return (
                       <Link
                         key={chapter._id}
@@ -160,8 +185,8 @@ const ListChapters = () => {
                           <span
                             className="text-gray-400 hover:text-blue-500 cursor-pointer flex-shrink-0"
                             onClick={(e) => {
-                              e.preventDefault()
-                              handleCompleteChapter(chapter._id)
+                              e.preventDefault();
+                              handleCompleteChapter(chapter._id);
                             }}
                           >
                             <svg
@@ -179,7 +204,7 @@ const ListChapters = () => {
                           </span>
                         )}
                       </Link>
-                    )
+                    );
                   })}
                 </div>
 
@@ -196,8 +221,21 @@ const ListChapters = () => {
                   >
                     {loading ? "Loading..." : "Start Exam"}
                   </button>
+                  <button
+                    onClick={() => handleEarnCertificate("Trelix")}
+                    disabled={!areAllChaptersCompleted() || loading}
+                    className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                      areAllChaptersCompleted() && !loading
+                        ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+                        : "bg-gray-400 cursor-not-allowed d-non"
+                    }`}
+                  >
+                    {loading ? "Loading..." : "Earn Certificate"}
+                  </button>
                   {!areAllChaptersCompleted() && !loading && (
-                    <p className="text-sm text-gray-500 mt-2">Complete all chapters to unlock the exam</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Complete all chapters to unlock the exam
+                    </p>
                   )}
                 </div>
               </aside>
@@ -212,8 +250,7 @@ const ListChapters = () => {
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default ListChapters
-
+export default ListChapters;
