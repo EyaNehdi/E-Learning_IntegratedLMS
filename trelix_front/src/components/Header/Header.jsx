@@ -394,7 +394,9 @@ function Header() {
                                     href="/profile/settings"
                                   >
                                     <i className="feather-icon icon-shopping-bag" />
+
                                     <span>Security</span>
+
                                   </a>
                                 </li>
                                 <ul>
