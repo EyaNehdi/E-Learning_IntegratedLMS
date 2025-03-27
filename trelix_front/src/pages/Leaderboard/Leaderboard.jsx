@@ -1,5 +1,5 @@
-import DailyQuizz from "../../components/dailyQuizz"
-import Leader from "../../components/Leader"
+import DailyQuizz from "../../components/Leaderboard/DailyQuizz"
+import Leader from "../../components/Leaderboard/Leader"
 import axios from 'axios';
 import { useState,useEffect } from "react";
 import io from 'socket.io-client';
@@ -104,20 +104,12 @@ useEffect(() => {
 return (
   <>
   <Leader />
-  {/* Wrapper for positioning DailyQuizz */}
-  <div style={{
-      position: "absolute",
-      right: "0px",  // Adjust to move it to the right
-      top: "0px",   // Adjust to move it down
-      width: "unset",  // Prevents forced shrinking
-      maxWidth: "100%", // Ensures it doesn’t go beyond screen width
-    }}>
-      <DailyQuizz />
-    </div>
+
+    <div>
     <div style={{
       position: "absolute",
-      right: "400px",
-      top: "600px",
+      right: "650px",
+      top: "200px",
       textAlign: "center",
       fontSize: "24px",
       fontWeight: "bold",
@@ -139,18 +131,26 @@ return (
       ) : (
       <p>Loading quiz...</p>
       )}
+        <DailyQuizz />
   </div>
+
   <ul style={{
       position: "absolute",
-      right: "300px",
-      top: "700px",
+      right: "450px",
+      top: "400px",
       listStyle: "circle",
       textAlign:"left",
       fontWeight:"bold"
       }}>
+        
               <li>You will get 5 questions</li>
+              <li>Your score would be displayed in the leaderboard</li>
               <li>Play and earn points to have access to our paid courses</li>
+              <li>You can also win badges for playing daily</li>
+              <li>Good luck!</li>
             </ul>
+            </div>
+            
   </>
 )
 

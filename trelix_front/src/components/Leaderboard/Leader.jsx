@@ -1,4 +1,4 @@
-import "./css/Leader.css";
+import "../css/Leader.css";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import axios from "axios";
@@ -45,8 +45,11 @@ function Leader() {
                       {user.profilePhoto && (
                         <img src={`http://localhost:5000${user.profilePhoto}`} alt="profile" className="leaderboard-profile-pic" />
                       )}
+                      </td>
+                      <td className="leaderboard-name">
                       {user.firstName} {user.lastName}
-                    </td>
+                      </td>
+                    
                     <td className="leaderboard-score">{user.totalScore.toFixed(2)}</td>
                   </tr>
                 ))

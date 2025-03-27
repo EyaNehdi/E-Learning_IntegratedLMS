@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import '../../components/css/QuizzLeaderboard.css';
 import { useAuthStore } from "../../store/authStore";
+import Swal from "sweetalert2";
 function QuizzLeaderboard() {
     const navigate = useNavigate();
     const { user, isAuthenticated } = useAuthStore();
@@ -75,8 +76,12 @@ function QuizzLeaderboard() {
             }, {
                 headers: { Authorization: `Bearer ${user?.token}` }
             });
-    
-            alert(`Quiz completed! Your score: ${res.data.attempt.score}`);
+            Swal.fire({
+                icon: "success",
+                title: "Quiz Completed",
+                text: `Your score: ${res.data.attempt.score}`,
+                confirmButtonColor: "#3085d6",
+            });
             navigate("/leaderboard");
         } catch (error) {
             console.error("Error submitting quiz:", error);
