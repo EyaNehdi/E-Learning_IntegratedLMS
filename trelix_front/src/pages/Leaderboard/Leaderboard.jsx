@@ -132,9 +132,11 @@ return (
             <div className="quiz-instructions-container">
               <ul>
                 <li>You will get 5 questions</li>
-                <li>Your score will be displayed in the leaderboard</li>
-                <li>Play and earn points to access our paid courses</li>
-                <li>You can also win badges for playing daily</li>
+                <li>Your score will be displayed in the leaderboard.</li>
+                <li>Play and earn points to access our paid courses.</li>
+                <li>Be careful , You have to answer within the time limit.</li>
+                <li>Try to manage your time.</li>
+                <li>You can also win badges for playing daily.</li>
                 <li>Good luck!</li>
               </ul>
             </div>

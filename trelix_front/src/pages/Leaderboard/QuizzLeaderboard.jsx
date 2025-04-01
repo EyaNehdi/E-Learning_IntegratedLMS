@@ -4,6 +4,7 @@ import axios from "axios";
 import '../../components/css/QuizzLeaderboard.css';
 import { useAuthStore } from "../../store/authStore";
 import Swal from "sweetalert2";
+import QuizProgressBar from "../../components/Leaderboard/QuizzProgressBar";
 function QuizzLeaderboard() {
     const navigate = useNavigate();
     const { user, isAuthenticated } = useAuthStore();
@@ -94,6 +95,12 @@ function QuizzLeaderboard() {
     const currentQuestion = questions[currentQuestionIndex];
     return (
         <div className="quiz-container" >
+            <QuizProgressBar 
+    totalQuestions={questions.length} 
+    answeredQuestions={Object.keys(answers).length} 
+    onTimeUp={handleSubmit} 
+/>
+
             <h2>Question Number :  {currentQuestionIndex + 1} / {questions.length}</h2>
             <p>{currentQuestion?.question}</p>
 
