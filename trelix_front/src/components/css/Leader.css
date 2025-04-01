@@ -5,10 +5,9 @@
 }
 
 .leaderboard-main {
-  width: 40rem;
-  height: 43rem;
-  background-color: #ffffff;
-  box-shadow: 0px 5px 15px 8px #e4e7fb;
+  width: 800px;
+  height: 688px;
+  background-color: #d7d7d7;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,7 +32,7 @@
 .leaderboard-content {
   width: 100%;
   position: relative;
-  overflow-y: auto;
+  overflow-y:auto;
   
 }
 
@@ -51,7 +50,6 @@
 .leaderboard-row:not(:first-child):hover {
   background-color: #fff;
   transform: scale(1.05);
-  box-shadow: 0px 5px 15px 8px #e4e7fb;
 }
 
 
@@ -64,6 +62,7 @@
   font-weight: bold;
   text-align: left;
   padding: 1rem 2rem;
+  width: 4rem;
 }
 
 .leaderboard-name {
@@ -95,55 +94,23 @@
 }
 .leaderboard-row:first-child {
   position: relative;
-  z-index: 10; /* Ensures it appears above the ribbon */
+  z-index: 5;
   background-color: gold; /* Highlight first place */
   color: #141a39; /* Keep text readable */
   font-weight: bold;
-  transform: scale(1.1); /* Make it slightly larger */
   box-shadow: 0px 5px 20px 5px rgba(255, 215, 0, 0.5); /* Glowing effect */
   border-radius: 0.5rem;
+  overflow: visible;
 }
 .leaderboard-row:first-child:hover {
+  transform: scale(1.05);
   background-color: #ffd700; /* Slightly lighter gold */
-  transform: scale(1.15); /* Increase size a bit */
   box-shadow: 0px 10px 25px 8px rgba(255, 215, 0, 0.6); /* Stronger glow */
   transition: all 0.3s ease-in-out;
   cursor: pointer; /* Indicate it's interactive */
 }
 
 
-
-/* Styling for the top ribbon */
-.leaderboard-ribbon {
-  width: 42rem;
-  height: 5.5rem;
-  top: -0.5rem;
-  background-color: #5c5be5;
-  position: absolute;
-  left: -1rem;
-  box-shadow: 0px 15px 11px -6px #7a7a7d;
-}
-
-.leaderboard-ribbon::before,
-.leaderboard-ribbon::after {
-  content: "";
-  height: 1.5rem;
-  width: 1.5rem;
-  bottom: -0.8rem;
-  background-color: #5c5be5;
-  position: absolute;
-  z-index: -1;
-}
-
-.leaderboard-ribbon::before {
-  left: 0.35rem;
-  transform: rotate(45deg);
-}
-
-.leaderboard-ribbon::after {
-  right: 0.35rem;
-  transform: rotate(45deg);
-} 
 
 /* Responsive Design */
 @media (max-width: 740px) {

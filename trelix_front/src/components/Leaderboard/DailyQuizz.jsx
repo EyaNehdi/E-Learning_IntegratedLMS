@@ -1,9 +1,10 @@
-import './css/dailyQuizz.css';
+// import '../css/dailyQuizz.css';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
 import { useEffect,useState } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
+import Swal from "sweetalert2";
 function DailyQuizz() {
     const { user, isAuthenticated } = useAuthStore();
     const navigate = useNavigate();
@@ -49,9 +50,19 @@ return () => {
 
                 // Check if the user has already passed the quiz
                 if (res.data.passed) {
-                  alert("You have already passed this quiz! Come back tomorrow for a new one.");
+                    Swal.fire({
+                        icon: "info",
+                        title: "Quiz Completed",
+                        text: "You have already passed this quiz! Come back tomorrow for a new one.",
+                        confirmButtonColor: "#3085d6",
+                    });
               } else if (res.data.attempted) {
-                  alert("You have already attempted this quiz today. Come back tomorrow.");
+                Swal.fire({
+                    icon: "warning",
+                    title: "Already Attempted",
+                    text: "You have already attempted this quiz today. Come back tomorrow.",
+                    confirmButtonColor: "#f39c12",
+                });
               } else {
                   navigate("/quiz");
               }
@@ -62,16 +73,18 @@ return () => {
             console.error("Error checking attempt:", error.response?.data || error.message); // Log detailed error message
         }
     } else {
-        alert("You need to be logged in to join the quiz!");
+        Swal.fire({
+            icon: "error",
+            title: "Not Logged In",
+            text: "You need to be logged in to join the quiz!",
+            confirmButtonColor: "#d33",
+        });
     }
 };
 
   return (
     <div id="container">
     <div className="container-inner">
-      <div className="content">
-        <p className="typing">Daily quiz available...</p>
-      </div>
       <div className="buttons">
       {loading ? (
                         <p>Loading...</p>
