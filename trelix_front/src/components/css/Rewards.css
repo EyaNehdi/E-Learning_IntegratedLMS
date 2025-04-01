@@ -1,0 +1,48 @@
+.rewards {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    border: 2px solid #000;
+    padding: 15px;
+    width: 120px; /* Slightly wider for better fit */
+    height: auto;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+/* Reduce font size and make it responsive */
+.rewards h2 {
+    font-size: 1rem; /* Smaller font */
+    margin-bottom: 5px;
+}
+
+.rewards p {
+    font-size: 0.8rem; /* Adjust text size */
+    max-width: 100%; /* Prevent overflow */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+/* Ensure images fit within the container */
+.rewards img {
+    max-width: 80%;
+    height: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+    .rewards {
+        width: 100px; /* Adjust container size */
+        padding: 10px;
+    }
+
+    .rewards h2 {
+        font-size: 0.9rem; /* Scale down */
+    }
+
+    .rewards p {
+        font-size: 0.7rem;
+    }
+}
