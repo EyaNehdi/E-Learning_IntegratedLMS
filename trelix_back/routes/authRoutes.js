@@ -7,13 +7,15 @@ const { registerStudent,
        registerInstructorLinkedin,
        registerStudentLinkedin,
        markChapterAsCompleted,
-       signInlinkedin} = require('../controllers/authController');
+       signInlinkedin,
+       trackCurrentLocation} = require('../controllers/authController');
 const { verifyToken } = require ('../middlewares/verifyToken.js');
 const { validateInput } = require ('../middlewares/validators.js');
 
 router.get('/check-auth', verifyToken, checkAuth);
 router.post('/register/student', validateInput,registerStudent);
 
+router.get('/current-location', verifyToken, trackCurrentLocation);
 
 router.post('/register/instructor',validateInput ,registerInstructor);
 
@@ -33,4 +35,7 @@ router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", forgotPassword );
 router.post("/reset-password/:token", resetPassword);
 router.get("/completedchapters", markChapterAsCompleted);
+
+
+
 module.exports = router;

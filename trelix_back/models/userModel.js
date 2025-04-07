@@ -46,6 +46,13 @@ const User = new Schema({
     enum: ["superAdmin", "admin", "student", "instructor"]
   },
   accountCreatedAt: { type: Date, default: Date.now },
+  lastLoginLocation: {
+    ip: String,
+    city: String,
+    region: String,
+    country: String,
+    loggedInAt: Date
+  },
 },
   { timestamps: true });
 // Hashing Password
