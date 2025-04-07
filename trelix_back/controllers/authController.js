@@ -616,6 +616,61 @@ const signOut = async (req, res) => {
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
+
+const trackCurrentLocation = async (req, res) => {
+  console.log("User ID from Token:", req.userId); // Log this to verify it is available here
+
+  if (!req.userId) return res.status(400).json({ error: "User ID not found in token" });
+
+  try {
+      let location;
+      try {
+          const ipResponse = await fetch("https://api.ipify.org?format=json");
+          const ipData = await ipResponse.json();
+          const ip = ipData.ip;
+          
+          const geoResponse = await fetch(`https://ipinfo.io/${ip}/json`);
+          location = await geoResponse.json();
+
+          console.log("Location Data:", location);
+
+          const user = await User.findById(req.userId);
+          if (!user) return res.status(404).json({ error: "User not found" });
+
+          user.lastLoginLocation = {
+              city: location.city || "Unknown",
+              region: location.region || "",
+              country: location.country || "Unknown",
+              loggedInAt: new Date(),
+          };
+
+          await user.save();
+          res.json({ message: "Location updated", location: user.lastLoginLocation ,userId: req.userId, userData: user });
+      } catch (apiError) {
+          console.error("API Error:", apiError);
+          if (req.userId) {
+              const user = await User.findById(req.userId);
+              if (user) {
+                  user.lastLoginLocation = {
+                      city: "Fallback City",
+                      region: "",
+                      country: "Fallback Country",
+                      loggedInAt: new Date(),
+                  };
+                  await user.save();
+                  return res.json({ message: "Using fallback location due to API errors", location: user.lastLoginLocation });
+              }
+          }
+          return res.status(500).json({ error: "Could not fetch location data" });
+      }
+  } catch (err) {
+      console.error("Failed to track location:", err);
+      res.status(500).json({ error: "Could not update location" });
+  }
+};
+
+
+
 module.exports = { signIngithub,
    signIngoogle, 
    registerStudentgithub, 
@@ -633,6 +688,7 @@ module.exports = { signIngithub,
           registerInstructorLinkedin,
            registerStudentLinkedin,
            signInlinkedin,
-           markChapterAsCompleted
+           markChapterAsCompleted,
+           trackCurrentLocation
         };
 

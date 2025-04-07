@@ -6,7 +6,7 @@ import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
 
 const ProfileDetails = () => {
-  const { user, accountCompletion, updateUser } = useOutletContext();
+  const { user, accountCompletion, updateUser, locationData } = useOutletContext();
 
   const [isEditing, setIsEditing] = useState(false);
   let timeoutId;
@@ -110,12 +110,23 @@ const ProfileDetails = () => {
       setIsLoading(false); // End loading regardless of success or failure
     }
   };
+  useEffect(() => {
+    // Set isLoading to false when the user data is available
+    if (user) {
+      setIsLoading(false);
+      console.log("User data loaded:", user);
+    }
+  }, [user]);
 
   // Function to navigate to the password change page
   const handleChangePassword = () => {
     navigate("/profile/change-password"); // Corrected path
   };
-
+// Extracting location from user
+const city = locationData?.city || "Unknown City";
+const region = locationData?.region || "Unknown Region";
+const country = locationData?.country || "Unknown Country";
+const lastLoggedInAt = locationData?.loggedInAt || "Unknown Date";
   return (
     <div className="d-flex justify-content-center align-items-start">
       <div className="bg-white rounded-lg w-full max-w-2xl p-8">
@@ -123,7 +134,16 @@ const ProfileDetails = () => {
           <>
             {/* Profile Info */}
             <ul className="space-y-3 text-gray-700">
-              {[
+              {[{
+  label: "Location",
+  value: `${city}${region ? `, ${region}` : ''}${country ? `, ${country}` : ''}`,
+  name: "location"
+},
+                {
+                  label: "Last Logged In At",
+                  value: `${lastLoggedInAt}`,
+                  name: "loggedInAt"
+                },
                 {
                   label: "UserName",
                   value: `${user?.firstName} ${user?.lastName}`,

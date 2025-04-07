@@ -350,14 +350,14 @@ function Header() {
                                   />
                                 ) : (
                                   <span>
-                                    {user?.firstName ? (
-                                      <>
-                                        {user.firstName.charAt(0)}
-                                        {user.lastName.charAt(0)}
-                                      </>
-                                    ) : (
-                                      "?"
-                                    )}
+                                   {user?.firstName && user?.lastName ? (
+  <>
+    {user.firstName.charAt(0)}
+    {user.lastName.charAt(0)}
+  </>
+) : (
+  "?"
+)}
                                   </span>
                                 )}
                               </div>
