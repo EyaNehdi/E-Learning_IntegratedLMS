@@ -2,9 +2,90 @@ const Certificate = require("../models/Certificate");
 const User = require("../models/userModel");
 const Course = require("../models/course");
 
-const generateVerificationCode = () => {
-    return Math.random().toString(36).substring(2, 10).toUpperCase();
-};
+const fs = require('fs');
+const fontkit = require('fontkit');
+const { PDFDocument, rgb } = require('pdf-lib');
+const path = require('path');
+const QRCode = require('qrcode');
+
+async function generateCertificate(user, course) {
+    const templatePath = path.join(__dirname, '../templates-cert/certificate_design_trelix.pdf');
+    const templateBytes = fs.readFileSync(templatePath);
+    const pdfDoc = await PDFDocument.load(templateBytes);
+
+    pdfDoc.registerFontkit(fontkit);
+
+    const greatVibesFontBytes = fs.readFileSync(path.join(__dirname, '../templates-cert/fonts/GreatVibes-Regular.ttf'));
+    const caviarBoldFontBytes = fs.readFileSync(path.join(__dirname, '../templates-cert/fonts/CaviarDreams_Bold.ttf'));
+    const openSansSemiBoldFontBytes = fs.readFileSync(path.join(__dirname, '../templates-cert/fonts/OpenSans-SemiBold.ttf'));
+    const greatVibesFont = await pdfDoc.embedFont(greatVibesFontBytes);
+    const caviarBoldFont = await pdfDoc.embedFont(caviarBoldFontBytes);
+    const openSansFont = await pdfDoc.embedFont(openSansSemiBoldFontBytes);
+
+    const pages = pdfDoc.getPages();
+    const firstPage = pages[0];
+    const { width, height } = pages[0].getSize();
+    
+    const Student_Name = [user.firstName, user.lastName]
+        .filter(Boolean)
+        .join('\u00A0')
+        .trim();
+    const Student_Name_textWidth = greatVibesFont.widthOfTextAtSize(Student_Name, 64);
+    
+    firstPage.drawText(Student_Name, {
+        x: ((width - Student_Name_textWidth) / 2),
+        y: 250,
+        size: 64,
+        font: greatVibesFont,
+        color: rgb(0, 0, 0)
+    });
+
+    const Course_Name = `${course.title}`;
+    const Course_Name_textWidth = caviarBoldFont.widthOfTextAtSize(Course_Name, 24);
+    
+    firstPage.drawText(Course_Name, {
+        x: ((width - Course_Name_textWidth) / 2),
+        y: 160,
+        size: 24,
+        font: caviarBoldFont,
+        color: rgb(0, 0, 0)
+    });
+
+    // Insert Date Acquired
+    const acquiredDate = new Date().toLocaleDateString();
+    firstPage.drawText(acquiredDate, {
+        x: 270,
+        y: 70,
+        size: 12,
+        font: openSansFont,
+        color: rgb(0, 0, 0)
+    });
+    const cleanTitle = course.title.replace(/\s+/g, '');
+    // Generate QR Code for verification
+    const verificationCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const qrCodeDir = path.join(__dirname, "../certificates");
+    const qrCodePath = path.join(qrCodeDir, `qrcode-${user._id}-${cleanTitle}.png`);
+    await QRCode.toFile(qrCodePath, `http://localhost:5173/verify/${verificationCode}`);
+
+    // Embed QR Code in the PDF
+    const qrImageBytes = fs.readFileSync(qrCodePath);
+    const qrImage = await pdfDoc.embedPng(qrImageBytes);
+    firstPage.drawImage(qrImage, {
+        x: 680,
+        y: 75,
+        width: 100,
+        height: 100
+    });
+
+    // Save the PDF
+    const pdfBytes = await pdfDoc.save();
+    
+    const certificateDir = path.join(__dirname, `../certificates/certificate-${user._id}-${cleanTitle}.pdf`);
+    fs.writeFileSync(certificateDir, pdfBytes);
+    const certificatePath = `/certificates/certificate-${user._id}-${cleanTitle}.pdf`;
+    // sendCertificateEmail(user.email, certificatePath);
+    return { certificatePath: certificatePath, verificationCode: verificationCode };
+}
 
 const issueCertificate = async (req, res) => {
     try {
@@ -25,9 +106,8 @@ const issueCertificate = async (req, res) => {
         if (user.certificatesOwned.some(cert => cert.certificateId && cert.certificateId.courseId.equals(courseId))) {
             return res.status(400).json({ error: "Certificate already earned for this course" });
         }
-
         let existingCertificate = await Certificate.findOne({ courseId });
-
+        const certifInfo = generateCertificate(user, course);
         if (!existingCertificate) {
             existingCertificate = new Certificate({
                 name: courseName,
@@ -36,6 +116,7 @@ const issueCertificate = async (req, res) => {
                 category: "Course Completion",
                 provider: provider,
                 providerLogo: provider === "Trelix" ? "/assets/images/ss.png" : null,
+                certificateFile: `/templates-cert/certificate-template.pdf`,
                 external: provider !== "Trelix",
             });
 
@@ -45,8 +126,8 @@ const issueCertificate = async (req, res) => {
         user.certificatesOwned.push({
             certificateId: existingCertificate._id,
             acquiredOn: new Date(),
-            verificationCode: generateVerificationCode(),
-            pdfUrl: `/certificates/${existingCertificate._id}.pdf`,
+            verificationCode: (await certifInfo).verificationCode,
+            pdfUrl: (await certifInfo).certificatePath,
         });
 
         await user.save();
@@ -127,6 +208,7 @@ const getAllCertifWithOwnedStatus = async (req, res) => {
                 acquiredOn: ownedData?.acquiredOn || null,
                 verificationCode: ownedData?.verificationCode || null,
                 pdfUrl: ownedData?.pdfUrl || null,
+                certificateOwnedId: ownedData?._id || null,
             };
         });
 
@@ -158,7 +240,7 @@ const getUserAchievements = async (req, res) => {
         const enrolledCourses = [
             ...new Set(user.completedChapters.map(chapter => chapter.courseId.toString())),
         ];
-        
+
         const completedCourses = user.certificatesOwned.map(cert => cert.certificateId.toString());
 
         const coursesEnrolled = enrolledCourses.length;

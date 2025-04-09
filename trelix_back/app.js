@@ -16,8 +16,8 @@ var mfaRoutes = require('./routes/mfaRoutes');
 const profileRoutes = require("./routes/profileRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const quizzRoutes = require("./routes/quizzRoutes");
-const Module =require("./routes/module");
-const Course =require("./routes/course");
+const Module = require("./routes/module");
+const Course = require("./routes/course");
 
 
 var app = express();
@@ -30,7 +30,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
-app.use(express.json({ limit: '100mb' }));  
+app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -43,7 +43,7 @@ app.use(cors({
 }));;
 // In app.js
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+app.use('/certificates', express.static(path.join(__dirname, 'certificates')));
 
 app.use('/ia', require('./routes/ia'));
 app.use('/', indexRouter);
@@ -57,7 +57,7 @@ app.use('/delete', Course);
 //auth routes
 const ExamRoutes = require('./routes/ExamRoutes');
 const quizRoutes = require('./routes/quizRoutes');
-const authRouteschapter = require('./routes/chapterRoutes'); 
+const authRouteschapter = require('./routes/chapterRoutes');
 const authRoutes = require('./routes/authRoutes');
 const authRoutesIA = require('./routes/ia');
 const certifRoutes = require('./routes/certif.routes');
@@ -67,8 +67,8 @@ app.use('/chapter', authRouteschapter);
 app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
 app.use("/api/admin", adminRoutes);
-app.use ("/api/quiz",quizzRoutes);
-app.use ("/certificates",certifRoutes);
+app.use("/api/quiz", quizzRoutes);
+app.use("/certificates", certifRoutes);
 
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
@@ -80,12 +80,12 @@ app.use((err, req, res, next) => {
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -104,7 +104,7 @@ async function startApp() {
 
   // Connect to MongoDB
   try {
-    const db = await connectDB(); 
+    const db = await connectDB();
     console.log(" Connected to MongoDB!");
   } catch (error) {
     console.error(" MongoDB connection failed:", error);
@@ -131,7 +131,7 @@ const io = socketIo(server, {
   }
 });
 // Socket Initialization
-const { initializeSocket } = require('./controllers/quizzLeaderboardController'); 
+const { initializeSocket } = require('./controllers/quizzLeaderboardController');
 initializeSocket(io);  // Pass the socket instance to the controller
 module.exports = app;
 
