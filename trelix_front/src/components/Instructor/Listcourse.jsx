@@ -91,6 +91,7 @@ function Listcourse() {
     Add New Course
   </a>
 </li>
+
         </ul>
       </div>
 
@@ -137,13 +138,12 @@ function Listcourse() {
                         </h3>
                         <div className="course-footer d-flex align-items-center justify-content-between pt-3">
                           <div className="price">
-                            {course.price}$<del>$35.00</del>
+                          {course.price === 0 ? "Gratuit" : course.price}<del>$10.00</del>
                           </div>
                           <div className="d-flex gap-2">
                           <a
   className="btn btn-sm btn-primary d-flex align-items-center"
   onClick={() => handleEdit(course._id)}
-  >
 
   <i className="feather-icon icon-edit me-2" />
   Edit
@@ -152,11 +152,12 @@ function Listcourse() {
 <a
   className="btn btn-sm btn-danger d-flex align-items-center"
   onClick={() => handleDelete(course._id)}
-  >
 
   <i className="feather-icon icon-trash me-2" />
   Delete
 </a>
+
+
                             
                           </div>
                         </div>

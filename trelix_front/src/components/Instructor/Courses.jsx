@@ -5,7 +5,8 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useOutletContext } from "react-router-dom"
 import { AlertCircle, CheckCircle2, Info } from "lucide-react"
-
+import { CKEditor } from "@ckeditor/ckeditor5-react"
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
 
 function Courses() {
   const [title, setTitle] = useState("")
@@ -21,6 +22,17 @@ function Courses() {
   const [showGiftModal, setShowGiftModal] = useState(false)
   const [giftType, setGiftType] = useState("")
 
+  // Nouvel état pour la devise
+  const [currency, setCurrency] = useState("eur")
+
+  // Symboles des devises
+  const currencySymbols = {
+    usd: "$",
+    eur: "€",
+    dzd: "د.ج",
+    free: "",
+  }
+
   // État pour gérer les erreurs par champ
   const [errors, setErrors] = useState({
     title: "",
@@ -35,6 +47,50 @@ function Courses() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const navigate = useNavigate()
+
+  // CKEditor configuration to match the image
+  const editorConfig = {
+    toolbar: [
+      "heading",
+      "|",
+      "fontFamily",
+      "fontSize",
+      "fontColor",
+      "fontBackgroundColor",
+      "|",
+      "bold",
+      "italic",
+      "underline",
+      "strikethrough",
+      "|",
+      "link",
+      "insertTable",
+      "|",
+      "bulletedList",
+      "numberedList",
+      "indent",
+      "outdent",
+      "|",
+      "alignment",
+      "|",
+      "undo",
+      "redo",
+      "|",
+      "imageUpload",
+      "blockQuote",
+      "insertImage",
+      "mediaEmbed",
+    ],
+    // Custom styling to match the image
+    styles: {
+      editable: {
+        border: "1px solid #ccc",
+        borderRadius: "4px",
+        padding: "10px",
+        minHeight: "200px",
+      },
+    },
+  }
 
   // Fonction pour récupérer les modules
   const fetchModules = async () => {
@@ -78,9 +134,18 @@ function Courses() {
     }
   }, [message])
 
+  // Function to strip HTML tags for validation
+  const stripHtml = (html) => {
+    const tmp = document.createElement("DIV")
+    tmp.innerHTML = html
+    return tmp.textContent || tmp.innerText || ""
+  }
+
   // Fonction pour valider que le texte contient au moins 10 caractères alphabétiques
   const validateMinAlphaChars = (text, minLength = 5) => {
-    const alphaCount = (text.match(/[a-zA-Z]/g) || []).length
+    // Strip HTML tags if the text contains HTML
+    const plainText = text.includes("<") ? stripHtml(text) : text
+    const alphaCount = (plainText.match(/[a-zA-Z]/g) || []).length
     return alphaCount >= minLength
   }
 
@@ -154,6 +219,15 @@ function Courses() {
     setFormProgress(progress)
   }
 
+  // Fonction pour gérer le changement de devise
+  const handleCurrencyChange = (value) => {
+    setCurrency(value)
+    if (value === "free") {
+      setPrice("0")
+      handleInputChange("price", "0")
+    }
+  }
+
   // Update handleInputChange to calculate progress after each change
   const handleInputChange = (field, value, validator = null) => {
     // Mettre à jour la valeur du champ
@@ -202,6 +276,7 @@ function Courses() {
       price,
       level,
       categorie,
+      currency, // Ajout de la devise
       moduleId: selectedModules,
     })
 
@@ -222,6 +297,7 @@ function Courses() {
         price,
         level,
         categorie,
+        currency, // Ajout de la devise
         moduleId: selectedModules[0],
         userId: user._id, // Envoyer seulement le premier module sélectionné
       })
@@ -243,6 +319,7 @@ function Courses() {
         setPrice("")
         setLevel("")
         setCategorie("")
+        setCurrency("eur") // Réinitialiser la devise
         setSelectedModules([])
         setErrors({
           title: "",
@@ -351,17 +428,88 @@ function Courses() {
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700">
                     Prix <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    id="price"
-                    type="number"
-                    value={price}
-                    onChange={(e) => handleInputChange("price", e.target.value)}
-                    placeholder="Prix du cours"
-                    className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
-                      errors.price ? "border-red-500" : "border-gray-300"
-                    }`}
-                    required
-                  />
+
+                  {/* Boutons radio pour la sélection de devise */}
+
+                  {/* Champ de prix avec symbole de devise */}
+                  <div className="relative">
+                    <input
+                      id="price"
+                      type="number"
+                      value={price}
+                      onChange={(e) => handleInputChange("price", e.target.value)}
+                      placeholder="Prix du cours"
+                      className={`w-full p-3 pl-8 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
+                        errors.price ? "border-red-500" : "border-gray-300"
+                      }`}
+                      required
+                      disabled={currency === "free"}
+                    />
+                    <div className="flex gap-4 mb-4">
+                      <div className="flex items-center space-x-1">
+                        <input
+                          type="radio"
+                          id="usd"
+                          name="currency"
+                          value="usd"
+                          checked={currency === "usd"}
+                          onChange={() => handleCurrencyChange("usd")}
+                          className="hidden peer"
+                        />
+                        <label
+                          htmlFor="usd"
+                          className="text-sm text-gray-700 cursor-pointer peer-checked:text-blue-500 peer-checked:bg-blue-100 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-300 transition-all duration-300 ease-in-out flex items-center space-x-2 px-4 py-2 rounded-lg"
+                        >
+                          <span className="h-6 w-6 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:bg-blue-500">
+                            <span className="w-3 h-3 bg-white rounded-full peer-checked:block hidden"></span>
+                          </span>
+                          Dollar($)
+                        </label>
+                      </div>
+
+                      <div className="flex items-center space-x-1">
+                        <input
+                          type="radio"
+                          id="eur"
+                          name="currency"
+                          value="eur"
+                          checked={currency === "eur"}
+                          onChange={() => handleCurrencyChange("eur")}
+                          className="hidden peer"
+                        />
+                        <label
+                          htmlFor="eur"
+                          className="text-sm text-gray-700 cursor-pointer peer-checked:text-green-500 peer-checked:bg-green-100 peer-checked:border-green-500 peer-checked:ring-2 peer-checked:ring-green-300 transition-all duration-300 ease-in-out flex items-center space-x-2 px-4 py-2 rounded-lg"
+                        >
+                          <span className="h-6 w-6 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:bg-green-500">
+                            <span className="w-3 h-3 bg-white rounded-full peer-checked:block hidden"></span>
+                          </span>
+                          Euro(€)
+                        </label>
+                      </div>
+
+                      <div className="flex items-center space-x-1">
+                        <input
+                          type="radio"
+                          id="free"
+                          name="currency"
+                          value="free"
+                          checked={currency === "free"}
+                          onChange={() => handleCurrencyChange("free")}
+                          className="hidden peer"
+                        />
+                        <label
+                          htmlFor="free"
+                          className="text-sm text-gray-700 cursor-pointer peer-checked:text-gray-600 peer-checked:bg-gray-100 peer-checked:border-gray-500 peer-checked:ring-2 peer-checked:ring-gray-300 transition-all duration-300 ease-in-out flex items-center space-x-2 px-4 py-2 rounded-lg"
+                        >
+                          <span className="h-6 w-6 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:bg-gray-500">
+                            <span className="w-3 h-3 bg-white rounded-full peer-checked:block hidden"></span>
+                          </span>
+                          Gratuit
+                        </label>
+                      </div>
+                    </div>
+                  </div>
                   {errors.price && (
                     <div className="text-red-500 text-sm mt-1 flex items-center">
                       <Info className="h-4 w-4 mr-1" />
@@ -375,17 +523,27 @@ function Courses() {
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                   Description <span className="text-red-500">*</span>
                 </label>
-                <textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => handleInputChange("description", e.target.value, validateMinAlphaChars)}
-                  placeholder="Description du cours"
-                  rows={4}
-                  className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
-                    errors.description ? "border-red-500" : "border-gray-300"
-                  }`}
-                  required
-                ></textarea>
+                <div className="border rounded-md overflow-hidden">
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={description}
+                    config={editorConfig}
+                    onChange={(event, editor) => {
+                      const data = editor.getData()
+                      handleInputChange("description", data, validateMinAlphaChars)
+                    }}
+                    onReady={(editor) => {
+                      // You can customize the editor further here
+                      // For example, you can add custom CSS to match the image
+                      const editorElement = editor.ui.getEditableElement()
+                      if (editorElement) {
+                        editorElement.style.minHeight = "200px"
+                        editorElement.style.border = "1px solid #ccc"
+                        editorElement.style.padding = "10px"
+                      }
+                    }}
+                  />
+                </div>
                 {errors.description && (
                   <div className="text-red-500 text-sm mt-1 flex items-center">
                     <Info className="h-4 w-4 mr-1" />
@@ -407,7 +565,11 @@ function Courses() {
                       className={`w-full p-3 border rounded-md appearance-none bg-gray-50 ${
                         errors.level ? "border-red-500" : "border-gray-300"
                       }`}
-                      style={{ display: "block", position: "relative", zIndex: 10 }}
+                      style={{
+                        display: "block",
+                        position: "relative",
+                        zIndex: 10,
+                      }}
                     >
                       <option value="" disabled>
                         Sélectionner un niveau

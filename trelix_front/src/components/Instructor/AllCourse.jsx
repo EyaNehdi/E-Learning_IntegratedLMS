@@ -1,4 +1,4 @@
-
+"use client"
 
 import { useState, useEffect } from "react"
 import axios from "axios"
@@ -19,6 +19,7 @@ const marks = [
   },
 ];
 function Allcourse() {
+
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -27,6 +28,11 @@ function Allcourse() {
   const [minPrice, setMinPrice] = useState(MIN);
   const [maxPrice, setMaxPrice] = useState(MAX);
   const [selectedLevels, setSelectedLevels] = useState([]);
+  const [filters, setFilters] = useState({
+    frontendDev: false,
+    backendDev: false,
+  })
+
 
   const handleChange = (_, newValue) => {
     setVal(newValue);
@@ -37,20 +43,68 @@ function Allcourse() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+
         setLoading(true);
         const response = await axios.get("http://localhost:5000/course/courses");
         console.log("Fetched courses:", response.data); 
         setCourses(response.data);
         setFilteredCourses(response.data); // Initialize with all courses
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching courses:", error);
-        setLoading(false);
-      }
-    };
 
-    fetchCourses();
-  }, []);
+      } catch (error) {
+        console.error("Error fetching courses:", error)
+        setLoading(false)
+      }
+    }
+
+    fetchCourses()
+  }, [])
+
+  // Apply filters when filter state changes
+  useEffect(() => {
+    applyFilters()
+  }, [filters, courses])
+
+  // Handle checkbox changes
+  const handleFilterChange = (filterName) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [filterName]: !prevFilters[filterName],
+    }))
+  }
+
+  // Apply all active filters to courses
+  const applyFilters = () => {
+    let result = [...courses]
+
+    // If no filters are active, show all courses
+    if (!filters.frontendDev && !filters.backendDev) {
+      setFilteredCourses(result)
+      return
+    }
+
+    // Apply module filters
+    if (filters.frontendDev || filters.backendDev) {
+      result = result.filter((course) => {
+        // Check if course has a module
+        if (!course.module) return false
+
+        const moduleName = course.module.name ? course.module.name.toLowerCase() : ""
+
+        if (filters.frontendDev && moduleName.includes("developpement front-end")) {
+          return true
+        }
+
+        if (filters.backendDev && moduleName.includes("developpement back-end")) {
+          return true
+        }
+
+        return false
+      })
+    }
+
+    setFilteredCourses(result)
+  }
 
   // Extract unique categories from courses
   const categories = Array.from(new Set(courses.map(course => course.categorie)));
@@ -118,7 +172,7 @@ function Allcourse() {
 
   return (
     <div>
-      <link rel="stylesheet" href="assets/css/style.css"/>
+      <link rel="stylesheet" href="assets/css/style.css" />
       <section
         className="promo-sec"
         style={{ background: 'url("images/promo-bg.jpg")no-repeat center center / cover' }}
@@ -150,6 +204,7 @@ function Allcourse() {
                 <div className="widget">
                   <h3 className="widget-title">Categories</h3>
                   <div className="widget-inner">
+
         <ul>
           {categories.map((category) => (
             <li key={category}>
@@ -168,6 +223,7 @@ function Allcourse() {
           ))}
         </ul>
       </div>
+
                 </div>{" "}
                 {/* Widget End */}
                 {/* Price filter section with slider */}
@@ -220,13 +276,23 @@ function Allcourse() {
               <div className="course-filters d-flex justify-content-between align-items-center">
                 <div className="result d-sm-flex align-items-center">
                   <p className="m-0">
+                    {filteredCourses.length} cours trouvés
+                    {(filters.frontendDev || filters.backendDev) && (
+                      <span className="ms-2">
+                        {filters.frontendDev
+                          ? "(Developpement Front-end)"
+                          : filters.backendDev
+                            ? "(Developpement Back-end)"
+                            : ""}
+                      </span>
+                    )}
                   </p>
                 </div>
-            
               </div>{" "}
               {/* Course Filter End */}
               <div className="course-lists row gy-4 mt-3">
                 {/* Dynamic course listing */}
+
                 {loading ? (
           <div className="col-12 text-center">
             <p>Loading...</p>
@@ -305,17 +371,22 @@ function Allcourse() {
           </div>
         )}
                 
+
                 {/* Pager Start - Only show if courses exist */}
-                {courses.length > 0 && (
+                {filteredCourses.length > 0 && (
                   <div className="col-lg-12">
                     <div className="pager text-center mt-5">
-                      <a href="#" className="next-btn"> <i className="feather-icon icon-arrow-left" />
+                      <a href="#" className="next-btn">
+                        {" "}
+                        <i className="feather-icon icon-arrow-left" />
                       </a>
                       <span className="current">1</span>
                       <a href="#">2</a>
                       <a href="#">3</a>
                       <a href="#">4</a>
-                      <a href="#" className="prev-btn"> <i className="feather-icon icon-arrow-right" />
+                      <a href="#" className="prev-btn">
+                        {" "}
+                        <i className="feather-icon icon-arrow-right" />
                       </a>
                     </div>
                   </div>
@@ -325,12 +396,9 @@ function Allcourse() {
           </div>
         </div>
       </section>
-     
-
-  
     </div>
-   
   )
 }
 
 export default Allcourse
+
