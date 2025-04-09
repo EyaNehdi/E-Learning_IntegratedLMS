@@ -141,25 +141,22 @@ function Listcourse() {
                           {course.price === 0 ? "Gratuit" : course.price}<del>$10.00</del>
                           </div>
                           <div className="d-flex gap-2">
-                          <a
-  className="btn btn-sm btn-primary d-flex align-items-center"
-  onClick={() => handleEdit(course._id)}
+  <a
+    className="btn btn-sm btn-primary d-flex align-items-center"
+    onClick={() => handleEdit(course._id)}
+  >
+    <i className="feather-icon icon-edit me-2"></i>
+    Edit
+  </a>
 
-  <i className="feather-icon icon-edit me-2" />
-  Edit
-</a>
-
-<a
-  className="btn btn-sm btn-danger d-flex align-items-center"
-  onClick={() => handleDelete(course._id)}
-
-  <i className="feather-icon icon-trash me-2" />
-  Delete
-</a>
-
-
-                            
-                          </div>
+  <a
+    className="btn btn-sm btn-danger d-flex align-items-center"
+    onClick={() => handleDelete(course._id)}
+  >
+    <i className="feather-icon icon-trash me-2"></i>
+    Delete
+  </a>
+</div>
                         </div>
                       </div>
                     </div>
