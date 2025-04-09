@@ -16,6 +16,7 @@ router.get('/auth/callback', (req, res) => {
 router.get('/courses', (req, res) => {
   console.log('Route /courses appelée');
   googleClassroomController.getAllCourses(req, res);
+  
 });
 
 module.exports = router;

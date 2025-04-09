@@ -12,6 +12,7 @@ const getAllCourses = async (userId) => {
       throw new Error('Utilisateur non authentifié avec Google Classroom');
     }
     
+    
     // Vérifier si le token est expiré et le rafraîchir si nécessaire
     if (userAuth.isTokenExpired() && userAuth.refreshToken) {
       oauth2Client.setCredentials({

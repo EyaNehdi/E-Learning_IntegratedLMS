@@ -20,6 +20,7 @@ const GoogleAuth = () => {
       } finally {
         setLoading(false)
       }
+      
     }
 
     fetchAuthUrl()

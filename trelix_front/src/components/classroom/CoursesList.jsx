@@ -111,6 +111,7 @@ const CoursesList = () => {
                 <i className="fas fa-folder"></i>
               </button>
             </div>
+            
           </div>
         ))}
       </div>

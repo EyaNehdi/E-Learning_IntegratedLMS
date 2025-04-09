@@ -4,6 +4,7 @@ const googleClassroomService = require('../services/googleClassroom.service');
 
 // Contrôleur pour obtenir l'URL d'authentification
 const getGoogleAuthUrl = (req, res) => {
+  
   try {
     const authUrl = getAuthUrl();
     console.log('URL d\'authentification générée:', authUrl);

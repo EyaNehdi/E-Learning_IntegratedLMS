@@ -12,6 +12,7 @@ const handleGoogleCallback = async (req, res) => {
                       } catch (error) {
                         // Gestion des erreurs...
                       }
+                      
                     };
                     
                     // De même pour getAllCourses :

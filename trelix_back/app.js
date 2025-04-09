@@ -143,6 +143,7 @@ const io = socketIo(server, {
   }
 });
 
+
 // Socket Initialization
 const { initializeSocket } = require('./controllers/quizzLeaderboardController'); 
 initializeSocket(io);  // Pass the socket instance to the controller

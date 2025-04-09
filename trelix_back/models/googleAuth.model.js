@@ -15,6 +15,7 @@ const googleAuthSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
     },
+    
     expiryDate: {
       type: Date,
     },

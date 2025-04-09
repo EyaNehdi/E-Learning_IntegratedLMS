@@ -6,6 +6,7 @@ const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
 
+
 // Vérifiez que les identifiants sont bien définis
 if (!CLIENT_ID || !CLIENT_SECRET || !REDIRECT_URI) {
   console.error('ERREUR: Variables d\'environnement Google manquantes!');
