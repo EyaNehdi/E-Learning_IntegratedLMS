@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { useProfileStore } from "../../store/profileStore"
-import { Link, Outlet, useParams, useNavigate } from "react-router-dom"
+import { Link, useParams, useNavigate } from "react-router-dom"
 
 const ListChapters = () => {
   const { id, courseid } = useParams()
@@ -13,6 +13,7 @@ const ListChapters = () => {
   const [completedChapters, setCompletedChapters] = useState([])
   const { user, fetchUser, clearUser } = useProfileStore()
   const [loading, setLoading] = useState(true)
+  const [courseDetails, setCourseDetails] = useState(null)
 
   // Fetch the user data on mount
   useEffect(() => {
@@ -24,6 +25,26 @@ const ListChapters = () => {
   }, [user])
 
   console.log("Course ID:", id)
+
+  // Fetch course details
+  useEffect(() => {
+    const fetchCourseDetails = async () => {
+      if (!courseid) {
+        console.error("Course ID is not defined")
+        return
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:5000/course/${courseid}`)
+        setCourseDetails(response.data)
+        console.log("Course details:", response.data)
+      } catch (error) {
+        console.error("Error fetching course details:", error)
+      }
+    }
+
+    fetchCourseDetails()
+  }, [courseid])
 
   useEffect(() => {
     const fetchChapters = async () => {
@@ -105,6 +126,21 @@ const ListChapters = () => {
     // Navigate to the exam page
     navigate(`/exams`)
   }
+
+  // Format price with currency symbol
+  const formatPrice = (price, currency = "EUR") => {
+    if (price === 0 || price === "0") return "Gratuit"
+
+    const currencySymbols = {
+      USD: "$",
+      EUR: "€",
+      DZD: "د.ج",
+    }
+
+    const symbol = currencySymbols[currency] || currencySymbols.EUR
+    return `${price} ${symbol}`
+  }
+
   return (
     <div>
       {/* Course Section */}
@@ -194,11 +230,632 @@ const ListChapters = () => {
               </aside>
             </div>
 
-            <div className="lg:w-4/5">
-              <div className="bg-white rounded-lg shadow-md p-8">
-                <Outlet />
+            <article className="course-details">
+              <img className="rounded-3 img-fluid" src="/assets/images/ces.png" alt="Course" />
+              <div className="course-details-meta d-lg-flex align-items-center justify-content-between">
+                <div className="d-flex">
+                 
+                  <div className="avatar-info ms-3">
+                    <h6> Niveau de cours</h6>
+                    <span  className="mute-alt">{courseDetails ? courseDetails.level : "Chargement..."}</span>
+                  </div>
+                </div>
+                <div className="course-reviews">
+                  <h6>Module</h6>
+                  <div className="d-flex align-items-center">
+                    <div className="ratings">
+                    </div>
+                    <span  className="mute-alt">{courseDetails ? courseDetails.categorie : "Chargement..."}</span>
+                  </div>
+                </div>
+                <div className="course-cat">
+                  <h6>Prix</h6>
+                  <span className="mute-alt">
+                    {courseDetails ? formatPrice(courseDetails.price, courseDetails.currency) : "Chargement..."}
+                  </span>
+                </div>
               </div>
-            </div>
+              {/* Course Tabs Start */}
+              <div className="course-nav">
+                <ul className="nav" id="myTab" role="tablist">
+                  <li className="nav-item" role="presentation">
+                    <button
+                      className="nav-link active"
+                      id="home-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#home"
+                      type="button"
+                      role="tab"
+                      aria-controls="home"
+                      aria-selected="true"
+                    >
+                      <i className="feather-icon icon-bookmark" /> Overview
+                    </button>
+                  </li>
+                </ul>
+                <div className="tab-content inner-sec" id="myTabContent">
+                  <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <h2 className="display-4 fw-bold">
+                      {courseDetails ? courseDetails.title : "Chargement du cours..."}
+                    </h2>
+                    <p>
+                    <span  className="mute-alt">{courseDetails ? courseDetails.description : "Chargement..."}</span>
+
+                    </p>
+                   
+                   
+                  </div>
+                  <div className="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <h2 className="display-4 fw-bold">Course Content</h2>
+                    <div className="accordion-2" id="accordion-course">
+                      <div className="accordion-item">
+                        <h2 className="accordion-header" id="headingOne">
+                          <button
+                            className="accordion-button"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne"
+                            aria-expanded="true"
+                            aria-controls="collapseOne"
+                          >
+                            Understanding UI and UX Design
+                            <sub className="ms-2">/ 2 hours 30min</sub>
+                          </button>
+                        </h2>
+                        <div
+                          id="collapseOne"
+                          className="accordion-collapse collapse show"
+                          aria-labelledby="headingOne"
+                          data-bs-parent="#accordion-course"
+                        >
+                          <div className="accordion-body">
+                            <div className="lesson-items">
+                              <ul className="list-unstyled">
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      51.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      User Research
+                                    </span>
+                                    <span>
+                                      3.32
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      2.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="accordion-item">
+                        <h2 className="accordion-header" id="heading2">
+                          <button
+                            className="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse2"
+                            aria-expanded="true"
+                            aria-controls="collapse2"
+                          >
+                            Roles in UI/UX Design
+                            <sub className="ms-2">/ 3 hours 10min</sub>
+                          </button>
+                        </h2>
+                        <div
+                          id="collapse2"
+                          className="accordion-collapse collapse"
+                          aria-labelledby="heading2"
+                          data-bs-parent="#accordion-course"
+                        >
+                          <div className="accordion-body">
+                            <div className="lesson-items">
+                              <ul className="list-unstyled">
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      User Research
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="accordion-item">
+                        <h2 className="accordion-header" id="heading3">
+                          <button
+                            className="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse3"
+                            aria-expanded="true"
+                            aria-controls="collapse3"
+                          >
+                            Principles UI/UX Design
+                            <sub className="ms-2">/ 3 hours 10min</sub>
+                          </button>
+                        </h2>
+                        <div
+                          id="collapse3"
+                          className="accordion-collapse collapse"
+                          aria-labelledby="heading3"
+                          data-bs-parent="#accordion-course"
+                        >
+                          <div className="accordion-body">
+                            <div className="lesson-items">
+                              <ul className="list-unstyled">
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      User Research
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="accordion-item">
+                        <h2 className="accordion-header" id="heading4">
+                          <button
+                            className="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse4"
+                            aria-expanded="true"
+                            aria-controls="collapse4"
+                          >
+                            User Research Techniques
+                            <sub className="ms-2">/ 3 hours 10min</sub>
+                          </button>
+                        </h2>
+                        <div
+                          id="collapse4"
+                          className="accordion-collapse collapse"
+                          aria-labelledby="heading4"
+                          data-bs-parent="#accordion-course"
+                        >
+                          <div className="accordion-body">
+                            <div className="lesson-items">
+                              <ul className="list-unstyled">
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="images/icons/video.png" alt="Video" />
+                                      User Research
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="assets/assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="accordion-item">
+                        <h2 className="accordion-header" id="heading5">
+                          <button
+                            className="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse5"
+                            aria-expanded="true"
+                            aria-controls="collapse5"
+                          >
+                            Creating User Personal
+                            <sub className="ms-2">/ 3 hours 10min</sub>
+                          </button>
+                        </h2>
+                        <div
+                          id="collapse5"
+                          className="accordion-collapse collapse"
+                          aria-labelledby="heading5"
+                          data-bs-parent="#accordion-course"
+                        >
+                          <div className="accordion-body">
+                            <div className="lesson-items">
+                              <ul className="list-unstyled">
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      User Research
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="assets/images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="assets/images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="accordion-item">
+                        <h2 className="accordion-header" id="heading6">
+                          <button
+                            className="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse6"
+                            aria-expanded="true"
+                            aria-controls="collapse6"
+                          >
+                            User Research Techniques
+                            <sub className="ms-2">/ 3 hours 10min</sub>
+                          </button>
+                        </h2>
+                        <div
+                          id="collapse6"
+                          className="accordion-collapse collapse"
+                          aria-labelledby="heading6"
+                          data-bs-parent="#accordion-course"
+                        >
+                          <div className="accordion-body">
+                            <div className="lesson-items">
+                              <ul className="list-unstyled">
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="images/icons/video.png" alt="Video" />
+                                      User Research
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#" className="d-flex justify-content-between align-items-center">
+                                    <span className="lesson-title">
+                                      <img src="images/icons/video.png" alt="Video" />
+                                      Persona Development
+                                    </span>
+                                    <span>
+                                      3.08
+                                      <img src="images/icons/lock.png" alt="Lock" />
+                                    </span>
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Accordion Item End */}
+                    </div>
+                    {/* Accordion Wrap End */}
+                  </div>
+                  {/* Tab Item End */}
+                  <div className="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                    <h2 className="display-4">Instructor</h2>
+                    <div className="author-card d-flex align-items-center border rounded-2 bg-shade p-3">
+                      <div className="author-img">
+                        <img src="images/instructor-lg.jpg" alt="Instructor" className="img-fluid rounded-3" />
+                      </div>
+                      <div className="author-text">
+                        <h4>Maria Rivera, M.A.</h4>
+                        <small className="text-mute">Arts Instructor</small>
+                        <p>
+                          This is a comprehensive outline, and the actual content and duration of each module may vary
+                          based on the course format and duration. Hands-on activities, case studies, and real-world
+                          projects should be integrated throughout the course to enhance practical skills.
+                        </p>
+                        <div className="social-share white mt-3">
+                          <a href="#">
+                            <i className="feather-icon icon-facebook" />
+                          </a>
+                          <a href="#">
+                            <i className="feather-icon icon-twitter" />
+                          </a>
+                          <a href="#">
+                            <i className="feather-icon icon-youtube" />
+                          </a>
+                          <a href="#">
+                            <i className="feather-icon icon-linkedin" />
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Tab Item End */}
+                  <div className="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
+                    <h2 className="display-4">Reviews (02)</h2>
+                    <div className="entry-comments mt-5">
+                      <div className="post-comments">
+                        <ol className="comment-list list-unstyled">
+                          <li>
+                            <article className="comment-entry">
+                              <div className="d-sm-flex align-items-top">
+                                <div className="comment-thumb">
+                                  <img
+                                    width={80}
+                                    className="img-fluid rounded-circle"
+                                    src="images/avatar5.png"
+                                    alt="Comments"
+                                  />
+                                </div>
+                                <div className="commentor ms-lg-4 bg-shade p-4 rounded-2">
+                                  <div className="d-flex justify-content-between mb-3">
+                                    <div className="comment-head">
+                                      <h4 className="display-5 mb-0">Johnathon Smith</h4>
+                                      <small className="text-muted">Nov 12, 2022 at 12:12 am</small>
+                                    </div>
+                                    <div className="ratings pt-2">
+                                      <img src="images/icons/star.png" alt="Star" />
+                                      <img src="images/icons/star.png" alt="Star" />
+                                      <img src="images/icons/star.png" alt="Star" />
+                                      <img src="images/icons/star.png" alt="Star" />
+                                      <img src="images/icons/star.png" alt="Star" />
+                                    </div>
+                                  </div>
+                                  <p>
+                                    Mauris non dignissim purus, ac commodo diam. Donec sit amet lacinia nulla. Aliquam
+                                    quis purus in justo pulvinar tempor.
+                                  </p>
+                                </div>
+                              </div>
+                            </article>
+                            <ol className="children">
+                              <li>
+                                <article className="comment-entry">
+                                  <div className="d-sm-flex align-items-top">
+                                    <div className="comment-thumb">
+                                      <img
+                                        width={80}
+                                        className="img-fluid rounded-circle"
+                                        src="images/avatar3.png"
+                                        alt="Comments"
+                                      />
+                                    </div>
+                                    <div className="commentor ms-lg-4 bg-shade p-4 rounded-2">
+                                      <div className="d-flex justify-content-between mb-3">
+                                        <div className="comment-head">
+                                          <h4 className="display-5 mb-0">Andrew Dian</h4>
+                                          <small className="text-muted">Nov 12, 2022 at 12:12 am</small>
+                                        </div>
+                                        <div className="ratings pt-2">
+                                          <img src="images/icons/star.png" alt="Star" />
+                                          <img src="images/icons/star.png" alt="Star" />
+                                          <img src="images/icons/star.png" alt="Star" />
+                                          <img src="images/icons/star.png" alt="Star" />
+                                          <img src="images/icons/star-half.png" alt="Star" />
+                                        </div>
+                                      </div>
+                                      <p>
+                                        Mauris non dignissim purus, ac commodo diam. Donec sit amet lacinia nulla.
+                                        Aliquam quis purus in justo pulvinar tempor.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </article>
+                              </li>
+                            </ol>
+                          </li>
+                          <li>
+                            <article className="comment-entry">
+                              <div className="d-sm-flex align-items-top">
+                                <div className="comment-thumb">
+                                  <img
+                                    width={80}
+                                    className="img-fluid rounded-circle"
+                                    src="images/avatar4.png"
+                                    alt="Comments"
+                                  />
+                                </div>
+                                <div className="commentor ms-lg-4 bg-shade p-4 rounded-2">
+                                  <div className="d-flex justify-content-between mb-3">
+                                    <div className="comment-head">
+                                      <h4 className="display-5 mb-0">Mc Donald</h4>
+                                      <small className="text-muted">Nov 12, 2022 at 12:12 am</small>
+                                    </div>
+                                    <div className="ratings pt-2">
+                                      <img src="images/icons/star.png" alt="Star" />
+                                      <img src="images/icons/star.png" alt="Star" />
+                                      <img src="images/icons/star.png" alt="Star" />
+                                      <img src="images/icons/star.png" alt="Star" />
+                                      <img src="images/icons/star-half.png" alt="Star" />
+                                    </div>
+                                  </div>
+                                  <p>
+                                    Mauris non dignissim purus, ac commodo diam. Donec sit amet lacinia nulla. Aliquam
+                                    quis purus in justo pulvinar tempor.
+                                  </p>
+                                </div>
+                              </div>
+                            </article>
+                          </li>
+                        </ol>
+                      </div>
+                      <div className="contact-form contact2-sec mt-5">
+                        <h3 className="display-4">Add a Review</h3>
+                        <div className="d-flex align-items-center">
+                          <span>Rate This Course:</span>
+                          <div className="ratings ms-2">
+                            <img src="images/icons/star-nil.png" alt="Star" />
+                            <img src="images/icons/star-nil.png" alt="Star" />
+                            <img src="images/icons/star-nil.png" alt="Star" />
+                            <img src="images/icons/star-nil.png" alt="Star" />
+                            <img src="images/icons/star-nil.png" alt="Star" />
+                          </div>
+                        </div>
+                        <form action="#" className="row gy-3 mt-4">
+                          <div className="col-lg-6 form-group">
+                            <input type="text" placeholder="Your Name" />
+                          </div>
+                          <div className="col-lg-6 form-group">
+                            <input type="text" placeholder="Email Address" />
+                          </div>
+                          <div className="col-lg-12 form-group">
+                            <textarea name="message" id="message" rows={8} placeholder="Comment" defaultValue={""} />
+                          </div>
+                          <div className="form-group">
+                            <input type="checkbox" id="check" />
+                            <label htmlFor="check">
+                              Save my name, email, and website in this browser for the next time I comment.
+                            </label>
+                          </div>
+                          <div className="col-lg-12">
+                            <button className="btn btn-primary mt-4">Leave a Review</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Tab Item End */}
+                </div>
+              </div>
+            </article>
           </div>
         </div>
       </section>
