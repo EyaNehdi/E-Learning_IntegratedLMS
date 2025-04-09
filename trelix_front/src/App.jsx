@@ -47,6 +47,8 @@ import AddExam from "./components/Exam/addExam";
 import AllExamsInstructor from "./components/Exam/AllExamsInstractor";
 import ExamStudent from "./components/Exam/ExamStudent";
 import CourseLearningPlatform from "./components/Quiz/test";
+import ClassroomDashboard from "./pages/classroom/ClassroomDashboard"
+ 
 
 function App() {
   return (
@@ -101,6 +103,7 @@ function App() {
             <Route path="course-chapter/:courseId" element={<CourseChapter/>} />
             <Route path="list" element={<Listecourse/>} />
             <Route path="module" element={<Module />} />
+            <Route path="/profile/classroom/dashboard" element={<ClassroomDashboard />} />
             <Route
               path="/profile/edit-course/:courseId"
               element={<EditCourse />}
