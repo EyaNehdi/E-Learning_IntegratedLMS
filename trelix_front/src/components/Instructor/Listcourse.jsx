@@ -105,7 +105,9 @@ function Listcourse() {
                   <div key={course._id} className="col-xl-4 col-sm-6" style={{width: "fit-content"}}>
                     <div className="course-entry-3 card rounded-2 bg-info border shadow-1">
                       <div className="card-media position-relative">
-                        <a href="single-course.html">
+
+                      <a href={`/profile/course-chapter/${course._id}`}>
+
                           <img
                             className="card-img-top"
                             src="/assets/images/course.png"
@@ -142,7 +144,7 @@ function Listcourse() {
                           <a
   className="btn btn-sm btn-primary d-flex align-items-center"
   onClick={() => handleEdit(course._id)}
->
+
   <i className="feather-icon icon-edit me-2" />
   Edit
 </a>
@@ -150,7 +152,7 @@ function Listcourse() {
 <a
   className="btn btn-sm btn-danger d-flex align-items-center"
   onClick={() => handleDelete(course._id)}
->
+
   <i className="feather-icon icon-trash me-2" />
   Delete
 </a>

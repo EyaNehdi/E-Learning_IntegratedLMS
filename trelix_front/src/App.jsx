@@ -47,13 +47,14 @@ import AddExam from "./components/Exam/addExam";
 import AllExamsInstructor from "./components/Exam/AllExamsInstractor";
 import ExamStudent from "./components/Exam/ExamStudent";
 import CourseLearningPlatform from "./components/Quiz/test";
+import CertificateBrowser from "./pages/Certification/CertificateBrowser";
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* **************** */}
-        <Route path="/addQuizzL" element={<DailyQuizzes />}/>
+        
         {/* Public routes */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<Index />} />
@@ -74,9 +75,10 @@ function App() {
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
+          <Route path="/certificates" element={<CertificateBrowser />} />
          
           <Route path="/allcours" element={<Allcourse />} />
-          <Route path="/exams" element={<ExamStudent />} />
+          <Route path="/exams/:courseid" element={<ExamStudent />} />
 
           <Route path="/chapters/:courseid" element={<ListChapters />} >
             <Route path="content/:id" element={<ChapterContent />} />
@@ -86,7 +88,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
-         
+
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addExam" element={<AddExam />} />
             <Route path="Allexams" element={<AllExamsInstructor />} />
@@ -119,7 +121,7 @@ function App() {
           <Route path="/leave" element={<Leave />} />
           <Route path="/leave/:id" element={<Leave />} />
           <Route path="/manage" element={<Manage />} />
-          <Route path="/report" element={<Reports />} />
+          <Route path="/report" element={<DailyQuizzes />} />
           <Route path="/set" element={<Settings />} />
         </Route>
         {/* **************** */}

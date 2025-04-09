@@ -12,6 +12,7 @@ const Course = new Schema({
                       module: { type: Schema.Types.ObjectId, ref: 'Module', required: true },
                       user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
                       chapters: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chapter' }],
+                      exams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Exam" }],
 
 
 })
