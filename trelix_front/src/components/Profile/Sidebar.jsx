@@ -73,7 +73,7 @@ function Sidebar({ setActivePage }) {
       alt="Google Classroom"
       style={{ width: "20px", height: "20px", marginRight: "8px" }}
     />
-    <span> Classroom</span>
+    <span> Cours Classroom</span>
   </Link>
 </li>
 
