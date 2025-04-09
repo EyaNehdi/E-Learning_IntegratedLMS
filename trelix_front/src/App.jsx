@@ -47,15 +47,21 @@ import AddExam from "./components/Exam/addExam";
 import AllExamsInstructor from "./components/Exam/AllExamsInstractor";
 import ExamStudent from "./components/Exam/ExamStudent";
 import CourseLearningPlatform from "./components/Quiz/test";
+
 import ClassroomDashboard from "./pages/classroom/ClassroomDashboard"
  
+
+import CertificatesPage from "./pages/Certification/CertificatesPage";
+import Achievements from "./components/Profile/Achievements";
+import BrowseCertificates from "./components/Student/BrowseCertificates";
+
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* **************** */}
-        <Route path="/addQuizzL" element={<DailyQuizzes />}/>
+
         {/* Public routes */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<Index />} />
@@ -64,8 +70,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/verify-email" element={<EmailVerificationPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          
-          
+
           <Route
             path="/reset-password/:token"
             element={<ResetPasswordPage />}
@@ -76,19 +81,24 @@ function App() {
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
-         
-          <Route path="/allcours" element={<Allcourse />} />
-          <Route path="/exams" element={<ExamStudent />} />
+          <Route path="/certificates" element={<CertificatesPage />}>
+            <Route index element={<BrowseCertificates />} />
+            <Route path="browse" element={<BrowseCertificates />} />
+          </Route>
 
-          <Route path="/chapters/:courseid" element={<ListChapters />} >
+          <Route path="/allcours" element={<Allcourse />} />
+          <Route path="/exams/:courseid" element={<ExamStudent />} />
+
+          <Route path="/chapters/:courseid" element={<ListChapters />}>
             <Route path="content/:id" element={<ChapterContent />} />
           </Route>
           <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/quiz" element={<QuizzLeaderboard />}/>
+          <Route path="/quiz" element={<QuizzLeaderboard />} />
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
-         
+            <Route path="achievements" element={<Achievements />} />
+
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addExam" element={<AddExam />} />
             <Route path="Allexams" element={<AllExamsInstructor />} />
@@ -97,11 +107,13 @@ function App() {
             <Route path="edit/:id" element={<QuizEdit />} />
             <Route path="addquiz" element={<AddQuiz />} />
             <Route path="settings" element={<MultiFactorAuth />} />
-            {/* Ajout de la route pour changer le mot de passe */}
             <Route path="change-password" element={<ChangePassword />} />
-            <Route path="Course" element={<Courses/>} />
-            <Route path="course-chapter/:courseId" element={<CourseChapter/>} />
-            <Route path="list" element={<Listecourse/>} />
+            <Route path="Course" element={<Courses />} />
+            <Route
+              path="course-chapter/:courseId"
+              element={<CourseChapter />}
+            />
+            <Route path="list" element={<Listecourse />} />
             <Route path="module" element={<Module />} />
             <Route path="/profile/classroom/dashboard" element={<ClassroomDashboard />} />
             <Route
@@ -109,10 +121,7 @@ function App() {
               element={<EditCourse />}
             />
             <Route path="/profile/allcours" element={<Allcourse />} />
-            
-            
           </Route>
-          
         </Route>
         <Route path="/CV" element={<CV />} />
         {/* **************** */}
@@ -122,7 +131,7 @@ function App() {
           <Route path="/leave" element={<Leave />} />
           <Route path="/leave/:id" element={<Leave />} />
           <Route path="/manage" element={<Manage />} />
-          <Route path="/report" element={<Reports />} />
+          <Route path="/report" element={<DailyQuizzes />} />
           <Route path="/set" element={<Settings />} />
         </Route>
         {/* **************** */}

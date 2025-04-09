@@ -15,6 +15,7 @@ import {
   Download,
 } from "lucide-react"
 import axios from "axios"
+import { useOutletContext, useParams } from "react-router-dom"
 
 const AddExam = () => {
   // State for exam details
@@ -45,7 +46,7 @@ const AddExam = () => {
 
   // Reference for file input
   const fileInputRef = useRef(null)
-
+  const { user, profile, setProfile, completion } = useOutletContext()
   // Add a new question
   const addQuestion = (type) => {
     const newQuestion = {
@@ -138,6 +139,7 @@ const AddExam = () => {
             questions,
             isPublished: publish,
             totalPoints,
+            user: user._id,
             originalFile: originalFile
                 ? {
                       name: originalFile.name,

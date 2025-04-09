@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+
 const HomeUser = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  
 
   // Fetch courses from API
   useEffect(() => {
@@ -472,7 +474,7 @@ const HomeUser = () => {
                       <div className="swiper-slide" key={course._id}>
                         <div className="course-entry-3 card rounded-2 bg-white border">
                           <div className="card-media position-relative">
-                            <a href={`/single-course/${course._id}`}>
+                            <a href={`/chapters/${course._id}`}>
                               <img
                                 className="card-img-top"
                                 src={course.image || "assets/images/crs.png"}
@@ -498,7 +500,7 @@ const HomeUser = () => {
                               </span>
                             </div>
                             <h3 className="sub-title mb-0">
-                              <a href={`/single-course/${course._id}`}>
+                              <a href={`/chapters/${course._id}`} >
                                 {course.title}
                               </a>
                             </h3>
@@ -517,7 +519,7 @@ const HomeUser = () => {
                                 ${course.price}
                                 <del>$35.00</del>
                               </div>
-                              <a href={`/enroll/${course._id}`}>
+                              <a href={`/chapters/${course._id}`}>
                                 Enroll Now{" "}
                                 <i className="feather-icon icon-arrow-right" />
                               </a>
