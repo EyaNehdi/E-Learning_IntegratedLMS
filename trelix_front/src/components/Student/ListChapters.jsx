@@ -11,10 +11,6 @@ const ListChapters = () => {
   const { id, courseid } = useParams();
   const navigate = useNavigate();
 
-  const [chapters, setChapters] = useState([]);
-  const [completedChapters, setCompletedChapters] = useState([]);
-  const { user, fetchUser, clearUser } = useProfileStore();
-  const [loading, setLoading] = useState(true);
 
   // Store courseid in localStorage if it's not already there
   useEffect(() => {
@@ -168,10 +164,11 @@ const ListChapters = () => {
       );
       alert(error.response?.data?.error || "An error occurred.");
     }
+    navigate(`/exams`)
   };
 
-    navigate(`/exams`)
-  }
+    
+  
 
   // Format price with currency symbol
   const formatPrice = (price, currency = "EUR") => {
@@ -186,7 +183,6 @@ const ListChapters = () => {
     const symbol = currencySymbols[currency] || currencySymbols.EUR
     return `${price} ${symbol}`
   }
-
 
   return (
     <div>
@@ -923,6 +919,6 @@ const ListChapters = () => {
       </section>
     </div>
   );
-};
+}
 
 export default ListChapters;
