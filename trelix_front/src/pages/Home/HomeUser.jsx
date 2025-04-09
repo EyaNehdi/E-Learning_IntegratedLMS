@@ -614,6 +614,8 @@ const HomeUser = () => {
                         <p>
                           We love to purse a best education platform for all.
                           Ipsam quos omnis nisi repudiandae, deleniti eum
+
+                          
                           cupiditate qui tempore animi quaerat modi in possimus
                           consequatur, commodi Lorem ipsum dolor sit amet.
                         </p>
@@ -622,7 +624,7 @@ const HomeUser = () => {
                             <img
                               className="rounded-circle"
                               width={56}
-                              src="assets/images/avatar2.png"
+                              src="assets/images/avatar2.png" 
                               alt="Avater"
                             />
                             <div className="avatar-txt ms-3">

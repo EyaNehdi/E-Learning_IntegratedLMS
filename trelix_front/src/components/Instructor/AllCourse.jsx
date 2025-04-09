@@ -1,33 +1,85 @@
-
+"use client"
 
 import { useState, useEffect } from "react"
 import axios from "axios"
 
 function Allcourse() {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([])
+  const [filteredCourses, setFilteredCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [filters, setFilters] = useState({
+    frontendDev: false,
+    backendDev: false,
+  })
 
   // Fetch courses from API
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        setLoading(true);
-        const response = await axios.get("http://localhost:5000/course/courses");
-        console.log("Courses fetched:", response.data);
-        setCourses(response.data);
-        setLoading(false);
+        setLoading(true)
+        const response = await axios.get("http://localhost:5000/course/courses")
+        console.log("Courses fetched:", response.data)
+        setCourses(response.data)
+        setFilteredCourses(response.data)
+        setLoading(false)
       } catch (error) {
-        console.error("Error fetching courses:", error);
-        setLoading(false);
+        console.error("Error fetching courses:", error)
+        setLoading(false)
       }
-    };
+    }
 
-    fetchCourses();
-  }, []);
+    fetchCourses()
+  }, [])
+
+  // Apply filters when filter state changes
+  useEffect(() => {
+    applyFilters()
+  }, [filters, courses])
+
+  // Handle checkbox changes
+  const handleFilterChange = (filterName) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [filterName]: !prevFilters[filterName],
+    }))
+  }
+
+  // Apply all active filters to courses
+  const applyFilters = () => {
+    let result = [...courses]
+
+    // If no filters are active, show all courses
+    if (!filters.frontendDev && !filters.backendDev) {
+      setFilteredCourses(result)
+      return
+    }
+
+    // Apply module filters
+    if (filters.frontendDev || filters.backendDev) {
+      result = result.filter((course) => {
+        // Check if course has a module
+        if (!course.module) return false
+
+        const moduleName = course.module.name ? course.module.name.toLowerCase() : ""
+
+        if (filters.frontendDev && moduleName.includes("developpement front-end")) {
+          return true
+        }
+
+        if (filters.backendDev && moduleName.includes("developpement back-end")) {
+          return true
+        }
+
+        return false
+      })
+    }
+
+    setFilteredCourses(result)
+  }
 
   return (
     <div>
-      <link rel="stylesheet" href="assets/css/style.css"/>
+      <link rel="stylesheet" href="assets/css/style.css" />
       <section
         className="promo-sec"
         style={{ background: 'url("images/promo-bg.jpg")no-repeat center center / cover' }}
@@ -60,33 +112,66 @@ function Allcourse() {
                   <h3 className="widget-title">Categories</h3>
                   <div className="widget-inner">
                     <ul>
-                      <li>
-                        <input id="art" className="checkbox-custom" name="checkbox-3" type="checkbox" />
-                        <label htmlFor="art" className="checkbox-custom-label">
-                          Art &amp; Design
+                      <li className="d-flex align-items-center">
+                        <div className="radio-wrapper" style={{ marginRight: "10px" }}>
+                          <input
+                            id="backend-dev"
+                            className="radio-custom"
+                            name="dev-type"
+                            type="radio"
+                            checked={filters.backendDev && !filters.frontendDev}
+                            onChange={() => {
+                              setFilters({
+                                frontendDev: false,
+                                backendDev: true,
+                              })
+                            }}
+                          />
+                        </div>
+                        <label htmlFor="backend-dev" className="checkbox-custom-label flex-grow-1">
+                          Developpement Back-end
                         </label>
-                        <span className="count">(12)</span>
                       </li>
-                      <li>
-                        <input id="dev" className="checkbox-custom" name="checkbox-3" type="checkbox" />
-                        <label htmlFor="dev" className="checkbox-custom-label">
-                          Technology
+                      <li className="d-flex align-items-center">
+                        <div className="radio-wrapper" style={{ marginRight: "10px" }}>
+                          <input
+                            id="frontend-dev"
+                            className="radio-custom"
+                            name="dev-type"
+                            type="radio"
+                            checked={filters.frontendDev && !filters.backendDev}
+                            onChange={() => {
+                              setFilters({
+                                frontendDev: true,
+                                backendDev: false,
+                              })
+                            }}
+                          />
+                        </div>
+                        <label htmlFor="frontend-dev" className="checkbox-custom-label flex-grow-1">
+                          Developpement Front-end
                         </label>
-                        <span className="count">(10)</span>
                       </li>
-                      <li>
-                        <input id="info" className="checkbox-custom" name="checkbox-3" type="checkbox" />
-                        <label htmlFor="info" className="checkbox-custom-label">
-                          Development
+                      <li className="d-flex align-items-center">
+                        <div className="radio-wrapper" style={{ marginRight: "10px" }}>
+                          <input
+                            id="all-dev"
+                            className="radio-custom"
+                            name="dev-type"
+                            type="radio"
+                            checked={!filters.frontendDev && !filters.backendDev}
+                            onChange={() => {
+                              setFilters({
+                                frontendDev: false,
+                                backendDev: false,
+                              })
+                            }}
+                          />
+                        </div>
+                        <label htmlFor="all-dev" className="checkbox-custom-label flex-grow-1">
+                          Tous les cours
                         </label>
-                        <span className="count">(09)</span>
-                      </li>
-                      <li>
-                        <input id="checkbox-3" className="checkbox-custom" name="checkbox-3" type="checkbox" />
-                        <label htmlFor="checkbox-3" className="checkbox-custom-label">
-                          Development
-                        </label>
-                        <span className="count">(12)</span>
+                        <span className="count">({courses.length})</span>
                       </li>
                     </ul>
                   </div>
@@ -228,23 +313,36 @@ function Allcourse() {
               <div className="course-filters d-flex justify-content-between align-items-center">
                 <div className="result d-sm-flex align-items-center">
                   <p className="m-0">
+                    {filteredCourses.length} cours trouvés
+                    {(filters.frontendDev || filters.backendDev) && (
+                      <span className="ms-2">
+                        {filters.frontendDev
+                          ? "(Developpement Front-end)"
+                          : filters.backendDev
+                            ? "(Developpement Back-end)"
+                            : ""}
+                      </span>
+                    )}
                   </p>
                 </div>
-            
               </div>{" "}
               {/* Course Filter End */}
               <div className="course-lists row gy-4 mt-3">
                 {/* Dynamic course listing */}
-                {courses.length > 0 ? (
-                  courses.map((course) => (
+                {filteredCourses.length > 0 ? (
+                  filteredCourses.map((course) => (
                     <div className="col-xl-6 col-md-6" key={course._id}>
                       <div className="course-entry-3 card rounded-2 bg-white border">
                         <div className="card-media position-relative">
-                        <a href={`/chapters/${course._id}`}>
+                          <a href={`/chapters/${course._id}`}>
                             <img className="card-img-top" src="assets/images/crs.png" alt={course.title} />
                           </a>
                           <a href="#" className="action-wishlist position-absolute text-white icon-xs rounded-circle">
-                            <img src="assets/images/icons/heart-fill.svg" alt="Wishlist" style={{marginTop: "10px",marginLeft: "9px"}} />
+                            <img
+                              src="assets/images/icons/heart-fill.svg"
+                              alt="Wishlist"
+                              style={{ marginTop: "10px", marginLeft: "9px" }}
+                            />
                           </a>
                         </div>
                         <div className="card-body">
@@ -265,7 +363,7 @@ function Allcourse() {
                             </span>
                           </div>
                           <h3 className="sub-title mb-0">
-                            <a href={`/single-course/${course._id}`}>{course.title}</a>
+                            <a>{course.title}</a>
                           </h3>
                           <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
                             <span>
@@ -274,13 +372,16 @@ function Allcourse() {
                                 Instructor
                               </a>
                             </span>
-                            <span>{course.module ? course.module.name : "No module assigned"}</span>
-
+                            <span className="badge bg-info text-white">
+                              {course.module ? course.module.name : "No module assigned"}
+                            </span>
                           </div>
                           <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                            <div className="price">{course.price}$<del>$35.00</del></div>
-                            <a href={`/enroll/${course._id}`}>
-                              Enroll Now <i className="feather-icon icon-arrow-right" />
+                            <div className="price">
+                              {course.price}$<del>$35.00</del>
+                            </div>
+                            <a href={`/chapters/${course._id}`}>
+                              voir détaills <i className="feather-icon icon-arrow-right" />
                             </a>
                           </div>
                         </div>
@@ -289,21 +390,25 @@ function Allcourse() {
                   ))
                 ) : (
                   <div className="col-12 text-center">
-                    <p>No courses available.</p>
+                    <p>Aucun cours disponible pour les filtres sélectionnés.</p>
                   </div>
                 )}
-                
+
                 {/* Pager Start - Only show if courses exist */}
-                {courses.length > 0 && (
+                {filteredCourses.length > 0 && (
                   <div className="col-lg-12">
                     <div className="pager text-center mt-5">
-                      <a href="#" className="next-btn"> <i className="feather-icon icon-arrow-left" />
+                      <a href="#" className="next-btn">
+                        {" "}
+                        <i className="feather-icon icon-arrow-left" />
                       </a>
                       <span className="current">1</span>
                       <a href="#">2</a>
                       <a href="#">3</a>
                       <a href="#">4</a>
-                      <a href="#" className="prev-btn"> <i className="feather-icon icon-arrow-right" />
+                      <a href="#" className="prev-btn">
+                        {" "}
+                        <i className="feather-icon icon-arrow-right" />
                       </a>
                     </div>
                   </div>
@@ -313,12 +418,9 @@ function Allcourse() {
           </div>
         </div>
       </section>
-     
-
-  
     </div>
-   
   )
 }
 
 export default Allcourse
+
