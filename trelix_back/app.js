@@ -1,14 +1,14 @@
+// Au tout début de app.js
+require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
 const cors = require('cors');
+const googleClassroomRoutes = require('./routes/googleClassroom.routes');
 const multer = require('multer');
 const socketIo = require('socket.io');
-
-
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -21,9 +21,7 @@ const Course = require("./routes/course");
 
 
 var app = express();
-require('dotenv').config();
 console.log("MONGO_URI:", process.env.MONGO_URI);  // Debug
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -34,16 +32,29 @@ app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 //cors
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
-}));;
+}));
+
+// Middleware de logging pour déboguer les requêtes
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
 // In app.js
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+// Routes
+
 app.use('/certificates', express.static(path.join(__dirname, 'certificates')));
+
 
 app.use('/ia', require('./routes/ia'));
 app.use('/', indexRouter);
@@ -52,7 +63,7 @@ app.use('/module', Module);
 app.use('/course', Course);
 app.use('/courses', Course);
 app.use('/delete', Course);
-
+app.use('/api/classroom', googleClassroomRoutes);
 
 //auth routes
 const ExamRoutes = require('./routes/ExamRoutes');
@@ -68,7 +79,10 @@ app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/quiz", quizzRoutes);
+
+=======
 app.use("/certificates", certifRoutes);
+
 
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
@@ -80,21 +94,41 @@ app.use((err, req, res, next) => {
 
 
 // catch 404 and forward to error handler
+
+app.use(function(req, res, next) {
+  console.log(`Route non trouvée: ${req.method} ${req.url}`);
+
 app.use(function (req, res, next) {
+
   next(createError(404));
 });
 
 // error handler
+
+app.use(function(err, req, res, next) {
+  // Log l'erreur pour le débogage
+  console.error(`Erreur: ${err.status || 500} - ${err.message}`);
+  console.error(`URL: ${req.method} ${req.originalUrl}`);
+  
+
 app.use(function (err, req, res, next) {
+
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
+  // Pour les API, renvoyer une réponse JSON si c'est une route API
+  if (req.originalUrl.startsWith('/api/')) {
+    return res.status(err.status || 500).json({
+      error: err.message,
+      status: err.status || 500
+    });
+  }
+
+  // render the error page pour les autres routes
   res.status(err.status || 500);
   res.render('error');
 });
-// Set up the socket connection
 
 //testing connectivity 
 const { connectDB } = require("./config/db");
@@ -112,11 +146,10 @@ async function startApp() {
 }
 
 startApp();
+
 //port number from .env
 const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => {
-//   console.log("Server is running on port " + PORT);
-// });
+
 // 1. Get the server instance from Express
 const server = app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
@@ -130,8 +163,10 @@ const io = socketIo(server, {
     credentials: true
   }
 });
+
+
 // Socket Initialization
 const { initializeSocket } = require('./controllers/quizzLeaderboardController');
 initializeSocket(io);  // Pass the socket instance to the controller
-module.exports = app;
 
+module.exports = app;
