@@ -3,10 +3,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
 const cors = require('cors');
 const multer = require('multer');
 const socketIo = require('socket.io');
+const axios = require('axios');
+
+require('dotenv').config(); // Charger les variables d'environnement
 
 
 
@@ -16,34 +18,92 @@ var mfaRoutes = require('./routes/mfaRoutes');
 const profileRoutes = require("./routes/profileRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const quizzRoutes = require("./routes/quizzRoutes");
-const Module =require("./routes/module");
-const Course =require("./routes/course");
-
+const Module = require("./routes/module");
+const Course = require("./routes/course");
 
 var app = express();
-require('dotenv').config();
-console.log("MONGO_URI:", process.env.MONGO_URI);  // Debug
 
-
-// view engine setup
+// Configuration du moteur de vues et des middlewares
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
-app.use(express.json({ limit: '100mb' }));  
+app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-//cors
+
+// Configuration CORS
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "http://localhost:5173",  // Assurez-vous que le frontend utilise ce port
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
-}));;
-// In app.js
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+}));
 
+app.post('/chatbot', async (req, res) => {
+  console.log("Requête reçue:", req.body); // Debug important
+  
+  try {
+    const { question } = req.body;
+    
+    // Validation renforcée
+    if (!question || typeof question !== 'string' || question.trim().length === 0) {
+      console.error("Question invalide:", question);
+      return res.status(400).json({ 
+        error: 'Question invalide',
+        details: 'La question doit être une chaîne non vide' 
+      });
+    }
+
+    // Log pour vérifier la clé API
+    console.log("Clé API utilisée:", process.env.DEEPSEEK_API_KEY ? "***" : "MANQUANTE");
+
+    const response = await axios.post(
+      'https://api.deepseek.com/v1/chat/completions',
+      {
+        model: 'deepseek-chat',
+        messages: [{ 
+          role: 'user', 
+          content: question.substring(0, 1000) // Protection
+        }],
+        max_tokens: 200,
+        temperature: 0.7
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        timeout: 10000 // 10s timeout
+      }
+    );
+
+    console.log("Réponse API:", response.data); // Debug
+
+    if (!response.data.choices?.[0]?.message?.content) {
+      throw new Error("Structure de réponse inattendue");
+    }
+
+    res.json({ 
+      reply: response.data.choices[0].message.content 
+    });
+
+  } catch (error) {
+    console.error("ERREUR COMPLÈTE:", {
+      message: error.message,
+      code: error.code,
+      response: error.response?.data,
+      stack: error.stack
+    });
+    
+  }
+});
+
+
+// Autres routes de ton application
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/ia', require('./routes/ia'));
 app.use('/', indexRouter);
@@ -53,11 +113,10 @@ app.use('/course', Course);
 app.use('/courses', Course);
 app.use('/delete', Course);
 
-
-//auth routes
+// Auth routes
 const ExamRoutes = require('./routes/ExamRoutes');
 const quizRoutes = require('./routes/quizRoutes');
-const authRouteschapter = require('./routes/chapterRoutes'); 
+const authRouteschapter = require('./routes/chapterRoutes');
 const authRoutes = require('./routes/authRoutes');
 const authRoutesIA = require('./routes/ia');
 app.use('/api/auth', authRoutes);
@@ -66,35 +125,32 @@ app.use('/chapter', authRouteschapter);
 app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
 app.use("/api/admin", adminRoutes);
-app.use ("/api/quiz",quizzRoutes);
-
+app.use("/api/quiz", quizzRoutes);
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
+
+// Gestion des erreurs
 app.use((err, req, res, next) => {
   console.error('Upload Error:', err.message);
   res.status(400).json({ error: err.message });
 });
 
-
-
-// catch 404 and forward to error handler
+// Catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
+// Error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
+
 // Set up the socket connection
 
-//testing connectivity 
+// Testing connectivity
 const { connectDB } = require("./config/db");
 
 async function startApp() {
@@ -102,7 +158,7 @@ async function startApp() {
 
   // Connect to MongoDB
   try {
-    const db = await connectDB(); 
+    const db = await connectDB();
     console.log(" Connected to MongoDB!");
   } catch (error) {
     console.error(" MongoDB connection failed:", error);
@@ -110,11 +166,10 @@ async function startApp() {
 }
 
 startApp();
-//port number from .env
+
+// Port number from .env
 const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => {
-//   console.log("Server is running on port " + PORT);
-// });
+
 // 1. Get the server instance from Express
 const server = app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
@@ -123,13 +178,14 @@ const server = app.listen(PORT, () => {
 // 2. Attach Socket.IO to the existing Express server
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5173",  // Assurez-vous que le frontend utilise ce port
     methods: ["GET", "POST"],
     credentials: true
   }
 });
-// Socket Initialization
-const { initializeSocket } = require('./controllers/quizzLeaderboardController'); 
-initializeSocket(io);  // Pass the socket instance to the controller
-module.exports = app;
 
+// Socket Initialization
+const { initializeSocket } = require('./controllers/quizzLeaderboardController');
+initializeSocket(io);  // Pass the socket instance to the controller
+
+module.exports = app;

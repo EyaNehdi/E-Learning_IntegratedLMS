@@ -128,6 +128,13 @@ function Sidebar({ setActivePage }) {
                 <span>addExam</span>
               </Link>
             </li>
+            <li>
+              <Link className="nav-link" to="/chatbot">
+                <i className="feather-icon icon-plus" />
+                <span>chatbot</span>
+              </Link>
+            </li>
+
           </ul>
         </nav>
       </div>

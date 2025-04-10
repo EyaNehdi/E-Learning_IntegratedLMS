@@ -4,6 +4,9 @@ const path = require("path");
 const { Parser } = require("json2csv");
 const Course = require("../models/course");
 const mongoose = require('mongoose');
+const moment = require('moment'); // Assure-toi que cette ligne est présente
+const notifier = require('node-notifier');
+
 
 // Configure multer storage
 const storage = multer.diskStorage({
@@ -81,6 +84,17 @@ const getExamById = async (req, res) => {
     }
 };
 
+
+
+const sendDesktopNotification = (subject, message) => {
+    notifier.notify({
+        title: subject,
+        message: message,
+        sound: true, // optionnel, pour jouer un son
+        wait: true    // optionnel, pour attendre que l'utilisateur ferme la notification
+    });
+};
+
 // Create new exam
 const createExam = async (req, res) => {
     try {
@@ -108,14 +122,27 @@ const createExam = async (req, res) => {
             originalFile,
         });
 
+        // Sauvegarder l'examen
         await newExam.save();
+
+        // Vérifier si l'examen commence dans 3 jours après la sauvegarde
+        const examStartDate = moment(newExam.startDate); // Date de début de l'examen
+        const threeDaysBefore = examStartDate.clone().subtract(3, 'days'); // 3 jours avant la date de début
+
+        if (moment().isSame(threeDaysBefore, 'day')) {
+            const subject = `Rappel : Un examen dans 3 jours !`;
+            const message = `L'examen "${newExam.title}" commence le ${examStartDate.format('LL')}. Préparez-vous !`;
+
+            // Fonction fictive pour envoyer la notification
+            sendDesktopNotification(subject, message);
+        }
+
         res.status(201).json(newExam);
     } catch (error) {
         console.error("Error creating exam:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
-
 // Update exam
 const updateExam = async (req, res) => {
     try {
