@@ -46,6 +46,7 @@ import QuizEdit from "./components/Quiz/quizEdit";
 import AddExam from "./components/Exam/addExam";
 import AllExamsInstructor from "./components/Exam/AllExamsInstractor";
 import ExamStudent from "./components/Exam/ExamStudent";
+
 import CourseLearningPlatform from "./components/Quiz/test";
 import React, { useState } from "react"; 
 import axios from "axios"; 
@@ -131,7 +132,9 @@ const Chatbot = () => {
 };
 
 
-import CertificateBrowser from "./pages/Certification/CertificateBrowser";
+
+
+import BrowseCertificates from "./components/Student/BrowseCertificates";
 import AssignQuizToChapter from "./components/Quiz/AssignQuizToChapter";
 import Achievements from "./components/Profile/Achievements";
 import MoodleCourses from "./components/MoodleCourses";
