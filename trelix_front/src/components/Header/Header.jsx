@@ -58,8 +58,7 @@ function Header() {
     }
 
     fetchCourses()
-    fetchUser()
-  }, [fetchUser])
+  }, []);
   
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -77,27 +76,6 @@ function Header() {
       }
     }
   }, [searchQuery, courses]);
-
-
-  // Fetch courses from API
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        setLoading(true)
-        const response = await axios.get("http://localhost:5000/course/courses")
-        setCourses(response.data)
-        setFilteredCourses(response.data)
-        setLoading(false)
-      } catch (err) {
-        console.error("Erreur lors du chargement des cours:", err)
-        setError("Impossible de charger les cours. Veuillez réessayer plus tard.")
-        setLoading(false)
-      }
-    }
-
-    fetchCourses()
-    fetchUser()
-  }, [fetchUser])
   
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -350,14 +328,14 @@ function Header() {
                                   />
                                 ) : (
                                   <span>
-                                    {user?.firstName ? (
-                                      <>
-                                        {user.firstName.charAt(0)}
-                                        {user.lastName.charAt(0)}
-                                      </>
-                                    ) : (
-                                      "?"
-                                    )}
+                                   {user?.firstName && user?.lastName ? (
+  <>
+    {user.firstName.charAt(0)}
+    {user.lastName.charAt(0)}
+  </>
+) : (
+  "?"
+)}
                                   </span>
                                 )}
                               </div>
