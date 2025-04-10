@@ -48,6 +48,63 @@ function Sidebar({ setActivePage }) {
                 <span>User Account</span>
               </Link>
             </li>
+
+            <li>
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/courses" ? "active" : ""
+                }`}
+                to="/profile/list"
+                onClick={() => setActivePage("My Courses")}
+              >
+                <i className="feather-icon icon-book" />
+                <span>My Courses</span>
+              </Link>
+              <ul style={{ paddingLeft: "20px", marginTop: "5px" }}>
+              <li>
+  <Link
+    className={`nav-link ${location.pathname === "/profile/classroom/dashboard" ? "active" : ""}`}
+    to="/profile/classroom/dashboard"
+    onClick={() => setActivePage("My Courses")}
+    style={{ display: "flex", alignItems: "center" }}
+  >
+    <img
+      src="https://www.gstatic.com/classroom/logo_square_48.svg"
+      alt="Google Classroom"
+      style={{ width: "20px", height: "20px", marginRight: "8px" }}
+    />
+    <span> Cours Classroom</span>
+  </Link>
+</li>
+
+
+    </ul>
+            </li>
+            <li>
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/wishlist" ? "active" : ""
+                }`}
+                to="/wishlist"
+                onClick={() => setActivePage("Wishlist")}
+              >
+                <i className="feather-icon icon-heart" />
+                <span>Wishlist</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/reviews" ? "active" : ""
+                }`}
+                to="/reviews"
+                onClick={() => setActivePage("Reviews")}
+              >
+                <i className="feather-icon icon-star" />
+                <span>Reviews</span>
+              </Link>
+            </li>
+
             {user?.role === "instructor" && (
               <>
                 <li>
@@ -61,6 +118,7 @@ function Sidebar({ setActivePage }) {
                     <span>My Courses</span>
                   </Link>
                 </li>
+
 
                 <li>
                   <Link className="nav-link" to="/profile/Allexams">
