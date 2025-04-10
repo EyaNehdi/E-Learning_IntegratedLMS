@@ -8,7 +8,8 @@ const ChapterSchema = new Schema({
   courseId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   userid: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   pdf: { type: String }, 
-  video: { type: String }, 
+  video: { type: String },
+  quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' }], // Relating quizzes to the chapter 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
