@@ -147,7 +147,23 @@ function Sidebar({ setActivePage }) {
                 <i className="feather-icon icon-plus" />
                 <span>AddQuiz</span>
               </Link>
-            </li> */}
+
+            </li>
+            <li>
+              <Link className="nav-link" to="/profile/addExam">
+                <i className="feather-icon icon-plus" />
+                <span>addExam</span>
+              </Link>
+            </li>
+            <li>
+              <Link className="nav-link" to="/chatbot">
+                <i className="feather-icon icon-plus" />
+                <span>chatbot</span>
+              </Link>
+            </li>
+
+           
+
 
           </ul>
         </nav>

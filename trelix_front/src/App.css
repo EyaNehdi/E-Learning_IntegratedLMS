@@ -47,3 +47,54 @@
   
   
 */
+/* src/styles/Chatbot.css */
+.chat-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.messages {
+  height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
+
+.message {
+  margin: 10px 0;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.message.user {
+  background: #e3f2fd;
+  text-align: right;
+}
+
+.message.bot {
+  background: #f1f1f1;
+  text-align: left;
+}
+
+input, button {
+  padding: 10px;
+  width: 80%;
+  margin-right: 5px;
+}
+
+button {
+  width: 18%;
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #cccccc;
+}
