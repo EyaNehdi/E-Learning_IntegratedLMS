@@ -9,7 +9,7 @@ const cors = require('cors');
 const googleClassroomRoutes = require('./routes/googleClassroom.routes');
 const multer = require('multer');
 const socketIo = require('socket.io');
-
+const certifRoutes = require('./routes/certif.routes');
 
 const { getMoodleCourses,getCourseContents  } = require('./API/Moodle'); 
 
@@ -52,7 +52,8 @@ app.use((req, res, next) => {
 
 // In app.js
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+app.use('/certificates', express.static(path.join(__dirname, 'certificates')));
+app.use("/certificates", certifRoutes);
 // Routes
 app.use('/ia', require('./routes/ia'));
 app.use('/', indexRouter);
