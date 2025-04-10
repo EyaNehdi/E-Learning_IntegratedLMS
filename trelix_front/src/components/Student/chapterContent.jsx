@@ -160,7 +160,13 @@ const ChapterContent = () => {
   const [videoCompleted, setVideoCompleted] = useState(false)
   const [pdfCompleted, setPdfCompleted] = useState(false)
   const [showQuiz, setShowQuiz] = useState(false)
-
+  const [selectedChapterDescription, setSelectedChapterDescription] = useState("")
+  //
+  const handleChapterClick = (chapter) => {
+    setCurrentChapter(chapter);
+    setSelectedChapterDescription(chapter.description); // Update the description when chapter is clicked
+  };
+  
   // Refs
   const videoRef = useRef(null)
 
@@ -185,7 +191,8 @@ const ChapterContent = () => {
       const selectedChapter = chapters.find((chapter) => chapter._id === id)
       if (selectedChapter) {
         setCurrentChapter(selectedChapter)
-
+      // Set the description for the selected chapter
+      setSelectedChapterDescription(selectedChapter.description)
         // Check if we have saved completion status
         checkSavedCompletionStatus(id)
 
@@ -291,133 +298,143 @@ const ChapterContent = () => {
 
   return (
     <section className="bg-gray-50 py-8 md:py-12 overflow-hidden">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row gap-8">
+      
+        
           {/* Main Content Area - 8/12 width on large screens */}
-          <div className="w-full lg:w-2/3">
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          
+            
               {currentChapter && (
                 <>
-                  {/* Video Player Section */}
-                  <div className="lesson-content">
-                    <div className="relative aspect-video w-full">
-                      <video
-                        className="clip w-full"
-                        ref={videoRef}
-                        controls
-                        autoPlay
-                        muted
-                        width="100%"
-                        height="100%"
-                        onTimeUpdate={handleVideoTimeUpdate}
-                      >
-                        <source src={`http://localhost:5000${currentChapter.video}`} type="video/mp4" />
-                        Your browser does not support the video tag.
-                      </video>
-
-                      {/* Video Progress Overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 px-4 py-2 flex items-center">
-                        <div className="w-full bg-gray-700 rounded-full h-1.5 mr-2">
-                          <div
-                            className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
-                            style={{ width: `${videoProgress}%` }}
-                          ></div>
-                        </div>
-                        <div className="flex items-center">
-                          {videoCompleted && (
-                            <span className="text-green-400 flex items-center text-xs">
-                              <CheckCircle className="w-3 h-3 mr-1" />
-                              <span>Completed</span>
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                  {/* Check if PDF exists */}
+                  {currentChapter.pdf === null ? (
+                    // If no PDF, show only the description
+                    <div className="lesson-content">
+                      <p className="text-gray-700">{selectedChapterDescription.description}</p>
                     </div>
-
-                    {/* Learning Progress */}
-                    <div className="p-4 bg-blue-50 border-b border-blue-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-blue-800">Your Learning Progress</h3>
-                        <span className="text-sm text-blue-700 font-medium">
-                          {Math.round(
-                            (videoCompleted ? 50 : videoProgress / 2) +
-                              (currentChapter.pdf ? (pdfCompleted ? 50 : pdfProgress / 2) : 50),
-                          )}
-                          %
-                        </span>
+                  ) : (
+                    // Otherwise, show the video and PDF
+                    <div className="lesson-content">
+                      {/* Video Player Section */}
+                      <div className="relative aspect-video w-full">
+                        <video
+                          className="clip w-full"
+                          ref={videoRef}
+                          controls
+                          autoPlay
+                          muted
+                          width="100%"
+                          height="100%"
+                          onTimeUpdate={handleVideoTimeUpdate}
+                        >
+                          <source src={`http://localhost:5000${currentChapter.video}`} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+  
+                        {/* Video Progress Overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 px-4 py-2 flex items-center">
+                          <div className="w-full bg-gray-700 rounded-full h-1.5 mr-2">
+                            <div
+                              className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                              style={{ width: `${videoProgress}%` }}
+                            ></div>
+                          </div>
+                          <div className="flex items-center">
+                            {videoCompleted && (
+                              <span className="text-green-400 flex items-center text-xs">
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                <span>Completed</span>
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="w-full bg-blue-200 rounded-full h-2.5">
-                        <div
-                          className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                          style={{
-                            width: `${
+  
+                      {/* Learning Progress */}
+                      <div className="p-4 bg-blue-50 border-b border-blue-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-medium text-blue-800">Your Learning Progress</h3>
+                          <span className="text-sm text-blue-700 font-medium">
+                            {Math.round(
                               (videoCompleted ? 50 : videoProgress / 2) +
-                              (currentChapter.pdf ? (pdfCompleted ? 50 : pdfProgress / 2) : 50)
-                            }%`,
-                          }}
-                        ></div>
-                      </div>
-
-                      <div className="flex mt-3 text-sm">
-                        <div className="flex items-center mr-4">
-                          <div
-                            className={`w-3 h-3 rounded-full mr-1 ${videoCompleted ? "bg-green-500" : "bg-blue-400"}`}
-                          ></div>
-                          <span className={videoCompleted ? "text-green-700" : "text-blue-700"}>
-                            Video {videoCompleted ? "Completed" : `${Math.round(videoProgress)}%`}
+                                (currentChapter.pdf ? (pdfCompleted ? 50 : pdfProgress / 2) : 50),
+                            )}
+                            %
                           </span>
                         </div>
-
-                        {currentChapter.pdf && (
-                          <div className="flex items-center">
+                        <div className="w-full bg-blue-200 rounded-full h-2.5">
+                          <div
+                            className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${
+                                (videoCompleted ? 50 : videoProgress / 2) +
+                                (currentChapter.pdf ? (pdfCompleted ? 50 : pdfProgress / 2) : 50)
+                              }%`,
+                            }}
+                          ></div>
+                        </div>
+  
+                        <div className="flex mt-3 text-sm">
+                          <div className="flex items-center mr-4">
                             <div
-                              className={`w-3 h-3 rounded-full mr-1 ${pdfCompleted ? "bg-green-500" : "bg-blue-400"}`}
+                              className={`w-3 h-3 rounded-full mr-1 ${videoCompleted ? "bg-green-500" : "bg-blue-400"}`}
                             ></div>
-                            <span className={pdfCompleted ? "text-green-700" : "text-blue-700"}>
-                              PDF {pdfCompleted ? "Completed" : `${Math.round(pdfProgress)}%`}
+                            <span className={videoCompleted ? "text-green-700" : "text-blue-700"}>
+                              Video {videoCompleted ? "Completed" : `${Math.round(videoProgress)}%`}
                             </span>
                           </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* PDF Button */}
-                    {currentChapter.pdf && (
-                      <div className="p-4 border-b">
-                        <button
-                          className={`px-6 py-2 rounded-full font-medium transition-all flex items-center ${
-                            showPDF
-                              ? "bg-red-100 text-red-600 hover:bg-red-200"
-                              : "bg-blue-100 text-blue-600 hover:bg-blue-200"
-                          }`}
-                          onClick={togglePDF}
-                        >
-                          <FileText className="w-4 h-4 mr-2" />
-                          {showPDF ? "Hide PDF" : "View Course PDF"}
-                          {pdfCompleted && <CheckCircle className="w-4 h-4 ml-2 text-green-500" />}
-                        </button>
-                      </div>
-                    )}
-
-                    {/* PDF Viewer using SimplePDFViewer */}
-                    {showPDF && currentChapter.pdf && (
-                      <div id="pdf-container" className="p-4 border-b">
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-lg font-semibold flex items-center">
-                              <FileText className="w-5 h-5 mr-2 text-blue-600" />
-                              Course PDF
-                            </h3>
-                          </div>
-
-                          <SimplePDFViewer
-                            pdfUrl={`http://localhost:5000${currentChapter.pdf}`}
-                            onProgressChange={handlePDFProgressChange}
-                            onComplete={handlePDFComplete}
-                          />
+  
+                          {currentChapter.pdf && (
+                            <div className="flex items-center">
+                              <div
+                                className={`w-3 h-3 rounded-full mr-1 ${pdfCompleted ? "bg-green-500" : "bg-blue-400"}`}
+                              ></div>
+                              <span className={pdfCompleted ? "text-green-700" : "text-blue-700"}>
+                                PDF {pdfCompleted ? "Completed" : `${Math.round(pdfProgress)}%`}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    )}
+  
+                      {/* PDF Button */}
+                      {currentChapter.pdf && (
+                        <div className="p-4 border-b">
+                          <button
+                            className={`px-6 py-2 rounded-full font-medium transition-all flex items-center ${
+                              showPDF
+                                ? "bg-red-100 text-red-600 hover:bg-red-200"
+                                : "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                            }`}
+                            onClick={togglePDF}
+                          >
+                            <FileText className="w-4 h-4 mr-2" />
+                            {showPDF ? "Hide PDF" : "View Course PDF"}
+                            {pdfCompleted && <CheckCircle className="w-4 h-4 ml-2 text-green-500" />}
+                          </button>
+                        </div>
+                      )}
+  
+                      {/* PDF Viewer using SimplePDFViewer */}
+                      {showPDF && currentChapter.pdf && (
+                        <div id="pdf-container" className="p-4 border-b">
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="text-lg font-semibold flex items-center">
+                                <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                                Course PDF
+                              </h3>
+                            </div>
+  
+                            <SimplePDFViewer
+                              pdfUrl={`http://localhost:5000${currentChapter.pdf}`}
+                              onProgressChange={handlePDFProgressChange}
+                              onComplete={handlePDFComplete}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                     {/* Quiz Button */}
                     <div className="p-6 flex justify-center">
@@ -443,8 +460,7 @@ const ChapterContent = () => {
 
                     <QuizModal showQuiz={showQuiz} onClose={() => setShowQuiz(false)} />
                         
-                  </div>
-
+                  
                   {/* Tabs Section */}
                   <div className="p-6">
                     <Tabs defaultValue="overview" className="w-full">
@@ -675,13 +691,13 @@ const ChapterContent = () => {
                   </div>
                 </>
               )}
-            </div>
-          </div>
+           
+          
 
           {/* Sidebar - Can be used for course navigation, related courses, etc. */}
           <div className="w-full lg:w-1/3">{/* You can add sidebar content here if needed */}</div>
-        </div>
-      </div>
+       
+      
     </section>
   )
 }

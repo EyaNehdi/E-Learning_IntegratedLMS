@@ -280,7 +280,7 @@ const handleExportAllResults = async () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredExams.map((exam) => (
+                  {filteredExams.filter((exam) => exam.user === user._id).map((exam) => (
                     <tr key={exam._id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -411,13 +411,14 @@ const handleExportAllResults = async () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Select Exams</label>
             <div className="mt-2 space-y-2">
-              {exams.map((exam) => (
+              {exams.filter((exam) => exam.user === user._id).map((exam) => (
                 <div key={exam._id} className="flex items-center">
                   <input
                     type="checkbox"
                     id={exam._id}
                     value={exam._id}
                     checked={selectedExams.includes(exam._id)}
+                    
                     onChange={(e) => {
                       if (e.target.checked) {
                         setSelectedExams([...selectedExams, exam._id])

@@ -1,27 +1,33 @@
+"use client"
 
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { useProfileStore } from "../../store/profileStore"
-import { Link, Outlet, useParams, useNavigate } from "react-router-dom"
+import { Link, Outlet, useParams, useNavigate, useLocation } from "react-router-dom"
 
 const ListChapters = () => {
   const { id, courseid } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [chapters, setChapters] = useState([])
   const [completedChapters, setCompletedChapters] = useState([])
-  const { user, fetchUser, clearUser } = useProfileStore()
+  const { user, fetchUser } = useProfileStore()
   const [loading, setLoading] = useState(true)
+  const [courseDetails, setCourseDetails] = useState(null)
+
+  // Determine if a specific chapter is selected
+  const isChapterSelected = location.pathname.includes("/content/")
 
   // Store courseid in localStorage if it's not already there
   useEffect(() => {
     if (courseid) {
-      localStorage.setItem('courseid', courseid)
+      localStorage.setItem("courseid", courseid)
     }
   }, [courseid])
 
   // Retrieve courseid from localStorage if it's not available from useParams
-  const storedCourseId = localStorage.getItem('courseid')
+  const storedCourseId = localStorage.getItem("courseid")
   const finalCourseId = courseid || storedCourseId
 
   // Fetch the user data on mount
@@ -29,15 +35,29 @@ const ListChapters = () => {
     fetchUser()
   }, [fetchUser])
 
+  // Fetch course details
   useEffect(() => {
-    console.log("user after fetch", user)
-  }, [user])
+    const fetchCourseDetails = async () => {
+      if (!finalCourseId) {
+        console.error("Course ID is not defined")
+        return
+      }
 
-  console.log("Course ID:", finalCourseId)
+      try {
+        const response = await axios.get(`http://localhost:5000/course/${finalCourseId}`)
+        setCourseDetails(response.data)
+        console.log("Course details:", response.data)
+      } catch (error) {
+        console.error("Error fetching course details:", error)
+      }
+    }
 
+    fetchCourseDetails()
+  }, [finalCourseId])
+
+  // Fetch chapters
   useEffect(() => {
     const fetchChapters = async () => {
-      console.log("Course ID:", finalCourseId)
       if (!finalCourseId) {
         console.error("Course ID is not defined")
         return
@@ -54,15 +74,16 @@ const ListChapters = () => {
     }
 
     fetchChapters()
-  }, [finalCourseId]) 
+  }, [finalCourseId])
+
+  // Fetch completed chapters
   useEffect(() => {
-    // Ensure that user is available before making the request
     if (user && user._id) {
       axios
         .get("http://localhost:5000/api/auth/completedchapters", {
           params: {
-            userId: user._id, // Pass user ID as query param
-            chapterId: id, // Pass the chapter ID as query param
+            userId: user._id,
+            chapterId: id,
           },
         })
         .then((response) => {
@@ -84,7 +105,7 @@ const ListChapters = () => {
     // When a chapter is completed, update the backend
     axios
       .post("http://localhost:5000/user/mark-chapter-completed", {
-        userId: user._id, // Get the logged-in user's ID
+        userId: user._id,
         chapterId: chapterId,
       })
       .then((response) => {
@@ -112,8 +133,40 @@ const ListChapters = () => {
     }
 
     // Navigate to the exam page
-    navigate(`/exams/${storedCourseId}`)
+    navigate(`/exams/${finalCourseId}`)
   }
+
+  // Handle earning certificate
+  const handleEarnCertificate = async (provider) => {
+    try {
+      const response = await axios.post("http://localhost:5000/certificates/issueCertificate", {
+        userId: user._id,
+        courseId: finalCourseId,
+        provider,
+      })
+
+      console.log("Certificate Earned Successfully:", response.data)
+      alert("Congratulations! You have earned a certificate.")
+    } catch (error) {
+      console.error("Error earning certificate:", error.response?.data || error)
+      alert(error.response?.data?.error || "An error occurred.")
+    }
+  }
+
+  // Format price with currency symbol
+  const formatPrice = (price, currency = "EUR") => {
+    if (price === 0 || price === "0") return "Gratuit"
+
+    const currencySymbols = {
+      USD: "$",
+      EUR: "€",
+      DZD: "د.ج",
+    }
+
+    const symbol = currencySymbols[currency] || currencySymbols.EUR
+    return `${price} ${symbol}`
+  }
+
   return (
     <div>
       {/* Course Section */}
@@ -183,7 +236,7 @@ const ListChapters = () => {
                   })}
                 </div>
 
-                {/* Start Exam Button */}
+                {/* Action Buttons */}
                 <div className="mt-8">
                   <button
                     onClick={handleStartExam}
@@ -196,6 +249,16 @@ const ListChapters = () => {
                   >
                     {loading ? "Loading..." : "Start Exam"}
                   </button>
+
+                  {areAllChaptersCompleted() && !loading && (
+                    <button
+                      onClick={() => handleEarnCertificate("Trelix")}
+                      className="w-full mt-3 py-3 px-4 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      Earn Certificate
+                    </button>
+                  )}
+
                   {!areAllChaptersCompleted() && !loading && (
                     <p className="text-sm text-gray-500 mt-2">Complete all chapters to unlock the exam</p>
                   )}
@@ -203,9 +266,93 @@ const ListChapters = () => {
               </aside>
             </div>
 
-            <div className="lg:w-4/5">
+            {/* Main content area */}
+            <div className="lg:w-2/3">
               <div className="bg-white rounded-lg shadow-md p-8">
-                <Outlet />
+                {isChapterSelected ? (
+                  // If a chapter is selected, show the chapter content
+                  <Outlet />
+                ) : (
+                  // If no chapter is selected, show the course details
+                  <article className="course-details">
+                    {courseDetails && (
+                      <>
+                        <img
+                          className="rounded-3 img-fluid w-full h-64 object-cover mb-6"
+                          src="/assets/images/ces.png"
+                          alt="Course"
+                        />
+                        <div className="course-details-meta grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 p-4 bg-gray-50 rounded-lg">
+                          <div className="flex items-center">
+                            <div className="avatar-info">
+                              <h6 className="font-semibold">Niveau de cours</h6>
+                              <span className="text-gray-600">{courseDetails.level || "Non spécifié"}</span>
+                            </div>
+                          </div>
+                          <div className="course-reviews">
+                            <h6 className="font-semibold">Module</h6>
+                            <span className="text-gray-600">{courseDetails.categorie || "Non spécifié"}</span>
+                          </div>
+                          <div className="course-cat">
+                            <h6 className="font-semibold">Prix</h6>
+                            <span className="text-gray-600">
+                              {formatPrice(courseDetails.price, courseDetails.currency)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="course-content">
+                          <h2 className="text-3xl font-bold mb-4">{courseDetails.title}</h2>
+                          <div className="course-description mb-8">
+                            <p className="text-gray-700">{courseDetails.description}</p>
+                          </div>
+
+                          {/* Course objectives or additional info can go here */}
+                          {courseDetails.objectives && (
+                            <div className="course-objectives mt-6">
+                              <h3 className="text-xl font-semibold mb-3">Objectifs du cours</h3>
+                              <ul className="list-disc pl-5 space-y-2">
+                                {courseDetails.objectives.map((objective, index) => (
+                                  <li key={index} className="text-gray-700">
+                                    {objective}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Call to action */}
+                          <div className="mt-8 text-center">
+                            <p className="text-lg mb-4">
+                              Sélectionnez un chapitre dans le menu pour commencer à apprendre
+                            </p>
+                            {chapters.length > 0 && (
+                              <Link
+                                to={`/chapters/${finalCourseId}/content/${chapters[0]._id}`}
+                                className="inline-block py-3 px-6 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                              >
+                                Commencer le premier chapitre
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {!courseDetails && !loading && (
+                      <div className="text-center py-12">
+                        <h2 className="text-2xl font-bold text-gray-700">Détails du cours non disponibles</h2>
+                        <p className="text-gray-600 mt-2">Les informations sur ce cours n'ont pas pu être chargées.</p>
+                      </div>
+                    )}
+
+                    {loading && (
+                      <div className="flex justify-center items-center py-12">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                      </div>
+                    )}
+                  </article>
+                )}
               </div>
             </div>
           </div>
@@ -216,4 +363,3 @@ const ListChapters = () => {
 }
 
 export default ListChapters
-
