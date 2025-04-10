@@ -20,6 +20,7 @@
     "express-session": "^1.18.1",
     "fontkit": "^2.0.4",
     "google-auth-library": "^9.15.1",
+    "googleapis": "^148.0.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "js-cookie": "^3.0.5",
