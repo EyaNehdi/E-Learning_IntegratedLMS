@@ -10,6 +10,10 @@ const googleClassroomRoutes = require('./routes/googleClassroom.routes');
 const multer = require('multer');
 const socketIo = require('socket.io');
 
+
+const { getMoodleCourses,getCourseContents  } = require('./API/Moodle'); 
+
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var mfaRoutes = require('./routes/mfaRoutes');
@@ -60,6 +64,7 @@ app.use('/delete', Course);
 app.use('/api/classroom', googleClassroomRoutes);
 
 //auth routes
+
 const ExamRoutes = require('./routes/ExamRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const authRouteschapter = require('./routes/chapterRoutes'); 
@@ -78,6 +83,37 @@ app.use("/Exam", ExamRoutes);
 app.use((err, req, res, next) => {
   console.error('Upload Error:', err.message);
   res.status(400).json({ error: err.message });
+});
+app.get('/api/courses', async (req, res) => {
+  try {
+      const courses = await getMoodleCourses();
+      res.json(courses);
+  } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch courses' });
+  }
+});
+
+
+app.get('/api/courses/:id/contents', async (req, res) => {
+  try {
+      const courseId = parseInt(req.params.id, 10);
+      if (isNaN(courseId)) {
+          return res.status(400).json({ error: 'Invalid course ID' });
+      }
+
+      const contents = await getCourseContents(courseId);
+
+      if (!Array.isArray(contents)) {
+          console.error('⚠️ Unexpected response from Moodle:', contents);
+          return res.status(500).json({ error: 'Expected array of contents from Moodle' });
+      }
+
+      console.log(`✅ Course ${courseId} contents:`, contents);
+      res.json(contents);
+  } catch (error) {
+      console.error(`❌ Failed to fetch course contents:`, error.message);
+      res.status(500).json({ error: 'Failed to fetch course contents' });
+  }
 });
 
 // catch 404 and forward to error handler
