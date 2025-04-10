@@ -9,9 +9,13 @@ const cors = require('cors');
 const googleClassroomRoutes = require('./routes/googleClassroom.routes');
 const multer = require('multer');
 const socketIo = require('socket.io');
+
+const certifRoutes = require('./routes/certif.routes');
+
 const axios = require('axios');
 
 require('dotenv').config(); // Charger les variables d'environnement
+
 
 
 const { getMoodleCourses,getCourseContents  } = require('./API/Moodle'); 
@@ -129,6 +133,10 @@ app.use((req, res, next) => {
 });
 
 
+// In app.js
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/certificates', express.static(path.join(__dirname, 'certificates')));
+app.use("/certificates", certifRoutes);
 
 // Routes
 
