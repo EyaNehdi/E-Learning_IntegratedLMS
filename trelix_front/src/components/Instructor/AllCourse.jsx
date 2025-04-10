@@ -303,15 +303,17 @@ function Allcourse() {
               <div className="course-entry-3 card rounded-2 bg-white border">
                 <div className="card-media position-relative">
                   <a href={`/chapters/${course._id}`}>
-                    <img
-                      className="card-img-top"
-                      src={
-                        course.categorie === "OpenClassrooms"
-                          ? "assets/images/openclassrooms.jpg"
-                          : "assets/images/crs.png"
-                      }
-                      alt={course.title}
-                    />
+                  <img
+  className="card-img-top"
+  src={
+    course.categorie === "OpenClassrooms"
+      ? "assets/images/openclassrooms.jpg"
+      : course.categorie === "OpenLearn"
+      ? "assets/images/openlearn.png"
+      : "assets/images/crs.png"
+  }
+  alt={course.title}
+/>
                   </a>
                   <a
                     href="#"
