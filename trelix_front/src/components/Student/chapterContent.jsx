@@ -298,11 +298,11 @@ const ChapterContent = () => {
 
   return (
     <section className="bg-gray-50 py-8 md:py-12 overflow-hidden">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row gap-8">
+      
+        
           {/* Main Content Area - 8/12 width on large screens */}
-          <div className="w-full lg:w-2/3">
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          
+            
               {currentChapter && (
                 <>
                   {/* Check if PDF exists */}
@@ -691,13 +691,13 @@ const ChapterContent = () => {
                   </div>
                 </>
               )}
-            </div>
-          </div>
+           
+          
 
           {/* Sidebar - Can be used for course navigation, related courses, etc. */}
           <div className="w-full lg:w-1/3">{/* You can add sidebar content here if needed */}</div>
-        </div>
-      </div>
+       
+      
     </section>
   )
 }
