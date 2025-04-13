@@ -42,7 +42,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 dir('trelix_back') {  
-                    sh 'npm run sonar'  
+                    sh 'sonar-scanner'  
                 }
             }
         }
