@@ -41,15 +41,16 @@ pipeline {
                 }
             }
         }
-        stage('SonarQube Analysis') {
-          steps {
-               withSonarQubeEnv('SonarQube') { 
-               dir('trelix_back') {
-                    sh 'sonar-scanner'
-                   }
-               }
+       stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv('SonarQube') { // Use the name of your SonarQube server config
+            dir('trelix_back') {
+                def scannerHome = tool 'DefaultScanner' // Use the name of your SonarScanner CLI tool
+                sh "${scannerHome}/bin/sonar-scanner"
             }
-          }
+        }
+    }
+}
 
         
     }
