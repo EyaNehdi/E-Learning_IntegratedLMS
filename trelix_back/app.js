@@ -155,7 +155,8 @@ app.use('/api/classroom', googleClassroomRoutes);
 
 //auth routes
 
-
+const mailersRoutes = require('./routes/mailroute');
+app.use('/', mailersRoutes);
 const ExamRoutes = require('./routes/ExamRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const authRouteschapter = require('./routes/chapterRoutes');

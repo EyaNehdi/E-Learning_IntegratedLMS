@@ -241,20 +241,43 @@ function Header() {
                           </a>
                         </li>
                         <li className="nav-item dropdown">
-                          <a
-                            href="/allcours"
-                            role="button"
-                            aria-expanded="false"
-                            className="nav-link px-3 px-xl-4"
-                            style={{
-                              paddingInline: "40px",
-                              fontWeight: "bold",
-                              fontSize: "20px",
-                            }}
-                          >
-                            Courses
-                          </a>
-                        </li>
+                        <a
+                          href="#"
+                          role="button"
+                         
+                          aria-expanded="false"
+                          style={{
+                            marginRight: "46px",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                          }}
+                        >
+                          Courses
+                        </a>
+                        {/* Dropdown menu for Courses */}
+                        <ul className="dropdown-menu">
+                          <li>
+                            <a className="dropdown-item" href="/allcours  ">
+                              All Cours
+                            </a>
+                          </li>
+                          <li>
+  <a className="dropdown-item" href="/Moodle" style={{ display: "flex", alignItems: "center" }}>
+    <img
+      src="https://moodle.org/theme/moodleorg/pix/moodle_logo_TM.svg"
+      alt="Moodle"
+      style={{ width: "80px", height: "20px", marginRight: "8px" }}
+    />
+ 
+  </a>
+</li>
+
+                          <li>
+                            <hr className="dropdown-divider" />
+                          </li>
+
+                        </ul>
+                      </li>
                         <li className="nav-item dropdown">
                           <a
                             href="/leaderboard"

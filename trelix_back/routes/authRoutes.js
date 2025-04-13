@@ -8,7 +8,8 @@ const { registerStudent,
        registerStudentLinkedin,
        markChapterAsCompleted,
        signInlinkedin,
-       trackCurrentLocation} = require('../controllers/authController');
+       trackCurrentLocation,
+       resendVerificationCode} = require('../controllers/authController');
 const { verifyToken } = require ('../middlewares/verifyToken.js');
 const { validateInput } = require ('../middlewares/validators.js');
 
@@ -25,7 +26,7 @@ router.post('/register/githubStudent', registerStudentgithub);
 router.post('/register/googleStudent', registerStudentgoogle);
 router.post('/register/linkedinInstructor', registerInstructorLinkedin);
 router.post('/register/linkedinStudent', registerStudentLinkedin);
-
+router.post('/resend-verification', resendVerificationCode);
 router.post("/loginLinkedIn", signInlinkedin);
 router.post("/login", signIn);
 router.post("/logingoogle", signIngoogle);
@@ -33,7 +34,7 @@ router.post("/loginGit", signIngithub);
 router.post("/logout", signOut);
 router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", forgotPassword );
-router.post("/reset-password/:token", resetPassword);
+router.post("/reset-password", resetPassword);
 router.get("/completedchapters", markChapterAsCompleted);
 
 

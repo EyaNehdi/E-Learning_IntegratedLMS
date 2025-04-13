@@ -34,6 +34,18 @@ pipeline {
                 }
             }
         }
+        stage('Test Project') {
+            steps {
+                sh 'npm test'
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                dir('trelix_back') {  
+                    sh 'sonar-scanner'  
+                }
+            }
+        }
 
         
     }
