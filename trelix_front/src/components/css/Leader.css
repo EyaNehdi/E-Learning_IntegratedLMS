@@ -1,0 +1,132 @@
+.leaderboard-container {
+  width: 100%;
+  display: flex;
+
+}
+
+.leaderboard-main {
+  width: 800px;
+  height: 688px;
+  background-color: #d7d7d7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 0.5rem;
+}
+
+.leaderboard-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+}
+
+.leaderboard-title {
+  font-family: "Rubik", sans-serif;
+  font-size: 1.7rem;
+  color: #141a39;
+  text-transform: uppercase;
+}
+
+.leaderboard-content {
+  width: 100%;
+  position: relative;
+  overflow-y:auto;
+  
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #141a39;
+}
+
+.leaderboard-row {
+  transition: all 0.2s ease-in-out;
+  border-radius: 0.2rem;
+}
+
+.leaderboard-row:not(:first-child):hover {
+  background-color: #fff;
+  transform: scale(1.05);
+}
+
+
+.leaderboard-row:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.leaderboard-rank {
+  font-size: 2.2rem;
+  font-weight: bold;
+  text-align: left;
+  padding: 1rem 2rem;
+  width: 4rem;
+}
+
+.leaderboard-name {
+  text-align: left;
+  font-size: 1.2rem;
+  padding: 1rem 2rem;
+}
+
+.leaderboard-score {
+  font-weight: bold;
+  font-size: 1.3rem;
+  text-align: right;
+  padding: 1rem 2rem;
+}
+
+.leaderboard-empty {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #7e7f86;
+  padding: 1rem 2rem;
+}
+
+.leaderboard-profile-pic {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+.leaderboard-row:first-child {
+  position: relative;
+  z-index: 5;
+  background-color: gold; /* Highlight first place */
+  color: #141a39; /* Keep text readable */
+  font-weight: bold;
+  box-shadow: 0px 5px 20px 5px rgba(255, 215, 0, 0.5); /* Glowing effect */
+  border-radius: 0.5rem;
+  overflow: visible;
+}
+.leaderboard-row:first-child:hover {
+  transform: scale(1.05);
+  background-color: #ffd700; /* Slightly lighter gold */
+  box-shadow: 0px 10px 25px 8px rgba(255, 215, 0, 0.6); /* Stronger glow */
+  transition: all 0.3s ease-in-out;
+  cursor: pointer; /* Indicate it's interactive */
+}
+
+
+
+/* Responsive Design */
+@media (max-width: 740px) {
+  .leaderboard-main {
+    width: 90%;
+  }
+}
+
+@media (max-width: 500px) {
+  .leaderboard-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .leaderboard-title {
+    font-size: 1.3rem;
+  }
+}

@@ -1,0 +1,77 @@
+.leaderboard-page-container {
+  width: 100%;
+  max-width: 2500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.leaderboard-page-content {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+/* Left Section (Leaderboard) */
+.leaderboard-left-section {
+  min-width: 300px;
+}
+
+/* Right Section (Quiz & Rewards) */
+.leaderboard-right-section {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  margin-left: 50px;
+  margin-top: 40px;
+}
+
+/* Splitting the right section into two columns */
+.leaderboard-main-content {
+  display: flex;
+  gap: 20px;
+}
+
+/* Quiz column (Left inside Right Section) */
+.quiz-column {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Rewards column (Right inside Right Section) */
+.rewards-column {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width:100%;
+  height:100%;
+}
+
+/* Styling for quiz title and timer */
+.quiz-header-container {
+  text-align: center;
+}
+
+/* Styling for instructions */
+.quiz-instructions-container ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  font-size: 1.2rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .leaderboard-page-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .leaderboard-main-content {
+    flex-direction: column;
+  }
+
+  .quiz-column, .rewards-column {
+    width: 100%;
+  }
+}

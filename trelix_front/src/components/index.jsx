@@ -1,5 +1,5 @@
-import Footer from "./Footer";
-import Header from "./Header";
+import Footer from "./Footer/Footer";
+import Header from "./Header/Header";
 function Index() {
 
                       return (
@@ -19,7 +19,6 @@ function Index() {
   <link href="assets/css/glightbox.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/swiper-bundle.min.css" />
   {/* Style css */}
-  <link rel="stylesheet" href="assets/css/style.css" />
 
 
   {/* Header  */}

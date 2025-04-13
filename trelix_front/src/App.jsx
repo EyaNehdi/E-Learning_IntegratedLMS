@@ -1,117 +1,267 @@
 import "./App.css";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-
-import SignupInstructor from './components/Instructor/InstructorRegister';
-import SignupStudent from './components/Student/StudentRegister';
-
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import { Toaster } from "react-hot-toast";
-
-
-
 import Login from "./pages/SignIn/Login";
-import Index from "./components/index";
-import Profile from "./components/Profile";
 import SignUpPage from "./pages/SignUpPage/SignUpPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicy/PrivacyPolicyPage";
-import Review from './components/Admin/Review';
-import Leave from './components/Admin/Leave';
-import Manage from './components/Admin/Manage';
-import Reports from './components/Admin/Reports';
-
-import { useAuthStore } from "./store/authStore";
-
-
+import Review from "./components/Admin/Review";
+import Leave from "./components/Admin/Leave";
+import Manage from "./components/Admin/Manage";
+import Reports from "./components/Admin/Reports";
 import NotFound from "./components/Notfound";
-import Settings from './components/Admin/Settings';
-
-import { LinkedInCallback } from 'react-linkedin-login-oauth2';
+import Settings from "./components/Admin/Settings";
+import { LinkedInCallback } from "react-linkedin-login-oauth2";
 import CV from "./pages/cv";
-import ProtectedRoute from "./pages/ProtectedRoute"; 
+import ProtectedRoute from "./layout/ProtectedRoute";
+import HomeUser from "./pages/Home/HomeUser";
+import ProfilePage from "./pages/Profile/ProfilePage";
+import ProfileDetails from "./components/Profile/ProfileDetails";
+import MultiFactorAuth from "./components/MfaSetup/MultiFactorAuth";
+import PublicRoute from "./layout/PublicRoute";
+import AdminRoute from "./layout/AdminRoute";
+import Index from "./components";
+import Leaderboard from "./pages/Leaderboard/Leaderboard";
+import DailyQuizzes from "./pages/Admin/DailyQuizzes";
+import QuizzLeaderboard from "./pages/Leaderboard/QuizzLeaderboard";
+import ChangePassword from "./pages/Profile/ChangePassword";
+
+import Module from "./components/Instructor/Module";
+import Courses from "./components/Instructor/Courses";
+import Listecourse from "./components/Instructor/Listcourse";
+import EditCourse from "./components/Instructor/Editcourse";
+import Allcourse from "./components/Instructor/AllCourse";
+
+import ListChapters from "./components/Student/ListChapters";
+import AddChapter from "./components/Instructor/addChapter";
+import ChapterContent from "./components/Student/chapterContent";
+import AddQuiz from "./components/Instructor/addQuiz";
+
+import CourseChapter from "./components/Instructor/CourseChapter";
+import AllQuiz from "./components/Quiz/AllQuiz";
+import QuizPreview from "./components/Quiz/QuizPreview";
+import QuizEdit from "./components/Quiz/quizEdit";
+import AddExam from "./components/Exam/addExam";
+import AllExamsInstructor from "./components/Exam/AllExamsInstractor";
+import ExamStudent from "./components/Exam/ExamStudent";
+
+import CourseLearningPlatform from "./components/Quiz/test";
+import React, { useState } from "react";
+import axios from "axios";
 
 
 
-const RedirectAuthenticatedUser = ({ children }) => {
-	const { isAuthenticated, user } = useAuthStore();
-
-	if (isAuthenticated && user.isVerified) {
-		return <Navigate to='/' replace />;
-	}
-
-	return children;
-};
-function App() {
 
 
+const Chatbot = () => {
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    setIsLoading(true);
+    // Ajout du message utilisateur immédiatement
+    setMessages(prev => [...prev, { sender: 'user', text: input }]);
+    setInput('');
+
+    try {
+      const res = await axios.post('http://localhost:5000/chatbot',
+        { question: input },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      // Utilisez reply au lieu de text pour correspondre au backend
+      setMessages(prev => [...prev, {
+        sender: 'Trelix',
+        text: res.data.reply || res.data.text || "Pas de réponse"
+      }]);
+
+    } catch (err) {
+      console.error('Erreur détaillée:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message
+      });
+
+      setMessages(prev => [...prev, {
+        sender: 'Trelix',
+        text: err.response?.data?.error || "Erreur de connexion au serveur"
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
+    
+    <div className="chat-container">
+     
+      
+      <div className="messages">
+        {messages.map((msg, i) => (
+          <div key={i} className={`message ${msg.sender}`}>
+            <strong>{msg.sender === 'user' ? 'Vous' : 'Trelix'}:</strong> {msg.text}
+          </div>
+        ))}
+        {isLoading && (
+          <div className="message Trelix">
+            <strong>Trelix:</strong> Réflexion en cours...
+          </div>
+        )}
+      </div>
+      <form onSubmit={handleSubmit} className="chat-form">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Posez votre question..."
+          disabled={isLoading}
+        />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? 'Envoi...' : 'Envoyer'}
+        </button>
+      </form>
+    </div>
+  );
+};
 
 
+
+
+import BrowseCertificates from "./components/Student/BrowseCertificates";
+import AssignQuizToChapter from "./components/Quiz/AssignQuizToChapter";
+import Achievements from "./components/Profile/Achievements";
+import MoodleCourses from "./components/MoodleCourses";
+import Calendar from "./components/Calendear/Calendar";
+
+
+import ClassroomDashboard from "./pages/classroom/ClassroomDashboard"
+
+
+import CertificatesPage from "./pages/Certification/CertificatesPage";
+import EmailForm from "./components/mail/EmailSender";
+import VerifyEmail from "./pages/VerifyEmail";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
+
+
+
+function App() {
+  return (
+    
     <Router>
+      
       <Routes>
-	  <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
+        {/* **************** */}
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        {/* Public routes */}
+        < Route element={<PublicRoute />}>
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
-       
 
-       
-       
-        
-        
-        <Route path="/verify-email" element={<EmailVerificationPage />} />
-        <Route
-					path='/reset-password/:token'
-					element={
-						<RedirectAuthenticatedUser>
-							<ResetPasswordPage />
-						</RedirectAuthenticatedUser>
-					}
-				/>
-        <Route
-				path="/forgot-password" 
-					element={
-						<RedirectAuthenticatedUser>
-							<ForgotPasswordPage/>
-						</RedirectAuthenticatedUser>
-					}
-				/>
-        
-        
-        
-        
-	
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
 
-        
 
+         
+          </Route>
+        <Route path="/test" element={<MoodleCourses />} />
+        <Route path="/test1" element={<EmailForm />} />
+        {/* **************** */}
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/home" element={<HomeUser />} />
+
+          {/* Route pour le chatbot */}
+          <Route path="/chatbot" element={<Chatbot />} />
+
+
+
+          <Route path="/calendar" element={<Calendar />} />
+
+          <Route path="/certificates" element={<CertificatesPage />}>
+            <Route index element={<BrowseCertificates />} />
+            <Route path="browse" element={<BrowseCertificates />} />
+          </Route>
+
+          <Route path="/Moodle" element={<MoodleCourses />} />
+          <Route path="/allcours" element={<Allcourse />} />
+          
+          <Route path="/exams/:courseid" element={<ExamStudent />} />
+
+          <Route path="/chapters/:courseid" element={<ListChapters />}>
+            <Route path="content/:id" element={<ChapterContent />} />
+          </Route>
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/quiz" element={<QuizzLeaderboard />} />
+          <Route path="/profile" element={<ProfilePage />}>
+            <Route index element={<ProfileDetails />} />
+            <Route path="details" element={<ProfileDetails />} />
+
+            <Route path="addchapter" element={<AddChapter />} />
+            <Route path="addExam" element={<AddExam />} />
+            <Route path="Allexams" element={<AllExamsInstructor />} />
+            <Route path="allquiz" element={<AllQuiz />} />
+            <Route path="preview/:idquiz" element={<QuizPreview />} />
+            <Route path="edit/:id" element={<QuizEdit />} />
+            <Route path="addquiz" element={<AddQuiz />} />
+            <Route path="settings" element={<MultiFactorAuth />} />
+            <Route path="change-password" element={<ChangePassword />} />
+            <Route path="Course" element={<Courses />} />
+
+            <Route path="course-chapter/:courseId" element={<CourseChapter />} />
+            <Route path="list" element={<Listecourse />} />
+            <Route path="module" element={<Module />} />
+            <Route path="achievements" element={<Achievements />} />
+
+            <Route path="/profile/classroom/dashboard" element={<ClassroomDashboard />} />
+
+            <Route
+              path="/profile/edit-course/:courseId"
+              element={<EditCourse />}
+            />
+            <Route path="/profile/allcours" element={<Allcourse />} />
+
+            <Route path="assgnedQuizToChapter" element={<AssignQuizToChapter />} />
+            
+          </Route>
+
+
+        </Route>
         <Route path="/CV" element={<CV />} />
+        {/* **************** */}
+        {/* Admin routes */}
+        <Route element={<AdminRoute />}>
+          <Route path="/Review" element={<Review />} />
+          <Route path="/leave" element={<Leave />} />
+          <Route path="/leave/:id" element={<Leave />} />
+          <Route path="/manage" element={<Manage />} />
+          <Route path="/report" element={<DailyQuizzes />} />
+          <Route path="/set" element={<Settings />} />
+        </Route>
+        {/* **************** */}
         <Route path="/linkedin/callback" element={<LinkedInCallback />} />
-        <Route path="/signup" element={<SignUpPage />} />
-       
-       
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/Review" element={<Review />} />
-        <Route path="/admin" element={<Review />} />
-        <Route path="/leave" element={<Leave />} /> {/* Add User Route */}
-        <Route path="/leave/:id" element={<Leave />} /> {/* Edit User Route */}
-        <Route path="/manage" element={<Manage />} />
-        <Route path="/report" element={<Reports />} />
-        <Route path="/set" element={<Settings />} />
-
-
-        
-
-
-        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        {/* Not found route */}
 
         <Route path="*" element={<NotFound />} />
 
+
       </Routes>
-<Toaster />
+      <Toaster />
     </Router>
   );
 }

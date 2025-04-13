@@ -1,9 +1,12 @@
 import { create } from "zustand";
 import axios from "axios";
 
-export const useProfileStore = create((set) => ({
+export const useProfileStore = create((set, get) => ({
   user: null,
+  isLoadingUser: false,
+  accountCompletion: 0,
   fetchUser: async () => {
+    set({ isLoadingUser: true });
     try {
       // Optionally, you can manually extract token from cookies if needed
       const token = document.cookie.split('token=')[1];  // Or use your method to retrieve token
@@ -14,15 +17,53 @@ export const useProfileStore = create((set) => ({
         },
         withCredentials: true,  // Ensure cookies are sent with the request
       });
-
-      set({ user: res.data });
+      console.log("User data loaded:", res.data);
+      set({ user: res.data, isLoadingUser: false });
+      get().calculateAccountCompletion(res.data);
     } catch (error) {
       console.error("Error fetching user:", error);
-      set({ user: null });
+      set({ user: null, isLoadingUser: false });
     }
   },
-  clearUser: () => set({ user: null }),  
-  updateUser: (updatedData) => set((state) => ({
-    user: { ...state.user, ...updatedData },
-  })),// To clear user on logout
+  calculateAccountCompletion: (profileData) => {
+    const fields = [
+      "firstName",
+      "lastName",
+      "email",
+      "profilePhoto",
+      "coverPhoto",
+      "phone",
+      "Bio",
+    ];
+    const filledFields = fields.filter((field) => profileData[field]);
+    const percentage = Math.round((filledFields.length / fields.length) * 100);
+    set({ accountCompletion: percentage });
+  },
+  toggleMFA: () => {
+    set((state) => ({
+      user: { ...state.user, mfaEnabled: !state.user.mfaEnabled, backupCodes: [] },
+    }));
+    console.log("MFA toggled");
+  },
+  setBackupCodes: (newbackupCodes) => {
+    set((state) => ({
+      user: { ...state.user, backupCodes: newbackupCodes },
+    }));
+  },
+  updateProfilePhoto: (photo) => {
+    set((state) => ({
+      user: { ...state.user, profilePhoto: photo },
+    }));
+  },
+  updateCoverPhoto: (photo) => {
+    set((state) => ({
+      user: { ...state.user, coverPhoto: photo },
+    }));
+  },
+  clearUser: () => set({ user: null }),
+  updateUser: (updatedFields) => {
+    const updatedUser = { ...get().user, ...updatedFields };
+    set({ user: updatedUser });
+    get().calculateAccountCompletion(updatedUser);
+  },
 }));

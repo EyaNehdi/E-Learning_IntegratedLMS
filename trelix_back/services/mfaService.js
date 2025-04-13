@@ -4,23 +4,25 @@ const User = require("../models/userModel");
 require("dotenv").config();
 const { encryptSecret, decryptSecret } = require("./encryptionService");
 const crypto = require("crypto");
+const bcrypt = require('bcrypt');
 
 const generateMFA = async (userId) => {
   try {
+    const user = await User.findById(userId);
+    if (!user) throw new Error("User not found");
+
     const secret = speakeasy.generateSecret({
-      name: `${process.env.AppIssuer} (${userId})`,
+      name: `${process.env.AppIssuer} (${user.email})`,
       issuer: process.env.AppIssuer,
     });
 
     const encryptedSecret = encryptSecret(secret.base32);
 
-    const user = await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
       userId,
       { mfaSecret: encryptedSecret, mfaEnabled: true },
       { new: true }
     );
-
-    if (!user) throw new Error("User not found");
 
     const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url);
 
@@ -60,10 +62,32 @@ function generateCodes() {
   const codes = new Set();
   while (codes.size < 8) {
     const newCode = generateSingleCode();
-    console.log(newCode);
     codes.add(newCode);
   }
   return Array.from(codes);
 }
 
-module.exports = { generateMFA, verifyMFA, generateCodes };
+const verifyPassword = async (req, res, next) => {
+  try {
+    const { userId, password } = req.body;
+    if (!userId || !password) {
+      return res.status(400).json({ message: "User ID and password are required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, isNotPass: true, message: "Incorrect password" });
+    }
+
+    next();
+  } catch (error) {
+    console.error("Error verifying password:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = { generateMFA, verifyMFA, generateCodes, verifyPassword };

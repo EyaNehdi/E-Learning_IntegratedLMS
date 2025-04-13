@@ -2,38 +2,25 @@ import { useState, useEffect, useRef } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
 import Preloader from "../../components/Preloader/Preloader";
-import { GoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
+import { useGoogleOneTapLogin } from "@react-oauth/google";
 import GitHubLogin from "react-github-login";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { useLinkedIn, LinkedIn } from 'react-linkedin-login-oauth2';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; 
+import { useProfileStore } from "../../store/profileStore";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setLoading,] = useState("");
-  
+  const { updateUser } = useProfileStore(); // Assuming you have a method to update user data in your profile store
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const navigate = useNavigate();
-  const { logingoogle, login, isAuthenticated, checkAuth } = useAuthStore();
+  const { logingoogle, login } = useAuthStore();
   const [error, setError] = useState("");
-  
 
-  // Effect to check authentication only once on mount
-  useEffect(() => {
-    console.log("🟢 Checking authentication on mount...");
-    checkAuth();
-  }, [checkAuth]);
-
-  // Effect to redirect when authentication state changes
-  useEffect(() => {
-    console.log("🟢 isAuthenticated state:", isAuthenticated);
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -41,6 +28,7 @@ function Login() {
     setLoading(true);
     try {
       await login(email, password, stayLoggedIn);
+     
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -72,6 +60,7 @@ function Login() {
             } else {
                 throw new Error("No token received from backend");
             }
+     
         } catch (error) {
           toast.error("This Linkedin account dosn't exists. Redirecting to signup...");
           setTimeout(() => {
@@ -113,12 +102,6 @@ function Login() {
     }
   };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
-
   const handleGoogleLoginError = () => {
     setError("Google login failed.");
   };
@@ -135,6 +118,7 @@ function Login() {
 
       if (res.data?.email) {
         await logingoogle(res.data.email, stayLoggedIn);
+       
         setLoading(false);
       }
     } catch (err) {

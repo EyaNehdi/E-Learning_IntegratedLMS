@@ -1,0 +1,259 @@
+/* Add this to your CSS file */
+.header-actions {
+  position: relative;
+}
+
+.user-dropdown {
+  position: relative;
+}
+
+.user-dropdown {
+  display: block;
+}
+
+.admin-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 999;
+}
+
+.admin-menu.open {
+  display: block;
+}
+
+/* Header blue bar animation */
+.marquee {
+  overflow: visible;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.marquee p {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 35s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  z-index: 10000;
+  padding: 20px;
+  transition: transform 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Logo styling */
+.logo-container {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.logo-image {
+  max-width: 120px;
+  margin: 0 auto 15px;
+  display: block;
+}
+
+.divider {
+  border-top: 1px solid #e0e0e0;
+  margin: 15px 0;
+}
+
+/* Navigation links */
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 55px;
+  margin-left: 30px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  padding: 10px 5px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  background-color: #f5f5f5;
+}
+
+.nav-link.active {
+  color: #1976d2;
+  background-color: rgba(25, 118, 210, 0.08);
+}
+
+.nav-icon {
+  margin-right: 12px;
+}
+
+/* User profile section */
+.user-profile-link {
+  text-decoration: none;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.user-profile:hover {
+  background-color: #eaeaea;
+}
+
+.profile-avatar {
+  margin-right: 15px;
+  width: 40px;
+  height: 40px;
+}
+
+.welcome-message {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  flex: 1;
+}
+
+.welcome-message span {
+  font-size: 14px;
+  color: #666;
+}
+
+.user-name {
+  font-size: 16px;
+  color: #333;
+}
+
+.profile-indicator {
+  color: #999;
+}
+
+.indicator-icon {
+  font-size: 20px;
+}
+
+/* Auth buttons */
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.signin-button,
+.signup-button {
+  flex: 1;
+  text-align: center;
+  padding: 12px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.signup-button {
+  border: 2px solid #1976d2b4;
+  color: #1976d2;
+  background-color: transparent;
+}
+
+.signin-button {
+  background-color: #1976d2;
+  color: white;
+  border: 2px solid #1976d2;
+}
+
+.signin-button:hover {
+  background-color: rgba(25, 118, 210, 0.663);
+  color: white;
+}
+
+.signup-button:hover {
+  background-color: rgba(25, 118, 210, 0.234);
+  color: #1976d2;
+  border: 2px solid #1976d2;
+}
+
+/* Logout button */
+.logout-button {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #d32f2f;
+  font-weight: 500;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: rgba(211, 47, 47, 0.08);
+}
+
+.profile-link {
+  margin-bottom: 10px;
+  margin-left: 30px;
+}
+
+/* Close button */
+.close-menu-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: #666;
+  padding: 5px;
+}
+
+.close-menu-button:hover {
+  color: #333;
+}
+
+/* Mobile menu toggle button */
+.mobile-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    display: block;
+  }
+}
