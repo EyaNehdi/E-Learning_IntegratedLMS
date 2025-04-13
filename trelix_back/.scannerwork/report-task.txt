@@ -1,0 +1,6 @@
+projectKey=PiTrelix
+serverUrl=http://192.168.33.10:9000
+serverVersion=25.2.0.102705
+dashboardUrl=http://192.168.33.10:9000/dashboard?id=PiTrelix
+ceTaskId=6db52029-df1f-4582-8f25-0882d1defca1
+ceTaskUrl=http://192.168.33.10:9000/api/ce/task?id=6db52029-df1f-4582-8f25-0882d1defca1

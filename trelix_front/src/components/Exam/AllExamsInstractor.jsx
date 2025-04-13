@@ -29,7 +29,7 @@ const AllExamsInstructor = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
-  const itemsPerPage = 3
+  const itemsPerPage = 5
   const { user } = useOutletContext()
 
   // New state for assign tab
