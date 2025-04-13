@@ -3,8 +3,7 @@ pipeline {
     tools {
         nodejs 'N_NODE' 
     }
-     environment {
-      
+    environment {
         NEXUS_URL = 'http://192.168.33.10:8081/repository/trelix/' // Your Nexus repository URL
         NEXUS_CREDENTIALS = 'nexus-credentials-id' // Replace with your Nexus credentials ID in Jenkins
     }
@@ -39,26 +38,32 @@ pipeline {
                 }
             }
         }
+
         stage('Test Project') {
             steps {
                 dir('trelix_back') { 
-                sh 'npm test'
+                    sh 'npm test'
                 }
             }
         }
-//       stage('SonarQube Analysis') {
-//     steps {
-//         withSonarQubeEnv('SonarQube') {
-//             dir('trelix_back') {
-//                 script {
-//                     def scannerHome = tool 'DefaultScanner'
-//                     sh "${scannerHome}/bin/sonar-scanner"
-//                 }
-//             }
-//         }
-//     }
-// }
- stage('Publish to Nexus') {
+
+        // Uncomment the following section if SonarQube Analysis is needed
+        /*
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    dir('trelix_back') {
+                        script {
+                            def scannerHome = tool 'DefaultScanner'
+                            sh "${scannerHome}/bin/sonar-scanner"
+                        }
+                    }
+                }
+            }
+        }
+        */
+
+        stage('Publish to Nexus') {
             steps {
                 script {
                     // Publish the package to Nexus
@@ -73,8 +78,5 @@ pipeline {
                 }
             }
         }
-
-
-        
-    
+    }
 }
