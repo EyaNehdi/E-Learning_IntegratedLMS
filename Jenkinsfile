@@ -42,12 +42,14 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
-            steps {
-                dir('trelix_back') {  
-                    sh 'sonar-scanner'  
-                }
+          steps {
+               withSonarQubeEnv('SonarQube') { 
+               dir('trelix_back') {
+                    sh 'sonar-scanner'
+                   }
+               }
             }
-        }
+          }
 
         
     }
