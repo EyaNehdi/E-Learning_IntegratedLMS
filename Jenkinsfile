@@ -46,7 +46,7 @@ pipeline {
         withSonarQubeEnv('SonarQube') {
             dir('trelix_back') {
                 script {
-                    def scannerHome = tool 'DefaultScanner'
+                    def scannerHome = tool 'SonarQube'
                     sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
