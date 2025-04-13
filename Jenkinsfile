@@ -36,7 +36,9 @@ pipeline {
         }
         stage('Test Project') {
             steps {
+                dir('trelix_back') { 
                 sh 'npm test'
+                }
             }
         }
         stage('SonarQube Analysis') {
