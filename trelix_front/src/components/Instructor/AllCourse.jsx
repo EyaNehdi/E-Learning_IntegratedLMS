@@ -277,8 +277,76 @@ function Allcourse() {
 
               <div className="course-lists row gy-4 mt-3">
                 {loading ? (
-                  <div className="col-12 text-center">
-                    <p>Chargement...</p>
+
+          <div className="col-12 text-center">
+            <p>Loading...</p>
+          </div>
+        ) : filteredCourses.length > 0 ? (
+          filteredCourses.map((course) => (
+            <div className="col-xl-6 col-md-6" key={course._id}>
+              <div className="course-entry-3 card rounded-2 bg-white border">
+                <div className="card-media position-relative">
+                  <a href={`/chapters/${course._id}`}>
+                  <img
+  className="card-img-top"
+  src={
+    course.categorie === "OpenClassrooms"
+      ? "assets/images/openclassrooms.jpg"
+      : course.categorie === "OpenLearn"
+      ? "assets/images/openlearn.png"
+      : "assets/images/crs.png"
+  }
+  alt={course.title}
+/>
+                  </a>
+                  <a
+                    href="#"
+                    className="action-wishlist position-absolute text-white icon-xs rounded-circle"
+                  >
+                    <img
+                      src="assets/images/icons/heart-fill.svg"
+                      alt="Wishlist"
+                      style={{ marginTop: "10px", marginLeft: "9px" }}
+                    />
+                  </a>
+                </div>
+                <div className="card-body">
+                  <div className="course-meta d-flex justify-content-between align-items-center mb-2">
+                    <div className="d-flex align-items-center">
+                      <img src="assets/images/icons/star.png" alt="Rating" />
+                      <strong>4.5</strong>
+                      <span className="rating-count d-none d-xl-block">(1k reviews)</span>
+                    </div>
+                    <span>
+                      <i className="feather-icon icon-layers me-2" />
+                      {course.level}
+                    </span>
+                    <span className="lead">
+                      <a href="#" className="text-reset">
+                        <i className="feather-icon icon-bookmark" />
+                      </a>
+                    </span>
+                  </div>
+                  <h3 className="sub-title mb-0">
+                    <a href={`/single-course/${course._id}`}>{course.title}</a>
+                  </h3>
+                  <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
+                    <span>
+                      By:{" "}
+                      <a href="#" className="text-reset">
+                        {course.categorie === "OpenClassrooms" ? "OpenClassrooms" : "Instructor"}
+                      </a>
+                    </span>
+                    <span>{course.module ? course.module.name : "No module assigned"}</span>
+                  </div>
+                  <div className="course-footer d-flex align-items-center justify-content-between pt-3">
+                    <div className="price">
+                      {course.price === 0 ? "Free" : course.price + "$"} <del>$35.00</del>
+                    </div>
+                    <a href={`/enroll/${course._id}`}>
+                      Enroll Now <i className="feather-icon icon-arrow-right" />
+                    </a>
+
                   </div>
                 ) : filteredCourses.length > 0 ? (
                   filteredCourses.map((course) => (

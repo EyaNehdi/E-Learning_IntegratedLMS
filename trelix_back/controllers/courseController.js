@@ -135,6 +135,39 @@ const searchCourses = async (req, res) => {
         console.error("Erreur lors de la recherche des cours:", error);
         res.status(500).json({ message: "Erreur du serveur" });
     }
-};
 
-module.exports = { createCourse, getAllCourses, getCourseById, updateCourse, deleteCourse, searchCourses,likeCourse };
+
+};
+    // Récupérer les catégories avec le nombre de cours dans chaque
+    const getCoursesByCategory = async (req, res) => {
+        try {
+          const categories = await Course.aggregate([
+            {
+              $group: {
+                _id: "$categorie",
+                totalCourses: { $sum: 1 }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                categorie: "$_id",
+                totalCourses: 1
+              }
+            }
+          ]);
+      
+          res.status(200).json(categories);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des catégories:", error);
+          res.status(500).json({ message: "Erreur du serveur" });
+        }
+      };
+module.exports = { createCourse,
+     getAllCourses,
+      getCourseById,
+       updateCourse,
+        deleteCourse,
+         searchCourses,
+         getCoursesByCategory,likeCourse };
+

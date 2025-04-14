@@ -5,6 +5,13 @@ const { Parser } = require("json2csv");
 const Course = require("../models/course");
 const mongoose = require('mongoose');
 
+const moment = require('moment'); // Assure-toi que cette ligne est présente
+const notifier = require('node-notifier');
+const ExamAttempt = require("../models/ExamAttempt") ;
+
+const ExamResult = require('../models/ExamResult');
+
+
 // Configure multer storage
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -81,6 +88,17 @@ const getExamById = async (req, res) => {
     }
 };
 
+
+
+const sendDesktopNotification = (subject, message) => {
+    notifier.notify({
+        title: subject,
+        message: message,
+        sound: true, // optionnel, pour jouer un son
+        wait: true    // optionnel, pour attendre que l'utilisateur ferme la notification
+    });
+};
+
 // Create new exam
 const createExam = async (req, res) => {
     try {
@@ -109,14 +127,27 @@ const createExam = async (req, res) => {
             originalFile,
         });
 
+        // Sauvegarder l'examen
         await newExam.save();
+
+        // Vérifier si l'examen commence dans 3 jours après la sauvegarde
+        const examStartDate = moment(newExam.startDate); // Date de début de l'examen
+        const threeDaysBefore = examStartDate.clone().subtract(3, 'days'); // 3 jours avant la date de début
+
+        if (moment().isSame(threeDaysBefore, 'day')) {
+            const subject = `Rappel : Un examen dans 3 jours !`;
+            const message = `L'examen "${newExam.title}" commence le ${examStartDate.format('LL')}. Préparez-vous !`;
+
+            // Fonction fictive pour envoyer la notification
+            sendDesktopNotification(subject, message);
+        }
+
         res.status(201).json(newExam);
     } catch (error) {
         console.error("Error creating exam:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
-
 // Update exam
 const updateExam = async (req, res) => {
     try {
@@ -282,6 +313,238 @@ const getRandomExamFromCourse = async (req, res) => {
     }
 };
 
+const getuserattempts = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        // Fetch all exam attempts by the user
+        const attempts = await Result.find({ user: userId }).populate("quiz");
+
+        // If no attempts found, return an empty array
+        if (!attempts || attempts.length === 0) {
+            return res.json([]); // Returning an empty array instead of an error
+        }
+
+        // Format response data
+        const formattedAttempts = attempts.map((attempt) => ({
+            quizId: attempt.quiz?._id, // Corrected to use populated `quiz`
+            quizTitle: attempt.quiz?.title || "Unknown Exam", // Corrected to use populated `quiz`
+            score: attempt.score,
+            date: attempt.date,
+            answers: attempt.answers,
+        }));
+
+        res.json(formattedAttempts);
+    } catch (error) {
+        console.error("Error fetching user attempts:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+const handleSubmitExam = async (req, res) => {
+    try {
+        const { examId } = req.params;
+        const { userId, answers } = req.body;  // Assuming answers is an array of user answers
+
+        // Check if the exam exists
+        const exam = await Exam.findById(examId).populate('questions.correctAnswer');
+        if (!exam) {
+            return res.status(404).json({ message: "Exam not found" });
+        }
+
+        let score = 0;
+
+        // Loop through the questions and compare answers
+        exam.questions.forEach((question, index) => {
+            const userAnswer = answers[index]; // User's answer for the current question
+            const correctAnswer = question.correctAnswer;
+
+            // Compare the answer (case-sensitive or case-insensitive based on your preference)
+            if (userAnswer === correctAnswer) {
+                score += question.points; // Add points for correct answer
+            }
+        });
+        const results = calculateResults(exam, answers)
+        // Create a new ExamResult entry with the calculated score
+        const newExamResult = new ExamResult({
+            user: userId,
+            exam: examId,
+            score,
+            answers,
+        });
+        const attempt = new ExamAttempt({
+            userId,
+            examId,
+            answers,
+            results,
+            submittedAt: new Date(),
+          })
+      
+          await attempt.save()
+
+        // Save the result
+        await newExamResult.save();
+
+        res.status(200).json({ message: "Exam submitted successfully", result: newExamResult });
+    } catch (error) {
+        console.error("Error submitting exam:", error);
+        res.status(500).json({ message: "Error submitting exam" });
+    }
+};
+function calculateResults(exam, answers) {
+    const questions = exam.questions || []
+    let correctCount = 0
+    let incorrectCount = 0
+    let score = 0
+    let totalPoints = 0
+    let unansweredCount = 0
+  
+    const questionResults = questions.map((question, index) => {
+      const userAnswer = answers[index]
+  
+      // Skip scoring for essay questions
+      if (question.type === "essay") {
+        totalPoints += question.points || 1
+        return {
+          questionId: question._id,
+          question: question.question,
+          userAnswer,
+          type: question.type,
+          needsGrading: true,
+          points: question.points || 1,
+          earnedPoints: "Pending",
+          options: question.options,
+        }
+      }
+  
+      // For short answer, we'll do a simple match
+      let isCorrect = false
+      if (question.type === "short_answer") {
+        isCorrect = userAnswer && userAnswer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim()
+      } else {
+        isCorrect = userAnswer === question.correctAnswer
+      }
+  
+      if (!userAnswer && userAnswer !== false) {
+        unansweredCount++
+      } else if (isCorrect) {
+        correctCount++
+      } else {
+        incorrectCount++
+      }
+  
+      const points = question.points || 1
+      totalPoints += points
+      if (isCorrect) score += points
+  
+      return {
+        questionId: question._id,
+        question: question.question,
+        userAnswer,
+        correctAnswer: question.correctAnswer,
+        isCorrect,
+        type: question.type,
+        points: points,
+        earnedPoints: isCorrect ? points : 0,
+        options: question.options,
+      }
+    })
+  
+    const percentageScore = totalPoints > 0 ? Math.round((score / totalPoints) * 100) : 0
+    const passingScore = exam.passingScore || 60
+    const passed = percentageScore >= passingScore
+  
+    return {
+      score,
+      totalPoints,
+      percentageScore,
+      correctCount,
+      incorrectCount,
+      unansweredCount,
+      totalQuestions: questions.length,
+      passed,
+      passingScore,
+      questionResults,
+    }
+  }
+  const checkAttempt = async (req, res) => {
+    try {
+      const { courseId, userId } = req.params
+      console.log("Course ID:", courseId)
+      console.log("User ID:", userId)
+  
+      // Find the course by its ID
+      const course = await Course.findById(courseId)
+      console.log("Course found:", course)
+  
+      if (!course) {
+        return res.status(404).json({ error: "Course not found" })
+      }
+  
+      // Find all exams for this course
+      const exams = await Exam.find({ _id: { $in: course.exams } })  // Use the exams field of the course
+      console.log("Exams for course:", exams)
+  
+      if (exams.length === 0) {
+        // No exams found for this course
+        return res.status(200).json({
+          hasAttempted: false,
+          message: "No exams available for this course.",
+        })
+      }
+  
+      const examIds = exams.map((exam) => exam._id)
+      console.log(examIds)
+  
+      // Check if the user has attempted any of these exams
+      const attempt = await ExamAttempt.findOne({
+        userId,
+        examId: { $in: examIds },
+      }).populate("examId")
+  
+      if (attempt) {
+        // User has already taken an exam for this course
+        return res.status(200).json({
+          hasAttempted: true,
+          results: attempt.results,
+          examId: attempt.examId,
+        })
+      }
+  
+      // User has not taken any exam for this course
+      return res.status(200).json({
+        hasAttempted: false,
+      })
+    } catch (error) {
+      console.error("Error checking exam attempt:", error)
+      res.status(500).json({ error: "Server error" })
+    }
+  }
+  
+    
+const checkstatus = async (req, res) => {
+    try {
+        const { courseId, userId } = req.params
+    
+        // Find the latest attempt for this user and course
+        const attempt = await ExamAttempt.findOne({
+          userId,
+          courseId,
+          passed: true, // Only find passed attempts
+        }).sort({ createdAt: -1 }) // Get the most recent
+    
+        return res.json({
+          hasPassed: !!attempt,
+          attempt: attempt,
+        })
+      } catch (error) {
+        console.error("Error checking exam status:", error)
+        return res.status(500).json({ error: "Server error" })
+      }
+}      
 
 
 module.exports = {
@@ -296,5 +559,9 @@ module.exports = {
     getExamss,
     assignExamsToCourse,
     getRandomExamFromCourse,
+    getuserattempts,
+    handleSubmitExam,
+    checkAttempt,
+    checkstatus,
     upload
 };

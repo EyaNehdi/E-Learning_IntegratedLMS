@@ -51,9 +51,8 @@ function Sidebar({ setActivePage }) {
 
             <li>
               <Link
-                className={`nav-link ${
-                  location.pathname === "/courses" ? "active" : ""
-                }`}
+                className={`nav-link ${location.pathname === "/courses" ? "active" : ""
+                  }`}
                 to="/profile/list"
                 onClick={() => setActivePage("My Courses")}
               >
@@ -61,6 +60,7 @@ function Sidebar({ setActivePage }) {
                 <span>My Courses</span>
               </Link>
               <ul style={{ paddingLeft: "20px", marginTop: "5px" }}>
+
               <li>
   <Link
     className={`nav-link ${location.pathname === "/profile/classroom" ? "active" : ""}`}
@@ -77,14 +77,31 @@ function Sidebar({ setActivePage }) {
   </Link>
 </li>
 
+                <li>
+                  <Link
+                    className={`nav-link ${location.pathname === "/profile/classroom/dashboard" ? "active" : ""}`}
+                    to="/profile/classroom/dashboard"
+                    onClick={() => setActivePage("My Courses")}
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    <img
+                      src="https://www.gstatic.com/classroom/logo_square_48.svg"
+                      alt="Google Classroom"
+                      style={{ width: "20px", height: "20px", marginRight: "8px" }}
+                    />
+                    <span> Cours Classroom</span>
+                  </Link>
+                </li>
 
-    </ul>
+
+
+              </ul>
+              
             </li>
             <li>
               <Link
-                className={`nav-link ${
-                  location.pathname === "/wishlist" ? "active" : ""
-                }`}
+                className={`nav-link ${location.pathname === "/wishlist" ? "active" : ""
+                  }`}
                 to="/wishlist"
                 onClick={() => setActivePage("Wishlist")}
               >
@@ -94,9 +111,8 @@ function Sidebar({ setActivePage }) {
             </li>
             <li>
               <Link
-                className={`nav-link ${
-                  location.pathname === "/reviews" ? "active" : ""
-                }`}
+                className={`nav-link ${location.pathname === "/reviews" ? "active" : ""
+                  }`}
                 to="/reviews"
                 onClick={() => setActivePage("Reviews")}
               >
@@ -147,18 +163,36 @@ function Sidebar({ setActivePage }) {
                 <i className="feather-icon icon-plus" />
                 <span>AddQuiz</span>
               </Link>
-            </li> */}
+
+            </li>
+            <li>
+              <Link className="nav-link" to="/profile/addExam">
+                <i className="feather-icon icon-plus" />
+                <span>addExam</span>
+              </Link>
+            </li>
+            <li>
+              <Link className="nav-link" to="/chatbot">
+                <i className="feather-icon icon-plus" />
+                <span>chatbot</span>
+              </Link>
+            </li>
+
+          
+
+          
+          */}
 
           </ul>
         </nav>
       </div>
 
       {/* Course Management */}
-     
-          {user?.role === "instructor" && (
-             <div className="widget">
-             <p className="greetings">Course Management</p>
-             <nav className="dashboard-nav">
+
+      {user?.role === "instructor" && (
+        <div className="widget">
+          <p className="greetings">Course Management</p>
+          <nav className="dashboard-nav">
             <ul className="list-unstyled nav">
               <li>
                 <Link
@@ -188,12 +222,18 @@ function Sidebar({ setActivePage }) {
                   <span>addExam</span>
                 </Link>
               </li>
+              <li>
+                <Link className="nav-link" to="/chatbot">
+                  <i className="feather-icon icon-plus" />
+                  <span>chatbot</span>
+                </Link>
+              </li>
             </ul>
-            </nav>
-            </div>  
-          )}
+          </nav>
+        </div>
+      )}
 
-       
+
 
       {/* Account Settings */}
       <div className="widget">
