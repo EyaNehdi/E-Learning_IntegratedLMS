@@ -261,12 +261,22 @@ function Header() {
                             <a className="dropdown-item" href="/allcours  ">
                               All Cours
                             </a>
-                          </li>
+                          </li> 
                           <li>
   <a className="dropdown-item" href="/Moodle" style={{ display: "flex", alignItems: "center" }}>
     <img
       src="https://moodle.org/theme/moodleorg/pix/moodle_logo_TM.svg"
       alt="Moodle"
+      style={{ width: "80px", height: "20px", marginRight: "8px" }}
+    />
+ 
+  </a>
+</li>
+<li>
+  <a className="dropdown-item" href="/Classroom" style={{ display: "flex", alignItems: "center" }}>
+    <img
+      src="https://www.gstatic.com/classroom/logo_square_48.svg"
+      alt="Classroom"
       style={{ width: "80px", height: "20px", marginRight: "8px" }}
     />
  

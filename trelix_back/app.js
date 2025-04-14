@@ -316,6 +316,7 @@ app.get('/api/classroom-test', (req, res) => {
       frontendUrl: process.env.FRONTEND_URL ? "Défini" : "Non défini"
     }
   });
+});
 
 app.get('/api/courses', async (req, res) => {
   try {

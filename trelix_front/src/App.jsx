@@ -55,6 +55,31 @@ import axios from "axios";
 
 import CourseLearningPlatform from "./components/Quiz/test";
 
+import AssignQuizToChapter from "./components/Quiz/AssignQuizToChapter";
+import Achievements from "./components/Profile/Achievements";
+import MoodleCourses from "./components/MoodleCourses";
+import Calendar from "./components/Calendear/Calendar";
+import JoinRoom from "./components/JoinRoom"
+import MeetingRoom from "./components/MeetingRoom"  
+import ChatComponent from './components/ChatComponent'; 
+
+
+import CertificatesPage from "./pages/Certification/CertificatesPage";
+
+
+import CourseChartPage from "./components/Instructor/CourseChart"
+import ClassroomPage from "./components/classroom/ClassroomPage";
+import CourseDetailsPage from "./components/classroom/CourseDetailsPage";
+
+
+
+
+
+import EmailForm from "./components/mail/EmailSender";
+import VerifyEmail from "./pages/VerifyEmail";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
 
 
 
@@ -140,49 +165,6 @@ const Chatbot = () => {
   );
 };
 
-
-
-
-
-import BrowseCertificates from "./components/Student/BrowseCertificates";
-
-import AssignQuizToChapter from "./components/Quiz/AssignQuizToChapter";
-import Achievements from "./components/Profile/Achievements";
-import MoodleCourses from "./components/MoodleCourses";
-import Calendar from "./components/Calendear/Calendar";
-import JoinRoom from "./components/JoinRoom"
-import MeetingRoom from "./components/MeetingRoom"  
-import ChatComponent from './components/ChatComponent'; 
-
-
-
-
-
-
-
-
-
- 
-
-import CertificatesPage from "./pages/Certification/CertificatesPage";
-import Achievements from "./components/Profile/Achievements";
-import BrowseCertificates from "./components/Student/BrowseCertificates";
-import CourseChartPage from "./components/Instructor/CourseChart"
-import ClassroomPage from "./components/classroom/ClassroomPage";
-import CourseDetailsPage from "./components/classroom/CourseDetailsPage";
-
-import ClassroomDashboard from "./pages/classroom/ClassroomDashboard"
-
-
-
-import EmailForm from "./components/mail/EmailSender";
-import VerifyEmail from "./pages/VerifyEmail";
-import ForgotPassword from "./pages/ForgotPassword.jsx";
-import ResetPassword from "./pages/ResetPassword.jsx";
-import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
-
-
-
 function App() {
 
 
@@ -251,6 +233,8 @@ function App() {
           </Route>
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/quiz" element={<QuizzLeaderboard />} />
+          <Route path="/Classroom" element={<ClassroomPage />} />
+          <Route path="/classroom/courses/:courseId" element={<CourseDetailsPage />} />
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
@@ -272,7 +256,7 @@ function App() {
 
             <Route path="achievements" element={<Achievements />} />
 
-            <Route path="/profile/classroom/dashboard" element={<ClassroomDashboard />} />
+       
 
 
             <Route
