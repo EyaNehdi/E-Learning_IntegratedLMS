@@ -1,7 +1,9 @@
 {
   "name": "trelix-back",
   "version": "0.0.0",
-  "private": true,
+  "publishConfig": {
+    "registry": "http://192.168.33.10:8081/repository/trelix/"
+  },
   "scripts": {
     "dev": "nodemon ./bin/www",
     "build": "webpack",
