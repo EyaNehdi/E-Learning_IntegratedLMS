@@ -48,27 +48,22 @@ pipeline {
         }
 
         stage('Publish to Nexus') {
-            steps {
-                script {
-                    // Publish the package to Nexus
-                    withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}", usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                        dir('trelix_back') {
-                            // List files to ensure we're in the correct directory and it has package.json
-                            sh "ls -l"
-                            
-                            // Configure npm to use Nexus credentials for publishing
-                            sh """
-                                echo Publishing package to Nexus...
-                                npm config set //192.168.33.10:8081/repository/trelix/:_authToken=${NEXUS_PASSWORD}
-                                npm config set //192.168.33.10:8081/repository/trelix/:username ${NEXUS_USERNAME}
-                                npm config set //192.168.33.10:8081/repository/trelix/:password ${NEXUS_PASSWORD}
-                                
-                                npm publish --registry ${NEXUS_URL} --access public
-                            """
-                        }
-                    }
+    steps {
+        script {
+            withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}", usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                dir('trelix_back') {
+                    sh '''
+                        echo Publishing package to Nexus...
+                        AUTH_STRING=$(echo -n "$NEXUS_USERNAME:$NEXUS_PASSWORD" | base64)
+                        echo "//192.168.33.10:8081/repository/trelix/:_auth=$AUTH_STRING" >> ~/.npmrc
+                        echo "//192.168.33.10:8081/repository/trelix/:email=admin@example.org" >> ~/.npmrc
+
+                        npm publish --registry http://192.168.33.10:8081/repository/trelix/ --access public
+                    '''
                 }
             }
         }
+    }
+}
     }
 }
