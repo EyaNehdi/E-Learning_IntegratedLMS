@@ -4,8 +4,8 @@ pipeline {
         nodejs 'N_NODE' 
     }
     environment {
-        NEXUS_URL = 'http://192.168.33.10:8081/repository/trelix/' // Your Nexus repository URL
-        NEXUS_CREDENTIALS = 'nexus-credentials-id' // Replace with your Nexus credentials ID in Jenkins
+        NEXUS_URL = 'http://192.168.33.10:8081/repository/trelix/' // Nexus repository URL
+        NEXUS_CREDENTIALS = 'nexus-credentials-id' // Nexus credentials ID in Jenkins
     }
 
     stages {
@@ -47,22 +47,6 @@ pipeline {
             }
         }
 
-        // Uncomment the following section if SonarQube Analysis is needed
-        /*
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    dir('trelix_back') {
-                        script {
-                            def scannerHome = tool 'DefaultScanner'
-                            sh "${scannerHome}/bin/sonar-scanner"
-                        }
-                    }
-                }
-            }
-        }
-        */
-
         stage('Publish to Nexus') {
             steps {
                 script {
@@ -72,10 +56,10 @@ pipeline {
                             // List files to ensure we're in the correct directory and it has package.json
                             sh "ls -l"
                             
-                            // Now publishing to Nexus
+                            // Publish the package to Nexus without username and password in the command
                             sh """
                                 echo Publishing package to Nexus...
-                                npm publish --registry ${NEXUS_URL} --username ${NEXUS_USERNAME} --password ${NEXUS_PASSWORD}
+                                npm publish --registry ${NEXUS_URL} --access public
                             """
                         }
                     }
