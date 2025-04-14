@@ -69,10 +69,13 @@ pipeline {
                     // Publish the package to Nexus
                     withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}", usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
                         dir('trelix_back') {
-                            // Ensure that the npm publish command points to the correct directory or package
+                            // List files to ensure we're in the correct directory and it has package.json
+                            sh "ls -l"
+                            
+                            // Now publishing to Nexus
                             sh """
                                 echo Publishing package to Nexus...
-                                npm publish . --registry ${NEXUS_URL} --username ${NEXUS_USERNAME} --password ${NEXUS_PASSWORD}
+                                npm publish --registry ${NEXUS_URL} --username ${NEXUS_USERNAME} --password ${NEXUS_PASSWORD}
                             """
                         }
                     }
