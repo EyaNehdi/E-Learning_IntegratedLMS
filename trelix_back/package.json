@@ -8,6 +8,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@daily-co/daily-js": "^0.77.0",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
@@ -20,6 +21,7 @@
     "express-session": "^1.18.1",
     "fontkit": "^2.0.4",
     "google-auth-library": "^9.15.1",
+    "googleapis": "^148.0.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "js-cookie": "^3.0.5",
@@ -33,11 +35,9 @@
     "morgan": "~1.9.1",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
-
+    "node-fetch": "^2.7.0",
     "node-notifier": "^10.0.1",
-
     "pdf-lib": "^1.17.1",
-
     "pdf-parse": "^1.1.1",
     "qrcode": "^1.5.4",
     "react-linkedin-login": "^1.0.4",

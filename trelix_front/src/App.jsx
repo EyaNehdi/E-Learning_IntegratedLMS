@@ -46,7 +46,8 @@ import QuizEdit from "./components/Quiz/quizEdit";
 import AddExam from "./components/Exam/addExam";
 import AllExamsInstructor from "./components/Exam/AllExamsInstractor";
 import ExamStudent from "./components/Exam/ExamStudent";
-import CourseLearningPlatform from "./components/Quiz/test";
+import BrowseCertificates from "./components/Student/BrowseCertificates";
+
 import React, { useState } from "react"; 
 import axios from "axios"; 
 
@@ -131,11 +132,24 @@ const Chatbot = () => {
 };
 
 
-import CertificateBrowser from "./pages/Certification/CertificateBrowser";
+
+
+
+
+
 import AssignQuizToChapter from "./components/Quiz/AssignQuizToChapter";
 import Achievements from "./components/Profile/Achievements";
 import MoodleCourses from "./components/MoodleCourses";
 import Calendar from "./components/Calendear/Calendar";
+import JoinRoom from "./components/JoinRoom"
+import MeetingRoom from "./components/MeetingRoom"  
+import ChatComponent from './components/ChatComponent'; 
+
+
+
+
+
+
 
 
 import ClassroomDashboard from "./pages/classroom/ClassroomDashboard"
@@ -145,9 +159,12 @@ import CertificatesPage from "./pages/Certification/CertificatesPage";
 
 
 
-
 function App() {
+
+
   return (
+
+    
     <Router>
       <Routes>
         {/* **************** */}
@@ -169,6 +186,12 @@ function App() {
         </Route>
         <Route path="/test" element={<MoodleCourses />} />
         <Route path="/test1" element={<Calendar />} />
+       <Route path="/meeting" element={<JoinRoom />} />
+       <Route path="/chat" element={<ChatComponent />} />
+      
+      
+
+<Route path="/meeting/:roomId" element={<MeetingRoom />} />
         {/* **************** */}
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
@@ -176,7 +199,8 @@ function App() {
 
           {/* Route pour le chatbot */}
         <Route path="/chatbot" element={<Chatbot />} />
-
+         {/* Route pour la réunion */}
+         
 
          
           <Route path="/calendar" element={<Calendar />} />
@@ -250,7 +274,11 @@ function App() {
       </Routes>
       <Toaster />
     </Router>
+
+    
   );
+
+
 }
 
 export default App;
