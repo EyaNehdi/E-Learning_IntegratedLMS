@@ -56,9 +56,13 @@ pipeline {
                             // List files to ensure we're in the correct directory and it has package.json
                             sh "ls -l"
                             
-                            // Publish the package to Nexus without username and password in the command
+                            // Configure npm to use Nexus credentials for publishing
                             sh """
                                 echo Publishing package to Nexus...
+                                npm config set //192.168.33.10:8081/repository/trelix/:_authToken=${NEXUS_PASSWORD}
+                                npm config set //192.168.33.10:8081/repository/trelix/:username ${NEXUS_USERNAME}
+                                npm config set //192.168.33.10:8081/repository/trelix/:password ${NEXUS_PASSWORD}
+                                
                                 npm publish --registry ${NEXUS_URL} --access public
                             """
                         }
