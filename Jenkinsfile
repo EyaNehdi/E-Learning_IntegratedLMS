@@ -49,23 +49,22 @@ pipeline {
 
         stage('Publish to Nexus') {
     steps {
-        script {
-            withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}", usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                dir('trelix_back') {
-                    sh '''
-                        echo Publishing package to Nexus...
-                        
-                        echo "//192.168.33.10:8081/repository/trelix/:username=$NEXUS_USERNAME" >> ~/.npmrc
-                        echo "//192.168.33.10:8081/repository/trelix/:_password=$(echo -n $NEXUS_PASSWORD | base64)" >> ~/.npmrc
-                        echo "//192.168.33.10:8081/repository/trelix/:email=admin@example.org" >> ~/.npmrc
+        dir('trelix_back') {
+            sh """
+                echo Publishing package to Nexus...
 
-                        npm publish --registry http://192.168.33.10:8081/repository/trelix/ --access public
-                    '''
-                }
-            }
+                npm config set //192.168.33.10:8081/repository/trelix/:username=admin
+                npm config set //192.168.33.10:8081/repository/trelix/:_password=$(echo -n 'admin' | base64)
+                npm config set //192.168.33.10:8081/repository/trelix/:email=admin@example.org
+                npm config set //192.168.33.10:8081/repository/trelix/:always-auth=true
+
+                npm publish --registry http://192.168.33.10:8081/repository/trelix/ --access public
+            """
         }
     }
 }
+
+
 
     }
 }
