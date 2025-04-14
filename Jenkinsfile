@@ -54,8 +54,9 @@ pipeline {
                 dir('trelix_back') {
                     sh '''
                         echo Publishing package to Nexus...
-                        AUTH_STRING=$(echo -n "$NEXUS_USERNAME:$NEXUS_PASSWORD" | base64)
-                        echo "//192.168.33.10:8081/repository/trelix/:_auth=$AUTH_STRING" >> ~/.npmrc
+                        
+                        echo "//192.168.33.10:8081/repository/trelix/:username=$NEXUS_USERNAME" >> ~/.npmrc
+                        echo "//192.168.33.10:8081/repository/trelix/:_password=$(echo -n $NEXUS_PASSWORD | base64)" >> ~/.npmrc
                         echo "//192.168.33.10:8081/repository/trelix/:email=admin@example.org" >> ~/.npmrc
 
                         npm publish --registry http://192.168.33.10:8081/repository/trelix/ --access public
@@ -65,5 +66,6 @@ pipeline {
         }
     }
 }
+
     }
 }
