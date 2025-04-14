@@ -54,7 +54,7 @@ pipeline {
                 echo Publishing package to Nexus...
 
                 npm config set //192.168.33.10:8081/repository/trelix/:username=admin
-                npm config set //192.168.33.10:8081/repository/trelix/:_password=$(echo -n 'admin' | base64)
+                npm config set //192.168.33.10:8081/repository/trelix/:_password=\$(echo -n 'admin' | base64)
                 npm config set //192.168.33.10:8081/repository/trelix/:email=admin@example.org
                 npm config set //192.168.33.10:8081/repository/trelix/:always-auth=true
 
@@ -63,6 +63,7 @@ pipeline {
         }
     }
 }
+
 
 
 
