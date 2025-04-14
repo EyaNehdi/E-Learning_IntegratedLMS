@@ -6,6 +6,7 @@ const {
     getCourseById, 
     updateCourse, 
     deleteCourse,
+    likeCourse,
     searchCourses  // Ajout de la fonction de recherche
 } = require('../controllers/courseController');
 
@@ -16,5 +17,6 @@ router.get("/search", searchCourses);
 router.get("/:id", getCourseById);
 router.put("/:id", updateCourse);
 router.delete("/delete/:id", deleteCourse);
+router.post("/like/:courseId", likeCourse);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 "use client"
 
 import axios from "axios"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { useOutletContext } from "react-router-dom"
 import { AlertCircle, CheckCircle2, Info } from "lucide-react"
@@ -47,6 +47,8 @@ function Courses() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const navigate = useNavigate()
+
+  const editorRef = useRef(null)
 
   // CKEditor configuration to match the image
   const editorConfig = {
@@ -524,25 +526,26 @@ function Courses() {
                   Description <span className="text-red-500">*</span>
                 </label>
                 <div className="border rounded-md overflow-hidden">
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={description}
-                    config={editorConfig}
-                    onChange={(event, editor) => {
-                      const data = editor.getData()
-                      handleInputChange("description", data, validateMinAlphaChars)
-                    }}
-                    onReady={(editor) => {
-                      // You can customize the editor further here
-                      // For example, you can add custom CSS to match the image
-                      const editorElement = editor.ui.getEditableElement()
-                      if (editorElement) {
-                        editorElement.style.minHeight = "200px"
-                        editorElement.style.border = "1px solid #ccc"
-                        editorElement.style.padding = "10px"
-                      }
-                    }}
-                  />
+                  {!editorRef.current && (
+                    <CKEditor
+                      editor={ClassicEditor}
+                      data={description}
+                      config={editorConfig}
+                      onChange={(event, editor) => {
+                        const data = editor.getData()
+                        handleInputChange("description", data, validateMinAlphaChars)
+                      }}
+                      onReady={(editor) => {
+                        editorRef.current = editor
+                        const editorElement = editor.ui.getEditableElement()
+                        if (editorElement) {
+                          editorElement.style.minHeight = "200px"
+                          editorElement.style.border = "1px solid #ccc"
+                          editorElement.style.padding = "10px"
+                        }
+                      }}
+                    />
+                  )}
                 </div>
                 {errors.description && (
                   <div className="text-red-500 text-sm mt-1 flex items-center">
@@ -714,4 +717,3 @@ function Courses() {
 }
 
 export default Courses
-

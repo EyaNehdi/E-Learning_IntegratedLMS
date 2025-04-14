@@ -240,6 +240,7 @@ function Header() {
                             Dashboard
                           </a>
                         </li>
+                        
                         <li className="nav-item dropdown">
                           <a
                             href="/allcours"
@@ -255,6 +256,21 @@ function Header() {
                             Courses
                           </a>
                         </li>
+                        <li className="nav-item dropdown">
+                          <a
+                            href="/chart"
+                            role="button"
+                            className="nav-link px-3 px-xl-4"
+                            style={{
+                              paddingInline: "40px",
+                              fontWeight: "bold",
+                              fontSize: "20px",
+                            }}
+                          >
+                            Statistique
+                          </a>
+                        </li>
+                        
                         <li className="nav-item dropdown">
                           <a
                             href="/leaderboard"

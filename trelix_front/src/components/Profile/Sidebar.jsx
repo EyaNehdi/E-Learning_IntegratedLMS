@@ -63,8 +63,8 @@ function Sidebar({ setActivePage }) {
               <ul style={{ paddingLeft: "20px", marginTop: "5px" }}>
               <li>
   <Link
-    className={`nav-link ${location.pathname === "/profile/classroom/dashboard" ? "active" : ""}`}
-    to="/profile/classroom/dashboard"
+    className={`nav-link ${location.pathname === "/profile/classroom" ? "active" : ""}`}
+    to="/profile/classroom"
     onClick={() => setActivePage("My Courses")}
     style={{ display: "flex", alignItems: "center" }}
   >

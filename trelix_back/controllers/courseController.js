@@ -94,6 +94,26 @@ const deleteCourse = async (req, res) => {
         res.status(500).json({ message: "Erreur du serveur" });
     }
 };
+const likeCourse = async (req, res) => {
+    const { courseId } = req.params;  // Récupérer l'ID du cours dans les paramètres de la route
+
+    try {
+        // Chercher le cours dans la base de données
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ message: "Cours non trouvé" });  // Si le cours n'existe pas
+        }
+
+        // Incrémenter le nombre de likes
+        course.likes += 1;
+        await course.save();  // Sauvegarder le cours mis à jour dans la base de données
+
+        res.status(200).json(course);  // Retourner le cours avec le nombre de likes mis à jour
+    } catch (error) {
+        console.error("Erreur lors de l'ajout du like:", error);
+        res.status(500).json({ message: "Erreur du serveur" });  // Gérer les erreurs serveur
+    }
+};
 
 // Rechercher des cours par titre ou description
 const searchCourses = async (req, res) => {
@@ -117,4 +137,4 @@ const searchCourses = async (req, res) => {
     }
 };
 
-module.exports = { createCourse, getAllCourses, getCourseById, updateCourse, deleteCourse, searchCourses };
+module.exports = { createCourse, getAllCourses, getCourseById, updateCourse, deleteCourse, searchCourses,likeCourse };

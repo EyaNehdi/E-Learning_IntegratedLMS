@@ -48,12 +48,14 @@ import AllExamsInstructor from "./components/Exam/AllExamsInstractor";
 import ExamStudent from "./components/Exam/ExamStudent";
 import CourseLearningPlatform from "./components/Quiz/test";
 
-import ClassroomDashboard from "./pages/classroom/ClassroomDashboard"
  
 
 import CertificatesPage from "./pages/Certification/CertificatesPage";
 import Achievements from "./components/Profile/Achievements";
 import BrowseCertificates from "./components/Student/BrowseCertificates";
+import CourseChartPage from "./components/Instructor/CourseChart"
+import ClassroomPage from "./components/classroom/ClassroomPage";
+import CourseDetailsPage from "./components/classroom/CourseDetailsPage";
 
 
 function App() {
@@ -70,7 +72,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/verify-email" element={<EmailVerificationPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-
+         
           <Route
             path="/reset-password/:token"
             element={<ResetPasswordPage />}
@@ -87,6 +89,7 @@ function App() {
           </Route>
 
           <Route path="/allcours" element={<Allcourse />} />
+          <Route path="/chart" element={<CourseChartPage/>} />
           <Route path="/exams/:courseid" element={<ExamStudent />} />
 
           <Route path="/chapters/:courseid" element={<ListChapters />}>
@@ -115,11 +118,17 @@ function App() {
             />
             <Route path="list" element={<Listecourse />} />
             <Route path="module" element={<Module />} />
-            <Route path="/profile/classroom/dashboard" element={<ClassroomDashboard />} />
+            
+          
+
+           
             <Route
               path="/profile/edit-course/:courseId"
               element={<EditCourse />}
             />
+             <Route path="/profile/classroom" element={<ClassroomPage />} />
+          <Route path="/profile/classroom/courses/:courseId" element={<CourseDetailsPage />} />
+
             <Route path="/profile/allcours" element={<Allcourse />} />
           </Route>
         </Route>
