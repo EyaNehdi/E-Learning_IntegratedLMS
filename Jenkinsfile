@@ -50,19 +50,20 @@ pipeline {
         stage('Publish to Nexus') {
     steps {
         dir('trelix_back') {
-            sh """
+            sh '''
                 echo Publishing package to Nexus...
 
                 npm config set //192.168.33.10:8081/repository/trelix/:username=admin
-                npm config set //192.168.33.10:8081/repository/trelix/:_password=\$(echo -n 'admin' | base64)
+                npm config set //192.168.33.10:8081/repository/trelix/:_password=$(echo -n "admin" | base64)
                 npm config set //192.168.33.10:8081/repository/trelix/:email=admin@example.org
-                npm config set //192.168.33.10:8081/repository/trelix/:always-auth=true
+                npm config set always-auth true
 
                 npm publish --registry http://192.168.33.10:8081/repository/trelix/ --access public
-            """
+            '''
         }
     }
 }
+
 
 
 
