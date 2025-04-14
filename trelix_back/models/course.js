@@ -13,6 +13,10 @@ const Course = new Schema({
                       user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
                       chapters: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chapter' }],
                       exams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Exam" }],
+                      likes: {
+                                            type: Number,
+                                            default: 0  // Initialement, le nombre de likes est à 0
+                                          },
 
 
 })

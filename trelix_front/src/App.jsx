@@ -144,15 +144,26 @@ import MoodleCourses from "./components/MoodleCourses";
 import Calendar from "./components/Calendear/Calendar";
 
 
+
+ 
+
+import CertificatesPage from "./pages/Certification/CertificatesPage";
+import Achievements from "./components/Profile/Achievements";
+import BrowseCertificates from "./components/Student/BrowseCertificates";
+import CourseChartPage from "./components/Instructor/CourseChart"
+import ClassroomPage from "./components/classroom/ClassroomPage";
+import CourseDetailsPage from "./components/classroom/CourseDetailsPage";
+
 import ClassroomDashboard from "./pages/classroom/ClassroomDashboard"
 
 
-import CertificatesPage from "./pages/Certification/CertificatesPage";
+
 import EmailForm from "./components/mail/EmailSender";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
+
 
 
 
@@ -177,10 +188,12 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
 
 
+
          
           </Route>
         <Route path="/test" element={<MoodleCourses />} />
         <Route path="/test1" element={<EmailForm />} />
+
         {/* **************** */}
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
@@ -200,7 +213,9 @@ function App() {
 
           <Route path="/Moodle" element={<MoodleCourses />} />
           <Route path="/allcours" element={<Allcourse />} />
-          
+
+          <Route path="/chart" element={<CourseChartPage/>} />
+
           <Route path="/exams/:courseid" element={<ExamStudent />} />
 
           <Route path="/chapters/:courseid" element={<ListChapters />}>
@@ -226,14 +241,19 @@ function App() {
             <Route path="course-chapter/:courseId" element={<CourseChapter />} />
             <Route path="list" element={<Listecourse />} />
             <Route path="module" element={<Module />} />
+
             <Route path="achievements" element={<Achievements />} />
 
             <Route path="/profile/classroom/dashboard" element={<ClassroomDashboard />} />
+
 
             <Route
               path="/profile/edit-course/:courseId"
               element={<EditCourse />}
             />
+             <Route path="/profile/classroom" element={<ClassroomPage />} />
+          <Route path="/profile/classroom/courses/:courseId" element={<CourseDetailsPage />} />
+
             <Route path="/profile/allcours" element={<Allcourse />} />
 
             <Route path="assgnedQuizToChapter" element={<AssignQuizToChapter />} />
