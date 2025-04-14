@@ -13,6 +13,8 @@ const {
     getRandomExamFromCourse,
     getuserattempts,
     handleSubmitExam,
+    checkAttempt,
+    checkstatus,
     upload
 } = require("../controllers/ExamController");
 
@@ -33,6 +35,8 @@ router.get('/user/:userId/attempts', verifyToken, getuserattempts);
 
 router.put("/update/:examId", verifyToken, updateExam);
 router.get("/random/:courseId", getRandomExamFromCourse); 
+router.get("/check-attempt/:courseId/:userId", checkAttempt); 
+router.get("/check-status/:courseId/:userId", checkstatus);
 
 router.delete("/delete/:examId", verifyToken, deleteExam);
 router.post("/publish/:examId", verifyToken, publishExam);
