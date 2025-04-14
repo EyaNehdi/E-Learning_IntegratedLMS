@@ -42,6 +42,18 @@ pipeline {
                 }
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    dir('trelix_back') {
+                        script {
+                            def scannerHome = tool 'DefaultScanner'
+                            sh "${scannerHome}/bin/sonar-scanner"
+                        }
+                    }
+                }
+            }
+        }
 
         stage('Publish to Nexus') {
             steps {
