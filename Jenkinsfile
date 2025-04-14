@@ -53,16 +53,17 @@ pipeline {
             sh '''
                 echo Publishing package to Nexus...
 
-                npm config set //192.168.33.10:8081/repository/trelix/:username=admin
-                npm config set //192.168.33.10:8081/repository/trelix/:_password=$(echo -n "admin" | base64)
-                npm config set //192.168.33.10:8081/repository/trelix/:email=admin@example.org
-                npm config set always-auth true
+                echo "//192.168.33.10:8081/repository/trelix/:username=admin" >> ~/.npmrc
+                echo "//192.168.33.10:8081/repository/trelix/:_password=$(echo -n admin | base64)" >> ~/.npmrc
+                echo "//192.168.33.10:8081/repository/trelix/:email=admin@example.org" >> ~/.npmrc
+                echo "//192.168.33.10:8081/repository/trelix/:always-auth=true" >> ~/.npmrc
 
                 npm publish --registry http://192.168.33.10:8081/repository/trelix/ --access public
             '''
         }
     }
 }
+
 
 
 
