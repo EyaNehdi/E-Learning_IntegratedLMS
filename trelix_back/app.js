@@ -26,6 +26,48 @@ const MongoStore = require('connect-mongo');
 const certifRoutes = require('./routes/certif.routes');
 
 const axios = require('axios');
+const fetch = require('node-fetch');
+var app = express();
+
+
+
+
+
+app.use(cors({
+  origin: "http://localhost:5173",  // Assurez-vous que le frontend utilise ce port
+  credentials: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+app.use(express.json({ limit: '100mb' }));
+
+
+
+
+
+// Route POST pour la création de salle
+app.post('/createRoom', async (req, res) => {
+  try {
+    // Création d'un nom de salle unique
+    const roomName = "room-" + Math.random().toString(36).substring(2, 9);
+    console.log("Nom de la salle générée:", roomName);  // Log pour vérifier
+
+    // Renvoie du nom de la salle en réponse
+    res.status(200).json({ roomName });
+  } catch (error) {
+    console.error("Erreur lors de la création de la salle:", error);
+    res.status(500).json({ error: "Erreur serveur lors de la création" });
+  }
+});
+
+
+
+
+
+
+
+
 
 require('dotenv').config(); // Charger les variables d'environnement
 
@@ -115,6 +157,7 @@ app.use(cors({
 
 
 
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'votre_secret_de_session',
   resave: false,
@@ -129,6 +172,7 @@ app.use(session({
     maxAge: 14 * 24 * 60 * 60 * 1000 // 14 jours
   }
 }));
+
 
 app.post('/chatbot', async (req, res) => {
   console.log("Requête reçue:", req.body); // Debug important
@@ -335,10 +379,12 @@ app.use(function(err, req, res, next) {
     });
   }
 
+
   // render the error page pour les autres routes
   res.status(err.status || 500);
   res.render('error');
 });
+
 
 
 // Testing connectivity

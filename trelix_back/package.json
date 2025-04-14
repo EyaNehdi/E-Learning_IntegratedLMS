@@ -8,6 +8,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@daily-co/daily-js": "^0.77.0",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
@@ -34,8 +35,12 @@
     "morgan": "~1.9.1",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
+
+    "node-fetch": "^2.7.0",
     "node-notifier": "^10.0.1",
+
     "nodemailer": "^6.10.0",
+
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
     "qrcode": "^1.5.4",
