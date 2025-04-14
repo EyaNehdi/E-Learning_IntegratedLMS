@@ -253,3 +253,10 @@ body {
   border-radius: 5px;
   border: 1px solid #ccc;
 }
+.edited-tag {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 2px;
+  display: block;
+  font-style: italic;
+}

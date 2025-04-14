@@ -19,7 +19,7 @@ const CourseCard = ({ course }) => {
             {course.courseState === 'ACTIVE' ? 'Actif' : 'Archivé'}
           </span>
           <Link 
-            to={`/profile/classroom/courses/${course.id}`}
+            to={`/classroom/courses/${course.id}`}
             className="bg-blue-500 hover:bg-blue-600 text-white text-sm py-1 px-3 rounded"
           >
             Voir le cours
