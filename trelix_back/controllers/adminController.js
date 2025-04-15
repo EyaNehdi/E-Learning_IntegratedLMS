@@ -110,5 +110,45 @@ const unarchiveUser = async (req, res) => {
     }
 };
 
+const countStudents = async (req, res) => {
+    try {
+        const count = await User.countDocuments({ role: "student" });
+        console.log("Students : ",count);
+        res.status(200).json({ count });
+    } catch (error) {
+        console.error("Error counting students:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+const countInstructors = async (req, res) => {
+    try {
+        const count = await User.countDocuments({ role: "instructor" });
+        res.status(200).json({ count });
+    } catch (error) {
+        console.error("Error counting instructors:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+const getInstructors = async (req, res) => {
+    try {
+        const instructors = await User.find({ role: "instructor" })
+            .select("firstName lastName email role isActive accountCreatedAt");
+        res.status(200).json(instructors);
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
-module.exports = { getUsers, getUserById, createUser, updateUser, deleteUser, getAuditLogs, archiveUser, unarchiveUser };
+
+module.exports = { getUsers,
+     getUserById, 
+     createUser,
+      updateUser,
+       deleteUser,
+        getAuditLogs,
+         archiveUser,
+          unarchiveUser,
+           countStudents ,
+countInstructors,
+getInstructors
+ };
