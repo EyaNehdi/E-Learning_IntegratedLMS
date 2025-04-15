@@ -163,11 +163,21 @@ const searchCourses = async (req, res) => {
           res.status(500).json({ message: "Erreur du serveur" });
         }
       };
+      const countCourses = async (req, res) => {
+        try {
+            const count = await Course.countDocuments();
+            res.status(200).json({ count });
+        } catch (error) {
+            console.error("Erreur lors du comptage des cours:", error);
+            res.status(500).json({ message: "Erreur du serveur" });
+        }
+    };
 module.exports = { createCourse,
      getAllCourses,
       getCourseById,
        updateCourse,
         deleteCourse,
          searchCourses,
-         getCoursesByCategory,likeCourse };
+         getCoursesByCategory,likeCourse,
+        countCourses };
 

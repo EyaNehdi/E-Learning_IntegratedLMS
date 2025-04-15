@@ -9,6 +9,65 @@ const HomeUser = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
+  const [countStudent, setCountStudent] = useState(0);
+      const [countInstructor,setCountInstructor] = useState(0);
+      const [countCourses,setCountCourses] = useState(0);
+      const [instructorsMeet,setInstructorsMeet] = useState([]);
+      useEffect(() => {
+        const fetchCategories = async () => {
+          try {
+            const res = await axios.get("http://localhost:5000/courses/categories");
+            setCategories(res.data);
+          } catch (err) {
+            console.error("Erreur lors du fetch des catégories:", err);
+          }
+        };
+    
+        fetchCategories();
+      }, []);
+  
+      useEffect(() => {
+        const fetchStudents = async () =>{
+          try {
+            const res = await axios.get('http://localhost:5000/api/admin/count/student') ;// adapt path if needed
+            setCountStudent(res.data.count); // assuming the response has a count property
+          }
+          catch(err){
+            console.error("Error fetching student count:", err);
+          }
+        };
+        const fetchInstructors = async () =>{
+          try {
+            const res = await axios.get('http://localhost:5000/api/admin/count/instructor') ;// adapt path if needed
+            setCountInstructor(res.data.count); // assuming the response has a count property
+          }
+          catch(err){
+            console.error("Error fetching instructor count:", err);
+          }
+        };
+        const fetchCoursesNumber = async () =>{
+          try {
+            const res = await axios.get('http://localhost:5000/course/count/courses') ;// adapt path if needed
+            setCountCourses(res.data.count); // assuming the response has a count property
+          }
+          catch(err){
+            console.error("Error fetching instructor count:", err);
+          }
+        };
+        const MeetOurInstructors = async () =>{
+          try {
+            const res = await axios.get('http://localhost:5000/api/admin/instructors'); // adapt if needed
+          setInstructorsMeet(res.data);
+        } catch (err) {
+          console.error("Error fetching instructors:", err);
+        }
+        };
+        fetchStudents();
+        fetchInstructors();
+        fetchCoursesNumber();
+        MeetOurInstructors();
+        
+      }, []);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
