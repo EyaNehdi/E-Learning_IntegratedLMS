@@ -77,17 +77,7 @@ function Sidebar({ setActivePage }) {
                 <span>Wishlist</span>
               </Link>
             </li>
-            <li>
-              <Link
-                className={`nav-link ${location.pathname === "/reviews" ? "active" : ""
-                  }`}
-                to="/reviews"
-                onClick={() => setActivePage("Reviews")}
-              >
-                <i className="feather-icon icon-star" />
-                <span>Reviews</span>
-              </Link>
-            </li>
+            
 
             {user?.role === "instructor" && (
               <>
@@ -212,6 +202,31 @@ function Sidebar({ setActivePage }) {
           </nav>
         </div>
       )}
+
+      {user?.role === "student" &&(
+         <div className="widget">
+         <p className="greetings">Cours Preference</p>
+         <nav className="dashboard-nav">
+           <ul className="list-unstyled nav">
+         <ul className="list-unstyled nav">
+         <li>
+           <Link
+             className={`nav-link ${location.pathname === "/preference" ? "active" : ""
+               }`}
+             to="/profile/preference"
+             onClick={() => setActivePage("Add Preference")}
+           >
+             <i className="feather-icon icon-book" />
+             <span>Preference</span>
+           </Link>
+         </li>
+         </ul>
+         </ul>
+         </nav>
+         </div>
+
+      )}
+
 
 
 

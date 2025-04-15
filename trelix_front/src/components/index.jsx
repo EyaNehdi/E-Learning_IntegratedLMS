@@ -1,6 +1,37 @@
+import { useState, useEffect } from "react";
 import Footer from "./Footer/Footer";
 import Header from "./Header/Header";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import axios from "axios";
+
+
 function Index() {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+
+
+    useEffect(() => {
+      const fetchCourses = async () => {
+        try {
+          setLoading(true);
+          const response = await axios.get(
+            "http://localhost:5000/course/courses"
+          );
+          console.log("Courses fetched:", response.data);
+          setCourses(response.data);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching courses:", error);
+          setLoading(false);
+        }
+      };
+  
+      fetchCourses();
+    }, []);
 
                       return (
 <div>
@@ -266,363 +297,92 @@ function Index() {
         </div>
       </div>
     </div>
-    <div className="swiper course-slider">
-      <div className="swiper-wrapper py-5">
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course6.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">React JS Zero to Mastery Front End Essentails.</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Brad Traversy</a></span>
-                <span>12,580 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$20.00<del>$35.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
+    <Swiper
+  modules={[Navigation]}
+  navigation={{
+    nextEl: '.button-prev',
+    prevEl: '.button-next',
+  }}
+  spaceBetween={30}
+  loop={true}
+  breakpoints={{
+    320: { slidesPerView: 1 },
+    768: { slidesPerView: 2 },
+    1024: { slidesPerView: 3 }
+  }}
+  className="course-slider py-5"
+>
+  {loading ? (
+    <SwiperSlide>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "300px" }}
+      >
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
         </div>
-        {/* Slide Item End */}
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course5.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">React JS Zero to Mastery Front End Essentails.</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Brad Traversy</a></span>
-                <span>12,580 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$20.00<del>$35.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
-        </div>
-        {/* Slide Item End */}
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course4.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">React JS Zero to Mastery Front End Essentails.</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Brad Traversy</a></span>
-                <span>2,580 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$20.00<del>$35.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
-        </div>
-        {/* Slide Item End */}
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course3.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">React JS Zero to Mastery Front End Essentails.</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Brad Traversy</a></span>
-                <span>4,510 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$20.00<del>$35.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
-        </div>
-        {/* Slide Item End */}
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course2.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">React JS Zero to Mastery Front End Essentails.</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Brad Traversy</a></span>
-                <span>280 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$80.00<del>$105.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
-        </div>
-        {/* Slide Item End */}
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course1.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">React JS Zero to Mastery Front End Essentails.</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Brad Traversy</a></span>
-                <span>5,280 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$20.00<del>$35.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
-        </div>
-        {/* Slide Item End */}
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course2.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">Comprehensive Introduction to Programming</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Brad Traversy</a></span>
-                <span>3,280 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$20.00<del>$35.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
-        </div>
-        {/* Slide Item End */}
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course6.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">React JS Zero to Mastery Front End Essentails.</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Mark Joe</a></span>
-                <span>12,580 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$20.00<del>$35.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
-        </div>
-        {/* Slide Item End */}
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course5.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">React JS Zero to Mastery Front End Essentails.</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Brad Traversy</a></span>
-                <span>5,580 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$20.00<del>$35.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
-        </div>
-        {/* Slide Item End */}
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course4.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">React JS Zero to Mastery Front End Essentails.</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Brad Traversy</a></span>
-                <span>12,580 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$20.00<del>$35.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
-        </div>
-        {/* Slide Item End */}
-        <div className="swiper-slide">
-          <div className="course-entry-3 card rounded-2 bg-white border">
-            <div className="card-media position-relative">
-              <a href="single-course.html"><img className="card-img-top" src="assets/images/course3.jpg" alt="Course" /></a>
-            </div>
-            <div className="card-body">
-              <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex align-items-center">
-                  <img src="assets/images/icons/star.png" alt />
-                  <strong>4.7</strong>
-                  <span className="rating-count">(2k reviews)</span>
-                </div>
-                <span><i className="feather-icon icon-video me-2" />25 hours 22m</span>
-                <span className="lead"><a href="#" className="text-reset"><i className="feather-icon icon-bookmark" /></a></span>
-              </div>
-              <h3 className="sub-title mb-0">
-                <a href="single-course.html">React JS Zero to Mastery Front End Essentails.</a>
-              </h3>
-              <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                <span>By: <a href="profile.html" className="text-reset">Brad Traversy</a></span>
-                <span>22,580 Students</span>
-              </div>
-              <p>Learn JavaScript fundamentals then build a React website from scratch.</p>
-              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                <div className="price">$20.00<del>$35.00</del></div>
-                <a href="#">Enroll Now <i className="feather-icon icon-arrow-right" /></a>
-              </div>
-            </div>
-          </div>
-          {/* Course Entry End */}
-        </div>
-        {/* Slide Item End */}
       </div>
-      {/* wrapper end */}
-    </div>
+    </SwiperSlide>
+  ) : courses.length > 0 ? (
+    courses.map((course) => (
+      <SwiperSlide key={course._id}>
+        <div className="course-entry-3 card rounded-2 bg-white border">
+          <div className="card-media position-relative">
+            <a href={`/chapters/${course._id}`}>
+              <img
+                className="card-img-top"
+                src={course.image || "assets/images/crs.png"}
+                alt={course.title}
+              />
+            </a>
+          </div>
+          <div className="card-body">
+            <div className="course-meta d-flex justify-content-between align-items-center mb-2">
+              <div className="d-flex align-items-center">
+                <img src="assets/images/icons/star.png" alt="Rating" />
+                <strong>4.7</strong>
+                <span className="rating-count">(2k reviews)</span>
+              </div>
+              <span>
+                <i className="feather-icon icon-layers me-2" />
+                {course.level}
+              </span>
+            </div>
+            <h3 className="sub-title mb-0">
+              <a href={`/chapters/${course._id}`}>{course.title}</a>
+            </h3>
+            <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
+              <span>
+                By:{" "}
+                <a href="#" className="text-reset">
+                  {course.instructor || "Instructeur"}
+                </a>
+              </span>
+            </div>
+            <div className="course-footer d-flex align-items-center justify-content-between pt-3">
+              <div className="price">
+                ${course.price}
+                <del>$35.00</del>
+              </div>
+              <a href={`/chapters/${course._id}`}>
+                Enroll Now <i className="feather-icon icon-arrow-right" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </SwiperSlide>
+    ))
+  ) : (
+    <SwiperSlide>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "300px" }}
+      >
+        <p>No courses available.</p>
+      </div>
+    </SwiperSlide>
+  )}
+</Swiper>
   </div>
   {/* Course Section End */}
   {/* Review Section Start */}
@@ -642,20 +402,8 @@ function Index() {
                     from all the forces to learn
                   </p>
                   <div className="d-sm-flex align-items-center justify-content-between">
-                    <div className="d-flex align-items-center">
-                      <img className="rounded-circle" width={56} src="assets/images/avatar.png" alt="Avater" />
-                      <div className="avatar-txt ms-3">
-                        <h5 className="display-5 m-0">Luisa Mary</h5>
-                        <small className="text-mute">Technology Facilitator</small>
-                      </div>
-                    </div>
-                    <div className="ratings">
-                      <img src="assets/images/icons/star.png" alt />
-                      <img src="assets/images/icons/star.png" alt />
-                      <img src="assets/images/icons/star.png" alt />
-                      <img src="assets/images/icons/star.png" alt />
-                      <img src="assets/images/icons/star-half.png" alt />
-                    </div>
+                   
+                   
                   </div>
                 </div>
               </div>
@@ -713,7 +461,7 @@ function Index() {
         </div>
         <div className="col-xl-6 order-l order-md-2 col-md-5">
           <figure className="review-img">
-            <img className="img-fluid" src="assets/images/review-bg.jpg" alt="Review Banner" />
+            <img className="img-fluid" src="assets/bb.png" alt="Review Banner" />
           </figure>
         </div>
       </div>
@@ -828,7 +576,8 @@ function Index() {
           <ul className="nav nav-tabs ct-tab" id="myTab" role="tablist">
             <li className="nav-item" role="presentation">
               <button className="nav-link" id="instructor-tab" data-bs-toggle="tab" data-bs-target="#instructor" type="button" role="tab" aria-controls="instructor" aria-selected="true">
-                <img src="assets/images/icons/instructor.png" alt />Expert Instructor
+                <img src="assets/images/icons/instructor.png" alt />Educational supervision
+
               </button>
             </li>
             <li className="nav-item" role="presentation">
@@ -857,18 +606,20 @@ function Index() {
                   </div>
                 </div>
                 <div className="col-lg-5">
-                  <div className="choose-txt">
-                    <h3 className="display-3">We provide education through our Instructor</h3>
-                    <blockquote className="bg-shade text-dark display-6 my-4">
-                      Education turns the filthy mind into open minds. The roots of education are bitter, but the fruit is sweet shapes people’s life
-                    </blockquote>
-                    <ul>
-                      <li>Educated citizens bring development in the country</li>
-                      <li>Education is a power and makes a person powerful</li>
-                      <li>Education is a key to success and freedom from all the forces</li>
-                      <li>Education changes your bad today into good tomorrow</li>
-                    </ul>
-                  </div>
+  <div className="choose-txt">
+    <h3 className="display-3">Apprenez autrement avec nos formateurs experts sur Trelix</h3>
+    <blockquote className="bg-shade text-dark display-6 my-4">
+      L’apprentissage est la clé pour transformer le potentiel en réussite. Sur Trelix, chaque cours ouvre une nouvelle opportunité.
+    </blockquote>
+    <ul>
+      <li>Des formateurs passionnés pour un apprentissage guidé et personnalisé</li>
+      <li>Une plateforme qui met la technologie au service de l’éducation</li>
+      <li>Un accès flexible au savoir, où que vous soyez</li>
+      <li>Apprenez aujourd’hui, transformez votre avenir dès demain</li>
+    </ul>
+  </div>
+
+
                 </div>
               </div>
             </div>
@@ -881,18 +632,18 @@ function Index() {
                   </div>
                 </div>
                 <div className="col-lg-5">
-                  <div className="choose-txt">
-                    <h3 className="display-3">Brings Opportunity of Unlimited Learning</h3>
-                    <blockquote className="bg-shade text-dark display-6 my-4">
-                      Education turns the filthy mind into open minds. The roots of education are bitter, but the fruit is sweet shapes people’s life
-                    </blockquote>
-                    <ul>
-                      <li>Educated citizens bring development in the country</li>
-                      <li>Education is a power and makes a person powerful</li>
-                      <li>Education is a key to success and freedom from all the forces</li>
-                      <li>Education changes your bad today into good tomorrow</li>
-                    </ul>
-                  </div>
+<div className="choose-txt">
+<h3 className="display-3">Open up a world of limitless learning with Trelix</h3>
+<blockquote className="bg-shade text-dark display-6 my-4">
+Education enlightens minds and broadens horizons. The beginnings can be challenging, but the results transform a life.
+</blockquote>
+<ul>
+<li>A learning community that shapes the future</li>
+<li>Knowledge as a lever for freedom and autonomy</li>
+<li>Skills for success in a constantly changing world</li>
+<li>Every day at Trelix is ​​a step towards your success</li>
+</ul>
+</div>
                 </div>
               </div>
             </div>
@@ -906,18 +657,18 @@ function Index() {
                   </div>
                 </div>
                 <div className="col-lg-5">
-                  <div className="choose-txt">
-                    <h3 className="display-3">Learning always should be flexible and effective.</h3>
-                    <blockquote className="bg-shade text-dark display-6 my-4">
-                      Education turns the filthy mind into open minds. The roots of education are bitter, but the fruit is sweet shapes people’s life
-                    </blockquote>
-                    <ul>
-                      <li>Educated citizens bring development in the country</li>
-                      <li>Education is a power and makes a person powerful</li>
-                      <li>Education is a key to success and freedom from all the forces</li>
-                      <li>Education changes your bad today into good tomorrow</li>
-                    </ul>
-                  </div>
+<div className="choose-txt">
+<h3 className="display-3">Learning should always be flexible, accessible, and impactful</h3>
+<blockquote className="bg-shade text-dark display-6 my-4">
+Education transforms closed minds into open ones. It requires effort, but its fruits shape a better future.
+</blockquote>
+<ul>
+<li>Educated citizens build a more sustainable world</li>
+<li>Knowledge empowers those who possess it</li>
+<li>Education opens the doors to success and freedom</li>
+<li>Learning today improves tomorrow</li>
+</ul>
+</div>
                 </div>
               </div>
             </div>
@@ -931,18 +682,18 @@ function Index() {
                   </div>
                 </div>
                 <div className="col-lg-5">
-                  <div className="choose-txt">
-                    <h3 className="display-3">We provide an exclusive support 24/7 hours.</h3>
-                    <blockquote className="bg-shade text-dark display-6 my-4">
-                      Education turns the filthy mind into open minds. The roots of education are bitter, but the fruit is sweet shapes people’s life
-                    </blockquote>
-                    <ul>
-                      <li>Educated citizens bring development in the country</li>
-                      <li>Education is a power and makes a person powerful</li>
-                      <li>Education is a key to success and freedom from all the forces</li>
-                      <li>Education changes your bad today into good tomorrow</li>
-                    </ul>
-                  </div>
+  <div className="choose-txt">
+    <h3 className="display-3">Un accompagnement dédié, disponible 24h/24 et 7j/7</h3>
+    <blockquote className="bg-shade text-dark display-6 my-4">
+      Chez Trelix, nous croyons que chaque apprenant mérite un soutien continu. Parce qu’apprendre ne s’arrête jamais, notre aide non plus.
+    </blockquote>
+    <ul>
+      <li>Assistance personnalisée à chaque étape de votre parcours</li>
+      <li>Support technique et pédagogique toujours accessible</li>
+      <li>Un accompagnement humain dans un environnement digital</li>
+      <li>Votre réussite est aussi notre mission</li>
+    </ul>
+  </div>
                 </div>
               </div>
             </div>

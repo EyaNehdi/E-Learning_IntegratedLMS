@@ -53,6 +53,11 @@ import ManageUser from "./components/Admin/ManageUser";
 import ManageBadges from "./components/Admin/ManageBadges";
 import BadgeFeature from "./pages/Admin/BadgeFeature";
 import ListBadges from "./components/Admin/ListBadges";
+import StatPreference from "./components/Student/preference-statistics" 
+import Preference from "./components/Student/AddPreference"
+
+  
+
 
 import React, { useState } from "react"; 
 import axios from "axios"; 
@@ -270,6 +275,10 @@ function App() {
             />
              <Route path="/profile/classroom" element={<ClassroomPage />} />
           <Route path="/profile/classroom/courses/:courseId" element={<CourseDetailsPage />} />
+          <Route path="/profile/preference" element={<Preference />} />
+          <Route path="/profile/preferencestat" element={<StatPreference />} />
+
+
 
             <Route path="/profile/allcours" element={<Allcourse />} />
 

@@ -191,16 +191,33 @@ function Allcourse() {
               <aside className="sidebar sidebar-spacing">
                 <div className="widget">
                   <h3 className="widget-title">Filtrer par popularité</h3>
-                  <div className="widget-inner d-flex flex-column gap-2">
-                    <button className="btn btn-outline-primary" onClick={() => handlePopularityFilter("most")}>
-                      Cours les plus likés
-                    </button>
-                    <button className="btn btn-outline-secondary" onClick={() => handlePopularityFilter("least")}>
-                      Cours les moins likés
-                    </button>
-                    <button className="btn btn-outline-dark" onClick={() => handlePopularityFilter("all")}>
-                      Réinitialiser le filtre
-                    </button>
+                  <div className="widget-inner">
+                    <ul className="list-unstyled">
+                      <li className="mb-2">
+                        <button
+                          className="btn btn-outline-primary w-100 text-start"
+                          onClick={() => handlePopularityFilter("most")}
+                        >
+                          Cours les plus likés
+                        </button>
+                      </li>
+                      <li className="mb-2">
+                        <button
+                          className="btn btn-outline-secondary w-100 text-start"
+                          onClick={() => handlePopularityFilter("least")}
+                        >
+                          Cours les moins likés
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          className="btn btn-outline-dark w-100 text-start"
+                          onClick={() => handlePopularityFilter("all")}
+                        >
+                          Réinitialiser le filtre
+                        </button>
+                      </li>
+                    </ul>
                   </div>
                 </div>
 

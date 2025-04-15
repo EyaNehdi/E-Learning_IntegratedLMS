@@ -41,7 +41,7 @@ const CourseChart = () => {
       labels,
       datasets: [
         {
-          label: "Répartition des cours par catégorie",
+          label: "Distribution of courses by category",
           data,
           backgroundColor: [
             "#FF6384",
@@ -64,7 +64,8 @@ const CourseChart = () => {
     <div className="d-flex min-vh-100">
       {/* Sidebar */}
       <div className="bg-light p-3" style={{ width: "300px", borderRight: "1px solid #ddd" }}>
-        <h4 className="mb-3">Cours Ajoutés</h4>
+        <h4 className="mb-3">Added Courses
+        </h4>
         <ul className="list-group">
           {courses.map((course) => (
             <li key={course._id} className="list-group-item">
@@ -76,14 +77,14 @@ const CourseChart = () => {
 
       {/* Main Content */}
       <div className="flex-grow-1 p-4">
-        <h2 className="mb-4 text-center">Tableau de bord des cours</h2>
+        <h2 className="mb-4 text-center">Course Dashboard </h2>
 
         {/* Cards */}
         <div className="row mb-4">
           <div className="col-md-4">
             <div className="card text-white bg-primary mb-3">
               <div className="card-body">
-                <h5 className="card-title">Total Cours</h5>
+                <h5 className="card-title">Total Course</h5>
                 <p className="card-text fs-4">{courses.length}</p>
               </div>
             </div>
