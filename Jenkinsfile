@@ -71,7 +71,9 @@ pipeline {
         }
          stage('Build Docker Image') {
             steps {
-                sh 'sudo docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'  // Removed sudo
+                dir('trelix_back') {
+                sh 'sudo docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'  
+                 }
             }
         }
           stage('Push Docker Image') {
