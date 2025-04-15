@@ -10,8 +10,8 @@ const {
     likeCourse,
 
     searchCourses,
-    getCoursesByCategory  // Ajout de la fonction de recherche
-
+    getCoursesByCategory , // Ajout de la fonction de recherche
+countCourses
 } = require('../controllers/courseController');
 
 // Routes pour les cours
@@ -23,6 +23,7 @@ router.get("/:id", getCourseById);
 router.put("/:id", updateCourse);
 router.delete("/delete/:id", deleteCourse);
 router.post("/like/:courseId", likeCourse);
+router.get("/count/courses", countCourses); // Route pour compter le nombre de cours
 
 
 module.exports = router;

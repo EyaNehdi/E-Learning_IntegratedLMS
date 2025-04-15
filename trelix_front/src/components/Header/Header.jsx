@@ -339,7 +339,7 @@ function Header() {
                               fontSize: "20px",
                             }}
                           >
-                            Statistique
+                            Statistical
                           </a>
                         </li>
 

@@ -49,19 +49,7 @@ function Sidebar({ setActivePage }) {
                 <span>Wishlist</span>
               </Link>
             </li>
-            <li>
-              <Link
-                className={`nav-link ${
-                  location.pathname === "/reviews" ? "active" : ""
-                }`}
-                to="/reviews"
-                onClick={() => setActivePage("Reviews")}
-              >
-                <i className="feather-icon icon-star" />
-                <span>Reviews</span>
-              </Link>
-            </li>
-            {/* INSTRUCTOR ONLY ROUTES */}
+
             {user?.role === "instructor" && (
               <>
                 <li>
@@ -133,26 +121,54 @@ function Sidebar({ setActivePage }) {
                 </Link>
               </li>
               <li>
-                <Link className="nav-link" to="/profile/chatbot">
-                  <i className="feather-icon icon-plus" />
-                  <span>chatbot</span>
-                </Link>
+
+              <Link className="nav-link" to="/profile/geminichat">
+
+                <i className="feather-icon icon-plus" />
+                <span>Chatbot</span>
+              </Link>
               </li>
               <li>
-                <Link className="nav-link" to="/meeting">
-                  <i className="feather-icon icon-plus" />
-                  <span>Meet</span>
-                </Link>
+              <Link className="nav-link" to="/profile/meeting">
+                <i className="feather-icon icon-plus" />
+                <span>Meet</span>
+              </Link>
               </li>
               <li>
-                <Link className="nav-link" to="/chat">
-                  <i className="feather-icon icon-plus" />
-                  <span>GroupChat</span>
-                </Link>
+              <Link className="nav-link" to="/profile/chat">
+                <i className="feather-icon icon-plus" />
+                <span>GroupChat</span>
+              </Link>
+
               </li>
             </ul>
           </nav>
         </div>
+      )}
+
+
+      {user?.role === "student" &&(
+         <div className="widget">
+         <p className="greetings">Cours Preference</p>
+         <nav className="dashboard-nav">
+           <ul className="list-unstyled nav">
+         <ul className="list-unstyled nav">
+         <li>
+           <Link
+             className={`nav-link ${location.pathname === "/preference" ? "active" : ""
+               }`}
+             to="/profile/preference"
+             onClick={() => setActivePage("Add Preference")}
+           >
+             <i className="feather-icon icon-book" />
+             <span>Preference</span>
+           </Link>
+         </li>
+         </ul>
+         </ul>
+         </nav>
+         </div>
+
       )}
 
       {/* Account Settings */}

@@ -53,9 +53,16 @@ import ManageUser from "./components/Admin/ManageUser";
 import ManageBadges from "./components/Admin/ManageBadges";
 import BadgeFeature from "./pages/Admin/BadgeFeature";
 import ListBadges from "./components/Admin/ListBadges";
+import StatPreference from "./components/Student/preference-statistics" 
+import Preference from "./components/Student/AddPreference"
 
-import React, { useState } from "react";
-import axios from "axios";
+  
+
+
+
+import React, { useState } from "react"; 
+import axios from "axios"; 
+import GeminiChatbot from "./components/GeminiChatbot";
 
 import CourseLearningPlatform from "./components/Quiz/test";
 
@@ -80,14 +87,14 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
 import MfaSetup from "./components/MfaSetup/MfaSetup.jsx";
 
+
 const Chatbot = () => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+
+
 
     setIsLoading(true);
     // Ajout du message utilisateur immédiatement
@@ -163,6 +170,7 @@ const Chatbot = () => {
   );
 };
 
+
 function App() {
   return (
     <Router>
@@ -189,6 +197,7 @@ function App() {
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
+        <Route path="/chatbot" element={<Chatbot />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/certificates" element={<CertificatesPage />}>
             <Route index element={<BrowseCertificates />} />
@@ -211,6 +220,11 @@ function App() {
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
+
+            <Route path="geminichat" element={<GeminiChatbot />} />
+            <Route path="chat" element={<ChatComponent />} />
+            <Route path="meeting" element={<JoinRoom />} />
+
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addExam" element={<AddExam />} />
             <Route path="Allexams" element={<AllExamsInstructor />} />
@@ -233,11 +247,12 @@ function App() {
               path="/profile/edit-course/:courseId"
               element={<EditCourse />}
             />
-            <Route path="/profile/classroom" element={<ClassroomPage />} />
-            <Route
-              path="/profile/classroom/courses/:courseId"
-              element={<CourseDetailsPage />}
-            />
+
+             <Route path="/profile/classroom" element={<ClassroomPage />} />
+          <Route path="/profile/classroom/courses/:courseId" element={<CourseDetailsPage />} />
+          <Route path="/profile/preference" element={<Preference />} />
+          <Route path="/profile/preferencestat" element={<StatPreference />} />
+
             <Route path="/profile/allcours" element={<Allcourse />} />
             <Route
               path="assgnedQuizToChapter"

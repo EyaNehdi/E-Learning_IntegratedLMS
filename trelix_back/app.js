@@ -8,6 +8,7 @@ var logger = require('morgan');
 const cors = require('cors');
 const multer = require('multer');
 const socketIo = require('socket.io');
+const preference = require("./routes/preference");
 
 
 
@@ -172,65 +173,7 @@ app.use(session({
 }));
 
 
-app.post('/chatbot', async (req, res) => {
-  console.log("Requête reçue:", req.body); // Debug important
-  
-  try {
-    const { question } = req.body;
-    
-    // Validation renforcée
-    if (!question || typeof question !== 'string' || question.trim().length === 0) {
-      console.error("Question invalide:", question);
-      return res.status(400).json({ 
-        error: 'Question invalide',
-        details: 'La question doit être une chaîne non vide' 
-      });
-    }
 
-    // Log pour vérifier la clé API
-    console.log("Clé API utilisée:", process.env.DEEPSEEK_API_KEY ? "***" : "MANQUANTE");
-
-    const response = await axios.post(
-      'https://api.deepseek.com/v1/chat/completions',
-      {
-        model: 'deepseek-chat',
-        messages: [{ 
-          role: 'user', 
-          content: question.substring(0, 1000) // Protection
-        }],
-        max_tokens: 200,
-        temperature: 0.7
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        timeout: 10000 // 10s timeout
-      }
-    );
-
-    console.log("Réponse API:", response.data); // Debug
-
-    if (!response.data.choices?.[0]?.message?.content) {
-      throw new Error("Structure de réponse inattendue");
-    }
-
-    res.json({ 
-      reply: response.data.choices[0].message.content 
-    });
-
-  } catch (error) {
-    console.error("ERREUR COMPLÈTE:", {
-      message: error.message,
-      code: error.code,
-      response: error.response?.data,
-      stack: error.stack
-    });
-    
-  }
-});
 
 
 // Autres routes de ton application
@@ -265,6 +208,7 @@ app.use('/module', Module);
 app.use('/course', Course);
 app.use('/courses', Course);
 app.use('/delete', Course);
+app.use('/preference',preference);
 
 
 // Routes Google Classroom (corrigées)
