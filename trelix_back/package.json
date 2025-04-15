@@ -1,7 +1,11 @@
 {
   "name": "trelix-back",
   "version": "0.0.0",
-  "private": true,
+  "description": "test",
+  "main": "app.js",
+  "publishConfig": {
+    "registry": "http://192.168.33.10:8081/repository/trelix/"
+  },
   "scripts": {
     "dev": "nodemon ./bin/www",
     "build": "webpack",
@@ -34,11 +38,9 @@
     "morgan": "~1.9.1",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
-
     "node-notifier": "^10.0.1",
-
+    "nodemailer": "^6.10.0",
     "pdf-lib": "^1.17.1",
-
     "pdf-parse": "^1.1.1",
     "qrcode": "^1.5.4",
     "react-linkedin-login": "^1.0.4",
