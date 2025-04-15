@@ -54,9 +54,8 @@ import ManageBadges from "./components/Admin/ManageBadges";
 import BadgeFeature from "./pages/Admin/BadgeFeature";
 import ListBadges from "./components/Admin/ListBadges";
 
-import React, { useState } from "react"; 
-import axios from "axios"; 
-
+import React, { useState } from "react";
+import axios from "axios";
 
 import CourseLearningPlatform from "./components/Quiz/test";
 
@@ -64,35 +63,25 @@ import AssignQuizToChapter from "./components/Quiz/AssignQuizToChapter";
 import Achievements from "./components/Profile/Achievements";
 import MoodleCourses from "./components/MoodleCourses";
 import Calendar from "./components/Calendear/Calendar";
-import JoinRoom from "./components/JoinRoom"
-import MeetingRoom from "./components/MeetingRoom"  
-import ChatComponent from './components/ChatComponent'; 
-
+import JoinRoom from "./components/JoinRoom";
+import MeetingRoom from "./components/MeetingRoom";
+import ChatComponent from "./components/ChatComponent";
 
 import CertificatesPage from "./pages/Certification/CertificatesPage";
 
-
-import CourseChartPage from "./components/Instructor/CourseChart"
+import CourseChartPage from "./components/Instructor/CourseChart";
 import ClassroomPage from "./components/classroom/ClassroomPage";
 import CourseDetailsPage from "./components/classroom/CourseDetailsPage";
-
-
-
-
 
 import EmailForm from "./components/mail/EmailSender";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
-
-
-
-
-
+import MfaSetup from "./components/MfaSetup/MfaSetup.jsx";
 
 const Chatbot = () => {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -102,50 +91,54 @@ const Chatbot = () => {
 
     setIsLoading(true);
     // Ajout du message utilisateur immédiatement
-    setMessages(prev => [...prev, { sender: 'user', text: input }]);
-    setInput('');
+    setMessages((prev) => [...prev, { sender: "user", text: input }]);
+    setInput("");
 
     try {
-      const res = await axios.post('http://localhost:5000/chatbot',
+      const res = await axios.post(
+        "http://localhost:5000/chatbot",
         { question: input },
         {
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
 
       // Utilisez reply au lieu de text pour correspondre au backend
-      setMessages(prev => [...prev, {
-        sender: 'Trelix',
-        text: res.data.reply || res.data.text || "Pas de réponse"
-      }]);
-
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "Trelix",
+          text: res.data.reply || res.data.text || "Pas de réponse",
+        },
+      ]);
     } catch (err) {
-      console.error('Erreur détaillée:', {
+      console.error("Erreur détaillée:", {
         status: err.response?.status,
         data: err.response?.data,
-        message: err.message
+        message: err.message,
       });
 
-      setMessages(prev => [...prev, {
-        sender: 'Trelix',
-        text: err.response?.data?.error || "Erreur de connexion au serveur"
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "Trelix",
+          text: err.response?.data?.error || "Erreur de connexion au serveur",
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    
     <div className="chat-container">
-     
-      
       <div className="messages">
         {messages.map((msg, i) => (
           <div key={i} className={`message ${msg.sender}`}>
-            <strong>{msg.sender === 'user' ? 'Vous' : 'Trelix'}:</strong> {msg.text}
+            <strong>{msg.sender === "user" ? "Vous" : "Trelix"}:</strong>{" "}
+            {msg.text}
           </div>
         ))}
         {isLoading && (
@@ -163,7 +156,7 @@ const Chatbot = () => {
           disabled={isLoading}
         />
         <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Envoi...' : 'Envoyer'}
+          {isLoading ? "Envoi..." : "Envoyer"}
         </button>
       </form>
     </div>
@@ -171,79 +164,53 @@ const Chatbot = () => {
 };
 
 function App() {
-
-
   return (
-
-    
     <Router>
-      
       <Routes>
         {/* **************** */}
-        <Route path="/verify-email" element={<VerifyEmail />} />
         {/* Public routes */}
-        < Route element={<PublicRoute />}>
+        <Route element={<PublicRoute />}>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
           <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-
-
-
-         
-          </Route>
+        </Route>
         <Route path="/test" element={<MoodleCourses />} />
-
         <Route path="/test1" element={<Calendar />} />
-       <Route path="/meeting" element={<JoinRoom />} />
-       <Route path="/chat" element={<ChatComponent />} />
-      
-      
-
-<Route path="/meeting/:roomId" element={<MeetingRoom />} />
-
+        <Route path="/meeting" element={<JoinRoom />} />
+        <Route path="/chat" element={<ChatComponent />} />
+        <Route path="/meeting/:roomId" element={<MeetingRoom />} />
         {/* **************** */}
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
-
-          {/* Route pour le chatbot */}
-
-        <Route path="/chatbot" element={<Chatbot />} />
-         {/* Route pour la réunion */}
-         
-
-
           <Route path="/calendar" element={<Calendar />} />
-
           <Route path="/certificates" element={<CertificatesPage />}>
             <Route index element={<BrowseCertificates />} />
             <Route path="browse" element={<BrowseCertificates />} />
           </Route>
-
           <Route path="/Moodle" element={<MoodleCourses />} />
           <Route path="/allcours" element={<Allcourse />} />
-
-          <Route path="/chart" element={<CourseChartPage/>} />
-
+          <Route path="/chart" element={<CourseChartPage />} />
           <Route path="/exams/:courseid" element={<ExamStudent />} />
-
           <Route path="/chapters/:courseid" element={<ListChapters />}>
             <Route path="content/:id" element={<ChapterContent />} />
           </Route>
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/quiz" element={<QuizzLeaderboard />} />
           <Route path="/Classroom" element={<ClassroomPage />} />
-          <Route path="/classroom/courses/:courseId" element={<CourseDetailsPage />} />
+          <Route
+            path="/classroom/courses/:courseId"
+            element={<CourseDetailsPage />}
+          />
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
-
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addExam" element={<AddExam />} />
             <Route path="Allexams" element={<AllExamsInstructor />} />
@@ -254,30 +221,29 @@ function App() {
             <Route path="settings" element={<MultiFactorAuth />} />
             <Route path="change-password" element={<ChangePassword />} />
             <Route path="Course" element={<Courses />} />
-
-            <Route path="course-chapter/:courseId" element={<CourseChapter />} />
+            <Route
+              path="course-chapter/:courseId"
+              element={<CourseChapter />}
+            />
             <Route path="list" element={<Listecourse />} />
             <Route path="module" element={<Module />} />
-
             <Route path="achievements" element={<Achievements />} />
-
-       
-
-
+            <Route path="chatbot" element={<Chatbot />} />
             <Route
               path="/profile/edit-course/:courseId"
               element={<EditCourse />}
             />
-             <Route path="/profile/classroom" element={<ClassroomPage />} />
-          <Route path="/profile/classroom/courses/:courseId" element={<CourseDetailsPage />} />
-
+            <Route path="/profile/classroom" element={<ClassroomPage />} />
+            <Route
+              path="/profile/classroom/courses/:courseId"
+              element={<CourseDetailsPage />}
+            />
             <Route path="/profile/allcours" element={<Allcourse />} />
-
-            <Route path="assgnedQuizToChapter" element={<AssignQuizToChapter />} />
-            
+            <Route
+              path="assgnedQuizToChapter"
+              element={<AssignQuizToChapter />}
+            />
           </Route>
-
-
         </Route>
         <Route path="/CV" element={<CV />} />
         {/* **************** */}
@@ -305,16 +271,10 @@ function App() {
         {/* Not found route */}
 
         <Route path="*" element={<NotFound />} />
-
-
       </Routes>
       <Toaster />
     </Router>
-
-    
   );
-
-
 }
 
 export default App;
