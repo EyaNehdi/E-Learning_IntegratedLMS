@@ -11,7 +11,7 @@ import Review from "./components/Admin/Review";
 import Leave from "./components/Admin/Leave";
 import Manage from "./components/Admin/Manage";
 import Reports from "./components/Admin/Reports";
-import NotFound from "./components/Notfound";
+import NotFound from "./components/NotFound.jsx";
 import Settings from "./components/Admin/Settings";
 import { LinkedInCallback } from "react-linkedin-login-oauth2";
 import CV from "./pages/cv";
