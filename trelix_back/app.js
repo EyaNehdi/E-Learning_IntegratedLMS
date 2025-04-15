@@ -54,7 +54,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //cors
 
 app.use(cors({
-  origin: "http://localhost:5173",  // Assurez-vous que le frontend utilise ce port
+  origin: "http://192.168.33.10:5173",  // Assurez-vous que le frontend utilise ce port
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
