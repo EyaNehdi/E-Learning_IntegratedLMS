@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN npm install --no-optional --legacy-peer-deps
-
+RUN npm install @rollup/rollup-linux-x64-gnu
 
 COPY . .
 
