@@ -256,7 +256,7 @@ const CourseDetailsPage = () => {
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
-        Retour aux cours
+        Back to course
       </Link>
 
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -293,13 +293,14 @@ const CourseDetailsPage = () => {
             className={`py-2 px-4 font-medium ${activeTab === "materials" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"}`}
             onClick={() => setActiveTab("materials")}
           >
-            Matériels ({courseWorkMaterials ? courseWorkMaterials.length : 0})
+            Materials
+            ({courseWorkMaterials ? courseWorkMaterials.length : 0})
           </button>
           <button
             className={`py-2 px-4 font-medium ${activeTab === "courseWork" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"}`}
             onClick={() => setActiveTab("courseWork")}
           >
-            Travaux ({courseWork ? courseWork.length : 0})
+            Works ({courseWork ? courseWork.length : 0})
           </button>
         </div>
       </div>
@@ -307,7 +308,7 @@ const CourseDetailsPage = () => {
       {/* Onglet Documentation */}
       {activeTab === "documentation" && (
         <div>
-          <h2 className="text-xl font-semibold mb-4">Documentation du cours</h2>
+          <h2 className="text-xl font-semibold mb-4">Course documentation  </h2>
           {!documents || documents.length === 0 ? (
             <div className="bg-gray-100 p-6 rounded-lg text-center">
               <p className="text-gray-600">Aucune documentation trouvée pour ce cours.</p>

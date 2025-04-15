@@ -315,7 +315,7 @@ const ProfilePage = () => {
               </div>
               <div className="col-lg-9 ps-lg-4">
                 <section className="dashboard-sec">
-                  <h2 className="">{activePage}</h2>
+                  
                   {isLoadingUser ? (
                     <Preloader />
                   ) : (

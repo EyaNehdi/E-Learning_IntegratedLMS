@@ -378,8 +378,8 @@ function Courses() {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-8">
-            <h1 className="text-3xl font-bold text-center text-white mb-2">Ajouter un cours</h1>
-            <p className="text-center text-blue-100">Créez un nouveau cours passionnant pour vos étudiants</p>
+            <h1 className="text-3xl font-bold text-center text-white mb-2">Add new course</h1>
+            <p className="text-center text-blue-100">Create an exciting new course for your students</p>
           </div>
 
           <div className="p-6">
@@ -405,14 +405,15 @@ function Courses() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                    Titre du cours <span className="text-red-500">*</span>
+                  Course title
+                  <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="title"
                     type="text"
                     value={title}
                     onChange={(e) => handleInputChange("title", e.target.value, validateMinAlphaChars)}
-                    placeholder="Titre du cours"
+                    placeholder="Course title"
                     className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
                       errors.title ? "border-red-500" : "border-gray-300"
                     }`}
@@ -428,7 +429,7 @@ function Courses() {
 
                 <div className="space-y-2">
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                    Prix <span className="text-red-500">*</span>
+                  Price <span className="text-red-500">*</span>
                   </label>
 
                   {/* Boutons radio pour la sélection de devise */}
@@ -440,7 +441,7 @@ function Courses() {
                       type="number"
                       value={price}
                       onChange={(e) => handleInputChange("price", e.target.value)}
-                      placeholder="Prix du cours"
+                      placeholder="Course price"
                       className={`w-full p-3 pl-8 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
                         errors.price ? "border-red-500" : "border-gray-300"
                       }`}
@@ -507,7 +508,7 @@ function Courses() {
                           <span className="h-6 w-6 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:bg-gray-500">
                             <span className="w-3 h-3 bg-white rounded-full peer-checked:block hidden"></span>
                           </span>
-                          Gratuit
+                          Free
                         </label>
                       </div>
                     </div>
@@ -523,7 +524,7 @@ function Courses() {
 
               <div className="space-y-2">
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                  Description <span className="text-red-500">*</span>
+                Description <span className="text-red-500">*</span>
                 </label>
                 <div className="border rounded-md overflow-hidden">
                   {!editorRef.current && (
@@ -558,7 +559,7 @@ function Courses() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2 relative">
                   <label htmlFor="level" className="block text-sm font-medium text-gray-700">
-                    Niveau <span className="text-red-500">*</span>
+                  Level <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <select
@@ -575,7 +576,8 @@ function Courses() {
                       }}
                     >
                       <option value="" disabled>
-                        Sélectionner un niveau
+                      Select a level
+
                       </option>
                       <option value="Débutant">Débutant</option>
                       <option value="Intermédiaire">Intermédiaire</option>
@@ -597,14 +599,14 @@ function Courses() {
 
                 <div className="space-y-2">
                   <label htmlFor="categorie" className="block text-sm font-medium text-gray-700">
-                    Catégorie <span className="text-red-500">*</span>
+                  Category <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="categorie"
                     type="text"
                     value={categorie}
                     onChange={(e) => handleInputChange("categorie", e.target.value)}
-                    placeholder="Catégorie du cours"
+                    placeholder="Course category"
                     className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
                       errors.categorie ? "border-red-500" : "border-gray-300"
                     }`}
@@ -622,7 +624,7 @@ function Courses() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label htmlFor="modules" className="block text-sm font-medium text-gray-700">
-                    Modules ({modules.length} disponibles) <span className="text-red-500">*</span>
+                    Modules ({modules.length} available) <span className="text-red-500">*</span>
                   </label>
                   <a
                     href="/profile/module"
@@ -637,7 +639,7 @@ function Courses() {
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Ajouter Module
+                    Add Module
                   </a>
                 </div>
                 <div className="relative">
@@ -681,7 +683,7 @@ function Courses() {
                   className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition-colors text-lg font-medium shadow-md"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Ajout en cours..." : "Ajouter cours"}
+                  {isSubmitting ? "Ajout en cours..." : "Add coursee"}
                 </button>
               </div>
 

@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
 const HomeUser = () => {
   const [courses, setCourses] = useState([]);
@@ -406,104 +410,93 @@ const HomeUser = () => {
               </div>
             </div>
           </div>
-          <div className="swiper course-slider">
-            <div className="swiper-wrapper py-5">
-              <div className="swiper course-slider">
-                <div className="swiper-wrapper py-5">
-                  {loading ? (
-                    // Loading state
-                    <div className="swiper-slide">
-                      <div
-                        className="d-flex justify-content-center align-items-center"
-                        style={{ height: "300px" }}
-                      >
-                        <div
-                          className="spinner-border text-primary"
-                          role="status"
-                        >
-                          <span className="visually-hidden">Loading...</span>
-                        </div>
-                      </div>
-                    </div>
-                  ) : courses.length > 0 ? (
-                    // Map through courses to create slides
-                    courses.map((course) => (
-                      <div className="swiper-slide" key={course._id}>
-                        <div className="course-entry-3 card rounded-2 bg-white border">
-                          <div className="card-media position-relative">
-                            <a href={`/chapters/${course._id}`}>
-                              <img
-                                className="card-img-top"
-                                src={course.image || "assets/images/crs.png"}
-                                alt={course.title}
-                              />
-                            </a>
-                          </div>
-                          <div className="card-body">
-                            <div className="course-meta d-flex justify-content-between align-items-center mb-2">
-                              <div className="d-flex align-items-center">
-                                <img
-                                  src="assets/images/icons/star.png"
-                                  alt="Rating"
-                                />
-                                <strong>4.7</strong>
-                                <span className="rating-count">
-                                  (2k reviews)
-                                </span>
-                              </div>
-                              <span>
-                                <i className="feather-icon icon-layers me-2" />
-                                {course.level}
-                              </span>
-                            </div>
-                            <h3 className="sub-title mb-0">
-                              <a href={`/chapters/${course._id}`} >
-                                {course.title}
-                              </a>
-                            </h3>
-                            <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
-                              <span>
-                                By:{" "}
-                                <a href="#" className="text-reset">
-                                  {course.instructor || " Instracteur"}
-                                </a>
-                              </span>
-                            </div>
-
-
-                              <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                              <div className="price">
-                                ${course.price}
-                                <del>$35.00</del>
-                              </div>
-                              <a href={`/chapters/${course._id}`}>
-                                Enroll Now{" "}
-                                <i className="feather-icon icon-arrow-right" />
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                        {/* Course Entry End */}
-                      </div>
-                    ))
-                  ) : (
-                    // No courses found
-                    <div className="swiper-slide">
-                      <div
-                        className="d-flex justify-content-center align-items-center"
-                        style={{ height: "300px" }}
-                      >
-                        <p>No courses available.</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Slide Item End */}
-            </div>
-            {/* wrapper end */}
+          <Swiper
+  modules={[Navigation]}
+  navigation={{
+    nextEl: '.button-prev',
+    prevEl: '.button-next',
+  }}
+  spaceBetween={30}
+  loop={true}
+  breakpoints={{
+    320: { slidesPerView: 1 },
+    768: { slidesPerView: 2 },
+    1024: { slidesPerView: 3 }
+  }}
+  className="course-slider py-5"
+>
+  {loading ? (
+    <SwiperSlide>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "300px" }}
+      >
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </SwiperSlide>
+  ) : courses.length > 0 ? (
+    courses.map((course) => (
+      <SwiperSlide key={course._id}>
+        <div className="course-entry-3 card rounded-2 bg-white border">
+          <div className="card-media position-relative">
+            <a href={`/chapters/${course._id}`}>
+              <img
+                className="card-img-top"
+                src={course.image || "assets/images/crs.png"}
+                alt={course.title}
+              />
+            </a>
           </div>
+          <div className="card-body">
+            <div className="course-meta d-flex justify-content-between align-items-center mb-2">
+              <div className="d-flex align-items-center">
+                <img src="assets/images/icons/star.png" alt="Rating" />
+                <strong>4.7</strong>
+                <span className="rating-count">(2k reviews)</span>
+              </div>
+              <span>
+                <i className="feather-icon icon-layers me-2" />
+                {course.level}
+              </span>
+            </div>
+            <h3 className="sub-title mb-0">
+              <a href={`/chapters/${course._id}`}>{course.title}</a>
+            </h3>
+            <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
+              <span>
+                By:{" "}
+                <a href="#" className="text-reset">
+                  {course.instructor || "Instructeur"}
+                </a>
+              </span>
+            </div>
+            <div className="course-footer d-flex align-items-center justify-content-between pt-3">
+              <div className="price">
+                ${course.price}
+                <del>$35.00</del>
+              </div>
+              <a href={`/chapters/${course._id}`}>
+                Enroll Now <i className="feather-icon icon-arrow-right" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </SwiperSlide>
+    ))
+  ) : (
+    <SwiperSlide>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "300px" }}
+      >
+        <p>No courses available.</p>
+      </div>
+    </SwiperSlide>
+  )}
+</Swiper>
+
         </div>
         {/* Course Section End */}
         {/* Review Section Start */}

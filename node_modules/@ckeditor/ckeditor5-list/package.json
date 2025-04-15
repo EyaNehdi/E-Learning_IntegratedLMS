@@ -1,0 +1,64 @@
+{
+  "name": "@ckeditor/ckeditor5-list",
+  "version": "27.1.0",
+  "description": "Ordered and unordered lists feature to CKEditor 5.",
+  "keywords": [
+    "ckeditor",
+    "ckeditor5",
+    "ckeditor 5",
+    "ckeditor5-feature",
+    "ckeditor5-plugin"
+  ],
+  "main": "src/index.js",
+  "dependencies": {
+    "ckeditor5": "^27.1.0"
+  },
+  "devDependencies": {
+    "@ckeditor/ckeditor5-basic-styles": "^27.1.0",
+    "@ckeditor/ckeditor5-block-quote": "^27.1.0",
+    "@ckeditor/ckeditor5-clipboard": "^27.1.0",
+    "@ckeditor/ckeditor5-core": "^27.1.0",
+    "@ckeditor/ckeditor5-dev-utils": "^24.0.0",
+    "@ckeditor/ckeditor5-editor-classic": "^27.1.0",
+    "@ckeditor/ckeditor5-engine": "^27.1.0",
+    "@ckeditor/ckeditor5-enter": "^27.1.0",
+    "@ckeditor/ckeditor5-essentials": "^27.1.0",
+    "@ckeditor/ckeditor5-font": "^27.1.0",
+    "@ckeditor/ckeditor5-heading": "^27.1.0",
+    "@ckeditor/ckeditor5-highlight": "^27.1.0",
+    "@ckeditor/ckeditor5-indent": "^27.1.0",
+    "@ckeditor/ckeditor5-link": "^27.1.0",
+    "@ckeditor/ckeditor5-paragraph": "^27.1.0",
+    "@ckeditor/ckeditor5-remove-format": "^27.1.0",
+    "@ckeditor/ckeditor5-table": "^27.1.0",
+    "@ckeditor/ckeditor5-theme-lark": "^27.1.0",
+    "@ckeditor/ckeditor5-typing": "^27.1.0",
+    "@ckeditor/ckeditor5-ui": "^27.1.0",
+    "@ckeditor/ckeditor5-undo": "^27.1.0",
+    "@ckeditor/ckeditor5-utils": "^27.1.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  },
+  "engines": {
+    "node": ">=12.0.0",
+    "npm": ">=5.7.1"
+  },
+  "author": "CKSource (http://cksource.com/)",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://ckeditor.com/ckeditor-5",
+  "bugs": "https://github.com/ckeditor/ckeditor5/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ckeditor/ckeditor5.git",
+    "directory": "packages/ckeditor5-list"
+  },
+  "files": [
+    "lang",
+    "src",
+    "theme",
+    "build"
+  ],
+  "scripts": {
+    "dll:build": "webpack"
+  }
+}

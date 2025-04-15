@@ -8,6 +8,7 @@ var logger = require('morgan');
 const cors = require('cors');
 const multer = require('multer');
 const socketIo = require('socket.io');
+const preference = require("./routes/preference");
 
 
 
@@ -265,6 +266,7 @@ app.use('/module', Module);
 app.use('/course', Course);
 app.use('/courses', Course);
 app.use('/delete', Course);
+app.use('/preference',preference);
 
 
 // Routes Google Classroom (corrigées)
