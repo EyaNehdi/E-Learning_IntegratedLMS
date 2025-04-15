@@ -7,8 +7,6 @@ import { Toaster } from "react-hot-toast";
 import Login from "./pages/SignIn/Login";
 import SignUpPage from "./pages/SignUpPage/SignUpPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicy/PrivacyPolicyPage";
-import Review from "./components/Admin/Review";
-import Leave from "./components/Admin/Leave";
 import Manage from "./components/Admin/Manage";
 import Reports from "./components/Admin/Reports";
 import NotFound from "./components/Notfound";
@@ -48,6 +46,13 @@ import AllExamsInstructor from "./components/Exam/AllExamsInstractor";
 import ExamStudent from "./components/Exam/ExamStudent";
 
 import BrowseCertificates from "./components/Student/BrowseCertificates";
+import AuditLogs from "./pages/Admin/Audit";
+import UsersPage from "./pages/Admin/UsersPage";
+import ListUsers from "./components/Admin/ListUsers";
+import ManageUser from "./components/Admin/ManageUser";
+import ManageBadges from "./components/Admin/ManageBadges";
+import BadgeFeature from "./pages/Admin/BadgeFeature";
+import ListBadges from "./components/Admin/ListBadges";
 
 import React, { useState } from "react"; 
 import axios from "axios"; 
@@ -278,9 +283,19 @@ function App() {
         {/* **************** */}
         {/* Admin routes */}
         <Route element={<AdminRoute />}>
-          <Route path="/Review" element={<Review />} />
-          <Route path="/leave" element={<Leave />} />
-          <Route path="/leave/:id" element={<Leave />} />
+          <Route path="/admin" element={<UsersPage />}>
+            <Route index element={<ListUsers />} />
+            <Route path="users" element={<ListUsers />} />
+            <Route path="update/:id" element={<ManageUser />} />
+            <Route path="create" element={<ManageUser />} />
+          </Route>
+          <Route path="/audit" element={<AuditLogs />} />
+          <Route path="/badge" element={<BadgeFeature />}>
+            <Route index element={<ListBadges />} />
+            <Route path="createBadge" element={<ManageBadges />} />
+            <Route path="edit/:id" element={<ManageBadges />} />
+            <Route path="list-badges" element={<ListBadges />} />
+          </Route>
           <Route path="/manage" element={<Manage />} />
           <Route path="/report" element={<DailyQuizzes />} />
           <Route path="/set" element={<Settings />} />

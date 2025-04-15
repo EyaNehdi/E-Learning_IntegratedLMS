@@ -18,13 +18,32 @@ const upload = multer({ storage });
 // Get User Profile
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select("firstName lastName email mfaEnabled image profilePhoto coverPhoto phone skils badges role Bio");
+        const user = await User.findById(req.userId).select("firstName lastName email mfaEnabled image profilePhoto coverPhoto phone skils badges role Bio certificatesOwned");
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
+        if (user) {
+            const certificateCount = user.certificatesOwned.length;
+            const userProfile_Details = {
+                _id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                mfaEnabled: user.mfaEnabled,
+                image: user.image,
+                profilePhoto: user.profilePhoto,
+                coverPhoto: user.coverPhoto,
+                phone: user.phone,
+                skils: user.skils,
+                badges: user.badges,
+                role: user.role,
+                Bio: user.Bio,
+                certificateCount,
+            };
+            res.status(200).json(userProfile_Details);
+        }
 
-        res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
@@ -188,8 +207,8 @@ const editSkils = async (req, res) => {
 
         // Find the user and update their skills
         const updatedUser = await User.findByIdAndUpdate(
-            userId, 
-            { skils: skills }, 
+            userId,
+            { skils: skills },
             { new: true } // Return updated document
         );
 

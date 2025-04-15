@@ -1,4 +1,4 @@
-const bcryptjs = require ('bcryptjs');
+const bcryptjs = require('bcryptjs');
 const User = require('../models/userModel');
 const generateToken = require('../utils/generateTokenAndSetCookie');
 const bcrypt = require('bcrypt');
@@ -7,15 +7,15 @@ const crypto = require('crypto');
 
 const jwt = require('jsonwebtoken');
 
-const {sendResetSuccessEmail } = require("../mailtrap/emails.js");
-const { sendVerificationEmail,sendPasswordResetEmail} = require("../API/mailer.js");
+const { sendResetSuccessEmail } = require("../mailtrap/emails.js");
+const { sendVerificationEmail, sendPasswordResetEmail } = require("../API/mailer.js");
 
 const axios = require('axios');
 //signup function
-const register = async (req, res) => {
-  console.log("🔹 Received Request Body:", req.body);
+const register = async (req, res, role) => {
+  console.log("🔹 Received Request Body:", req.body); // Log request body
 
-  const { firstName, lastName, email, password, role } = req.body;
+  const { firstName, lastName, email, password } = req.body; // Ensure role is extracted
 
   try {
     // Validate input fields
@@ -42,7 +42,7 @@ const register = async (req, res) => {
       lastName,
       email,
       password,
-      role,
+      role: role,
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // Token expires in 24 hours
     });
@@ -90,7 +90,7 @@ const regestergoogle = async (req, res, role) => {
       email,
       role
     };
-    
+
     // If the request contains a password (i.e., normal signup), add it to the user data
     if (password) {
       newUserData.password = password;
@@ -124,7 +124,7 @@ const registerLinkedIn = async (req, res, role) => {
 
   try {
     const authCode = req.body.code;
-    
+
     // Exchange auth code for access token
     const response = await axios.post(
       "https://www.linkedin.com/oauth/v2/accessToken",
@@ -250,7 +250,7 @@ const checkAuth = async (req, res) => {
     const user = await User.findById(req.userId).select("-password");
     if (!user) {
       return res.status(400).json({ success: false, message: "User not found" });
-      
+
     }
 
 
@@ -327,7 +327,7 @@ const markUserAsVerified = async (email) => {
   if (!user) {
     throw new Error("User not found");
   }
-  
+
   user.isVerified = true; // Mark the user as verified
   user.verificationToken = null; // Remove the verification token after successful verification
   await user.save(); // Save the updated user
@@ -398,7 +398,7 @@ const signIn = async (req, res) => {
     console.log("🟢 Stored hashed password:", user.password);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    
+
 
     if (!isPasswordValid) {
       console.log("🔴 Password does not match");
@@ -504,7 +504,7 @@ const signInlinkedin = async (req, res) => {
 
   try {
     const authCode = req.body.code;
-    
+
     // Exchange auth code for access token
     const response = await axios.post(
       "https://www.linkedin.com/oauth/v2/accessToken",
@@ -535,11 +535,11 @@ const signInlinkedin = async (req, res) => {
       return res.status(400).json({ success: false, message: "User with this email doses not exist" });
     }
 
-   
+
 
     // Create new user
-   
-    
+
+
 
     await generateToken(res, user._id);
 
@@ -682,7 +682,7 @@ const markChapterAsCompleted = async (req, res) => {
 
     // Return the updated completedChapters array
     return res.status(200).json({ completedChapters });
-    
+
   } catch (err) {
     console.error("Error marking chapter as completed:", err);
     return res.status(500).json({ error: "An error occurred while marking the chapter as completed" });
@@ -705,73 +705,74 @@ const trackCurrentLocation = async (req, res) => {
   if (!req.userId) return res.status(400).json({ error: "User ID not found in token" });
 
   try {
-      let location;
-      try {
-          const ipResponse = await fetch("https://api.ipify.org?format=json");
-          const ipData = await ipResponse.json();
-          const ip = ipData.ip;
-          
-          const geoResponse = await fetch(`https://ipinfo.io/${ip}/json`);
-          location = await geoResponse.json();
+    let location;
+    try {
+      const ipResponse = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipResponse.json();
+      const ip = ipData.ip;
 
-          console.log("Location Data:", location);
+      const geoResponse = await fetch(`https://ipinfo.io/${ip}/json`);
+      location = await geoResponse.json();
 
-          const user = await User.findById(req.userId);
-          if (!user) return res.status(404).json({ error: "User not found" });
+      console.log("Location Data:", location);
 
+      const user = await User.findById(req.userId);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      user.lastLoginLocation = {
+        city: location.city || "Unknown",
+        region: location.region || "",
+        country: location.country || "Unknown",
+        loggedInAt: new Date(),
+      };
+
+      await user.save();
+      res.json({ message: "Location updated", location: user.lastLoginLocation, userId: req.userId, userData: user });
+    } catch (apiError) {
+      console.error("API Error:", apiError);
+      if (req.userId) {
+        const user = await User.findById(req.userId);
+        if (user) {
           user.lastLoginLocation = {
-              city: location.city || "Unknown",
-              region: location.region || "",
-              country: location.country || "Unknown",
-              loggedInAt: new Date(),
+            city: "Fallback City",
+            region: "",
+            country: "Fallback Country",
+            loggedInAt: new Date(),
           };
-
           await user.save();
-          res.json({ message: "Location updated", location: user.lastLoginLocation ,userId: req.userId, userData: user });
-      } catch (apiError) {
-          console.error("API Error:", apiError);
-          if (req.userId) {
-              const user = await User.findById(req.userId);
-              if (user) {
-                  user.lastLoginLocation = {
-                      city: "Fallback City",
-                      region: "",
-                      country: "Fallback Country",
-                      loggedInAt: new Date(),
-                  };
-                  await user.save();
-                  return res.json({ message: "Using fallback location due to API errors", location: user.lastLoginLocation });
-              }
-          }
-          return res.status(500).json({ error: "Could not fetch location data" });
+          return res.json({ message: "Using fallback location due to API errors", location: user.lastLoginLocation });
+        }
       }
+      return res.status(500).json({ error: "Could not fetch location data" });
+    }
   } catch (err) {
-      console.error("Failed to track location:", err);
-      res.status(500).json({ error: "Could not update location" });
+    console.error("Failed to track location:", err);
+    res.status(500).json({ error: "Could not update location" });
   }
 };
 
 
 
-module.exports = { signIngithub,
-   signIngoogle, 
-   registerStudentgithub, 
-   registerStudentgoogle, 
-   registerInstructorgithub,
-    registerInstructorgoogle,
-     registerStudent, 
-     registerInstructor,
-      checkAuth, signIn, 
-      signOut,
-       verifyEmail,
-        forgotPassword,
-         resetPassword ,
-         registerLinkedIn,
-          registerInstructorLinkedin,
-           registerStudentLinkedin,
-           signInlinkedin,
-           markChapterAsCompleted,
-           trackCurrentLocation,
-           resendVerificationCode
-        };
+module.exports = {
+  signIngithub,
+  signIngoogle,
+  registerStudentgithub,
+  registerStudentgoogle,
+  registerInstructorgithub,
+  registerInstructorgoogle,
+  registerStudent,
+  registerInstructor,
+  checkAuth, signIn,
+  signOut,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+  registerLinkedIn,
+  registerInstructorLinkedin,
+  registerStudentLinkedin,
+  signInlinkedin,
+  markChapterAsCompleted,
+  trackCurrentLocation,
+  resendVerificationCode
+};
 
