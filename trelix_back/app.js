@@ -23,8 +23,6 @@ const MongoStore = require('connect-mongo');
 
 // Middleware pour déboguer les sessions
 
-const certifRoutes = require('./routes/certif.routes');
-
 const axios = require('axios');
 const fetch = require('node-fetch');
 var app = express();
