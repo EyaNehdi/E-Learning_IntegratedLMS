@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm install --no-optional --legacy-peer-deps
 RUN npm install @rollup/rollup-linux-x64-gnu --legacy-peer-deps
 RUN npm install @tailwindcss/oxide-linux-x64-gnu --legacy-peer-deps
-
+RUN npm install lightningcss --platform=linux --legacy-peer-deps
 
 COPY . .
 
