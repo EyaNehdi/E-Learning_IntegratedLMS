@@ -19,4 +19,5 @@ services:
       - "5173:5173"
     environment:
       - REACT_APP_API_URL=http://192.168.33.10:5000  
+      - VITE_API_URL=http://localhost:5000/api/auth
    
