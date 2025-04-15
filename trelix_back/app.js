@@ -6,9 +6,24 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors');
-const googleClassroomRoutes = require('./routes/googleClassroom.routes');
 const multer = require('multer');
 const socketIo = require('socket.io');
+const preference = require("./routes/preference");
+
+
+
+// Correction des imports pour Google Classroom
+const googleAuthRoutes = require('./routes/googleAuth');
+const classroomRoutes = require('./routes/classroom');
+// Dans app.js, après les imports
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+
+// Avant les routes, après les middlewares comme cors, etc.
+
+
+// Middleware pour déboguer les sessions
+
 const axios = require('axios');
 const fetch = require('node-fetch');
 var app = express();
@@ -56,7 +71,9 @@ app.post('/createRoom', async (req, res) => {
 require('dotenv').config(); // Charger les variables d'environnement
 
 
+
 const { getMoodleCourses,getCourseContents  } = require('./API/Moodle'); 
+
 
 
 var indexRouter = require('./routes/index');
@@ -75,6 +92,14 @@ var app = express();
 
 console.log("MONGO_URI:", process.env.MONGO_URI);  // Debug
 
+// Vérification des variables d'environnement pour Google Classroom
+console.log("Google Classroom Config:", {
+  clientId: process.env.GOOGLE_CLIENT_ID ? "Défini" : "Non défini",
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET ? "Défini" : "Non défini",
+  redirectUri: process.env.GOOGLE_REDIRECT_URI ? "Défini" : "Non défini",
+  frontendUrl: process.env.FRONTEND_URL ? "Défini" : "Non défini"
+});
+
 // view engine setup
 
 app.set('views', path.join(__dirname, 'views'));
@@ -87,7 +112,38 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// Configuration CORS
+
+
+
+app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'classroom_secret_key',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    ttl: 14 * 24 * 60 * 60 // 14 jours
+  }),
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 14 * 24 * 60 * 60 * 1000 // 14 jours
+  }
+}));
+
+app.use((req, res, next) => {
+  console.log('Session:', req.session);
+  console.log('Session ID:', req.sessionID);
+  next();
+});
+app.use(cors({
+  origin: "http://localhost:5173", // URL de votre frontend
+  credentials: true, // Important pour les cookies de session
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+
 
 //cors
 
@@ -101,7 +157,20 @@ app.use(cors({
 
 
 
-
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'votre_secret_de_session',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    ttl: 14 * 24 * 60 * 60 // 14 jours
+  }),
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 14 * 24 * 60 * 60 * 1000 // 14 jours
+  }
+}));
 
 
 
@@ -111,6 +180,7 @@ app.use(cors({
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
+
 // Middleware de logging pour déboguer les requêtes
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
@@ -118,8 +188,18 @@ app.use((req, res, next) => {
 });
 
 
-
-// Routes
+// In app.js
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/certificates', express.static(path.join(__dirname, 'certificates')));
+app.get('/download-certificate/:filename', (req, res) => {
+  const filePath = path.join(__dirname, 'certificates', req.params.filename);
+  res.download(filePath, err => {
+    if (err) {
+      console.error("Download error:", err);
+      res.status(404).send("File not found");
+    }
+  });
+});
 
 app.use('/ia', require('./routes/ia'));
 app.use('/', indexRouter);
@@ -128,20 +208,25 @@ app.use('/module', Module);
 app.use('/course', Course);
 app.use('/courses', Course);
 app.use('/delete', Course);
+app.use('/preference',preference);
 
 
-// Auth routes
+// Routes Google Classroom (corrigées)
+app.use('/api/auth/google', googleAuthRoutes);
+app.use('/api/classroom', classroomRoutes);
 
-app.use('/api/classroom', googleClassroomRoutes);
 
 //auth routes
 
-
+const mailersRoutes = require('./routes/mailroute');
+app.use('/', mailersRoutes);
 const ExamRoutes = require('./routes/ExamRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const authRouteschapter = require('./routes/chapterRoutes');
 const authRoutes = require('./routes/authRoutes');
 const authRoutesIA = require('./routes/ia');
+const certifRoutes = require('./routes/certif.routes');
+const badgesRoutes = require('./routes/badge.routes');
 app.use('/api/auth', authRoutes);
 app.use('/ia/auth', authRoutesIA);
 app.use('/chapter', authRouteschapter);
@@ -149,6 +234,8 @@ app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/quiz", quizzRoutes);
+app.use("/certificates", certifRoutes);
+app.use("/api/badges-r", badgesRoutes);
 
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
@@ -158,6 +245,31 @@ app.use((err, req, res, next) => {
   console.error('Upload Error:', err.message);
   res.status(400).json({ error: err.message });
 });
+
+// Middleware de débogage pour les redirections
+app.use((req, res, next) => {
+  const originalRedirect = res.redirect;
+  res.redirect = function(url) {
+    console.log(`Redirection vers: ${url}`);
+    return originalRedirect.call(this, url);
+  };
+  next();
+});
+
+// Placez ce middleware avant vos routes
+
+// Route de test pour Google Classroom
+app.get('/api/classroom-test', (req, res) => {
+  res.json({
+    message: 'Google Classroom API est configurée',
+    config: {
+      clientId: process.env.GOOGLE_CLIENT_ID ? "Défini" : "Non défini",
+      redirectUri: process.env.GOOGLE_REDIRECT_URI ? "Défini" : "Non défini",
+      frontendUrl: process.env.FRONTEND_URL ? "Défini" : "Non défini"
+    }
+  });
+});
+
 app.get('/api/courses', async (req, res) => {
   try {
       const courses = await getMoodleCourses();
@@ -191,6 +303,7 @@ app.get('/api/courses/:id/contents', async (req, res) => {
       console.error(`❌ Failed to fetch course contents:`, error.message);
       res.status(500).json({ error: 'Failed to fetch course contents' });
   }
+
 });
 
 // catch 404 and forward to error handler
@@ -250,6 +363,7 @@ const PORT = process.env.PORT || 5000;
 // 1. Get the server instance from Express
 const server = app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
+  console.log(`Google Auth URL: http://localhost:${PORT}/api/auth/google/login`);
 });
 
 // 2. Attach Socket.IO to the existing Express server
@@ -263,6 +377,8 @@ const io = socketIo(server, {
 
 // Socket Initialization
 const { initializeSocket } = require('./controllers/quizzLeaderboardController');
+const { initSocket } = require('./utils/socket');
 initializeSocket(io);  // Pass the socket instance to the controller
+initSocket(io);
 
 module.exports = app;

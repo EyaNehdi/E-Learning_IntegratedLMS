@@ -94,6 +94,26 @@ const deleteCourse = async (req, res) => {
         res.status(500).json({ message: "Erreur du serveur" });
     }
 };
+const likeCourse = async (req, res) => {
+    const { courseId } = req.params;  // Récupérer l'ID du cours dans les paramètres de la route
+
+    try {
+        // Chercher le cours dans la base de données
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ message: "Cours non trouvé" });  // Si le cours n'existe pas
+        }
+
+        // Incrémenter le nombre de likes
+        course.likes += 1;
+        await course.save();  // Sauvegarder le cours mis à jour dans la base de données
+
+        res.status(200).json(course);  // Retourner le cours avec le nombre de likes mis à jour
+    } catch (error) {
+        console.error("Erreur lors de l'ajout du like:", error);
+        res.status(500).json({ message: "Erreur du serveur" });  // Gérer les erreurs serveur
+    }
+};
 
 // Rechercher des cours par titre ou description
 const searchCourses = async (req, res) => {
@@ -115,6 +135,49 @@ const searchCourses = async (req, res) => {
         console.error("Erreur lors de la recherche des cours:", error);
         res.status(500).json({ message: "Erreur du serveur" });
     }
-};
 
-module.exports = { createCourse, getAllCourses, getCourseById, updateCourse, deleteCourse, searchCourses };
+
+};
+    // Récupérer les catégories avec le nombre de cours dans chaque
+    const getCoursesByCategory = async (req, res) => {
+        try {
+          const categories = await Course.aggregate([
+            {
+              $group: {
+                _id: "$categorie",
+                totalCourses: { $sum: 1 }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                categorie: "$_id",
+                totalCourses: 1
+              }
+            }
+          ]);
+      
+          res.status(200).json(categories);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des catégories:", error);
+          res.status(500).json({ message: "Erreur du serveur" });
+        }
+      };
+      const countCourses = async (req, res) => {
+        try {
+            const count = await Course.countDocuments();
+            res.status(200).json({ count });
+        } catch (error) {
+            console.error("Erreur lors du comptage des cours:", error);
+            res.status(500).json({ message: "Erreur du serveur" });
+        }
+    };
+module.exports = { createCourse,
+     getAllCourses,
+      getCourseById,
+       updateCourse,
+        deleteCourse,
+         searchCourses,
+         getCoursesByCategory,likeCourse,
+        countCourses };
+

@@ -445,3 +445,10 @@ body {
     border-radius: 0;
   }
 }
+.edited-tag {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 2px;
+  display: block;
+  font-style: italic;
+}

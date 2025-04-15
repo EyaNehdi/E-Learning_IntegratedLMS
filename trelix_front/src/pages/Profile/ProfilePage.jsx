@@ -46,48 +46,52 @@ const ProfilePage = () => {
   const [locationData, setLocationData] = useState(null);
 
   // Ensure that tracking location and fetching user data are done sequentially
-useEffect(() => {
-  const trackAndFetchData = async () => {
-    if (!locationTracked) {
-      console.log("Tracking location...");
-      const locationResponse = await trackLocation();
-      if (locationResponse) {
-        console.log("Location tracking completed.");
-        // Fetch user data AFTER location tracking completes
+  useEffect(() => {
+    const trackAndFetchData = async () => {
+      if (!locationTracked) {
+        console.log("Tracking location...");
+        const locationResponse = await trackLocation();
+        if (locationResponse) {
+          console.log("Location tracking completed.");
+          // Fetch user data AFTER location tracking completes
+          await fetchUser();
+        }
+      } else if (!isLoadingUser && !user) {
+        console.log("Fetching user data...");
         await fetchUser();
       }
-    } else if (!isLoadingUser && !user) {
-      console.log("Fetching user data...");
-      await fetchUser();
-    }
-  };
+    };
 
-  trackAndFetchData();
-}, []);
-  
+    trackAndFetchData();
+  }, []);
+
   // Function to track the user's current location
   const trackLocation = async () => {
     console.log("Tracking location...");
-  
+
     try {
       // Make sure you send the request with credentials (cookie)
-      const response = await axios.get("http://localhost:5000/api/auth/current-location", {
-        withCredentials: true, // This ensures the cookie is sent along with the request
-      });
-  
+      const response = await axios.get(
+        "http://localhost:5000/api/auth/current-location",
+        {
+          withCredentials: true, // This ensures the cookie is sent along with the request
+        }
+      );
+
       console.log("Location tracking triggered successfully:", response.data);
-  // Save the location data to state
-  const location = response.data.location;
-  setLocationData(location);
-  setLocationTracked(true); // Set the tracking flag to true
-  console.log("Location:", location);
-  return location;
+      // Save the location data to state
+      const location = response.data.location;
+      setLocationData(location);
+      setLocationTracked(true); // Set the tracking flag to true
+      console.log("Location:", location);
+      return location;
     } catch (error) {
-      console.error("Error tracking location:", error.response?.data || error.message);
+      console.error(
+        "Error tracking location:",
+        error.response?.data || error.message
+      );
     }
   };
-  
-  
 
   const handleProfilePhotoChange = async (event) => {
     const file = event.target.files[0];
@@ -126,8 +130,14 @@ useEffect(() => {
   };
 
   const awardBadge = async () => {
+    const description = "Earned for completing profile";
+    const hasBadge = user.badges?.some(
+      (badge) => badge.description === description
+    );
+    if (hasBadge) {
+      return;
+    }
     const badgeImageUrl = "/assets/Badges/WelcomeBadge.png";
-
     try {
       const response = await axios.post(
         "http://localhost:5000/api/info/profile/badge",
@@ -203,14 +213,14 @@ useEffect(() => {
                           />
                         ) : (
                           <span>
-                           {user?.firstName && user?.lastName ? (
-  <>
-    {user.firstName.charAt(0)}
-    {user.lastName.charAt(0)}
-  </>
-) : (
-  "?"
-)}
+                            {user?.firstName && user?.lastName ? (
+                              <>
+                                {user.firstName.charAt(0)}
+                                {user.lastName.charAt(0)}
+                              </>
+                            ) : (
+                              "?"
+                            )}
                           </span>
                         )}
                       </div>
@@ -246,7 +256,8 @@ useEffect(() => {
                       Enrolled{" "}
                     </span>
                     <span>
-                      <i className="feather-icon icon-award" />0 Certificates
+                      <i className="feather-icon icon-award" />
+                      {user?.certificateCount} Certificates
                     </span>
                   </div>
                 </div>
@@ -304,7 +315,7 @@ useEffect(() => {
               </div>
               <div className="col-lg-9 ps-lg-4">
                 <section className="dashboard-sec">
-                  <h2 className="">{activePage}</h2>
+                  
                   {isLoadingUser ? (
                     <Preloader />
                   ) : (
@@ -315,7 +326,7 @@ useEffect(() => {
                         accountCompletion,
                         toggleMFA,
                         setBackupCodes,
-                        locationData
+                        locationData,
                       }}
                     />
                   )}

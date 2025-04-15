@@ -8,6 +8,7 @@ function ChatComponent() {
   const [messages, setMessages] = useState([]);
   const [editingMessage, setEditingMessage] = useState(null);
   const [editedText, setEditedText] = useState('');
+
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Send message with rate limiting (10 per minute)
@@ -24,6 +25,7 @@ function ChatComponent() {
     // Check the limit
     if (recentTimestamps.length >= 10) {
       alert("⛔ You've reached the limit of 10 messages per minute.");
+
       return;
     }
 
@@ -36,18 +38,19 @@ function ChatComponent() {
         edited: false
       });
 
-      // Add this timestamp and save to localStorage
+
       localStorage.setItem("messageTimestamps", JSON.stringify([...recentTimestamps, now]));
 
       setMessage('');
     }
   };
 
-  // Delete a message
+
   const handleDeleteMessage = (messageId) => {
     const messageRef = ref(db, 'messages/' + messageId);
     remove(messageRef)
       .then(() => {
+
         console.log("Message deleted");
       })
       .catch((error) => {
@@ -56,6 +59,7 @@ function ChatComponent() {
   };
 
   // Update a message (only once)
+
   const handleUpdateMessage = (messageId) => {
     if (editedText.trim()) {
       const messageRef = ref(db, 'messages/' + messageId);
@@ -64,17 +68,21 @@ function ChatComponent() {
         edited: true
       })
         .then(() => {
+
           console.log("Message updated");
+
           setEditingMessage(null);
           setEditedText('');
         })
         .catch((error) => {
+
           console.error("Update error:", error);
         });
     }
   };
 
   // Read messages in real-time
+
   useEffect(() => {
     const messagesRef = ref(db, 'messages');
     onValue(messagesRef, (snapshot) => {
@@ -83,6 +91,7 @@ function ChatComponent() {
       for (const id in data) {
         loadedMessages.push({ id, ...data[id] });
       }
+
       // Sort messages by timestamp
       loadedMessages.sort((a, b) => a.timestamp - b.timestamp);
       setMessages(loadedMessages);
@@ -128,6 +137,7 @@ function ChatComponent() {
             <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
           </svg>
         )}
+
       </div>
   
       {/* Chat interface */}
@@ -223,9 +233,12 @@ function ChatComponent() {
 </button>
 
 
+
         </div>
+
       </div>
     </div>
   );
 }
+
 export default ChatComponent;
