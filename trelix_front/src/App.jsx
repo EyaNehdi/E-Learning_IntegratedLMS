@@ -61,6 +61,7 @@ import Preference from "./components/Student/AddPreference"
 
 import React, { useState } from "react"; 
 import axios from "axios"; 
+import GeminiChatbot from "./components/GeminiChatbot";
 
 
 import CourseLearningPlatform from "./components/Quiz/test";
@@ -96,14 +97,8 @@ import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
 
 
 
-const Chatbot = () => {
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+
 
     setIsLoading(true);
     // Ajout du message utilisateur immédiatement
@@ -175,6 +170,7 @@ const Chatbot = () => {
   );
 };
 
+
 function App() {
 
 
@@ -217,9 +213,11 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
 
+
           {/* Route pour le chatbot */}
 
         <Route path="/chatbot" element={<Chatbot />} />
+
          {/* Route pour la réunion */}
          
 
@@ -248,7 +246,9 @@ function App() {
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
-
+            <Route path="geminichat" element={<GeminiChatbot />} />
+            <Route path="chat" element={<ChatComponent />} />
+            <Route path="meeting" element={<JoinRoom />} />
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addExam" element={<AddExam />} />
             <Route path="Allexams" element={<AllExamsInstructor />} />

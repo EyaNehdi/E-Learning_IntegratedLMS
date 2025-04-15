@@ -15,6 +15,7 @@
     "@daily-co/daily-js": "^0.77.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@google/generative-ai": "^0.24.0",
     "@mui/icons-material": "^6.4.4",
     "@mui/material": "^6.4.4",
     "@radix-ui/react-progress": "^1.1.2",

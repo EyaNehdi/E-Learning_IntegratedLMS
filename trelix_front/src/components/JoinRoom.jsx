@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
+
+
 export default function JoinRoom() {
   const [room, setRoom] = useState("");
   const navigate = useNavigate();
@@ -47,66 +49,158 @@ export default function JoinRoom() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "calc(100vh - 80px)", // Enlever l'espace occupé par le header et footer (80px ici pour exemple)
-        padding: "2rem",
-        fontFamily: "'Arial', sans-serif", // Police moderne
-        backgroundColor: "#f7f7f7",  // Fond plus clair
+        minHeight: "calc(100vh - 80px)",
+        padding: "1rem",
+        backgroundColor: "#f8f9fa",
+        backgroundImage: "linear-gradient(to bottom right, #f8f9fa, #e9ecef)",
       }}
     >
       <div
         style={{
-          textAlign: "center",
-          padding: "2rem",
-          borderRadius: "10px",
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)", // Ombre légère
-          maxWidth: "600px",  // Augmenter la largeur de la boîte
-          width: "100%", // S'adapte à la taille de l'écran
-          backgroundColor: "white", // Fond blanc pour la boîte
+          width: "100%",
+          maxWidth: "450px",
+          backgroundColor: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 24px rgba(0, 0, 0, 0.08)",
+          overflow: "hidden",
         }}
       >
-        <h2 style={{ color: "#343a40", fontWeight: "bold" }}>Bienvenue dans la plateforme de réunion !</h2>
-
-        <div style={{ marginTop: "2rem", display: "flex", justifyContent: "center" }}>
-          <input
-            type="text"
-            placeholder="Entrer un ID de salle"
-            value={room}
-            onChange={(e) => setRoom(e.target.value)}
+        <div style={{ padding: "1.5rem 1.5rem 1rem" }}>
+          <h2
             style={{
-              padding: "12px 15px",
-              width: "100%", // L'input occupe toute la largeur de la boîte
-              maxWidth: "400px", // Limiter la largeur à 400px
-              fontSize: "16px",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              marginRight: "15px",
-              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-              transition: "0.3s ease-in-out",
+              fontSize: "1.5rem",
+              fontWeight: "700",
+              textAlign: "center",
+              margin: "0 0 0.5rem",
+              color: "#333",
             }}
-          />
-          <button
-            onClick={handleJoin}
-            style={{
-              padding: "12px 30px",
-              fontSize: "16px",
-              borderRadius: "8px",
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
-              cursor: "pointer",
-              transition: "0.3s ease-in-out",
-              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-              width: "150px",  // Largeur plus grande pour le bouton
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = "#218838"} // Couleur au survol
-            onMouseLeave={(e) => e.target.style.backgroundColor = "#28a745"} // Retour à la couleur initiale
           >
-            Rejoindre
-          </button>
+            Join a Meeting
+          </h2>
+          <p
+            style={{
+              textAlign: "center",
+              color: "#6c757d",
+              fontSize: "0.9rem",
+              marginTop: "0.25rem",
+            }}
+          >
+            Enter a room ID to join the meet
+          </p>
         </div>
 
-       
+        <div style={{ padding: "0.5rem 1.5rem 1.5rem" }}>
+          <div style={{ marginBottom: "1.25rem", position: "relative" }}>
+            <div style={{ position: "relative" }}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6c757d"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  position: "absolute",
+                  left: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <input
+                type="text"
+                placeholder="Enter room ID"
+                value={room}
+                onChange={(e) => setRoom(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "0.75rem 0.75rem 0.75rem 2.5rem",
+                  fontSize: "1rem",
+                  borderRadius: "8px",
+                  border: "1px solid #dee2e6",
+                  outline: "none",
+                  transition: "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
+                  height: "48px",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "#4dabf7"
+                  e.target.style.boxShadow = "0 0 0 3px rgba(77, 171, 247, 0.25)"
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "#dee2e6"
+                  e.target.style.boxShadow = "none"
+                }}
+              />
+            </div>
+            {!room && (
+              <p
+                style={{
+                  fontSize: "0.75rem",
+                  color: "#6c757d",
+                  margin: "0.5rem 0 0 0.25rem",
+                }}
+              >
+                Room ID can be any combination of letters and numbers
+              </p>
+            )}
+          </div>
+
+          <button
+            onClick={handleJoin}
+            disabled={!room.trim()}
+            style={{
+              width: "100%",
+              height: "48px",
+              backgroundColor: room.trim() ? "#4dabf7" : "#a5d8ff",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "1.1rem",
+              fontWeight: "500",
+              cursor: room.trim() ? "pointer" : "not-allowed",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "background-color 0.15s ease-in-out",
+              padding: "0.75rem 1rem",
+            }}
+            onMouseEnter={(e) => {
+              if (room.trim()) {
+                e.target.style.backgroundColor = "#339af0"
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (room.trim()) {
+                e.target.style.backgroundColor = "#4dabf7"
+              }
+            }}
+          >
+            Join Meeting
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ marginLeft: "0.5rem" }}
+            >
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
-  );
+  )
 };

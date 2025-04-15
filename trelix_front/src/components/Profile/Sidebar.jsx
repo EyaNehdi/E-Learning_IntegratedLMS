@@ -179,19 +179,20 @@ function Sidebar({ setActivePage }) {
               </li>
               <li>
 
-              <Link className="nav-link" to="/chatbot">
+              <Link className="nav-link" to="/profile/geminichat">
+
                 <i className="feather-icon icon-plus" />
-                <span>chatbot</span>
+                <span>Chatbot</span>
               </Link>
               </li>
               <li>
-              <Link className="nav-link" to="/meeting">
+              <Link className="nav-link" to="/profile/meeting">
                 <i className="feather-icon icon-plus" />
                 <span>Meet</span>
               </Link>
               </li>
               <li>
-              <Link className="nav-link" to="/chat">
+              <Link className="nav-link" to="/profile/chat">
                 <i className="feather-icon icon-plus" />
                 <span>GroupChat</span>
               </Link>
