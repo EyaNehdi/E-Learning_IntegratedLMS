@@ -40,7 +40,7 @@ pipeline {
                     sh 'npm test'
                 }
             }
-        }/*
+        }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
@@ -53,7 +53,7 @@ pipeline {
                 }
             }
         }
-*/
+
         stage('Publish to Nexus') {
             steps {
                 dir('trelix_back') {
