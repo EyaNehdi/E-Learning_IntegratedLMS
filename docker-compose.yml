@@ -11,3 +11,13 @@ services:
     environment:
       MONGO_URI: "mongodb+srv://eyanehdi:Trelix123@trelix.1akuy.mongodb.net/Trelix?retryWrites=true&w=majority"
 
+  frontend:
+    build:
+      context: ./trelix_front  # or whatever the frontend folder is
+    container_name: trelix_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - REACT_APP_API_URL=http://192.168.33.10:5000  # Adjust if reverse proxy is used
+    depends_on:
+      - backend
