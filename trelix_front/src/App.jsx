@@ -50,86 +50,14 @@ import BrowseCertificates from "./components/Student/BrowseCertificates";
 
 import React, { useState } from "react"; 
 import axios from "axios"; 
+import GeminiChatbot from "./components/GeminiChatbot";
 
 
 
 
 
-const Chatbot = () => {
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
 
-    setIsLoading(true);
-    // Ajout du message utilisateur immédiatement
-    setMessages(prev => [...prev, { sender: 'user', text: input }]);
-    setInput('');
-
-    try {
-      const res = await axios.post('http://localhost:5000/chatbot', 
-        { question: input },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      // Utilisez reply au lieu de text pour correspondre au backend
-      setMessages(prev => [...prev, { 
-        sender: 'Trelix', 
-        text: res.data.reply || res.data.text || "Pas de réponse" 
-      }]);
-      
-    } catch (err) {
-      console.error('Erreur détaillée:', {
-        status: err.response?.status,
-        data: err.response?.data,
-        message: err.message
-      });
-      
-      setMessages(prev => [...prev, { 
-        sender: 'Trelix', 
-        text: err.response?.data?.error || "Erreur de connexion au serveur" 
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="chat-container">
-      <div className="messages">
-        {messages.map((msg, i) => (
-          <div key={i} className={`message ${msg.sender}`}>
-            <strong>{msg.sender === 'user' ? 'Vous' : 'Trelix'}:</strong> {msg.text}
-          </div>
-        ))}
-        {isLoading && (
-          <div className="message Trelix">
-            <strong>Trelix:</strong> Réflexion en cours...
-          </div>
-        )}
-      </div>
-      <form onSubmit={handleSubmit} className="chat-form">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Posez votre question..."
-          disabled={isLoading}
-        />
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Envoi...' : 'Envoyer'}
-        </button>
-      </form>
-    </div>
-  );
-};
 
 
 
@@ -197,8 +125,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
 
-          {/* Route pour le chatbot */}
-        <Route path="/chatbot" element={<Chatbot />} />
+          
          {/* Route pour la réunion */}
          
 
@@ -222,7 +149,9 @@ function App() {
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
-
+            <Route path="geminichat" element={<GeminiChatbot />} />
+            <Route path="chat" element={<ChatComponent />} />
+            <Route path="meeting" element={<JoinRoom />} />
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addExam" element={<AddExam />} />
             <Route path="Allexams" element={<AllExamsInstructor />} />
