@@ -56,6 +56,10 @@ const User = new Schema({
     country: String,
     loggedInAt: Date
   },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
 },
   { timestamps: true });
 // Hashing Password

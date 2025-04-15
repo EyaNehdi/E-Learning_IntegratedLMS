@@ -250,9 +250,15 @@ app.use((req, res, next) => {
 // In app.js
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/certificates', express.static(path.join(__dirname, 'certificates')));
-app.use("/certificates", certifRoutes);
-
-// Routes
+app.get('/download-certificate/:filename', (req, res) => {
+  const filePath = path.join(__dirname, 'certificates', req.params.filename);
+  res.download(filePath, err => {
+    if (err) {
+      console.error("Download error:", err);
+      res.status(404).send("File not found");
+    }
+  });
+});
 
 app.use('/ia', require('./routes/ia'));
 app.use('/', indexRouter);
@@ -277,6 +283,8 @@ const quizRoutes = require('./routes/quizRoutes');
 const authRouteschapter = require('./routes/chapterRoutes');
 const authRoutes = require('./routes/authRoutes');
 const authRoutesIA = require('./routes/ia');
+const certifRoutes = require('./routes/certif.routes');
+const badgesRoutes = require('./routes/badge.routes');
 app.use('/api/auth', authRoutes);
 app.use('/ia/auth', authRoutesIA);
 app.use('/chapter', authRouteschapter);
@@ -284,6 +292,8 @@ app.use("/signup/mfa", mfaRoutes);
 app.use("/api/info", profileRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/quiz", quizzRoutes);
+app.use("/certificates", certifRoutes);
+app.use("/api/badges-r", badgesRoutes);
 
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
@@ -425,6 +435,8 @@ const io = socketIo(server, {
 
 // Socket Initialization
 const { initializeSocket } = require('./controllers/quizzLeaderboardController');
+const { initSocket } = require('./utils/socket');
 initializeSocket(io);  // Pass the socket instance to the controller
+initSocket(io);
 
 module.exports = app;
