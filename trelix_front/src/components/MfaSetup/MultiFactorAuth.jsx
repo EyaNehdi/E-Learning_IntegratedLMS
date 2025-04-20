@@ -311,16 +311,7 @@ const MultiFactorAuth = () => {
                         </div>
                       </ul>
 
-                      <button
-                        className="btn btn-link shadow mt-3 rounded-5"
-                        onClick={handleGenerateNewBackupCodes}
-                        style={{
-                          textDecoration: "underline",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Generate New Backup Codes
-                      </button>
+                      
                     </div>
                   )}
                 </>

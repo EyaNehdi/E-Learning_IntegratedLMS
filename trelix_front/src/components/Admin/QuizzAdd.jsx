@@ -84,41 +84,15 @@ function QuizzAdd() {
                             <li className="breadcrumb-item d-inline-block"><a href="index.html" className="text-dark">Home</a></li>
                             <li className="breadcrumb-item d-inline-block active">Leave</li>
                           </ol>
-                          <h4 className="text-dark">Leave</h4>
+                          <h4 className="text-dark">Add Quizz</h4>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="card ctm-border-radius shadow-sm">
-                <div className="card-header">
-                  <div className="d-inline-block">
-                    <h4 className="card-title mb-0">Focus Technologies</h4>
-                    <p className="mb-0 ctm-text-sm">Head Office</p>
-                  </div>
-                </div>
-                <div className="card-body">
-                  <h4 className="card-title">Members</h4>
-                  <a href="employment.html"><span className="avatar" data-toggle="tooltip" data-placement="top" title="Danny Ward"><img alt="avatar image" src="assetss/img/profiles/img-5.jpg" className="img-fluid" /></span></a>
-                  <a href="employment.html"><span className="avatar" data-toggle="tooltip" data-placement="top" title="Linda Craver"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-4.jpg" /></span></a>
-                  <a href="employment.html"><span className="avatar" data-toggle="tooltip" data-placement="top" title="Jenni Sims"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-3.jpg" /></span></a>
-                  <a href="employment.html"><span className="avatar" data-toggle="tooltip" data-placement="top" title="Maria Cotton"><img alt="avatar image" src="assetss/img/profiles/img-6.jpg" className="img-fluid" /></span></a>
-                  <a href="employment.html"><span className="avatar" data-toggle="tooltip" data-placement="top" title="John Gibbs"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-2.jpg" /></span></a>
-                  <a href="employment.html"><span className="avatar" data-toggle="tooltip" data-placement="top" title="Richard Wilson"><img className="img-fluid" alt="avatar image" src="assetss/img/profiles/img-10.jpg" /></span></a>
-                </div>
-              </div>
-              <div className="card shadow-sm ctm-border-radius">
-                <div className="card-body">
-                  <span className="avatar" data-toggle="tooltip" data-placement="top" title="Jenni Sims"><img src="assetss/img/profiles/img-3.jpg" alt="Jenni Sims" className="img-fluid" /></span><span className="ml-4">Jenni Sims is working from home today.</span>
-                </div>
-              </div>
-              <div className="card shadow-sm ctm-border-radius">
-                <div className="card-body">
-                  <span className="avatar" data-toggle="tooltip" data-placement="top" title="John Gibbs"><img className="img-fluid" src="assetss/img/profiles/img-2.jpg" alt="Jenni Sims" /></span><span className="ml-4">
-                    John Gibbs is away today.</span>
-                </div>
-              </div>
+              
+          
             </aside>
           </div>
           <div className="col-xl-9 col-lg-8 col-md-12">

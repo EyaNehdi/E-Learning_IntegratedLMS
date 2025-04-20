@@ -177,7 +177,7 @@ function MoodleCourses() {
                   <button
                     key={course.id}
                     onClick={() => fetchCourseContents(course.id)}
-                    className={`w-full text-left p-3 rounded-lg flex items-center transition-colors ${
+                    className={` text-left p-3 rounded-lg flex items-center transition-colors min-w-[250px] ${
                       selectedCourseId === course.id
                         ? "bg-indigo-50 border border-indigo-100"
                         : "hover:bg-gray-50 border border-transparent"

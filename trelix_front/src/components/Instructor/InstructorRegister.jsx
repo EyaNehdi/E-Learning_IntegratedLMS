@@ -239,7 +239,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
           break;
       
         case "email":
-          newErrors.email = !/^[A-Za-z]+(?:\.[A-Za-z0-9]+)?@[A-Za-z]+\.[A-Za-z]+$/
+          newErrors.email = !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
 .test(value.trim())
             ? "Invalid email format (e.g., example@domain.com)."
             : "";
