@@ -46,6 +46,7 @@ const AuditLogs = () => {
       setLogs((prev) => [log, ...prev.slice(0, 99)]);
       setHighlightedLogId(log._id);
       setCurrentPage(1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       setTimeout(() => setHighlightedLogId(null), 2000); // Remove highlight after 2s
     });
 
@@ -77,9 +78,7 @@ const AuditLogs = () => {
     FAILURE: "bg-red-100 text-red-700",
   };
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
+ 
 
   return (
     <>
@@ -166,8 +165,31 @@ const AuditLogs = () => {
                       )}
                     >
                       <td className="px-4 py-2">
-                        {`${log.user?.firstName} ${log.user?.lastName}` ||
-                          "Anonymous"}
+                      {log.user?.firstName || log.user?.lastName ? (
+                          <span>
+                            {`${log.user?.firstName ?? ""} ${
+                              log.user?.lastName ?? ""
+                            }`.trim()}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 italic flex items-center gap-1">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4 text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M18.364 5.636L5.636 18.364M5.636 5.636l12.728 12.728"
+                              />
+                            </svg>
+                            (Deleted User)
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-2">{log.action}</td>
                       <td className="px-4 py-2">{log.method}</td>
@@ -189,7 +211,7 @@ const AuditLogs = () => {
                           onClick={() =>
                             setExpandedRow(index === expandedRow ? null : index)
                           }
-                          className="text-blue-600 hover:underline text-sm"
+                          className="text-blue-600 hover:underline text-sm px-2 py-1 min-w-[48px] rounded"
                         >
                           {expandedRow === index ? "Hide" : "View"}
                         </button>

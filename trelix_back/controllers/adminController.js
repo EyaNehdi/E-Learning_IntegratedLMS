@@ -132,7 +132,7 @@ const countInstructors = async (req, res) => {
 const getInstructors = async (req, res) => {
     try {
         const instructors = await User.find({ role: "instructor" })
-            .select("firstName lastName email role isActive accountCreatedAt");
+            .select("firstName lastName email role isActive accountCreatedAt skils profilePhoto Bio");
         res.status(200).json(instructors);
     } catch (error) {
         res.status(500).json({ message: "Server error" });

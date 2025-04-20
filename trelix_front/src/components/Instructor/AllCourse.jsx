@@ -352,7 +352,7 @@ function Allcourse() {
                             <span>{course.level}</span>
                           </div>
                           <h3 className="sub-title mb-0">
-                            <a href={`/single-course/${course._id}`}>{course.title}</a>
+                            <a href={`/chapters/${course._id}`}>{course.title}</a>
                           </h3>
                           <div className="author-meta small d-flex pt-2 justify-content-between">
                             <span>By: {course.categorie}</span>
@@ -360,9 +360,9 @@ function Allcourse() {
                           </div>
                           <div className="course-footer d-flex align-items-center justify-content-between pt-3">
                             <div className="price">
-                              {course.price === 0 ? "Free" : `${course.price}$`} <del>$35.00</del>
+                              {course.price === 0 ? "Free" : `${course.price}$`} 
                             </div>
-                            <a href={`/enroll/${course._id}`}>
+                            <a href={`/chapters/${course._id}`}>
                               Enroll Now <i className="feather-icon icon-arrow-right" />
                             </a>
                           </div>

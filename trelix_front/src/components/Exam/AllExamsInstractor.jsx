@@ -1,4 +1,3 @@
-"use client"
 
 import { useState, useEffect } from "react"
 import axios from "axios"
@@ -29,7 +28,7 @@ const AllExamsInstructor = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
-  const itemsPerPage = 5
+  const itemsPerPage = 40
   const { user } = useOutletContext()
 
   // New state for assign tab
@@ -257,13 +256,13 @@ const handleExportAllResults = async () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <button onClick={() => handleSort("title")} className="flex items-center focus:outline-none">
+                      <button onClick={() => handleSort("title")} className="text-blue-600 hover:underline text-sm px-2 py-1 min-w-[48px] rounded">
                         Exam Title
                         {sortBy === "title" && <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>}
                       </button>
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <button onClick={() => handleSort("date")} className="flex items-center focus:outline-none">
+                      <button onClick={() => handleSort("date")} className="text-blue-600 hover:underline text-sm px-2 py-1 min-w-[48px] rounded">
                         Created Date
                         {sortBy === "date" && <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>}
                       </button>
