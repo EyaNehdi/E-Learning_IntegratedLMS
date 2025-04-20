@@ -88,92 +88,14 @@ import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
 import MfaSetup from "./components/MfaSetup/MfaSetup.jsx";
 
 
-const Chatbot = () => {
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
-
-
-
-    setIsLoading(true);
-    // Ajout du message utilisateur immédiatement
-    setMessages((prev) => [...prev, { sender: "user", text: input }]);
-    setInput("");
-
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/chatbot",
-        { question: input },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      // Utilisez reply au lieu de text pour correspondre au backend
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "Trelix",
-          text: res.data.reply || res.data.text || "Pas de réponse",
-        },
-      ]);
-    } catch (err) {
-      console.error("Erreur détaillée:", {
-        status: err.response?.status,
-        data: err.response?.data,
-        message: err.message,
-      });
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "Trelix",
-          text: err.response?.data?.error || "Erreur de connexion au serveur",
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="chat-container">
-      <div className="messages">
-        {messages.map((msg, i) => (
-          <div key={i} className={`message ${msg.sender}`}>
-            <strong>{msg.sender === "user" ? "Vous" : "Trelix"}:</strong>{" "}
-            {msg.text}
-          </div>
-        ))}
-        {isLoading && (
-          <div className="message Trelix">
-            <strong>Trelix:</strong> Réflexion en cours...
-          </div>
-        )}
-      </div>
-      <form onSubmit={handleSubmit} className="chat-form">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Posez votre question..."
-          disabled={isLoading}
-        />
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Envoi..." : "Envoyer"}
-        </button>
-      </form>
-    </div>
-  );
-};
+ 
 
 
 function App() {
   return (
-    <Router>
+    <Router> 
+      <ChatComponent />
       <Routes>
         {/* **************** */}
         {/* Public routes */}
@@ -197,7 +119,7 @@ function App() {
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
-        <Route path="/chatbot" element={<Chatbot />} />
+       
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/certificates" element={<CertificatesPage />}>
             <Route index element={<BrowseCertificates />} />
@@ -242,7 +164,7 @@ function App() {
             <Route path="list" element={<Listecourse />} />
             <Route path="module" element={<Module />} />
             <Route path="achievements" element={<Achievements />} />
-            <Route path="chatbot" element={<Chatbot />} />
+           
             <Route
               path="/profile/edit-course/:courseId"
               element={<EditCourse />}
@@ -277,9 +199,9 @@ function App() {
             <Route path="edit/:id" element={<ManageBadges />} />
             <Route path="list-badges" element={<ListBadges />} />
           </Route>
-          <Route path="/manage" element={<Manage />} />
+        
           <Route path="/report" element={<DailyQuizzes />} />
-          <Route path="/set" element={<Settings />} />
+       
         </Route>
         {/* **************** */}
         <Route path="/linkedin/callback" element={<LinkedInCallback />} />

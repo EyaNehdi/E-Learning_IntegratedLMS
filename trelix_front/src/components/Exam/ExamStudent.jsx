@@ -410,10 +410,10 @@ const ExamStudent = () => {
               Try Again
             </button>
             <button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/home")}
               className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
-              Return to Dashboard
+              Return to Home
             </button>
           </div>
           <p className="mt-6 text-sm text-gray-500">If the problem persists, please contact support.</p>
@@ -831,11 +831,11 @@ const ExamStudent = () => {
 
                 <div className="mt-8 flex justify-between">
                   <button
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => navigate("/Home")}
                     className="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center"
                   >
                     <ArrowLeft className="w-5 h-5 mr-2" />
-                    Return to Dashboard
+                    Return to Home
                   </button>
 
                   {/* You could add more actions here if needed */}
