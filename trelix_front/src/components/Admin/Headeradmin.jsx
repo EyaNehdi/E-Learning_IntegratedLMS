@@ -18,10 +18,10 @@ const Headeradmin = () => {
   const navLinks = [
     { path: "/admin", icon: "lnr-users", label: "Users" },
     { path: "/Audit", icon: "lnr-layers", label: "Audit" },
-    { path: "/report", icon: "lnr-rocket", label: "Reports" },
-    { path: "/manage", icon: "lnr-sync", label: "Manage" },
-    { path: "/badge", icon: "lnr-trophy", label: "Gamification" },
-    { path: "/set", icon: "lnr-cog", label: "Settings" },
+    { path: "/report", icon: "lnr-rocket", label: "Quizzes" },
+   
+    { path: "/badge", icon: "lnr-rocket", label: "Gamification" },
+    { path: "/home", icon: "lnr-home", label: "Return Home" },
   ];
 
   return (

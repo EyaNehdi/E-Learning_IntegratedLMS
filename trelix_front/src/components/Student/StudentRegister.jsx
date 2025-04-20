@@ -205,10 +205,11 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
     }
   
     // Validate email: letters/numbers / optional period + @ + letters only + . + letters only
-    if (!/^[A-Za-z]+(?:\.[A-Za-z0-9]+)?@[A-Za-z]+\.[A-Za-z]+$/
-.test(formData.email.trim())) {
-      newErrors.email = "Invalid email format (e.g., example@domain.com).";
+    if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(formData.email.trim())) {
+      newErrors.email = "Invalid email format (e.g., example@domain.com)";
     }
+    
+    
   
     // Validate password: min 6 chars, at least one uppercase, one lowercase, one number, one special character
     if (formData.password.length < 6) {
@@ -252,7 +253,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
           break;
       
         case "email":
-          newErrors.email = !/^[A-Za-z]+(?:\.[A-Za-z0-9]+)?@[A-Za-z]+\.[A-Za-z]+$/
+          newErrors.email = !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
 .test(value.trim())
             ? "Invalid email format (e.g., example@domain.com)."
             : "";
