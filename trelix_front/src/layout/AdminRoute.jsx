@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
 import Preloader from "../components/Preloader/Preloader";
 import { Navigate, Outlet } from "react-router-dom";
-
+import ViewSwitcher from "../components/ViewSwitcher";
 const AdminRoute = () => {
   const { isAuthenticated, isCheckingAuth, checkAuth, user } = useAuthStore();
 
@@ -18,7 +18,12 @@ const AdminRoute = () => {
 
   if (!isAdmin) return <Navigate to="/" replace />;
 
-  return <Outlet />;
+  return (
+    <>
+      {isAdmin && <ViewSwitcher isAdmin={isAdmin} />}
+      <Outlet />;
+    </>
+  );
 };
 
 export default AdminRoute;

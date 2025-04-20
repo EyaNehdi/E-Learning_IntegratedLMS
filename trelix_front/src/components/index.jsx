@@ -1,102 +1,131 @@
 import { useState, useEffect } from "react";
-import Footer from "./Footer/Footer";
-import Header from "./Header/Header";
-
+import axios from "axios";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import axios from "axios";
 
+import { Share2 } from "lucide-react"
+import Footer from "./Footer/Footer";
+import Header from "./Header/Header";
 
-function Index() {
+const Index = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-
-
-
-    useEffect(() => {
-      const fetchCourses = async () => {
-        try {
-          setLoading(true);
-          const response = await axios.get(
-            "http://localhost:5000/course/courses"
-          );
-          console.log("Courses fetched:", response.data);
-          setCourses(response.data);
-          setLoading(false);
-        } catch (error) {
-          console.error("Error fetching courses:", error);
-          setLoading(false);
-        }
-      };
+  const [categories, setCategories] = useState([]);
+  const [countStudent, setCountStudent] = useState(0);
   
-      fetchCourses();
-
-
-    const [categories, setCategories] = useState([]);
-    const [countStudent, setCountStudent] = useState(0);
-    const [countInstructor,setCountInstructor] = useState(0);
-    const [countCourses,setCountCourses] = useState(0);
-    const [instructorsMeet,setInstructorsMeet] = useState([]);
-    useEffect(() => {
-      const fetchCategories = async () => {
-        try {
-          const res = await axios.get("http://localhost:5000/courses/categories");
-          setCategories(res.data);
-        } catch (err) {
-          console.error("Erreur lors du fetch des catégories:", err);
-        }
-      };
-  
-      fetchCategories();
-    }, []);
-
-    useEffect(() => {
-      const fetchStudents = async () =>{
-        try {
-          const res = await axios.get('http://localhost:5000/api/admin/count/student') ;// adapt path if needed
-          setCountStudent(res.data.count); // assuming the response has a count property
-        }
-        catch(err){
-          console.error("Error fetching student count:", err);
-        }
-      };
-      const fetchInstructors = async () =>{
-        try {
-          const res = await axios.get('http://localhost:5000/api/admin/count/instructor') ;// adapt path if needed
-          setCountInstructor(res.data.count); // assuming the response has a count property
-        }
-        catch(err){
-          console.error("Error fetching instructor count:", err);
-        }
-      };
-      const fetchCoursesNumber = async () =>{
-        try {
-          const res = await axios.get('http://localhost:5000/course/count/courses') ;// adapt path if needed
-          setCountCourses(res.data.count); // assuming the response has a count property
-        }
-        catch(err){
-          console.error("Error fetching instructor count:", err);
-        }
-      };
-      const MeetOurInstructors = async () =>{
-        try {
-          const res = await axios.get('http://localhost:5000/api/admin/instructors'); // adapt if needed
-        setInstructorsMeet(res.data);
-      } catch (err) {
-        console.error("Error fetching instructors:", err);
+      const [countInstructor,setCountInstructor] = useState(0);
+      const [countCourses,setCountCourses] = useState(0);
+      const [instructorsMeet,setInstructorsMeet] = useState([]);
+      useEffect(() => {
+        const fetchCategories = async () => {
+          try {
+            const res = await axios.get("http://localhost:5000/courses/categories");
+            setCategories(res.data);
+          } catch (err) {
+            console.error("Erreur lors du fetch des catégories:", err);
+          }
+        };
+    
+        fetchCategories();
+      }, []);
+      const [currentPage, setCurrentPage] = useState(1)
+      const [showSocialIndex, setShowSocialIndex] = useState(null)
+      const instructorsPerPage = 5
+    
+      // Calculate pagination
+      const totalPages = Math.ceil(instructorsMeet.length / instructorsPerPage)
+      const indexOfLastInstructor = currentPage * instructorsPerPage
+      const indexOfFirstInstructor = indexOfLastInstructor - instructorsPerPage
+      const currentInstructors = instructorsMeet.slice(indexOfFirstInstructor, indexOfLastInstructor)
+    
+      const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber)
       }
-      };
-      fetchStudents();
-      fetchInstructors();
-      fetchCoursesNumber();
-      MeetOurInstructors();
-      
+    
+      const toggleSocial = (index) => {
+        if (showSocialIndex === index) {
+          setShowSocialIndex(null)
+        } else {
+          setShowSocialIndex(index)
+        }
+      }
+      useEffect(() => {
+        const fetchStudents = async () =>{
+          try {
+            const res = await axios.get('http://localhost:5000/api/admin/count/student') ;// adapt path if needed
+            setCountStudent(res.data.count); // assuming the response has a count property
+          }
+          catch(err){
+            console.error("Error fetching student count:", err);
+          }
+        };
+        const fetchInstructors = async () =>{
+          try {
+            const res = await axios.get('http://localhost:5000/api/admin/count/instructor') ;// adapt path if needed
+            setCountInstructor(res.data.count); // assuming the response has a count property
+          }
+          catch(err){
+            console.error("Error fetching instructor count:", err);
+          }
+        };
+        const fetchCoursesNumber = async () =>{
+          try {
+            const res = await axios.get('http://localhost:5000/course/count/courses') ;// adapt path if needed
+            setCountCourses(res.data.count); // assuming the response has a count property
+          }
+          catch(err){
+            console.error("Error fetching instructor count:", err);
+          }
+        };
+        const MeetOurInstructors = async () =>{
+          try {
+            const res = await axios.get('http://localhost:5000/api/admin/instructors'); // adapt if needed
+          setInstructorsMeet(res.data);
+        } catch (err) {
+          console.error("Error fetching instructors:", err);
+        }
+        };
+        fetchStudents();
+        fetchInstructors();
+        fetchCoursesNumber();
+        MeetOurInstructors();
+        
+      }, []);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/courses/categories");
+        setCategories(res.data);
+      } catch (err) {
+        console.error("Erreur lors du fetch des catégories:", err);
+      }
+    };
 
-    }, []);
+    fetchCategories();
+  }, []);
 
-                      return (
+  // Fetch courses from API
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          "http://localhost:5000/course/courses"
+        );
+        console.log("Courses fetched:", response.data);
+        setCourses(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+  return (
 <div>
   {/* Mirrored from html.theme-village.com/eduxo/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:25:31 GMT */}
   <meta charSet="utf-8" />
@@ -133,7 +162,7 @@ function Index() {
             <h1 className="display-1 fw-bold">Education is the Way to <span className="color">Success</span></h1>
             <div className="banner-info">
               <p className="display-5">Education is a key to success and freedom from all the forces is a power and makes a person powerful</p>
-              <a href="#" className="btn btn-primary shadow mt-3 rounded-5">Get Started on your first course</a>
+              <a href="/allcours" className="btn btn-primary shadow mt-3 rounded-5">Get Started on your first course</a>
             </div>
           </div>
         </div>
@@ -190,7 +219,7 @@ function Index() {
         <div className="row g-4">
           {categories.map((cat, index) => (
             <div key={index} className="col-lg-4 col-md-6">
-              <a href="courses.html" className="category-entry d-flex bg-info p-3 p-xl-4 align-items-center">
+              <a  className="category-entry d-flex bg-info p-3 p-xl-4 align-items-center">
                 <span className="icon-lg rounded-circle">
                   <svg xmlns="http://www.w3.org/2000/svg" width={32} height={32}>
                     {/* icône fixe ou tu peux l'associer dynamiquement si tu veux */}
@@ -292,7 +321,7 @@ function Index() {
                   <p>Education is smart enough to change the human mind positively your Door to The Future</p>
                 </div>
               </div>
-              <a href="about.html" className="btn btn-primary shadow rounded-5">Learn More us</a>
+              
             </div>
           </div>
         </div>
@@ -380,7 +409,7 @@ function Index() {
             <div className="course-footer d-flex align-items-center justify-content-between pt-3">
               <div className="price">
                 ${course.price}
-                <del>$35.00</del>
+              
               </div>
               <a href={`/chapters/${course._id}`}>
                 Enroll Now <i className="feather-icon icon-arrow-right" />
@@ -496,41 +525,183 @@ function Index() {
           <h2 className="sec-title">
             Meet Our <span className="color">Instructors</span>
           </h2>
+          <p className="mt-3 mb-5 text-muted mx-auto" style={{ maxWidth: "700px" }}>
+            Learn from our experienced instructors who are passionate about education and dedicated to your success.
+          </p>
         </div>
-        <div className="row justify-content-center g-3 g-lg-4">
-          {instructorsMeet.map((instructor, index) => (
-            <div className="col-lg-4 col-md-6" key={instructor._id || index}>
-              <div
-                className="teacher-entry position-relative"
-                style={{ backgroundImage: `url("images/teacher${(index % 3) + 1}.jpg")` }} // Rotate 3 sample images
-              >
-                <div className="teacher-info position-absolute p-3">
-                  <ul className="teacher-socials position-absolute list-unstyled">
-                    <li><a href="#"><img src="assets/images/icons/fb.png" alt="" /></a></li>
-                    <li><a href="#"><img src="assets/images/icons/linkedin.png" alt="" /></a></li>
-                    <li><a href="#"><img src="assets/images/icons/twitter.png" alt="" /></a></li>
-                    <li><a href="#"><img src="assets/images/icons/pinterest.png" alt="" /></a></li>
-                  </ul>
-                  <div className="teacher-intro p-4 text-center">
-                    <div className="social-action position-absolute icon icon-sm bg-secondary rounded-circle text-white">
-                      <i className="feather-icon icon-share-2" />
+
+        {instructorsMeet.length > 0 ? (
+          <>
+            <div className="row justify-content-center g-4">
+              {currentInstructors.map((instructor, index) => (
+                <div className="col-lg-4 col-md-6" key={instructor._id || index}>
+                  <div className="instructor-card position-relative overflow-hidden shadow-sm rounded-3 bg-white">
+                    <div className="instructor-image text-center pt-4">
+                      <img
+                        src={`http://localhost:5000${instructor?.profilePhoto}`}
+                        className="rounded-circle shadow-sm border border-2 border-white"
+                        alt={`${instructor.firstName} ${instructor.lastName}`}
+                        style={{
+                          width: "120px",
+                          height: "120px",
+                          objectFit: "cover",
+                          transition: "transform 0.3s ease",
+                        }}
+                        onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
+                        onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
+                      />
                     </div>
-                    <h3 className="display-4 mb-1">
-                      <a className="text-reset" href="single-instructor.html">
-                        {instructor.firstName} {instructor.lastName}
-                      </a>
-                    </h3>
-                    <span className="designation">{instructor.email}</span>
+
+                    <div className="instructor-info p-4 text-center">
+                      <h3 className="display-6 mb-1 fw-bold">
+                        <a className="text-reset text-decoration-none" href={`/instructor/${instructor._id}`}>
+                          {instructor.firstName} {instructor.lastName}
+                        </a>
+                      </h3>
+                      <span className="designation d-block mb-3 text-muted">{instructor.email}</span>
+
+                      <div className="instructor-bio mb-3">
+                        <p className="small text-muted">
+                          {instructor.bio || "Passionate educator dedicated to helping students achieve their goals."}
+                        </p>
+                      </div>
+
+                      <div className="d-flex justify-content-center align-items-center position-relative">
+                        <button
+                          className="btn btn-sm btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                          style={{ width: "40px", height: "40px" }}
+                          onClick={() => toggleSocial(index)}
+                        >
+                          <Share2 size={18} />
+                        </button>
+
+                        <ul
+                          className={`social-links list-unstyled d-flex gap-2 position-absolute mb-0 ${
+                            showSocialIndex === index ? "show-social" : ""
+                          }`}
+                          style={{
+                            left: "50%",
+                            transform: `translateX(-50%) translateY(${showSocialIndex === index ? "0" : "10px"})`,
+                            opacity: showSocialIndex === index ? 1 : 0,
+                            transition: "all 0.3s ease",
+                            zIndex: 10,
+                          }}
+                        >
+                          <li>
+                            <a
+                              href="#"
+                              className="btn btn-sm btn-primary rounded-circle d-flex align-items-center justify-content-center"
+                              style={{ width: "36px", height: "36px" }}
+                            >
+                              <i className="feather-icon icon-facebook" style={{ fontSize: "14px" }}></i>
+                            </a>
+                          </li>
+                          <li>
+                            <a
+                              href="#"
+                              className="btn btn-sm btn-info rounded-circle d-flex align-items-center justify-content-center"
+                              style={{ width: "36px", height: "36px" }}
+                            >
+                              <i className="feather-icon icon-twitter" style={{ fontSize: "14px" }}></i>
+                            </a>
+                          </li>
+                          <li>
+                            <a
+                              href="#"
+                              className="btn btn-sm btn-secondary rounded-circle d-flex align-items-center justify-content-center"
+                              style={{ width: "36px", height: "36px" }}
+                            >
+                              <i className="feather-icon icon-linkedin" style={{ fontSize: "14px" }}></i>
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="instructor-badge position-absolute" style={{ top: "20px", right: "20px" }}>
+                      <span className="badge bg-primary rounded-pill px-3 py-2 small">
+                        {instructor.role || "Instructor"}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-          {instructorsMeet.length === 0 && (
-            <p className="text-center">No instructors found.</p>
-          )}
-        </div>
+
+            {/* Pagination */}
+            {instructorsMeet.length > instructorsPerPage && (
+              <div className="pagination-container mt-5 d-flex justify-content-center">
+                <nav aria-label="Instructors pagination">
+                  <ul className="pagination ">
+                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                      <button
+                      style ={{ backgroundColor: "transparent", border: "1px solid black" }}
+                        className="page-link"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        aria-label="Previous"
+                      >
+                        <span aria-hidden="true">&laquo;</span>
+                      </button>
+                    </li>
+
+                    {Array.from({ length: totalPages }).map((_, index) => (
+                      <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
+                        <button className="page-link" onClick={() => handlePageChange(index + 1)}>
+                          {index + 1}
+                        </button>
+                      </li>
+                    ))}
+
+                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                      <button className="page-link" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-5 bg-light rounded-3">
+            <div className="mb-3">
+              <i className="feather-icon icon-users" style={{ fontSize: "48px", opacity: 0.5 }}></i>
+            </div>
+            <h4 className="mb-2">No instructors found</h4>
+            <p className="text-muted">Our team of instructors will be available soon.</p>
+          </div>
+        )}
       </div>
+
+      {/* Add some custom styles */}
+      <style jsx>{`
+        .instructor-card {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          height: 100%;
+        }
+        .instructor-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+        }
+        .show-social {
+          opacity: 1 !important;
+          transform: translateX(-50%) translateY(0) !important;
+        }
+        .pagination .page-link {
+          color: var(--bs-primary);
+          border-radius: 50%;
+          margin: 0 3px;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .pagination .page-item.active .page-link {
+          background-color: var(--bs-primary);
+          border-color: var(--bs-primary);
+        }
+      `}</style>
     </section>
 
   {/* Team Section End */}
@@ -684,5 +855,6 @@ Education transforms closed minds into open ones. It requires effort, but its fr
   {/* Mirrored from html.theme-village.com/eduxo/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:26:01 GMT */}
 </div>
                       );
-}
+};
+
 export default Index;

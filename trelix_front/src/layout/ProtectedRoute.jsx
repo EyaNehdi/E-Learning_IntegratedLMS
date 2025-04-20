@@ -4,20 +4,21 @@ import { useEffect } from "react";
 import Preloader from "../components/Preloader/Preloader";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
-
+import ViewSwitcher from "../components/ViewSwitcher";
 const ProtectedRoute = () => {
-  const { isAuthenticated, isCheckingAuth, checkAuth } = useAuthStore();
+  const { isAuthenticated, isCheckingAuth, checkAuth ,user} = useAuthStore();
 
   useEffect(() => {
     checkAuth();
   }, []);
-
+  const isAdmin = user?.role === "admin";
   return (
     <>
       {isCheckingAuth ? (
         <Preloader />
       ) : isAuthenticated ? (
         <>
+        {isAdmin && <ViewSwitcher isAdmin={isAdmin} />}
           <Header />
           <Outlet />
           <Footer />
