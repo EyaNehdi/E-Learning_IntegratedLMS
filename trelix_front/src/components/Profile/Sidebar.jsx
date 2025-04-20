@@ -25,60 +25,17 @@ function Sidebar({ setActivePage }) {
         {/* Navigation */}
         <nav className="dashboard-nav">
           <ul className="list-unstyled nav">
-            {/* <li>
-              <Link
-                className={`nav-link ${
-                  location.pathname === "/dashboard" ? "active" : ""
-                }`}
-                to="/dashboard"
-                onClick={() => setActivePage("Dashboard")}
-              >
-                <i className="feather-icon icon-home" />
-                <span>Dashboard</span>
-              </Link>
-            </li> */}
             <li>
               <Link
-                className={`nav-link ${location.pathname === "/profile" ? "active" : ""
-                  }`}
+                className={`nav-link ${
+                  location.pathname === "/profile" ? "active" : ""
+                }`}
                 to="/profile"
                 onClick={() => setActivePage("User Account")}
               >
                 <i className="feather-icon icon-user" />
                 <span>User Account</span>
               </Link>
-            </li>
-
-            <li>
-              <Link
-                className={`nav-link ${
-                  location.pathname === "/courses" ? "active" : ""
-                }`}
-                to="/profile/list"
-                onClick={() => setActivePage("My Courses")}
-              >
-                <i className="feather-icon icon-book" />
-                <span>My Courses</span>
-              </Link>
-              <ul style={{ paddingLeft: "20px", marginTop: "5px" }}>
-              <li>
-  <Link
-    className={`nav-link ${location.pathname === "/profile/classroom/dashboard" ? "active" : ""}`}
-    to="/profile/classroom/dashboard"
-    onClick={() => setActivePage("My Courses")}
-    style={{ display: "flex", alignItems: "center" }}
-  >
-    <img
-      src="https://www.gstatic.com/classroom/logo_square_48.svg"
-      alt="Google Classroom"
-      style={{ width: "20px", height: "20px", marginRight: "8px" }}
-    />
-    <span> Cours Classroom</span>
-  </Link>
-</li>
-
-
-    </ul>
             </li>
             <li>
               <Link
@@ -92,25 +49,14 @@ function Sidebar({ setActivePage }) {
                 <span>Wishlist</span>
               </Link>
             </li>
-            <li>
-              <Link
-                className={`nav-link ${
-                  location.pathname === "/reviews" ? "active" : ""
-                }`}
-                to="/reviews"
-                onClick={() => setActivePage("Reviews")}
-              >
-                <i className="feather-icon icon-star" />
-                <span>Reviews</span>
-              </Link>
-            </li>
 
             {user?.role === "instructor" && (
               <>
                 <li>
                   <Link
-                    className={`nav-link ${location.pathname === "/courses" ? "active" : ""
-                      }`}
+                    className={`nav-link ${
+                      location.pathname === "/courses" ? "active" : ""
+                    }`}
                     to="/profile/list"
                     onClick={() => setActivePage("My Courses")}
                   >
@@ -118,7 +64,6 @@ function Sidebar({ setActivePage }) {
                     <span>My Courses</span>
                   </Link>
                 </li>
-
 
                 <li>
                   <Link className="nav-link" to="/profile/Allexams">
@@ -135,52 +80,21 @@ function Sidebar({ setActivePage }) {
                 </li>
               </>
             )}
-
-            {/* <li>
-              <Link className="nav-link" to="/profile/addchapter">
-                <i className="feather-icon icon-plus" />
-                <span>AddChapter</span>
-              </Link>
-            </li>
-            <li>
-              <Link className="nav-link" to="/profile/addquiz">
-                <i className="feather-icon icon-plus" />
-                <span>AddQuiz</span>
-              </Link>
-
-            </li>
-            <li>
-              <Link className="nav-link" to="/profile/addExam">
-                <i className="feather-icon icon-plus" />
-                <span>addExam</span>
-              </Link>
-            </li>
-            <li>
-              <Link className="nav-link" to="/chatbot">
-                <i className="feather-icon icon-plus" />
-                <span>chatbot</span>
-              </Link>
-            </li>
-
-          
-
-          
-          */}
           </ul>
         </nav>
       </div>
 
-      {/* Course Management */}
-     
-          {user?.role === "instructor" && (
-             <div className="widget">
-             <p className="greetings">Course Management</p>
-             <nav className="dashboard-nav">
+      {/* INSTRUCTOR ONLY ROUTES --- Course Management */}
+      {user?.role === "instructor" && (
+        <div className="widget">
+          <p className="greetings">Course Management</p>
+          <nav className="dashboard-nav">
             <ul className="list-unstyled nav">
               <li>
                 <Link
-                  className={`nav-link ${location.pathname === "/courses/add-chapter" ? "active" : ""
-                    }`}
+                  className={`nav-link ${
+                    location.pathname === "/courses/add-chapter" ? "active" : ""
+                  }`}
                   to="/profile/addchapter"
                   onClick={() => setActivePage("Add Chapter")}
                 >
@@ -190,8 +104,9 @@ function Sidebar({ setActivePage }) {
               </li>
               <li>
                 <Link
-                  className={`nav-link ${location.pathname === "/courses/add-quiz" ? "active" : ""
-                    }`}
+                  className={`nav-link ${
+                    location.pathname === "/courses/add-quiz" ? "active" : ""
+                  }`}
                   to="/profile/addquiz"
                   onClick={() => setActivePage("Add Quiz")}
                 >
@@ -205,12 +120,56 @@ function Sidebar({ setActivePage }) {
                   <span>addExam</span>
                 </Link>
               </li>
-            </ul>
-            </nav>
-            </div>  
-          )}
+              <li>
 
-       
+              <Link className="nav-link" to="/profile/geminichat">
+
+                <i className="feather-icon icon-plus" />
+                <span>Chatbot</span>
+              </Link>
+              </li>
+              <li>
+              <Link className="nav-link" to="/profile/meeting">
+                <i className="feather-icon icon-plus" />
+                <span>Meet</span>
+              </Link>
+              </li>
+              <li>
+              <Link className="nav-link" to="/profile/chat">
+                <i className="feather-icon icon-plus" />
+                <span>GroupChat</span>
+              </Link>
+
+              </li>
+            </ul>
+          </nav>
+        </div>
+      )}
+
+
+      {user?.role === "student" &&(
+         <div className="widget">
+         <p className="greetings">Cours Preference</p>
+         <nav className="dashboard-nav">
+           <ul className="list-unstyled nav">
+         <ul className="list-unstyled nav">
+         <li>
+           <Link
+             className={`nav-link ${location.pathname === "/preference" ? "active" : ""
+               }`}
+             to="/profile/preference"
+             onClick={() => setActivePage("Add Preference")}
+           >
+             <i className="feather-icon icon-book" />
+             <span>Preference</span>
+           </Link>
+         </li>
+         </ul>
+         </ul>
+         </nav>
+         </div>
+
+      )}
 
       {/* Account Settings */}
       <div className="widget">
@@ -219,8 +178,9 @@ function Sidebar({ setActivePage }) {
           <ul className="list-unstyled nav">
             <li>
               <Link
-                className={`nav-link ${location.pathname === "/profile/details" ? "active" : ""
-                  }`}
+                className={`nav-link ${
+                  location.pathname === "/profile/details" ? "active" : ""
+                }`}
                 to="/profile/details"
                 onClick={() => setActivePage("Profile Information")}
               >
@@ -230,8 +190,9 @@ function Sidebar({ setActivePage }) {
             </li>
             <li>
               <Link
-                className={`nav-link ${location.pathname === "/profile/settings" ? "active" : ""
-                  }`}
+                className={`nav-link ${
+                  location.pathname === "/profile/settings" ? "active" : ""
+                }`}
                 to="/profile/settings"
                 onClick={() => setActivePage("Security & Privacy")}
               >
@@ -239,17 +200,22 @@ function Sidebar({ setActivePage }) {
                 <span>Security & Privacy</span>
               </Link>
             </li>
-            <li>
-              <Link
-                className={`nav-link ${location.pathname === "/profile/achievements" ? "active" : ""
+            {user?.role === "student" && (
+              <li>
+                <Link
+                  className={`nav-link ${
+                    location.pathname === "/profile/achievements"
+                      ? "active"
+                      : ""
                   }`}
-                to="/profile/achievements"
-                onClick={() => setActivePage("Achievements")}
-              >
-                <i className="feather-icon icon-award" />
-                <span>Achievements</span>
-              </Link>
-            </li>
+                  to="/profile/achievements"
+                  onClick={() => setActivePage("Achievements")}
+                >
+                  <i className="feather-icon icon-award" />
+                  <span>Achievements</span>
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       </div>

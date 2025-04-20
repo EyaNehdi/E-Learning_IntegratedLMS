@@ -1,4 +1,4 @@
-const bcryptjs = require ('bcryptjs');
+const bcryptjs = require('bcryptjs');
 const User = require('../models/userModel');
 const generateToken = require('../utils/generateTokenAndSetCookie');
 const bcrypt = require('bcrypt');
@@ -7,17 +7,18 @@ const crypto = require('crypto');
 
 const jwt = require('jsonwebtoken');
 
-const { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail } = require("../mailtrap/emails.js");
-
+const { sendResetSuccessEmail } = require("../mailtrap/emails.js");
+const { sendVerificationEmail, sendPasswordResetEmail } = require("../API/mailer.js");
 
 const axios = require('axios');
 //signup function
-const register = async (req, res) => {
+const register = async (req, res, role) => {
   console.log("🔹 Received Request Body:", req.body); // Log request body
 
-  const { firstName, lastName, email, password, role } = req.body; // Ensure role is extracted
+  const { firstName, lastName, email, password } = req.body; // Ensure role is extracted
 
   try {
+    // Validate input fields
     if (!firstName || !lastName || !email || !password || !role) {
       console.error("❌ Validation Failed: Missing Fields", { firstName, lastName, email, password, role });
       return res.status(400).json({ error: "All fields are required" });
@@ -31,40 +32,38 @@ const register = async (req, res) => {
       return res.status(400).json({ error: "Email already registered" });
     }
 
-
     console.log("✅ Email is available. Creating new user...");
-    
 
+    // Generate a 6-digit verification token
     const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
-
 
     const newUser = new User({
       firstName,
       lastName,
       email,
       password,
-      role,
+      role: role,
       verificationToken,
-      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
+      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // Token expires in 24 hours
     });
 
     await newUser.save();
     console.log("✅ User saved successfully:", newUser);
 
-    // Generate JWT Token
+    // Generate JWT Token (you can still generate the token for now, but don't use it for verification)
     generateToken(res, newUser._id);
     console.log("✅ JWT Token generated for user:", newUser._id);
 
-    // Send verification email
-    // await sendVerificationEmail(newUser.email, verificationToken);
+    // Send the verification email with the token
+    await sendVerificationEmail(newUser.email, verificationToken);
     console.log("📧 Verification email sent to:", newUser.email);
 
     res.status(201).json({
       success: true,
-      message: "Registration successful",
+      message: "Registration successful. Please check your email for the verification code.",
       user: {
         ...newUser._doc,
-        password: undefined,
+        password: undefined, // Don't send password back in response
       },
     });
 
@@ -73,6 +72,7 @@ const register = async (req, res) => {
     res.status(500).json({ error: "Registration failed: " + err.message });
   }
 };
+
 const regestergoogle = async (req, res, role) => {
   const { firstName, lastName, email, password } = req.body;
 
@@ -90,7 +90,7 @@ const regestergoogle = async (req, res, role) => {
       email,
       role
     };
-    
+
     // If the request contains a password (i.e., normal signup), add it to the user data
     if (password) {
       newUserData.password = password;
@@ -124,7 +124,7 @@ const registerLinkedIn = async (req, res, role) => {
 
   try {
     const authCode = req.body.code;
-    
+
     // Exchange auth code for access token
     const response = await axios.post(
       "https://www.linkedin.com/oauth/v2/accessToken",
@@ -250,7 +250,7 @@ const checkAuth = async (req, res) => {
     const user = await User.findById(req.userId).select("-password");
     if (!user) {
       return res.status(400).json({ success: false, message: "User not found" });
-      
+
     }
 
 
@@ -261,37 +261,93 @@ const checkAuth = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
-//verifyEmail
-const verifyEmail = async (req, res) => {
-  const { code } = req.body;
-  try {
-    const user = await User.findOne({
-      verificationToken: code,
-      verificationTokenExpiresAt: { $gt: Date.now() },
-    });
 
+const resendVerificationCode = async (req, res) => {
+  const { email } = req.body;
+
+  // Ensure the email is provided
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+
+    // If user doesn't exist
     if (!user) {
-      return res.status(400).json({ success: false, message: "Invalid or expired verification code" });
+      return res.status(404).json({ error: "User not found" });
     }
 
-		user.isVerified = true;
-		user.verificationToken = undefined;
-		user.verificationTokenExpiresAt = undefined;
-		await user.save();
-		res.status(201).json({
-      success: true,
-      message: "Registration successful",
-      user: {
-        ...user._doc,
-        password: undefined
-      }
+    // Generate a new verification token (you can use a library like UUID or JWT)
+    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();// Implement this function as needed
 
+    // Save the token (optional, depending on your token storage logic)
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpiresAt = Date.now() + 3600000; // 1 hour expiration
+    await user.save();
+
+    // Send the verification email with the new token
+    await sendVerificationEmail(user.email, verificationToken);
+
+    res.status(200).json({
+      message: "A new verification code has been sent to your email",
     });
-	} catch (error) {
-		console.log("error in verifyEmail ", error);
-		res.status(500).json({ success: false, message: "Server error" });
-	}
+  } catch (error) {
+    console.error("Error resending verification code:", error);
+    res.status(500).json({ error: "Failed to resend verification code" });
+  }
 };
+//verifyEmail
+const verifyEmail = async (req, res) => {
+  const { email, verificationCode } = req.body;
+
+  try {
+    console.log("🔍 Verifying email for:", email);
+    // Step 1: Check if the verification code matches what was sent
+    const storedCode = await getVerificationCodeFromDB(email); // Fetch stored code from DB
+    if (verificationCode !== storedCode) {
+      return res.status(400).json({ error: 'Invalid verification code' });
+    }
+
+    // Step 2: Mark the user as verified in the database
+    await markUserAsVerified(email);
+
+    // Step 3: Respond with success
+    res.status(200).json({ message: 'Email verified successfully!' });
+
+  } catch (error) {
+    console.error("Error verifying email:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const markUserAsVerified = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  user.isVerified = true; // Mark the user as verified
+  user.verificationToken = null; // Remove the verification token after successful verification
+  await user.save(); // Save the updated user
+};
+// Fetch the stored verification code from the database
+const getVerificationCodeFromDB = async (email) => {
+  try {
+    const user = await User.findOne({ email: email }); // Look up user by email
+    if (!user) {
+      throw new Error("User not found"); // Throw error if user does not exist
+    }
+    return user.verificationToken; // Return the verification token if user is found
+  } catch (error) {
+    console.error("Error fetching verification code:", error);
+    throw error; // Rethrow the error for handling in the main flow
+  }
+};
+
+
+
 
 
 
@@ -342,6 +398,7 @@ const signIn = async (req, res) => {
     console.log("🟢 Stored hashed password:", user.password);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
 
     if (!isPasswordValid) {
       console.log("🔴 Password does not match");
@@ -447,7 +504,7 @@ const signInlinkedin = async (req, res) => {
 
   try {
     const authCode = req.body.code;
-    
+
     // Exchange auth code for access token
     const response = await axios.post(
       "https://www.linkedin.com/oauth/v2/accessToken",
@@ -478,11 +535,11 @@ const signInlinkedin = async (req, res) => {
       return res.status(400).json({ success: false, message: "User with this email doses not exist" });
     }
 
-   
+
 
     // Create new user
-   
-    
+
+
 
     await generateToken(res, user._id);
 
@@ -495,79 +552,104 @@ const signInlinkedin = async (req, res) => {
 
 
 
+// Generate a secure random token
+const generateResetToken = () => {
+  return crypto.randomBytes(20).toString('hex');
+};
+
+
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
-  console.log("Requête reçue avec l'email :", email);  // Log de débogage
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
 
   try {
+    // Check if the user exists in the database
     const user = await User.findOne({ email });
 
     if (!user) {
-      console.log("Utilisateur non trouvé pour l'email :", email);  // Log de débogage
-      return res.status(400).json({ success: false, message: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
-    // Générer le token de réinitialisation
-    const resetToken = crypto.randomBytes(20).toString("hex");
-    const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 heure
-
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpiresAt = resetTokenExpiresAt;
-
+    // Generate a password reset token (using a library like crypto)
+    const resetToken = generateResetToken(); // Implement this function to generate a secure token
+    user.resetToken = resetToken;
+    user.resetTokenExpiresAt = Date.now() + 3600000; // Token valid for 1 hour
     await user.save();
 
-    // Envoyer l'email
-    await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`);
+    // Send the password reset email
+    await sendPasswordResetEmail(user.email, resetToken);
 
-    res.status(200).json({ success: true, message: "Password reset link sent to your email" });
+    res.status(200).json({
+      message: "Password reset email sent! Please check your inbox.",
+    });
   } catch (error) {
-    console.log("Error in forgotPassword ", error);
-    res.status(400).json({ success: false, message: error.message });
+    console.error("Error sending password reset email:", error);
+    res.status(500).json({ error: "Failed to send password reset email" });
   }
 };
 
 
 const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body
+  console.log("Reset password request body:", { token, passwordLength: newPassword?.length })
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ error: "Token and new password are required" })
+  }
+
   try {
-    const { token } = req.params;
-    const { password } = req.body;
-
-    console.log("🔍 Requête reçue pour reset password");
-    console.log("📌 Token:", token);
-    console.log("📝 Nouveau mot de passe reçu:", password);
-
-    // Hash du mot de passe
-    const hashedPassword = await bcryptjs.hash(password, 10);
-    console.log("🔑 Nouveau mot de passe hashé:", hashedPassword);
-
-    // Mise à jour de l'utilisateur avec findOneAndUpdate
-    const user = await User.findOneAndUpdate(
-      { resetPasswordToken: token, resetPasswordExpiresAt: { $gt: Date.now() } }, 
-      { 
-        password: hashedPassword, 
-        resetPasswordToken: null, 
-        resetPasswordExpiresAt: null 
-      }, 
-      { new: true } // Pour retourner l'utilisateur mis à jour
-    );
+    // Find user with valid token
+    const user = await User.findOne({
+      resetToken: token,
+      resetTokenExpiresAt: { $gt: Date.now() },
+    })
 
     if (!user) {
-      console.log("❌ Token invalide ou expiré");
-      return res.status(400).json({ success: false, message: "Invalid or expired reset token" });
+      return res.status(400).json({ error: "Invalid or expired token" })
     }
 
-    console.log("✅ Utilisateur mis à jour:", user.email);
+    console.log("✅ Found user with valid token:", user.email)
 
-    // Envoi d'un email de confirmation
-    await sendResetSuccessEmail(user.email);
+    // Set the plain text password - the pre-save hook will handle hashing
+    user.password = newPassword
+    user.resetToken = undefined
+    user.resetTokenExpiresAt = undefined
 
-    res.status(200).json({ success: true, message: "Password reset successful" });
+    // Save the user
+    await user.save()
+
+    // Verify the password was saved correctly
+    const updatedUser = await User.findById(user._id)
+    console.log("Stored password hash after save:", updatedUser.password)
+
+    // Test password verification using the model's method
+    const verificationTest = await updatedUser.comparePassword(newPassword)
+    console.log("Password verification test:", verificationTest ? "PASSED ✅" : "FAILED ❌")
+
+    // Generate token after resetting password
+    generateToken(res, user._id, false)
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully!",
+    })
   } catch (error) {
-    console.error("❌ Erreur dans resetPassword:", error);
-    res.status(500).json({ success: false, message: "Erreur interne du serveur" });
+    console.error("❌ Error resetting password:", error)
+    res.status(500).json({
+      success: false,
+      error: "Failed to reset password",
+    })
   }
-};
+}
+
+
+
+
+
+
 
 
 const markChapterAsCompleted = async (req, res) => {
@@ -600,7 +682,7 @@ const markChapterAsCompleted = async (req, res) => {
 
     // Return the updated completedChapters array
     return res.status(200).json({ completedChapters });
-    
+
   } catch (err) {
     console.error("Error marking chapter as completed:", err);
     return res.status(500).json({ error: "An error occurred while marking the chapter as completed" });
@@ -623,72 +705,74 @@ const trackCurrentLocation = async (req, res) => {
   if (!req.userId) return res.status(400).json({ error: "User ID not found in token" });
 
   try {
-      let location;
-      try {
-          const ipResponse = await fetch("https://api.ipify.org?format=json");
-          const ipData = await ipResponse.json();
-          const ip = ipData.ip;
-          
-          const geoResponse = await fetch(`https://ipinfo.io/${ip}/json`);
-          location = await geoResponse.json();
+    let location;
+    try {
+      const ipResponse = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipResponse.json();
+      const ip = ipData.ip;
 
-          console.log("Location Data:", location);
+      const geoResponse = await fetch(`https://ipinfo.io/${ip}/json`);
+      location = await geoResponse.json();
 
-          const user = await User.findById(req.userId);
-          if (!user) return res.status(404).json({ error: "User not found" });
+      console.log("Location Data:", location);
 
+      const user = await User.findById(req.userId);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      user.lastLoginLocation = {
+        city: location.city || "Unknown",
+        region: location.region || "",
+        country: location.country || "Unknown",
+        loggedInAt: new Date(),
+      };
+
+      await user.save();
+      res.json({ message: "Location updated", location: user.lastLoginLocation, userId: req.userId, userData: user });
+    } catch (apiError) {
+      console.error("API Error:", apiError);
+      if (req.userId) {
+        const user = await User.findById(req.userId);
+        if (user) {
           user.lastLoginLocation = {
-              city: location.city || "Unknown",
-              region: location.region || "",
-              country: location.country || "Unknown",
-              loggedInAt: new Date(),
+            city: "Fallback City",
+            region: "",
+            country: "Fallback Country",
+            loggedInAt: new Date(),
           };
-
           await user.save();
-          res.json({ message: "Location updated", location: user.lastLoginLocation ,userId: req.userId, userData: user });
-      } catch (apiError) {
-          console.error("API Error:", apiError);
-          if (req.userId) {
-              const user = await User.findById(req.userId);
-              if (user) {
-                  user.lastLoginLocation = {
-                      city: "Fallback City",
-                      region: "",
-                      country: "Fallback Country",
-                      loggedInAt: new Date(),
-                  };
-                  await user.save();
-                  return res.json({ message: "Using fallback location due to API errors", location: user.lastLoginLocation });
-              }
-          }
-          return res.status(500).json({ error: "Could not fetch location data" });
+          return res.json({ message: "Using fallback location due to API errors", location: user.lastLoginLocation });
+        }
       }
+      return res.status(500).json({ error: "Could not fetch location data" });
+    }
   } catch (err) {
-      console.error("Failed to track location:", err);
-      res.status(500).json({ error: "Could not update location" });
+    console.error("Failed to track location:", err);
+    res.status(500).json({ error: "Could not update location" });
   }
 };
 
 
 
-module.exports = { signIngithub,
-   signIngoogle, 
-   registerStudentgithub, 
-   registerStudentgoogle, 
-   registerInstructorgithub,
-    registerInstructorgoogle,
-     registerStudent, 
-     registerInstructor,
-      checkAuth, signIn, 
-      signOut,
-       verifyEmail,
-        forgotPassword,
-         resetPassword ,
-         registerLinkedIn,
-          registerInstructorLinkedin,
-           registerStudentLinkedin,
-           signInlinkedin,
-           markChapterAsCompleted,
-           trackCurrentLocation
-        };
+module.exports = {
+  signIngithub,
+  signIngoogle,
+  registerStudentgithub,
+  registerStudentgoogle,
+  registerInstructorgithub,
+  registerInstructorgoogle,
+  registerStudent,
+  registerInstructor,
+  checkAuth, signIn,
+  signOut,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+  registerLinkedIn,
+  registerInstructorLinkedin,
+  registerStudentLinkedin,
+  signInlinkedin,
+  markChapterAsCompleted,
+  trackCurrentLocation,
+  resendVerificationCode
+};
 
