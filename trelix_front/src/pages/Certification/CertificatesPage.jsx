@@ -18,7 +18,7 @@ const CertificatesPage = () => {
   const fetchCertificates = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/certificates/getCertAll?userId=${user._id}`
+        `http://localhost:5000/certificates/getCertAll?userId=${user?._id}`
       );
       setCertificates(response.data);
     } catch (error) {
@@ -27,6 +27,7 @@ const CertificatesPage = () => {
       setLoading(false);
     }
   };
+
   return (
     <div className="container mt-4">
       <h2>Browse Certificates</h2>

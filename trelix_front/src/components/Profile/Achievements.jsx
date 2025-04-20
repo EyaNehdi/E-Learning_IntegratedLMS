@@ -4,6 +4,8 @@ import Divider from "@mui/material/Divider";
 import { Link, useOutletContext } from "react-router-dom";
 import axios from "axios";
 
+const baseUrl = "http://localhost:5000";
+
 const Achievements = () => {
   const { user } = useOutletContext();
   const [achievements, setAchievements] = useState(null);
@@ -281,65 +283,94 @@ const Achievements = () => {
                     <div key={index} className="col-md-6 col-lg-4 mb-3">
                       <div
                         style={{
-                          border: "1px solid #e0e0e0",
-                          padding: "12px",
-                          borderRadius: "5px",
-                          backgroundColor: "#f9f9f9",
+                          border: "1px solid #ddd",
+                          padding: "16px",
+                          borderRadius: "10px",
+                          backgroundColor: "#fff",
                           display: "flex",
-                          alignItems: "center",
+                          alignItems: "flex-start",
+                          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+                          gap: "16px",
+                          maxWidth: "500px",
                         }}
                       >
                         <img
                           src={cert.logo}
                           alt={cert.name}
                           style={{
-                            width: "40px",
-                            height: "40px",
-                            marginRight: "12px",
-                            borderRadius: "4px",
+                            width: "50px",
+                            height: "50px",
+                            objectFit: "cover",
+                            objectPosition: "center",
+                            borderRadius: "6px",
+                            border: "1px solid #ccc",
+                            backgroundColor: "#f0f0f0",
                           }}
                         />
-                        <div>
-                          <h4 style={{ fontSize: "1rem", margin: "0 0 5px 0" }}>
+                        <div style={{ flex: 1 }}>
+                          <h4
+                            style={{
+                              fontSize: "1rem",
+                              fontWeight: "600",
+                              margin: "0 0 6px 0",
+                              color: "#333",
+                            }}
+                          >
                             {cert.name}
                           </h4>
                           <p
                             style={{
-                              fontSize: "0.8rem",
-                              margin: "0 0 3px 0",
+                              fontSize: "0.85rem",
+                              margin: "0 0 4px 0",
                               color: "#555",
                             }}
                           >
-                            Issuer: {cert.issuer}
+                            <strong>Issuer:</strong> {cert.issuer}
                           </p>
                           <p
                             style={{
                               fontSize: "0.8rem",
-                              margin: "0",
+                              margin: "0 0 8px 0",
                               color: "#777",
                             }}
                           >
-                            Issued:{" "}
+                            <strong>Issued:</strong>{" "}
                             {new Date(cert.issuedDate).toLocaleDateString()}
                           </p>
-                          <div style={{ marginTop: "8px" }}>
-                            {cert.pdfUrl ? (
-                              <a
-                                href={cert.pdfUrl}
-                                download
-                                className="btn btn-sm btn-primary"
-                              >
-                                Download Certificate
-                              </a>
-                            ) : (
-                              <button
-                                className="btn btn-sm btn-secondary"
-                                disabled
-                              >
-                                No PDF Available
-                              </button>
-                            )}
-                          </div>
+                          {cert.pdfUrl ? (
+                            <a
+                              href={`${baseUrl}/download-certificate/${cert.pdfUrl
+                                .split("/")
+                                .pop()}`}
+                              className="btn btn-sm btn-primary"
+                              style={{
+                                fontSize: "0.8rem",
+                                padding: "6px 12px",
+                                borderRadius: "4px",
+                                backgroundColor: "#007bff",
+                                color: "#fff",
+                                textDecoration: "none",
+                                display: "inline-block",
+                              }}
+                            >
+                              Download Certificate
+                            </a>
+                          ) : (
+                            <button
+                              className="btn btn-sm btn-secondary"
+                              disabled
+                              style={{
+                                fontSize: "0.8rem",
+                                padding: "6px 12px",
+                                borderRadius: "4px",
+                                backgroundColor: "#ccc",
+                                color: "#666",
+                                cursor: "not-allowed",
+                              }}
+                            >
+                              No PDF Available
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

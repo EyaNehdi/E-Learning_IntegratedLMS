@@ -9,23 +9,23 @@ import Tooltip from "@mui/material/Tooltip";
 import MobileMenu from "./MobileMenu";
 import axios from "axios";
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 function Header() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
- 
-  const [filteredCourses, setFilteredCourses] = useState([])
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [filteredCourses, setFilteredCourses] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null)
-  const { isAuthenticated, logout } = useAuthStore()
-  const navigate = useNavigate()
-  const { user, fetchUser, clearUser } = useProfileStore()
-  const location = useLocation()
-
+  const [error, setError] = useState(null);
+  const { isAuthenticated, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const { user, fetchUser, clearUser } = useProfileStore();
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
 
   useEffect(() => {
     fetchUser();
@@ -40,26 +40,30 @@ function Header() {
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
-  
+
   // Fetch courses from API
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        setLoading(true)
-        const response = await axios.get("http://localhost:5000/course/courses")
-        setCourses(response.data)
-        setFilteredCourses(response.data)
-        setLoading(false)
+        setLoading(true);
+        const response = await axios.get(
+          "http://localhost:5000/course/courses"
+        );
+        setCourses(response.data);
+        setFilteredCourses(response.data);
+        setLoading(false);
       } catch (err) {
-        console.error("Erreur lors du chargement des cours:", err)
-        setError("Impossible de charger les cours. Veuillez réessayer plus tard.")
-        setLoading(false)
+        console.error("Erreur lors du chargement des cours:", err);
+        setError(
+          "Impossible de charger les cours. Veuillez réessayer plus tard."
+        );
+        setLoading(false);
       }
-    }
+    };
 
-    fetchCourses()
+    fetchCourses();
   }, []);
-  
+
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredCourses(courses);
@@ -68,7 +72,7 @@ function Header() {
         course.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredCourses(filtered);
-  
+
       // Vérifie que l'objet global est défini avant de l'utiliser
       if (window.courseSearchState) {
         window.courseSearchState.query = searchQuery;
@@ -76,7 +80,7 @@ function Header() {
       }
     }
   }, [searchQuery, courses]);
-  
+
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredCourses(courses);
@@ -85,7 +89,7 @@ function Header() {
         course.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredCourses(filtered);
-  
+
       // Vérifie que l'objet global est défini avant de l'utiliser
       if (window.courseSearchState) {
         window.courseSearchState.query = searchQuery;
@@ -111,7 +115,11 @@ function Header() {
         </div>
 
         {/* Search panel offcanvas */}
-        <div className="search-popup offcanvas offcanvas-top" id="offcanvas-search" data-bs-scroll="true">
+        <div
+          className="search-popup offcanvas offcanvas-top"
+          id="offcanvas-search"
+          data-bs-scroll="true"
+        >
           <div className="container d-flex flex-row py-5 align-items-center position-relative">
             <button
               type="button"
@@ -141,19 +149,26 @@ function Header() {
                 <div className="alert alert-danger">{error}</div>
               ) : (
                 <div className="product-wrap d-block">
-                  <h6>{searchQuery ? `Résultats pour "${searchQuery}"` : "Our Best Selling Courses"}</h6>
+                  <h6>
+                    {searchQuery
+                      ? `Résultats pour "${searchQuery}"`
+                      : "Our Best Selling Courses"}
+                  </h6>
                   {filteredCourses.length > 0 ? (
                     <div className="row mt-3">
                       {filteredCourses.map((course) => (
-                        <div className="col-sm-4 mb-4" key={course._id || course.id}>
+                        <div
+                          className="col-sm-4 mb-4"
+                          key={course._id || course.id}
+                        >
                           <div className="course-entry-3 card rounded-2 border shadow-1">
                             <div className="card-media position-relative">
-
-                            <a href={`/chapters/${course._id}`}>
-
+                              <a href={`/chapters/${course._id}`}>
                                 <img
                                   className="card-img-top"
-                                  src={course.image || "assets/images/course1.jpg"}
+                                  src={
+                                    course.image || "assets/images/course1.jpg"
+                                  }
                                   alt={course.title}
                                 />
                               </a>
@@ -161,21 +176,28 @@ function Header() {
                             <div className="card-body p-3">
                               <div className="d-flex justify-content-between align-items-center small">
                                 <div className="d-flex align-items-center small">
-                                  
-                                  <span className="rating-count">({course.reviews || 0})</span>
+                                  <span className="rating-count">
+                                    ({course.reviews || 0})
+                                  </span>
                                 </div>
                               </div>
                               <h3 className="display-6 mt-1">
-                                <a href={`/courses/${course._id || course.id}`}>{course.title}</a>
+                                <a href={`/courses/${course._id || course.id}`}>
+                                  {course.title}
+                                </a>
                               </h3>
-                              <span className="fw-bold">${course.price?.toFixed(2) || "0.00"}</span>
+                              <span className="fw-bold">
+                                ${course.price?.toFixed(2) || "0.00"}
+                              </span>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="alert alert-info mt-3">Aucun cours ne correspond à votre recherche.</div>
+                    <div className="alert alert-info mt-3">
+                      Aucun cours ne correspond à votre recherche.
+                    </div>
                   )}
                 </div>
               )}
@@ -228,7 +250,6 @@ function Header() {
                           <a
                             href="/calendar"
                             role="button"
-                           
                             aria-expanded="false"
                             className="nav-link px-3 px-xl-4"
                             style={{
@@ -240,11 +261,77 @@ function Header() {
                             Dashboard
                           </a>
                         </li>
+
                         <li className="nav-item dropdown">
                           <a
-                            href="/allcours"
+                            href="#"
                             role="button"
                             aria-expanded="false"
+                            style={{
+                              marginRight: "46px",
+                              fontWeight: "bold",
+                              fontSize: "20px",
+                            }}
+                          >
+                            Courses
+                          </a>
+                          {/* Dropdown menu for Courses */}
+                          <ul className="dropdown-menu">
+                            <li>
+                              <a className="dropdown-item" href="/allcours  ">
+                                All Cours
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className="dropdown-item"
+                                href="/Moodle"
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <img
+                                  src="https://moodle.org/theme/moodleorg/pix/moodle_logo_TM.svg"
+                                  alt="Moodle"
+                                  style={{
+                                    width: "80px",
+                                    height: "20px",
+                                    marginRight: "8px",
+                                  }}
+                                />
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className="dropdown-item"
+                                href="/Classroom"
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <img
+                                  src="https://www.gstatic.com/classroom/logo_square_48.svg"
+                                  alt="Classroom"
+                                  style={{
+                                    width: "80px",
+                                    height: "20px",
+                                    marginRight: "8px",
+                                  }}
+                                />
+                              </a>
+                            </li>
+
+                            <li>
+                              <hr className="dropdown-divider" />
+                            </li>
+                          </ul>
+                        </li>
+                        <li className="nav-item dropdown">
+                          <a
+                            href="/chart"
+                            role="button"
                             className="nav-link px-3 px-xl-4"
                             style={{
                               paddingInline: "40px",
@@ -252,9 +339,10 @@ function Header() {
                               fontSize: "20px",
                             }}
                           >
-                            Courses
+                            Statistical
                           </a>
                         </li>
+
                         <li className="nav-item dropdown">
                           <a
                             href="/leaderboard"
@@ -297,8 +385,9 @@ function Header() {
                         </a>
                         {menuOpen && (
                           <div
-                            className={`admin-menu pt-3 bg-white ${menuOpen ? "open" : ""
-                              }`}
+                            className={`admin-menu pt-3 bg-white ${
+                              menuOpen ? "open" : ""
+                            }`}
                           >
                             <div className="d-flex avatar border-bottom">
                               <div
@@ -328,14 +417,14 @@ function Header() {
                                   />
                                 ) : (
                                   <span>
-                                   {user?.firstName && user?.lastName ? (
-  <>
-    {user.firstName.charAt(0)}
-    {user.lastName.charAt(0)}
-  </>
-) : (
-  "?"
-)}
+                                    {user?.firstName && user?.lastName ? (
+                                      <>
+                                        {user.firstName.charAt(0)}
+                                        {user.lastName.charAt(0)}
+                                      </>
+                                    ) : (
+                                      "?"
+                                    )}
                                   </span>
                                 )}
                               </div>
@@ -356,57 +445,22 @@ function Header() {
                               <ul className="list-unstyled nav">
                                 {location.pathname !== "/home" && (
                                   <li>
-                                    <a className="nav-link" href="/home">
+                                    <a className={isActive("/home") ? "nav-link active" : "nav-link"} href="/home">
                                       <i className="feather-icon icon-home" />
                                       <span>Home</span>
                                     </a>
                                   </li>
                                 )}
                                 <li>
-                                  <a className="nav-link" href="/profile">
+                                  <a className={isActive("/profile") ? "nav-link active" : "nav-link"} href="/profile">
                                     <i className="feather-icon icon-user" />
                                     <span>My Profile</span>
                                   </a>
                                 </li>
-                                {/* <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-enrolled-courses.html"
-                                  >
-                                    <i className="feather-icon icon-book-open" />
-                                    <span>Enrolled Courses</span>
-                                  </a>
-                                </li> */}
-                                {/* <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-wishlist.html"
-                                  >
-                                    <i className="feather-icon icon-gift" />
-                                    <span>Wishlist</span>
-                                  </a>
-                                </li> */}
-                                {/* <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-reviews.html"
-                                  >
-                                    <i className="feather-icon icon-star" />
-                                    <span>Reviews</span>
-                                  </a>
-                                </li> */}
-                                {/* <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-my-quiz-attempts.html"
-                                  >
-                                    <i className="feather-icon icon-box" />
-                                    <span>My Quiz Attempts</span>
-                                  </a>
-                                </li> */}
+                               
                                 <li>
                                   <a
-                                    className="nav-link"
+                                    className={isActive("/profile/settings") ? "nav-link active" : "nav-link"}
                                     href="/profile/settings"
                                   >
                                     <i className="feather-icon icon-shopping-bag" />
@@ -414,46 +468,59 @@ function Header() {
                                     <span>Security</span>
                                   </a>
                                 </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="/certificates"
-                                  >
-                                    <i className="feather-icon icon-award" />
-                                    <span>View Certificates</span>
+                                {user?.role === "student" && (
+                                  <li>
+                                    <a
+                                      className={isActive("/certificates") ? "nav-link active" : "nav-link"}
+                                      href="/certificates"
+                                    >
+                                      <i className="feather-icon icon-award" />
+                                      <span>View Certificates</span>
+                                    </a>
+                                  </li>
+                                )}
 
-                                  </a>
-                                </li>
-                                <ul>
-                                  {user?.role === "instructor" && (
-                                    <>
-                                      <li>
-                                        <a className="nav-link active" href="/profile/list">
-                                          <i className="feather-icon icon-book" />
-                                          <span>My Courses</span>
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a className="nav-link" href="/profile/allquiz">
-                                          <i className="feather-icon icon-briefcase" />
-                                          <span>My Quizs</span>
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a className="nav-link" href="/profile/Allexams">
-                                          <i className="feather-icon icon-cpu" />
-                                          <span>My Exams</span>
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a className="nav-link" href="/profile/addchapter">
-                                          <i className="feather-icon icon-bell" />
-                                          <span>My Chapters</span>
-                                        </a>
-                                      </li>
-                                    </>
-                                  )}
-                                </ul>
+                                {user?.role === "instructor" && (
+                                  <>
+                                    <li>
+                                      <a
+                                         className={isActive("/profile/list") ? "nav-link active" : "nav-link"}
+                                        href="/profile/list"
+                                      >
+                                        <i className="feather-icon icon-book" />
+                                        <span>My Courses</span>
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a
+                                         className={isActive("/profile/allquiz") ? "nav-link active" : "nav-link"}
+                                        href="/profile/allquiz"
+                                      >
+                                        <i className="feather-icon icon-briefcase" />
+                                        <span>My Quizs</span>
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a
+                                         className={isActive("/profile/Allexams") ? "nav-link active" : "nav-link"}
+                                        href="/profile/Allexams"
+                                      >
+                                        <i className="feather-icon icon-cpu" />
+                                        <span>My Exams</span>
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a
+                                         className={isActive("/profile/addchapter") ? "nav-link active" : "nav-link"}
+                                        href="/profile/addchapter"
+                                      >
+                                        <i className="feather-icon icon-bell" />
+                                        <span>My Chapters</span>
+                                      </a>
+                                    </li>
+                                  </>
+                                )}
+
                                 <li className="border-bottom" />
                                 <li>
                                   <a

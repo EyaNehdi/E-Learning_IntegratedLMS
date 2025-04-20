@@ -15,10 +15,11 @@ import {
   XIcon,
   BarChart2,
   ArrowLeft,
+  BookOpen,
 } from "lucide-react"
 import axios from "axios"
 import { useParams, useNavigate } from "react-router-dom"
-import { useProfileStore } from "../../store/profileStore";
+import { useProfileStore } from "../../store/profileStore"
 
 const ExamStudent = () => {
   // State for exam data
@@ -47,9 +48,46 @@ const ExamStudent = () => {
   const [examResults, setExamResults] = useState(null)
   const [showResults, setShowResults] = useState(false)
   const [viewingQuestion, setViewingQuestion] = useState(null)
- const { user, fetchUser, clearUser } = useProfileStore()
+  const [hasAttemptedExam, setHasAttemptedExam] = useState(false)
+
+  const { user, fetchUser, clearUser } = useProfileStore()
+
   // Get ID from URL
   const { courseid } = useParams()
+
+  // Check if student has already taken this exam
+  const checkPreviousAttempt = async () => {
+    try {
+      setLoading(true)
+      // Make a request to check if the user has already taken an exam for this course
+      const response = await axios.get(`http://localhost:5000/exam/check-attempt/${courseid}/${user._id}`)
+
+      console.log("Check attempt response:", response.data)
+
+      if (response.data.hasAttempted) {
+        // User has already taken this exam
+        setHasAttemptedExam(true)
+        setExamResults(response.data.results)
+        setExamSubmitted(true)
+        setShowResults(true)
+        setLoading(false)
+
+        // If the user has passed, redirect to dashboard or course page
+        if (response.data.results && response.data.results.passed) {
+          alert("You have already passed this exam. You cannot take it again.")
+          navigate(`/chapters/${courseid}`) // Redirect to course page
+          return
+        }
+      } else {
+        // User has not taken this exam yet, proceed to fetch a new one
+        fetchExam()
+      }
+    } catch (err) {
+      console.error("Error checking previous attempt:", err)
+      // If there's an error checking attempts, proceed to fetch a new exam
+      fetchExam()
+    }
+  }
 
   const fetchExam = async () => {
     // The course ID that you want to fetch the exam from
@@ -88,8 +126,14 @@ const ExamStudent = () => {
   }
 
   useEffect(() => {
-    fetchExam()
-  }, [])
+    // First check if the user has already taken this exam
+    if (user && user._id) {
+      checkPreviousAttempt()
+    } else {
+      // If user data isn't available yet, fetch the exam directly
+      fetchExam()
+    }
+  }, [user, courseid])
 
   // Timer effect
   useEffect(() => {
@@ -257,38 +301,51 @@ const ExamStudent = () => {
   // Submit exam
   const handleSubmitExam = async () => {
     if (confirmSubmit) {
-        try {
-            setIsSubmitting(true);
+      try {
+        setIsSubmitting(true)
 
-            // Map the answers object to an array of values (this assumes answers is an object with question IDs as keys)
-            const answersArray = Object.values(answers);  // Ensure the answers are in the same order as the questions
+        // Map the answers object to an array of values
+        const answersArray = Object.values(answers)
 
-            // Submit answers to the backend
-            const response = await axios.post(`http://localhost:5000/exam/submit/${exam._id}`, {
-                userId: user._id, // Pass the user ID
-                answers: answersArray,  // Send answers as an array in the same order as questions
-            });
+        // Submit answers to the backend
+        const response = await axios.post(`http://localhost:5000/exam/submit/${exam._id}`, {
+          userId: user._id,
+          answers: answersArray,
+        })
 
-            // Assuming response contains exam results, process them
-            const results = processExamResults(response.data.result, exam, answers);  // processExamResults already calculates score
+        // Process exam results
+        const results = processExamResults(response.data.result, exam, answers)
 
-            setExamResults(results);
-            setExamSubmitted(true);
-            setShowResults(true);
-            setIsSubmitting(false);
-            setTimerActive(false);
-            setConfirmSubmit(false);
-        } catch (err) {
-            console.error("Error submitting exam:", err);
-            alert("Failed to submit exam. Please try again.");
-            setIsSubmitting(false);
+        // If the user passed, update the exam status in the backend
+        if (results.passed) {
+          try {
+            await axios.post(`http://localhost:5000/exam/update-status`, {
+              userId: user._id,
+              courseId: courseid,
+              passed: true,
+              score: results.percentageScore,
+            })
+            console.log("Exam status updated successfully")
+          } catch (error) {
+            console.error("Error updating exam status:", error)
+          }
         }
+
+        setExamResults(results)
+        setExamSubmitted(true)
+        setShowResults(true)
+        setIsSubmitting(false)
+        setTimerActive(false)
+        setConfirmSubmit(false)
+      } catch (err) {
+        console.error("Error submitting exam:", err)
+        alert("Failed to submit exam. Please try again.")
+        setIsSubmitting(false)
+      }
     } else {
-        setConfirmSubmit(true);
+      setConfirmSubmit(true)
     }
-};
-
-
+  }
 
   // Cancel submission confirmation
   const cancelSubmit = () => {
@@ -360,6 +417,20 @@ const ExamStudent = () => {
             </button>
           </div>
           <p className="mt-6 text-sm text-gray-500">If the problem persists, please contact support.</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If the user has already taken this exam, show a message and their results
+  if (hasAttemptedExam && !examResults) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center p-8 max-w-md bg-white rounded-lg shadow-md">
+          <BookOpen className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Exam Already Completed</h2>
+          <p className="text-gray-600 mb-6">You have already taken this exam. Loading your results...</p>
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     )
@@ -624,7 +695,7 @@ const ExamStudent = () => {
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
                 <h1 className="text-2xl font-bold mb-2">Exam Results</h1>
-                <p>{exam.title}</p>
+                <p>{exam?.title || "Exam"}</p>
               </div>
 
               <div className="p-6">
@@ -1095,4 +1166,3 @@ const ExamStudent = () => {
 }
 
 export default ExamStudent
-

@@ -25,13 +25,13 @@ async function generateCertificate(user, course) {
     const pages = pdfDoc.getPages();
     const firstPage = pages[0];
     const { width, height } = pages[0].getSize();
-    
+
     const Student_Name = [user.firstName, user.lastName]
         .filter(Boolean)
         .join('\u00A0')
         .trim();
     const Student_Name_textWidth = greatVibesFont.widthOfTextAtSize(Student_Name, 64);
-    
+
     firstPage.drawText(Student_Name, {
         x: ((width - Student_Name_textWidth) / 2),
         y: 250,
@@ -42,7 +42,7 @@ async function generateCertificate(user, course) {
 
     const Course_Name = `${course.title}`;
     const Course_Name_textWidth = caviarBoldFont.widthOfTextAtSize(Course_Name, 24);
-    
+
     firstPage.drawText(Course_Name, {
         x: ((width - Course_Name_textWidth) / 2),
         y: 160,
@@ -79,7 +79,7 @@ async function generateCertificate(user, course) {
 
     // Save the PDF
     const pdfBytes = await pdfDoc.save();
-    
+
     const certificateDir = path.join(__dirname, `../certificates/certificate-${user._id}-${cleanTitle}.pdf`);
     fs.writeFileSync(certificateDir, pdfBytes);
     const certificatePath = `/certificates/certificate-${user._id}-${cleanTitle}.pdf`;
@@ -89,6 +89,8 @@ async function generateCertificate(user, course) {
 
 const issueCertificate = async (req, res) => {
     try {
+        console.log(req.body);
+
         const { userId, courseId, provider } = req.body;
 
         if (!userId || !courseId || !provider) {
@@ -177,7 +179,8 @@ const getUserCertificates = async (req, res) => {
 
 const getAllCertifWithOwnedStatus = async (req, res) => {
     try {
-        const { userId } = req.query;
+
+        const userId = req.query.userId;
 
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });

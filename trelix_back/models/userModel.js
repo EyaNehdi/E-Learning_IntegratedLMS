@@ -36,10 +36,13 @@ const User = new Schema({
   skils: { type: [String], default: [] },
   profilePhoto: { type: String, default: null },
   coverPhoto: { type: String, default: null },
+  resetToken: { type: String, default: null },
+  resetTokenExpiresAt: { type: Date, default: null },
   resetPasswordToken: String,
   resetPasswordExpiresAt: Date,
-  verificationToken: String,
-  verificationTokenExpiresAt: Date,
+  verificationToken: String,  // Token used for email verification
+  verificationTokenExpiresAt: Date,  // Expiration time for the token
+  isVerified: { type: Boolean, default: false },  // Whether the user has verified their email
   totalScore: { type: Number, default: 0 },
   role: {
     type: String,
@@ -52,6 +55,10 @@ const User = new Schema({
     region: String,
     country: String,
     loggedInAt: Date
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
   },
 },
   { timestamps: true });
@@ -72,5 +79,32 @@ User.pre('save', async function (next) {
 User.methods.comparePassword = async function (userPassword) {
   return await bcrypt.compare(userPassword, this.password);
 };
+// Modified pre-save hook to prevent double-hashing
+User.pre("save", async function (next) {
+  // Only hash if password field has been modified
+  if (!this.isModified("password")) return next()
+
+  // Check if the password is already hashed (starts with $2b$ or $2a$ for bcrypt)
+  if (this.password.startsWith("$2b$") || this.password.startsWith("$2a$")) {
+    console.log("Password is already hashed, skipping hashing")
+    return next()
+  }
+
+  try {
+    console.log("Hashing password...")
+    const salt = await bcrypt.genSalt(10)
+    this.password = await bcrypt.hash(this.password, salt)
+    console.log("Password hashed successfully")
+    next()
+  } catch (err) {
+    console.error("Error hashing password:", err)
+    next(err)
+  }
+})
+
+// Compare Password while login
+User.methods.comparePassword = async function (userPassword) {
+  return await bcrypt.compare(userPassword, this.password)
+}
 
 module.exports = mongoose.model('User', User);
