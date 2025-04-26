@@ -32,8 +32,6 @@ const createBadge = async (req, res) => {
 const getAllBadges = async (req, res) => {
     try {
         const badges = await Badge.find();
-        console.log(badges);
-
         res.status(200).json(badges);
     } catch (error) {
         console.error("Error fetching badges", error);
