@@ -74,7 +74,7 @@ async function shuffleQuiz() {
         selectedQuiz.nextResetTime = now; // Store this in DB
         await selectedQuiz.save();
 
-        console.log(`All quizzes have been deactivated. Quiz titled "${selectedQuiz.title}" is now active!`);
+        // console.log(`All quizzes have been deactivated. Quiz titled "${selectedQuiz.title}" is now active!`);
 
         // Emit the updated quiz data to the front-end
         if (io) {
@@ -247,15 +247,15 @@ const leaderboard = async (req, res) => {
 
 //daily task 
 const task = cron.schedule('* * * * *', () => {
-    console.log("Running cron job to shuffle quiz...");
+    // console.log("Running cron job to shuffle quiz...");
 
     // Check the time and log when the job is triggered
     const now = new Date();
-    console.log(`Cron job triggered at: ${now.toISOString()}`);
+    // console.log(`Cron job triggered at: ${now.toISOString()}`);
     shuffleQuiz();
 });
 task.start(); // Start the cron job once, outside the function
-console.log("Cron job for daily quizz started...");
+// console.log("Cron job for daily quizz started...");
 module.exports = { shuffleQuiz,
     addQuizz,
     activeQuizz,

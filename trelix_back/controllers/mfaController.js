@@ -2,6 +2,9 @@ const { generateMFA, verifyMFA, generateCodes } = require("../services/mfaServic
 const User = require("../models/userModel");
 const crypto = require("crypto");
 const { decryptSecret, encryptSecret } = require("../services/encryptionService");
+const { generateTrustedDeviceToken } = require("../middlewares/UserAccess");
+const { v4: uuidv4 } = require("uuid");
+const generateToken = require("../utils/generateTokenAndSetCookie");
 
 const enableMFA = async (req, res) => {
   try {
@@ -18,17 +21,44 @@ const enableMFA = async (req, res) => {
 };
 
 const authenticateMfa = async (req, res) => {
-  const { userId, token } = req.body;
+  const { userId, token, trustDevice, metadata } = req.body;
 
   try {
     const verified = await verifyMFA(userId, token);
-    if (verified) {
-      res.json({ success: true, message: "MFA verified" });
-    } else {
-      res.status(400).json({ error: "Invalid OTP" });
+    if (!verified) {
+      return res.status(400).json({ error: "Invalid OTP" });
     }
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    if (trustDevice) {
+      const deviceId = uuidv4();
+      const tokenTrustedDevice = generateTrustedDeviceToken(userId, deviceId, metadata);
+      const newTrustedDevice = {
+        deviceId,
+        ...metadata,
+        addedAt: new Date(),
+        expiresAt: expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      };
+      await User.findByIdAndUpdate(
+        userId,
+        {
+          $push: {
+            "mfa.trustedDevices": newTrustedDevice
+          },
+        },
+        { new: true }
+      );
+      res.cookie("trusted_device_token", tokenTrustedDevice, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      });
+    }
+    return res.json({ success: true, message: "MFA verified" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -46,7 +76,7 @@ const generateBackupCodes = async (req, res) => {
       used: false,
     }));
 
-    const updatedUser = await User.findByIdAndUpdate(userId, { backupCodes: hashedBackupCodes }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(userId, { "mfa.backupCodes": hashedBackupCodes }, { new: true });
     if (updatedUser) {
       res.json({ success: true, ResponseBackupCodes });
     }
@@ -69,7 +99,7 @@ const getBackupCodes = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    const backupCodes = user.backupCodes;
+    const backupCodes = user.mfa?.backupCodes;
 
     if (!backupCodes || backupCodes.length === 0) {
       return res.status(200).json({
@@ -99,14 +129,21 @@ const disableMFA = async (req, res) => {
     const { userId } = req.body;
     if (!userId) return res.status(400).json({ message: "User ID is required" });
     const user = await User.findById(userId);
-    if (!user.mfaSecret || user.mfaSecret.length === 0 || !user.mfaEnabled) {
-      console.log("MFA is already disabled");
+    if (
+      !user?.mfa?.enabled ||
+      !user?.mfa?.secret ||
+      user.mfa.secret.length === 0
+    ) {
       return res.status(400).json({ message: "MFA is already disabled" });
     }
 
     const userUpdated = await User.findByIdAndUpdate(
       userId,
-      { mfaEnabled: false, mfaSecret: null, backupCodes: [] },
+      {
+        "mfa.enabled": false,
+        "mfa.secret": null,
+        "mfa.backupCodes": [],
+      },
       { new: true }
     );
 
@@ -119,4 +156,122 @@ const disableMFA = async (req, res) => {
   }
 };
 
-module.exports = { enableMFA, authenticateMfa, generateBackupCodes, getBackupCodes, disableMFA };
+const verifyMfaCode = async (req, res) => {
+  console.log("req.body, verifyMfaCode", req.body);
+
+  const { userId, otpCode, backupCode, trustDevice, deviceInfo } = req.body;
+  try {
+    if (!otpCode && !backupCode) return { success: false, message: "Missing code input" };
+
+    const user = await User.findById(userId);
+    if (!user || !user.mfa.enabled) {
+      return res.status(404).json({ success: false, message: "User or MFA setup not found" });
+    }
+
+    if (otpCode) {
+      const verified = await verifyMFA(userId, otpCode);
+      if (!verified) {
+        return res.status(401).json({ success: false, otpError: true, message: "Invalid OTP" });
+      }
+    } else if (backupCode) {
+      const matchingCode = user.mfa.backupCodes.find((entry) => {
+        if (!entry.used) {
+          const decryptedCode = decryptSecret(entry.code);
+          return decryptedCode === backupCode;
+        }
+        return false;
+      });
+
+      if (!matchingCode) {
+        return res.status(401).json({ success: false, otpError: false, message: "Invalid or already used backup code" });
+      }
+      matchingCode.used = true;
+    }
+    if (trustDevice) {
+      const deviceId = uuidv4();
+      const tokenTrustedDevice = generateTrustedDeviceToken(userId, deviceId, deviceInfo);
+      const newTrustedDevice = {
+        deviceId,
+        ...deviceInfo,
+        addedAt: new Date(),
+        expiresAt: expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      };
+      const existingDevice = user.mfa.trustedDevices.find((d) => d.deviceId === deviceId);
+      if (!existingDevice) {
+        await User.findByIdAndUpdate(
+          userId,
+          {
+            $push: {
+              "mfa.trustedDevices": newTrustedDevice
+            },
+          },
+          { new: true }
+        );
+        res.cookie("trusted_device_token", tokenTrustedDevice, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "Strict",
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+        });
+      }
+    }
+    await user.save();
+    generateToken(res, user._id, true);
+    return res.status(200).json({
+      success: true,
+      message: "Logged in successfully",
+      user: {
+        ...user._doc,
+        password: undefined,
+      },
+    });
+  } catch (error) {
+    console.error("Error verifying MFA:", error.message);
+    return { success: false, message: "Server error during MFA verification" };
+  }
+};
+
+const getTrusted = async (req, res) => {
+  const userId = req.query.userId;
+  try {
+    const user = await User.findById(userId);
+    if (!user || !user.mfa.enabled) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    const trustedDevices = user.mfa?.trustedDevices;
+    if (!trustedDevices || trustedDevices.length === 0) {
+      return res.status(204).json({
+        success: false,
+        message: "No trusted devices found.",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      trustedDevices: trustedDevices,
+    });
+
+  } catch (error) {
+    console.error("Error fetching Trusted Devices:", error.message);
+    return { success: false, message: "Server error during get trusted devices" };
+  }
+}
+
+const removeDevice = async (req, res) => {
+  const { userId, deviceId } = req.query;
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { 'mfa.trustedDevices': { deviceId } } },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    res.status(200).json({ success: true, message: 'Device removed successfully.' });
+  } catch (error) {
+    console.error('Error removing device:', error);
+    res.status(500).json({ success: false, message: 'Internal server error.' });
+  }
+};
+
+module.exports = { enableMFA, authenticateMfa, generateBackupCodes, getBackupCodes, disableMFA, verifyMfaCode, getTrusted, removeDevice };
