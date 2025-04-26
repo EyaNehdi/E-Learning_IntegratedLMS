@@ -11,6 +11,7 @@ const { sendResetSuccessEmail } = require("../mailtrap/emails.js");
 const { sendVerificationEmail, sendPasswordResetEmail } = require("../API/mailer.js");
 
 const axios = require('axios');
+const { verifyTrustedDeviceToken } = require('../middlewares/UserAccess.js');
 //signup function
 const register = async (req, res, role) => {
   console.log("🔹 Received Request Body:", req.body); // Log request body
@@ -382,48 +383,60 @@ const registerStudentLinkedin = async (req, res) => {
 
 const signIn = async (req, res) => {
   const { email, password, stayLoggedIn } = req.body;
-  console.log("StayLoggedIn:", stayLoggedIn);
-
+  if (stayLoggedIn === undefined) {
+    return res.status(400).json({ message: "Missing stayLoggedIn value" });
+  }
   try {
     const user = await User.findOne({ email });
-    if (stayLoggedIn === undefined) {
-      return res.status(400).json({ message: "Missing stayLoggedIn value" });
-    }
     if (!user) {
       console.log("🔴 User not found");
       return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
-
-    console.log("🟢 Found user:", user.email);
-    console.log("🟢 Stored hashed password:", user.password);
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
-
     if (!isPasswordValid) {
       console.log("🔴 Password does not match");
       return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
+    if (user.mfa?.enabled) {
+      const trustedToken = req.cookies["trusted_device_token"];
+      const decoded = trustedToken ? verifyTrustedDeviceToken(trustedToken) : null;
 
-    // Set token expiration based on stayLoggedIn
+      if (!decoded || !decoded.deviceId) {
+        return res.status(200).json({
+          success: true,
+          mfaRequired: true,
+          backupCodesExist: user.mfa?.backupCodes?.length !== 0,
+          message: "Unrecognized device. MFA is required.",
+          userId: user._id,
+        });
+      }
+      const trusted = user.mfa.trustedDevices.some((d) => d.deviceId === decoded.deviceId);
+      if (!trusted) {
+        return res.status(200).json({
+          success: true,
+          mfaRequired: true,
+          backupCodesExist: user.mfa?.backupCodes?.length !== 0,
+          message: "MFA is required",
+          userId: user._id,
+        });
+      }
+    }
     generateToken(res, user._id, stayLoggedIn);
-
-    console.log("🟢 Login successful for user:", user.email);
-
     res.status(200).json({
       success: true,
       message: "Logged in successfully",
+      mfaRequired: false,
       user: {
         ...user._doc,
         password: undefined,
       },
     });
-
   } catch (error) {
     console.error("🔴 Error in login:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 const signIngoogle = async (req, res) => {
   const { email, password } = req.body;
 

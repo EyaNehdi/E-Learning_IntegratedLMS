@@ -65,7 +65,6 @@ const getAuditLogs = async (req, res) => {
             .limit(limit)
             .populate('user', '_id firstName lastName')
             .lean();
-        console.log(logs);
 
         res.status(200).json(logs);
     } catch (error) {

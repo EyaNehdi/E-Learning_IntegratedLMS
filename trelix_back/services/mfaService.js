@@ -20,7 +20,10 @@ const generateMFA = async (userId) => {
 
     await User.findByIdAndUpdate(
       userId,
-      { mfaSecret: encryptedSecret, mfaEnabled: true },
+      {
+        "mfa.secret": encryptedSecret,
+        "mfa.enabled": true,
+      },
       { new: true }
     );
 
@@ -36,12 +39,9 @@ const generateMFA = async (userId) => {
 const verifyMFA = async (userId, token) => {
   try {
     if (!token) return false;
-
     const user = await User.findById(userId);
-    if (!user || !user.mfaSecret) return false;
-
-    const decryptedSecret = decryptSecret(user.mfaSecret);
-
+    if (!user || user.mfa.secret === null) return false;
+    const decryptedSecret = decryptSecret(user.mfa.secret);
     return speakeasy.totp.verify({
       secret: decryptedSecret,
       encoding: "base32",
