@@ -7,7 +7,14 @@ import InputBase from "@mui/material/InputBase";
 import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
-import { IconButton, Typography, Box, Grid } from "@mui/material";
+import {
+  IconButton,
+  Typography,
+  Box,
+  Grid,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
 import { useEffect } from "react";
 import { useProfileStore } from "../../store/profileStore";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
@@ -27,6 +34,15 @@ const MfaSetup = () => {
   const [buttonMfa, setButtonMfa] = useState(false);
   const [userId, setUserId] = useState(null);
   const { user, fetchUser } = useProfileStore();
+  const [trustDevice, setTrustDevice] = useState(false);
+  const [metadata, setMetadata] = useState({});
+
+  useEffect(() => {
+    setMetadata({
+      browser: navigator.userAgent,
+      os: navigator.userAgentData?.platform || "Unknown",
+    });
+  }, []);
 
   useEffect(() => {
     fetchUser();
@@ -66,7 +82,7 @@ const MfaSetup = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/signup/mfa/verify",
-        { userId: userId, token }
+        { userId, token, trustDevice, metadata }
       );
       setMessage(response.data.message);
       if (response.data.success) {
@@ -261,15 +277,15 @@ const MfaSetup = () => {
                 <Paper
                   component="form"
                   sx={{
-                    p: "2px 4px",
+                    px: 1,
+                    py: 0.5,
                     display: "flex",
                     alignItems: "center",
-                    width: 230,
                   }}
                   onSubmit={(e) => e.preventDefault()}
                 >
                   <InputBase
-                    sx={{ ml: 1, flex: 1 }}
+                    sx={{ ml: 1, flex: 1, fontSize: 14 }}
                     placeholder="e.g., XXXXXX"
                     inputProps={{
                       "aria-label": "verify code",
@@ -280,11 +296,17 @@ const MfaSetup = () => {
                     onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
                   />
-                  <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+                  <Divider  sx={{ height: 28, mx: 1 }} orientation="vertical" />
                   <Tooltip title="Verify">
                     <Button
                       loading={loading}
-                      sx={{ p: "10px" }}
+                      sx={{
+                        px: 2,
+                        py: 1,
+                        minWidth: "auto",
+                        textTransform: "none",
+                        fontSize: 14,
+                      }}
                       aria-label="verify"
                       variant=""
                       onClick={verifyMfa}
@@ -294,6 +316,16 @@ const MfaSetup = () => {
                     </Button>
                   </Tooltip>
                 </Paper>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={trustDevice}
+                      onChange={(e) => setTrustDevice(e.target.checked)}
+                      color="primary"
+                    />
+                  }
+                  label="Trust this device"
+                />
                 <Button variant="outlined" onClick={handleCancelMfa}>
                   Cancel
                 </Button>

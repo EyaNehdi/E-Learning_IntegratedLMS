@@ -9,10 +9,10 @@ const verifyToken = async (req, res, next) => {
 		if (!decoded) return res.status(401).json({ success: false, message: "Unauthorized - invalid token" });
 
 		req.userId = decoded.userId;
-		console.log("User ID in verifyToken:", req.userId);  // Log here to confirm userId is set
+		//console.log("User ID in verifyToken:", req.userId);  // Log here to confirm userId is set
 		next();
 	} catch (error) {
-		console.log("Error in verifyToken ", error);
+		//console.log("Error in verifyToken ", error);
 		return res.status(500).json({ success: false, message: "Server error" });
 	}
 };
