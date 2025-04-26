@@ -132,8 +132,8 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-  console.log('Session:', req.session);
-  console.log('Session ID:', req.sessionID);
+  // console.log('Session:', req.session);
+  // console.log('Session ID:', req.sessionID);
   next();
 });
 app.use(cors({
@@ -182,10 +182,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 // Middleware de logging pour déboguer les requêtes
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+//   next();
+// });
 
 
 // In app.js
