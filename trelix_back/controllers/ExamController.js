@@ -45,6 +45,21 @@ const getExams = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+const getallExams = async (req, res) => {
+  try {
+      // Fetch all exams without pagination
+      const exams = await Exam.find(); // Get all exams
+
+      res.status(200).json({
+          exams, // Return all exams
+          totalPages: 1, // Since we're returning all exams, there's only 1 page
+      });
+  } catch (error) {
+      console.error("Error fetching exams:", error);
+      res.status(500).json({ message: "Server error" });
+  }
+};
+
 const getExamss = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
@@ -563,5 +578,6 @@ module.exports = {
     handleSubmitExam,
     checkAttempt,
     checkstatus,
-    upload
+    upload,
+    getallExams
 };

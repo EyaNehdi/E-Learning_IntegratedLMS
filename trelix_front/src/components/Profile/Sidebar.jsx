@@ -206,6 +206,15 @@ function Sidebar({ setActivePage }) {
                 <i className="feather-icon icon-shield" />
                 <span>Security & Privacy</span>
               </Link>
+              <Link
+                className={`nav-link ${location.pathname === "/profile/settings" ? "active" : ""
+                  }`}
+                to="/profile/test"
+                onClick={() => setActivePage("Security & Privacy")}
+              >
+                <i className="feather-icon icon-shield" />
+                <span>Wordle</span>
+              </Link>
             </li>
             {user?.role === "student" && (
               <li>
