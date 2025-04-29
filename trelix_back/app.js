@@ -9,7 +9,7 @@ const cors = require('cors');
 const multer = require('multer');
 const socketIo = require('socket.io');
 const preference = require("./routes/preference");
-
+const Goal = require('./models/calanderGoal'); // Assurez-vous que le chemin est correct
 
 
 // Correction des imports pour Google Classroom
@@ -59,6 +59,10 @@ app.post('/createRoom', async (req, res) => {
     res.status(500).json({ error: "Erreur serveur lors de la création" });
   }
 });
+
+
+// POST /api/goals
+
 
 
 
@@ -278,8 +282,72 @@ app.get('/api/courses', async (req, res) => {
       res.status(500).json({ error: 'Failed to fetch courses' });
   }
 });
+app.post('/api/goals', async (req, res) => {
+  try {
+    const newGoal = new Goal(req.body);
+    const savedGoal = await newGoal.save();
+    res.status(201).json(savedGoal);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.get('/api/goals', async (req, res) => {
+  try {
+    const goals = await Goal.find().sort({ date: 1 });
+    res.json(goals);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.put('/api/goals/:id', async (req, res) => {
+  try {
+    const updatedGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
+      new: true, // return updated document
+      runValidators: true,
+    });
 
+    if (!updatedGoal) {
+      return res.status(404).json({ error: 'Goal not found' });
+    }
 
+    res.json(updatedGoal);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+app.delete('/api/goals/:id', async (req, res) => {
+  try {
+    const deletedGoal = await Goal.findByIdAndDelete(req.params.id);
+
+    if (!deletedGoal) {
+      return res.status(404).json({ error: 'Goal not found' });
+    }
+
+    res.json({ message: 'Goal deleted successfully', id: req.params.id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.put('/api/goals/:id', async (req, res) => {
+  try {
+    const goal = await Goal.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    if (!goal) {
+      return res.status(404).json({ error: 'Goal not found' });
+    }
+
+    res.json({ message: 'Goal updated successfully', goal });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+const words = ["apple", "brain", "chair", "dream", "eagle"]; // Ideally from MongoDB!
+
+app.get('/api/wordle/word', (req, res) => {
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+    res.json({ word: randomWord });
+});
 app.get('/api/courses/:id/contents', async (req, res) => {
   try {
       const courseId = parseInt(req.params.id, 10);
