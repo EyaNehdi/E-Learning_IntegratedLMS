@@ -18,9 +18,11 @@ import {
   Play,
   ChevronDown,
   ChevronUp,
+  Globe,
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { Progress } from "../ui/progress"
+import "./b.css";
 
 // Import your QuizModal component
 import QuizModal from "../Quiz/QuizModal"
@@ -169,8 +171,6 @@ const ChapterContent = () => {
   const [currentChapter, setCurrentChapter] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
-
-  // Content tracking states
   const [showPDF, setShowPDF] = useState(false)
   const [videoProgress, setVideoProgress] = useState(0)
   const [pdfProgress, setPdfProgress] = useState(0)
@@ -178,6 +178,24 @@ const ChapterContent = () => {
   const [pdfCompleted, setPdfCompleted] = useState(false)
   const [showQuiz, setShowQuiz] = useState(false)
   const [selectedChapterDescription, setSelectedChapterDescription] = useState("")
+  const [translatedDescription, setTranslatedDescription] = useState("")
+  const [isTranslating, setIsTranslating] = useState(false)
+  const [selectedLanguage, setSelectedLanguage] = useState({ code: "en", name: "English" })
+
+  // List of common languages
+  const languages = [
+    { code: "en", name: "English" },
+    { code: "ar", name: "Arabic" },
+    { code: "fr", name: "French" },
+    { code: "es", name: "Spanish" },
+    { code: "de", name: "German" },
+    { code: "ar", name: "Arabic" },
+    { code: "zh", name: "Chinese" },
+    { code: "ru", name: "Russian" },
+    { code: "ja", name: "Japanese" },
+    { code: "tr", name: "Turkish" },
+    { code: "it", name: "Italian" },
+  ]
   //
   const handleChapterClick = (chapter) => {
     setCurrentChapter(chapter)
@@ -305,6 +323,45 @@ const ChapterContent = () => {
     }
   }
 
+  // Function to translate text
+  const translateText = async (text, targetLang) => {
+    if (!text) return ""
+    setIsTranslating(true)
+
+    try {
+      const response = await axios.post("http://localhost:8000/translate", {
+        text: text,
+        source_lang: "en", // Assuming original content is in English
+        target_lang: targetLang,
+      })
+
+      setIsTranslating(false)
+      return response.data.translated_text
+    } catch (error) {
+      console.error("Translation error:", error)
+      setIsTranslating(false)
+      return ""
+    }
+  }
+
+  // Handle language selection and translation
+  const handleTranslate = async (langCode) => {
+    const lang = languages.find((l) => l.code === langCode)
+    setSelectedLanguage(lang)
+
+    if (langCode === "en") {
+      // Reset to original content
+      setTranslatedDescription("")
+      return
+    }
+
+    // Translate the description
+    const translated = await translateText(selectedChapterDescription, langCode)
+    if (translated) {
+      setTranslatedDescription(translated)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full w-full bg-white">
@@ -361,7 +418,45 @@ const ChapterContent = () => {
               {currentChapter.pdf === null ? (
                 // If no PDF, show only the description
                 <div className="p-6">
-                  <p className="text-gray-700 leading-relaxed">{selectedChapterDescription}</p>
+                  {/* Translation button */}
+                  <div className="flex justify-end mb-4">
+                    <div className="relative inline-block text-left">
+                      <button
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                        onClick={() => document.getElementById("language-dropdown").classList.toggle("hidden")}
+                        disabled={isTranslating}
+                      >
+                        {isTranslating ? (
+                          <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                        ) : (
+                          <Globe className="w-4 h-4 mr-1" />
+                        )}
+                        {isTranslating ? "Translating..." : "Translate"}
+                        <span className="text-xs bg-blue-100 px-2 py-0.5 rounded-full">{selectedLanguage.name}</span>
+                        <ChevronDown className="w-4 h-4" />
+                      </button>
+                      <div
+                        id="language-dropdown"
+                        className="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 py-1"
+                      >
+                        {languages.map((lang) => (
+                          <button
+                            key={lang.code}
+                            onClick={() => {
+                              handleTranslate(lang.code)
+                              document.getElementById("language-dropdown").classList.add("hidden")
+                            }}
+                            className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left ${
+                              selectedLanguage.code === lang.code ? "bg-blue-50" : ""
+                            }`}
+                          >
+                            {lang.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-gray-700 leading-relaxed">{translatedDescription || selectedChapterDescription}</p>
                 </div>
               ) : (
                 // Otherwise, show the video and PDF
@@ -550,7 +645,51 @@ const ChapterContent = () => {
                 <TabsContent value="overview" className="p-6">
                   <div className="space-y-6">
                     <h2 className="text-2xl font-bold text-gray-800">{currentChapter.title}</h2>
-                    <p className="text-gray-700 leading-relaxed">{currentChapter.description}</p>
+
+                    {/* Translation button */}
+                    <div className="flex justify-end">
+                      <div className="relative inline-block text-left">
+                        <button
+                          className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                          onClick={() =>
+                            document.getElementById("overview-language-dropdown").classList.toggle("hidden")
+                          }
+                          disabled={isTranslating}
+                        >
+                          {isTranslating ? (
+                            <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                          ) : (
+                            <Globe className="w-4 h-4 mr-1" />
+                          )}
+                          {isTranslating ? "Translating..." : "Translate"}
+                          <span className="text-xs bg-blue-100 px-2 py-0.5 rounded-full">{selectedLanguage.name}</span>
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                        <div
+                          id="overview-language-dropdown"
+                          className="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 py-1"
+                        >
+                          {languages.map((lang) => (
+                            <button
+                              key={lang.code}
+                              onClick={() => {
+                                handleTranslate(lang.code)
+                                document.getElementById("overview-language-dropdown").classList.add("hidden")
+                              }}
+                              className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left ${
+                                selectedLanguage.code === lang.code ? "bg-blue-50" : ""
+                              }`}
+                            >
+                              {lang.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-gray-700 leading-relaxed">
+                      {translatedDescription || currentChapter.description}
+                    </p>
 
                     <div className="mt-6 bg-gray-50 p-6 rounded-lg border border-gray-100">
                       <h3 className="text-xl font-semibold mb-4 text-gray-800">What you'll learn</h3>
@@ -790,7 +929,9 @@ const ChapterContent = () => {
             </div>
           </>
         )}
+        
       </div>
+      
     </section>
   )
 }
