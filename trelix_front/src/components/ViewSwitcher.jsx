@@ -11,7 +11,7 @@ const ViewSwitcher = ({ isAdmin }) => {
 
   const isInAdminView =
     location.pathname.startsWith("/admin") ||
-    location.pathname.startsWith("/Audit") ||
+    location.pathname.startsWith("/monitor") ||
     location.pathname.startsWith("/badge") ||
     location.pathname.startsWith("/manage") ||
     location.pathname.startsWith("/report") ||

@@ -46,22 +46,18 @@ import AllExamsInstructor from "./components/Exam/AllExamsInstractor";
 import ExamStudent from "./components/Exam/ExamStudent";
 
 import BrowseCertificates from "./components/Student/BrowseCertificates";
-import AuditLogs from "./pages/Admin/Audit";
+import AuditLogs from "./components/Admin/activitytrack/Audit";
 import UsersPage from "./pages/Admin/UsersPage";
 import ListUsers from "./components/Admin/ListUsers";
 import ManageUser from "./components/Admin/ManageUser";
 import ManageBadges from "./components/Admin/ManageBadges";
 import BadgeFeature from "./pages/Admin/BadgeFeature";
 import ListBadges from "./components/Admin/ListBadges";
-import StatPreference from "./components/Student/preference-statistics" 
-import Preference from "./components/Student/AddPreference"
+import StatPreference from "./components/Student/preference-statistics";
+import Preference from "./components/Student/AddPreference";
 
-  
-
-
-
-import React, { useState } from "react"; 
-import axios from "axios"; 
+import React, { useState } from "react";
+import axios from "axios";
 import GeminiChatbot from "./components/GeminiChatbot";
 
 import CourseLearningPlatform from "./components/Quiz/test";
@@ -85,16 +81,14 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
-import MfaSetup from "./components/MfaSetup/MfaSetup.jsx";
+import AuditPage from "./pages/Admin/AuditPage.jsx";
 
-
-
- 
-
+import StudentActions from "./components/Admin/activitytrack/StudentActions.jsx";
+import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
 
 function App() {
   return (
-    <Router> 
+    <Router>
       <ChatComponent />
       <Routes>
         {/* **************** */}
@@ -119,7 +113,7 @@ function App() {
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomeUser />} />
-       
+
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/certificates" element={<CertificatesPage />}>
             <Route index element={<BrowseCertificates />} />
@@ -164,16 +158,22 @@ function App() {
             <Route path="list" element={<Listecourse />} />
             <Route path="module" element={<Module />} />
             <Route path="achievements" element={<Achievements />} />
-           
+
             <Route
               path="/profile/edit-course/:courseId"
               element={<EditCourse />}
             />
 
-             <Route path="/profile/classroom" element={<ClassroomPage />} />
-          <Route path="/profile/classroom/courses/:courseId" element={<CourseDetailsPage />} />
-          <Route path="/profile/preference" element={<Preference />} />
-          <Route path="/profile/preferencestat" element={<StatPreference />} />
+            <Route path="/profile/classroom" element={<ClassroomPage />} />
+            <Route
+              path="/profile/classroom/courses/:courseId"
+              element={<CourseDetailsPage />}
+            />
+            <Route path="/profile/preference" element={<Preference />} />
+            <Route
+              path="/profile/preferencestat"
+              element={<StatPreference />}
+            />
 
             <Route path="/profile/allcours" element={<Allcourse />} />
             <Route
@@ -192,16 +192,19 @@ function App() {
             <Route path="update/:id" element={<ManageUser />} />
             <Route path="create" element={<ManageUser />} />
           </Route>
-          <Route path="/audit" element={<AuditLogs />} />
+          <Route path="monitor" element={<AuditPage />}>
+            <Route index element={<AuditLogs />} />
+            <Route path="users-audit" element={<AuthDashboard />} />
+            <Route path="system" element={<StudentActions />} />
+          </Route>
           <Route path="/badge" element={<BadgeFeature />}>
             <Route index element={<ListBadges />} />
             <Route path="createBadge" element={<ManageBadges />} />
             <Route path="edit/:id" element={<ManageBadges />} />
             <Route path="list-badges" element={<ListBadges />} />
           </Route>
-        
+
           <Route path="/report" element={<DailyQuizzes />} />
-       
         </Route>
         {/* **************** */}
         <Route path="/linkedin/callback" element={<LinkedInCallback />} />

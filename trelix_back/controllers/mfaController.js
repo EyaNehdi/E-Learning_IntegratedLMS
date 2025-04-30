@@ -217,6 +217,13 @@ const verifyMfaCode = async (req, res) => {
     }
     await user.save();
     generateToken(res, user._id, true);
+    req.actingUser = {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    };
+    res.locals.fullyLoggedIn = true;
     return res.status(200).json({
       success: true,
       message: "Logged in successfully",
