@@ -46,6 +46,13 @@ function Login() {
       }
       await login(responseLogin.data);
     } catch (error) {
+      if (
+        error.response?.status === 403 &&
+        error.response.data.verificationRequired
+      ) {
+        navigate("/verify-email", { state: { email, source: "login" } });
+        return;
+      }
       if (error.response?.data?.message === "Account does not exist") {
         setErrorMessage("Account does not exist");
       } else {

@@ -14,26 +14,17 @@ const axios = require('axios');
 const { verifyTrustedDeviceToken } = require('../middlewares/UserAccess.js');
 //signup function
 const register = async (req, res, role) => {
-  console.log("🔹 Received Request Body:", req.body); // Log request body
-
-  const { firstName, lastName, email, password } = req.body; // Ensure role is extracted
-
+  const { firstName, lastName, email, password } = req.body;
   try {
-    // Validate input fields
     if (!firstName || !lastName || !email || !password || !role) {
-      console.error("❌ Validation Failed: Missing Fields", { firstName, lastName, email, password, role });
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    console.log("🔍 Checking if email already exists:", email);
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
       console.error("❌ Validation Failed: Email already registered", email);
       return res.status(400).json({ error: "Email already registered" });
     }
-
-    console.log("✅ Email is available. Creating new user...");
 
     // Generate a 6-digit verification token
     const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
@@ -44,30 +35,33 @@ const register = async (req, res, role) => {
       email,
       password,
       role: role,
+      isVerified: false,
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // Token expires in 24 hours
     });
 
     await newUser.save();
-    console.log("✅ User saved successfully:", newUser);
 
-    // Generate JWT Token (you can still generate the token for now, but don't use it for verification)
-    generateToken(res, newUser._id);
-    console.log("✅ JWT Token generated for user:", newUser._id);
-
-    // Send the verification email with the token
     await sendVerificationEmail(newUser.email, verificationToken);
     console.log("📧 Verification email sent to:", newUser.email);
-
+    req.actingUser = {
+      id: newUser._id,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      role: newUser.role,
+    };
+    res.locals.fullyLoggedIn = true;
     res.status(201).json({
       success: true,
       message: "Registration successful. Please check your email for the verification code.",
       user: {
-        ...newUser._doc,
-        password: undefined, // Don't send password back in response
+        id: newUser._id,
+        email: newUser.email,
+        role: newUser.role,
+        isVerified: newUser.isVerified,
+        password: undefined,
       },
     });
-
   } catch (err) {
     console.error("🔥 Unexpected Error:", err);
     res.status(500).json({ error: "Registration failed: " + err.message });
@@ -299,64 +293,56 @@ const resendVerificationCode = async (req, res) => {
     res.status(500).json({ error: "Failed to resend verification code" });
   }
 };
+
 //verifyEmail
 const verifyEmail = async (req, res) => {
-  const { email, verificationCode } = req.body;
+  const { email, verificationCode, source } = req.body;
 
   try {
     console.log("🔍 Verifying email for:", email);
-    // Step 1: Check if the verification code matches what was sent
-    const storedCode = await getVerificationCodeFromDB(email); // Fetch stored code from DB
-    if (verificationCode !== storedCode) {
-      return res.status(400).json({ error: 'Invalid verification code' });
-    }
+    const user = await User.findOne({ email });
 
-    // Step 2: Mark the user as verified in the database
-    await markUserAsVerified(email);
-
-    // Step 3: Respond with success
-    res.status(200).json({ message: 'Email verified successfully!' });
-
-  } catch (error) {
-    console.error("Error verifying email:", error.message);
-    res.status(500).json({ error: error.message });
-  }
-};
-
-const markUserAsVerified = async (email) => {
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  user.isVerified = true; // Mark the user as verified
-  user.verificationToken = null; // Remove the verification token after successful verification
-  await user.save(); // Save the updated user
-};
-// Fetch the stored verification code from the database
-const getVerificationCodeFromDB = async (email) => {
-  try {
-    const user = await User.findOne({ email: email }); // Look up user by email
     if (!user) {
-      throw new Error("User not found"); // Throw error if user does not exist
+      return res.status(404).json({ error: "User not found" });
     }
-    return user.verificationToken; // Return the verification token if user is found
+
+    if (verificationCode !== user.verificationToken) {
+      return res.status(400).json({ error: "Invalid verification code" });
+    }
+
+    if (source === "login") {
+      req.actingUser = {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      };
+
+      res.locals.fullyLoggedIn = true;
+    }
+
+    user.isVerified = true;
+    user.verificationToken = null;
+    await user.save();
+
+    generateToken(res, user._id);
+
+    res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+      user: { ...user.toObject(), password: undefined },
+    });
+
   } catch (error) {
-    console.error("Error fetching verification code:", error);
-    throw error; // Rethrow the error for handling in the main flow
+    console.error("🔥 Error verifying email:", error.message);
+    res.status(500).json({ error: "Email verification failed" });
   }
 };
-
-
-
-
-
 
 // Student registration
 const registerStudent = async (req, res) => {
   await register(req, res, "student");
 };
-
 
 // Instructor registration
 const registerInstructor = async (req, res) => {
@@ -397,31 +383,50 @@ const signIn = async (req, res) => {
       console.log("🔴 Password does not match");
       return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
-    if (user.mfa?.enabled) {
-      const trustedToken = req.cookies["trusted_device_token"];
-      const decoded = trustedToken ? verifyTrustedDeviceToken(trustedToken) : null;
-
-      if (!decoded || !decoded.deviceId) {
-        return res.status(200).json({
-          success: true,
-          mfaRequired: true,
-          backupCodesExist: user.mfa?.backupCodes?.length !== 0,
-          message: "Unrecognized device. MFA is required.",
-          userId: user._id,
+    if (user?.role !== "admin") {
+      if (!user.isVerified) {
+        await sendVerificationEmail(user.email, user.verificationToken);
+        return res.status(403).json({
+          success: false,
+          message: "Account not verified. A new verification email has been sent.",
+          verificationRequired: true,
+          userId: user._id
         });
       }
-      const trusted = user.mfa.trustedDevices.some((d) => d.deviceId === decoded.deviceId);
-      if (!trusted) {
-        return res.status(200).json({
-          success: true,
-          mfaRequired: true,
-          backupCodesExist: user.mfa?.backupCodes?.length !== 0,
-          message: "MFA is required",
-          userId: user._id,
-        });
+      if (user.mfa?.enabled) {
+        const trustedToken = req.cookies["trusted_device_token"];
+        const decoded = trustedToken ? verifyTrustedDeviceToken(trustedToken) : null;
+
+        if (!decoded || !decoded.deviceId) {
+          return res.status(200).json({
+            success: true,
+            mfaRequired: true,
+            backupCodesExist: user.mfa?.backupCodes?.length !== 0,
+            message: "Unrecognized device. MFA is required.",
+            userId: user._id,
+          });
+        }
+        const trusted = user.mfa.trustedDevices.some((d) => d.deviceId === decoded.deviceId);
+        if (!trusted) {
+          return res.status(200).json({
+            success: true,
+            mfaRequired: true,
+            backupCodesExist: user.mfa?.backupCodes?.length !== 0,
+            message: "MFA is required",
+            userId: user._id,
+          });
+        }
       }
     }
     generateToken(res, user._id, stayLoggedIn);
+    req.actingUser = {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    };
+
+    res.locals.fullyLoggedIn = true;
     res.status(200).json({
       success: true,
       message: "Logged in successfully",

@@ -231,6 +231,7 @@ const authRoutes = require('./routes/authRoutes');
 const authRoutesIA = require('./routes/ia');
 const certifRoutes = require('./routes/certif.routes');
 const badgesRoutes = require('./routes/badge.routes');
+const logRoutes = require('./routes/log.routes');
 app.use('/api/auth', authRoutes);
 app.use('/ia/auth', authRoutesIA);
 app.use('/chapter', authRouteschapter);
@@ -240,6 +241,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/quiz", quizzRoutes);
 app.use("/certificates", certifRoutes);
 app.use("/api/badges-r", badgesRoutes);
+app.use("/api/logs", logRoutes);
 
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
