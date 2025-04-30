@@ -9,6 +9,9 @@ const cors = require('cors');
 const multer = require('multer');
 const socketIo = require('socket.io');
 const preference = require("./routes/preference");
+const intelligentRecommendationRoutes = require("./routes/intelligentRecommendation");
+
+
 
 
 
@@ -84,6 +87,8 @@ const adminRoutes = require("./routes/adminRoutes");
 const quizzRoutes = require("./routes/quizzRoutes");
 const Module = require("./routes/module");
 const Course = require("./routes/course");
+
+
 
 var app = express();
 
@@ -201,6 +206,7 @@ app.get('/download-certificate/:filename', (req, res) => {
   });
 });
 
+
 app.use('/ia', require('./routes/ia'));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -209,6 +215,9 @@ app.use('/course', Course);
 app.use('/courses', Course);
 app.use('/delete', Course);
 app.use('/preference',preference);
+app.use('/intelligent-recommendation', intelligentRecommendationRoutes);
+
+
 
 
 // Routes Google Classroom (corrigées)
