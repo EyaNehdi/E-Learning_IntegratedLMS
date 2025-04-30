@@ -53,14 +53,7 @@ function Settings(){
                   </div>
                 </div>
               </div>
-              <div className="quicklink-sidebar-menu ctm-border-radius shadow-sm bg-white card">
-                <div className="card-body">
-                  <ul className="list-group">
-                    <li className="list-group-item text-center active button-5"><a href="settings.html" className="text-white">General</a></li>
-                    <li className="list-group-item text-center button-6"><a className="text-dark" href="settings-timeoff.html">Time Off</a></li>
-                  </ul>
-                </div>
-              </div>
+             
             </aside>
           </div>
           <div className="col-xl-9 col-lg-8 col-md-12">
@@ -87,28 +80,7 @@ function Settings(){
                 </div>
               </div>
               <div className="col-md-6 d-flex">
-                <div className="card ctm-border-radius shadow-sm flex-fill">
-                  <div className="card-header">
-                    <h4 className="card-title mb-0">
-                      Your Company
-                    </h4>
-                  </div>
-                  <div className="card-body">
-                    <form>
-                      <div className="form-group">
-                        <label>Company Name</label>
-                        <input type="text" className="form-control" />
-                      </div>
-                      <div className="form-group">
-                        <label>Company Url</label>
-                        <input type="text" className="form-control" />
-                      </div>
-                      <div className="text-center">
-                        <a href="javascript:void(0)" className="btn btn-theme button-1 ctm-border-radius text-white">Save Changes</a>
-                      </div>
-                    </form>
-                  </div>
-                </div>
+               
               </div>
             </div>
           </div>

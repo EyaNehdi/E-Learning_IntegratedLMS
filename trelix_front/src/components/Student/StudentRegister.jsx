@@ -11,7 +11,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import PasswordStrengthMeter from "../PasswordStrengthMeter";
 import { motion } from "framer-motion";
-import { useLinkedIn, LinkedIn } from 'react-linkedin-login-oauth2';
+import { useLinkedIn, LinkedIn } from "react-linkedin-login-oauth2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -46,32 +46,32 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
       console.log("LinkedIn code:", code);
       setIsLoading(true); // Start loading
 
-        try {
-            const response = await axios.post(
-                "http://localhost:5000/api/auth/register/linkedinStudent",
-                { code }
-            );
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/api/auth/register/linkedinStudent",
+          { code }
+        );
 
-            if (response.data) {
-               
-                setIsRegisterSuccess(true);
-                setisRegisterSuccess(true);
-            } else {
-                throw new Error("No token received from backend");
-            }
-        } catch (error) {
-          toast.error("This Linkedin account already exists. Redirecting to login...");
-          setTimeout(() => {
-            window.location.href = "http://localhost:5173/login";
-        }, 2000);
-            console.error("Error:", error);
-        } finally {
-            // Simulate a 5-second wait
-            setTimeout(() => {
-                setIsLoading(false); // Stop loading
-            }, 5000);
+        if (response.data) {
+          setIsRegisterSuccess(true);
+          setisRegisterSuccess(true);
+        } else {
+          throw new Error("No token received from backend");
         }
-     
+      } catch (error) {
+        toast.error(
+          "This Linkedin account already exists. Redirecting to login..."
+        );
+        setTimeout(() => {
+          window.location.href = "http://localhost:5173/login";
+        }, 2000);
+        console.error("Error:", error);
+      } finally {
+        // Simulate a 5-second wait
+        setTimeout(() => {
+          setIsLoading(false); // Stop loading
+        }, 5000);
+      }
     },
     onError: (error) => {
       console.error("LinkedIn Error:", error);
@@ -112,10 +112,12 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
         setisRegisterSuccess(true);
       }
     } catch (err) {
-      toast.error("This Google account already exists. Redirecting to login...");
+      toast.error(
+        "This Google account already exists. Redirecting to login..."
+      );
       setTimeout(() => {
         window.location.href = "http://localhost:5173/login";
-    }, 2000);
+      }, 2000);
       console.error(err);
     }
   };
@@ -143,10 +145,12 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
         setisRegisterSuccess(true);
       }
     } catch (err) {
-      toast.error("This Github account already exists. Redirecting to login...");
+      toast.error(
+        "This Github account already exists. Redirecting to login..."
+      );
       setTimeout(() => {
         window.location.href = "http://localhost:5173/login";
-    }, 2000);
+      }, 2000);
       console.error(err);
     }
   };
@@ -193,41 +197,57 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
   //Controle de saisie
   const validateForm = () => {
     const newErrors = {};
-  
-    // Validate first name: strictly letters and minimum 3 characters
-    if (!/^[A-Za-z]{3,}$/.test(formData.firstName.trim())) {
-      newErrors.firstName = "First name must be at least 3 letters and contain only letters.";
+
+    // First name validation
+    if (
+      !/^(?!\s)(?!.*\s$)(?=.*[a-zA-Z])[a-zA-Z'-]+(?:\s+[a-zA-Z'-]+)*$/.test(
+        formData.firstName.trim()
+      )
+    ) {
+      newErrors.firstName =
+        "Please enter a valid first name (e.g., John or Mary Anne)";
     }
-  
-    // Validate last name: strictly letters and minimum 3 characters
-    if (!/^[A-Za-z]{3,}$/.test(formData.lastName.trim())) {
-      newErrors.lastName = "Last name must be at least 3 letters and contain only letters.";
+
+    // Last name validation
+    if (
+      !/^(?!\s)(?!.*\s$)(?=.*[a-zA-Z])[a-zA-Z'-]+(?:\s+[a-zA-Z'-]+)*$/.test(
+        formData.lastName.trim()
+      )
+    ) {
+      newErrors.lastName =
+        "Please enter a valid last name (e.g., Smith or O'Connor)";
     }
-  
+
     // Validate email: letters/numbers / optional period + @ + letters only + . + letters only
-    if (!/^[A-Za-z]+(?:\.[A-Za-z0-9]+)?@[A-Za-z]+\.[A-Za-z]+$/
-.test(formData.email.trim())) {
-      newErrors.email = "Invalid email format (e.g., example@domain.com).";
+    if (
+      !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+        formData.email.trim()
+      )
+    ) {
+      newErrors.email = "Invalid email format (e.g., example@domain.com)";
     }
-  
+
     // Validate password: min 6 chars, at least one uppercase, one lowercase, one number, one special character
     if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters.";
     } else {
       if (!/[A-Z]/.test(formData.password)) {
-        newErrors.password = "Password must contain at least one uppercase letter.";
+        newErrors.password =
+          "Password must contain at least one uppercase letter.";
       }
       if (!/[a-z]/.test(formData.password)) {
-        newErrors.password = "Password must contain at least one lowercase letter.";
+        newErrors.password =
+          "Password must contain at least one lowercase letter.";
       }
       if (!/\d/.test(formData.password)) {
         newErrors.password = "Password must contain at least one number.";
       }
       if (!/[^A-Za-z0-9]/.test(formData.password)) {
-        newErrors.password = "Password must contain at least one special character.";
+        newErrors.password =
+          "Password must contain at least one special character.";
       }
     }
-  
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // Returns true if no errors
   };
@@ -240,44 +260,55 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
       // Field-specific validation
       switch (name) {
         case "firstName":
-          newErrors.firstName = !/^[A-Za-z]{3,}$/.test(value.trim())
-            ? "First name must be at least 3 letters and contain only letters."
-            : "";
+          newErrors.firstName =
+            !/^(?!\s)(?!.*\s$)(?=.*[a-zA-Z])[a-zA-Z'-]+(?:\s+[a-zA-Z'-]+)*$/.test(
+              value.trim()
+            )
+              ? "Invalid firstName, must be at least 3 characters (required)"
+              : "";
           break;
-      
+
         case "lastName":
-          newErrors.lastName = !/^[A-Za-z]{3,}$/.test(value.trim())
-            ? "Last name must be at least 3 letters and contain only letters."
-            : "";
+          newErrors.lastName =
+            !/^(?!\s)(?!.*\s$)(?=.*[a-zA-Z])[a-zA-Z'-]+(?:\s+[a-zA-Z'-]+)*$/.test(
+              value.trim()
+            )
+              ? "Invalid lastname, must be at least 3 characters (required)"
+              : "";
           break;
-      
+
         case "email":
-          newErrors.email = !/^[A-Za-z]+(?:\.[A-Za-z0-9]+)?@[A-Za-z]+\.[A-Za-z]+$/
-.test(value.trim())
-            ? "Invalid email format (e.g., example@domain.com)."
-            : "";
+          newErrors.email =
+            !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+              value.trim()
+            )
+              ? "Invalid email format (e.g., example@domain.com)."
+              : "";
           break;
-      
+
         case "password":
           if (value.length < 6) {
             newErrors.password = "Password must be at least 6 characters.";
           } else if (!/[A-Z]/.test(value)) {
-            newErrors.password = "Password must contain at least one uppercase letter.";
+            newErrors.password =
+              "Password must contain at least one uppercase letter.";
           } else if (!/[a-z]/.test(value)) {
-            newErrors.password = "Password must contain at least one lowercase letter.";
+            newErrors.password =
+              "Password must contain at least one lowercase letter.";
           } else if (!/\d/.test(value)) {
             newErrors.password = "Password must contain at least one number.";
           } else if (!/[^A-Za-z0-9]/.test(value)) {
-            newErrors.password = "Password must contain at least one special character.";
+            newErrors.password =
+              "Password must contain at least one special character.";
           } else {
             newErrors.password = ""; // No errors
           }
           break;
-      
+
         default:
           break;
       }
-      
+
       return newErrors;
     });
   };
@@ -300,7 +331,9 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
       );
 
       if (response.data) {
-        navigate("/verify-email");
+        navigate("/verify-email", {
+          state: { email: formData.email, source: "registration" },
+        });
         setisRegisterSuccess(true);
       }
     } catch (err) {
@@ -497,7 +530,6 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
                 style={{ cursor: "pointer" }}
               />
             </div>
-           
           </div>
           <p>
             Already have an account?{" "}
@@ -506,7 +538,6 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
             </a>
           </p>
         </div>
-      
       </div>
     </>
   );

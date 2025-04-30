@@ -8,8 +8,6 @@ const User = new Schema({
   email: { type: String, unique: true },
   password: String,
   image: { type: String, default: null },
-  mfaEnabled: { type: Boolean, default: false },
-  mfaSecret: { type: String, default: null },
   phone: { type: String, default: null },
   Bio: { type: String, default: null },
   badges: [{
@@ -26,12 +24,6 @@ const User = new Schema({
       verificationCode: String,
       pdfUrl: { type: String, default: null },
     }
-  ],
-  backupCodes: [
-    {
-      code: { type: String, required: true },
-      used: { type: Boolean, default: false },
-    },
   ],
   skils: { type: [String], default: [] },
   profilePhoto: { type: String, default: null },
@@ -55,6 +47,25 @@ const User = new Schema({
     region: String,
     country: String,
     loggedInAt: Date
+  },
+  mfa: {
+    enabled: { type: Boolean, default: false },
+    secret: { type: String, default: null },
+    backupCodes: [
+      {
+        code: { type: String, required: true },
+        used: { type: Boolean, default: false },
+      },
+    ],
+    trustedDevices: [
+      {
+        deviceId: { type: String, required: true },
+        addedAt: { type: Date, default: Date.now },
+        expiresAt: { type: Date, required: true },
+        browser: { type: String },
+        os: { type: String },
+      },
+    ],
   },
   isActive: {
     type: Boolean,
@@ -86,15 +97,15 @@ User.pre("save", async function (next) {
 
   // Check if the password is already hashed (starts with $2b$ or $2a$ for bcrypt)
   if (this.password.startsWith("$2b$") || this.password.startsWith("$2a$")) {
-    console.log("Password is already hashed, skipping hashing")
+    //console.log("Password is already hashed, skipping hashing")
     return next()
   }
 
   try {
-    console.log("Hashing password...")
+    //console.log("Hashing password...")
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
-    console.log("Password hashed successfully")
+    //console.log("Password hashed successfully")
     next()
   } catch (err) {
     console.error("Error hashing password:", err)

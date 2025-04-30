@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { useProfileStore } from "../store/profileStore";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./VerifyEmail.css";
+import Preloader from "../components/Preloader/Preloader";
+import { useAuthStore } from "../store/authStore";
 
 const VerifyEmail = () => {
   const navigate = useNavigate();
-  const { user } = useProfileStore();
+  const { state } = useLocation();
+  const email = state?.email;
+  const source = state?.source;
+  const [isValid, setIsValid] = useState(false);
   const [verificationCode, setVerificationCode] = useState([
     "",
     "",
@@ -20,11 +24,29 @@ const VerifyEmail = () => {
   const [resendDisabled, setResendDisabled] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const inputRefs = useRef([]);
+  const { login } = useAuthStore();
 
-  // Handle input change for verification code
+  useEffect(() => {
+    const navEmail = state?.email;
+    if (navEmail) {
+      setIsValid(true);
+    } else {
+      navigate("/");
+    }
+  }, [navigate, state]);
+
+  // Countdown timer for resend button
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (countdown === 0 && resendDisabled) {
+      setResendDisabled(false);
+    }
+  }, [countdown, resendDisabled]);
+
   const handleCodeChange = (index, value) => {
     if (value.length > 1) {
-      // If pasting multiple digits, distribute them across inputs
       const digits = value.split("").slice(0, 6 - index);
       const newCode = [...verificationCode];
 
@@ -35,37 +57,29 @@ const VerifyEmail = () => {
       });
 
       setVerificationCode(newCode);
-
-      // Focus on the next empty input or the last one
       const nextIndex = Math.min(index + digits.length, 5);
       if (nextIndex < 6) {
         inputRefs.current[nextIndex].focus();
       }
     } else {
-      // Handle single digit input
       const newCode = [...verificationCode];
       newCode[index] = value;
       setVerificationCode(newCode);
-
-      // Auto-focus next input if current one is filled
       if (value && index < 5) {
         inputRefs.current[index + 1].focus();
       }
     }
   };
 
-  // Handle key press for backspace navigation
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && !verificationCode[index] && index > 0) {
       inputRefs.current[index - 1].focus();
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const code = verificationCode.join("");
-
     if (code.length !== 6) {
       setStatus({
         type: "error",
@@ -73,41 +87,43 @@ const VerifyEmail = () => {
       });
       return;
     }
-
     setIsLoading(true);
     setStatus({ type: "info", message: "Verifying your email..." });
-
     try {
-      await axios.post("http://localhost:5000/api/auth/verify-email", {
-        email: user.email,
-        verificationCode: code,
-      });
-
-      setStatus({
-        type: "success",
-        message:
-          "Email verified successfully! Redirecting you to the dashboard...",
-      });
-
-      // Send confirmation email
-      try {
-        await axios.post(
-          "http://localhost:5000/api/send-verification-confirmation",
-          {
-            email: user.email,
-          }
-        );
-      } catch (error) {
-        console.error("Error sending confirmation email:", error);
-        // Non-critical error, don't show to user
-      }
-
-      // Redirect after a short delay to show success message
-      setTimeout(() => {
-        navigate("/signup", {
-          state: { isRegisterSuccess: true },
+      const responseVerification = await axios.post(
+        "http://localhost:5000/api/auth/verify-email",
+        {
+          email: email,
+          verificationCode: code,
+          source: source,
+        }
+      );
+      if (responseVerification) {
+        setStatus({
+          type: "success",
+          message:
+            "Email verified successfully! Redirecting you to the dashboard...",
         });
-      }, 2000);
+        try {
+          await axios.post(
+            "http://localhost:5000/api/send-verification-confirmation",
+            {
+              email: email,
+            }
+          );
+        } catch (error) {
+          console.error("Error sending confirmation email:", error);
+        }
+        setTimeout(async () => {
+          if (source === "login") {
+            await login(responseVerification.data);
+          } else {
+            navigate("/signup", {
+              state: { isRegisterSuccess: true },
+            });
+          }
+        }, 2000);
+      }
     } catch (error) {
       setStatus({
         type: "error",
@@ -126,7 +142,7 @@ const VerifyEmail = () => {
 
     try {
       await axios.post("http://localhost:5000/api/auth/resend-verification", {
-        email: user.email,
+        email: email,
       });
 
       setStatus({
@@ -134,11 +150,9 @@ const VerifyEmail = () => {
         message: "A new verification code has been sent to your email",
       });
 
-      // Reset verification code inputs
       setVerificationCode(["", "", "", "", "", ""]);
       inputRefs.current[0].focus();
 
-      // Start countdown for resend button (60 seconds)
       setCountdown(60);
     } catch (error) {
       setStatus({
@@ -149,15 +163,9 @@ const VerifyEmail = () => {
     }
   };
 
-  // Countdown timer for resend button
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (countdown === 0 && resendDisabled) {
-      setResendDisabled(false);
-    }
-  }, [countdown, resendDisabled]);
+  if (!isValid) {
+    return <Preloader />;
+  }
 
   return (
     <div className="verify-email-container">
@@ -182,7 +190,7 @@ const VerifyEmail = () => {
           </div>
           <h1>Verify Your Email</h1>
           <p className="email-info">
-            We have sent a verification code to <strong>{user?.email}</strong>
+            We have sent a verification code to <strong>{email}</strong>
           </p>
         </div>
 

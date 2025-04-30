@@ -41,13 +41,23 @@ export const useProfileStore = create((set, get) => ({
   },
   toggleMFA: () => {
     set((state) => ({
-      user: { ...state.user, mfaEnabled: !state.user.mfaEnabled, backupCodes: [] },
+      user: {
+        ...state.user, mfa: {
+          ...state.user.mfa,
+          enabled: !state.user.mfa?.enabled,
+          backupCodes: [],
+        },
+      },
     }));
-    console.log("MFA toggled");
   },
-  setBackupCodes: (newbackupCodes) => {
+  setBackupCodes: (newBackupCodes) => {
     set((state) => ({
-      user: { ...state.user, backupCodes: newbackupCodes },
+      user: {
+        ...state.user, mfa: {
+          ...state.user.mfa,
+          backupCodes: newBackupCodes,
+        },
+      },
     }));
   },
   updateProfilePhoto: (photo) => {

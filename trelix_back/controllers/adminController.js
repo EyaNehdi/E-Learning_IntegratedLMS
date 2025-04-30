@@ -60,12 +60,11 @@ const deleteUser = async (req, res) => {
 const getAuditLogs = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 50;
-        const logs = await ActivityLog.find()
+        const logs = await ActivityLog.find({ target: { $ne: 'Auth' } })
             .sort({ createdAt: -1 })
             .limit(limit)
             .populate('user', '_id firstName lastName')
             .lean();
-        console.log(logs);
 
         res.status(200).json(logs);
     } catch (error) {
@@ -113,7 +112,7 @@ const unarchiveUser = async (req, res) => {
 const countStudents = async (req, res) => {
     try {
         const count = await User.countDocuments({ role: "student" });
-        console.log("Students : ",count);
+        console.log("Students : ", count);
         res.status(200).json({ count });
     } catch (error) {
         console.error("Error counting students:", error);
@@ -132,23 +131,113 @@ const countInstructors = async (req, res) => {
 const getInstructors = async (req, res) => {
     try {
         const instructors = await User.find({ role: "instructor" })
-            .select("firstName lastName email role isActive accountCreatedAt");
+            .select("firstName lastName email role isActive accountCreatedAt skils profilePhoto Bio");
         res.status(200).json(instructors);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
 };
 
+// In your user routes file
+const UserStats = async (req, res) => {
+    try {
+        const total = await User.countDocuments();
+        const students = await User.countDocuments({ role: 'student' });
+        const instructors = await User.countDocuments({ role: 'instructor' });
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        const previousTotal = await User.countDocuments({
+            accountCreatedAt: { $lt: oneWeekAgo }
+        });
 
-module.exports = { getUsers,
-     getUserById, 
-     createUser,
-      updateUser,
-       deleteUser,
-        getAuditLogs,
-         archiveUser,
-          unarchiveUser,
-           countStudents ,
-countInstructors,
-getInstructors
- };
+        const growth = total - previousTotal;
+        const growthPercentage = previousTotal > 0
+            ? ((growth / previousTotal) * 100).toFixed(1)
+            : 100;
+        return res.json({
+            total,
+            students,
+            instructors,
+            growth,
+            growthPercentage
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Error fetching user stats' });
+    }
+};
+
+const RegistrationStats = async (req, res) => {
+    try {
+        const days = parseInt(req.query.days) || 30;
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - days);
+        startDate.setHours(0, 0, 0, 0);
+
+        const result = await User.aggregate([
+            {
+                $match: {
+                    accountCreatedAt: { $gte: startDate },
+                    role: { $in: ["student", "instructor"] }
+                }
+            },
+            {
+                $project: {
+                    date: {
+                        $dateToString: { format: "%Y-%m-%d", date: "$accountCreatedAt" }
+                    },
+                    role: 1
+                }
+            },
+            {
+                $group: {
+                    _id: "$date",
+                    count: { $sum: 1 },
+                    roles: {
+                        $push: "$role"
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    roles: {
+                        student: { $size: { $filter: { input: "$roles", as: "role", cond: { $eq: ["$$role", "student"] } } } },
+                        instructor: { $size: { $filter: { input: "$roles", as: "role", cond: { $eq: ["$$role", "instructor"] } } } }
+                    }
+                }
+            },
+            {
+                $sort: { "_id": 1 }
+            },
+            {
+                $project: {
+                    date: "$_id",
+                    count: 1,
+                    roles: 1,
+                    _id: 0
+                }
+            }
+        ]);
+
+        res.json(result);
+    } catch (error) {
+        console.error("Error fetching registration trends:", error);
+        res.status(500).json({ message: "Error fetching registration trends" });
+    }
+};
+
+
+module.exports = {
+    getUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser,
+    getAuditLogs,
+    archiveUser,
+    unarchiveUser,
+    countStudents,
+    countInstructors,
+    getInstructors,
+    UserStats,
+    RegistrationStats
+};

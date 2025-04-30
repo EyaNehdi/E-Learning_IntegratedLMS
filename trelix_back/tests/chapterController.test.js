@@ -1,9 +1,9 @@
-const { getChapters, createChapter, updateChapter, deleteChapter, assignChapters, getChaptersByCourse } = require('../../controllers/chapterController');
-const Chapter = require('../../models/chapterModels');
-const Course = require('../../models/course');
+const { getChapters, createChapter, updateChapter, deleteChapter, assignChapters, getChaptersByCourse } = require('../controllers/chapterController');
+const Chapter = require('../models/chapterModels');
+const Course = require('../models/course');
 
-jest.mock('../../models/chapterModels');
-jest.mock('../../models/course');
+jest.mock('../models/chapterModels');
+jest.mock('../models/course');
 
 const mockRes = () => {
   const res = {};

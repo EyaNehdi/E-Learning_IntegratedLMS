@@ -11,8 +11,7 @@ const socketIo = require('socket.io');
 const preference = require("./routes/preference");
 const intelligentRecommendationRoutes = require("./routes/intelligentRecommendation");
 
-
-
+const Goal = require('./models/calanderGoal'); // Assurez-vous que le chemin est correct
 
 
 // Correction des imports pour Google Classroom
@@ -62,6 +61,10 @@ app.post('/createRoom', async (req, res) => {
     res.status(500).json({ error: "Erreur serveur lors de la création" });
   }
 });
+
+
+// POST /api/goals
+
 
 
 
@@ -137,8 +140,8 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-  console.log('Session:', req.session);
-  console.log('Session ID:', req.sessionID);
+  // console.log('Session:', req.session);
+  // console.log('Session ID:', req.sessionID);
   next();
 });
 app.use(cors({
@@ -187,10 +190,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 // Middleware de logging pour déboguer les requêtes
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+//   next();
+// });
 
 
 // In app.js
@@ -236,6 +239,7 @@ const authRoutes = require('./routes/authRoutes');
 const authRoutesIA = require('./routes/ia');
 const certifRoutes = require('./routes/certif.routes');
 const badgesRoutes = require('./routes/badge.routes');
+const logRoutes = require('./routes/log.routes');
 app.use('/api/auth', authRoutes);
 app.use('/ia/auth', authRoutesIA);
 app.use('/chapter', authRouteschapter);
@@ -245,6 +249,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/quiz", quizzRoutes);
 app.use("/certificates", certifRoutes);
 app.use("/api/badges-r", badgesRoutes);
+app.use("/api/logs", logRoutes);
 
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
@@ -287,8 +292,72 @@ app.get('/api/courses', async (req, res) => {
       res.status(500).json({ error: 'Failed to fetch courses' });
   }
 });
+app.post('/api/goals', async (req, res) => {
+  try {
+    const newGoal = new Goal(req.body);
+    const savedGoal = await newGoal.save();
+    res.status(201).json(savedGoal);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.get('/api/goals', async (req, res) => {
+  try {
+    const goals = await Goal.find().sort({ date: 1 });
+    res.json(goals);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.put('/api/goals/:id', async (req, res) => {
+  try {
+    const updatedGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
+      new: true, // return updated document
+      runValidators: true,
+    });
 
+    if (!updatedGoal) {
+      return res.status(404).json({ error: 'Goal not found' });
+    }
 
+    res.json(updatedGoal);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+app.delete('/api/goals/:id', async (req, res) => {
+  try {
+    const deletedGoal = await Goal.findByIdAndDelete(req.params.id);
+
+    if (!deletedGoal) {
+      return res.status(404).json({ error: 'Goal not found' });
+    }
+
+    res.json({ message: 'Goal deleted successfully', id: req.params.id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.put('/api/goals/:id', async (req, res) => {
+  try {
+    const goal = await Goal.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    if (!goal) {
+      return res.status(404).json({ error: 'Goal not found' });
+    }
+
+    res.json({ message: 'Goal updated successfully', goal });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+const words = ["apple", "brain", "chair", "dream", "eagle"]; // Ideally from MongoDB!
+
+app.get('/api/wordle/word', (req, res) => {
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+    res.json({ word: randomWord });
+});
 app.get('/api/courses/:id/contents', async (req, res) => {
   try {
       const courseId = parseInt(req.params.id, 10);

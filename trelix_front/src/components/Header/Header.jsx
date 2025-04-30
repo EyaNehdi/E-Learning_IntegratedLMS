@@ -343,6 +343,7 @@ function Header() {
                           </a>
                         </li>
 
+
                         <li className="nav-item dropdown">
                           <a
                             href="/leaderboard"
