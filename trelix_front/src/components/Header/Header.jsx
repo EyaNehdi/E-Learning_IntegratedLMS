@@ -328,7 +328,21 @@ function Header() {
                             </li>
                           </ul>
                         </li>
-          
+                        <li className="nav-item dropdown">
+                          <a
+                            href="/chart"
+                            role="button"
+                            className="nav-link px-3 px-xl-4"
+                            style={{
+                              paddingInline: "40px",
+                              fontWeight: "bold",
+                              fontSize: "20px",
+                            }}
+                          >
+                            Statistics
+                          </a>
+                        </li>
+
 
                         <li className="nav-item dropdown">
                           <a
@@ -642,4 +656,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default Header;  

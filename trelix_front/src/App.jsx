@@ -53,8 +53,13 @@ import ManageUser from "./components/Admin/ManageUser";
 import ManageBadges from "./components/Admin/ManageBadges";
 import BadgeFeature from "./pages/Admin/BadgeFeature";
 import ListBadges from "./components/Admin/ListBadges";
-import StatPreference from "./components/Student/preference-statistics";
-import Preference from "./components/Student/AddPreference";
+import StatPreference from "./components/Student/preference-statistics" 
+import Preference from "./components/Student/AddPreference"
+import IntelligentCourses from "./components/Student/IntelligentCourses"
+
+
+
+
 
 import React, { useState } from "react";
 import axios from "axios";
@@ -83,9 +88,56 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
 import AuditPage from "./pages/Admin/AuditPage.jsx";
 import MfaSetup from "./components/MfaSetup/MfaSetup.jsx";
+
+
+const Chatbot = () => {
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+
+
+
+    setIsLoading(true);
+    // Ajout du message utilisateur immédiatement
+    setMessages((prev) => [...prev, { sender: "user", text: input }]);
+    setInput("");
+ 
+
+  return (
+    <div className="chat-container">
+      <div className="messages">
+        {messages.map((msg, i) => (
+          <div key={i} className={`message ${msg.sender}`}>
+            <strong>{msg.sender === "user" ? "Vous" : "Trelix"}:</strong>{" "}
+            {msg.text}
+          </div>
+        ))}
+        {isLoading && (
+          <div className="message Trelix">
+            <strong>Trelix:</strong> Réflexion en cours...
+          </div>
+        )}
+      </div>
+      <form onSubmit={handleSubmit} className="chat-form">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Posez votre question..."
+          disabled={isLoading}
+        />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Envoi..." : "Envoyer"}
+        </button>
+      </form>
+    </div>
+  );
+};
 import WordleGame from "./components/Leaderboard/WordleGame.jsx";
 import StudentActions from "./components/Admin/activitytrack/StudentActions.jsx";
 import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
+
 
 
 function App() {
@@ -168,16 +220,11 @@ function App() {
               element={<EditCourse />}
             />
 
-            <Route path="/profile/classroom" element={<ClassroomPage />} />
-            <Route
-              path="/profile/classroom/courses/:courseId"
-              element={<CourseDetailsPage />}
-            />
-            <Route path="/profile/preference" element={<Preference />} />
-            <Route
-              path="/profile/preferencestat"
-              element={<StatPreference />}
-            />
+             <Route path="/profile/classroom" element={<ClassroomPage />} />
+          <Route path="/profile/classroom/courses/:courseId" element={<CourseDetailsPage />} />
+          <Route path="/profile/preference" element={<Preference />} />
+          <Route path="/profile/preferencestat" element={<StatPreference />} />
+          <Route path="/profile/intelligent-courses" element={<IntelligentCourses />} />
 
             <Route path="/profile/allcours" element={<Allcourse />} />
             <Route
