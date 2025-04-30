@@ -858,3 +858,5 @@ Education transforms closed minds into open ones. It requires effort, but its fr
 };
 
 export default Index;
+
+
