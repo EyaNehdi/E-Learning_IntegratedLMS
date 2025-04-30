@@ -55,6 +55,10 @@ import BadgeFeature from "./pages/Admin/BadgeFeature";
 import ListBadges from "./components/Admin/ListBadges";
 import StatPreference from "./components/Student/preference-statistics" 
 import Preference from "./components/Student/AddPreference"
+import IntelligentCourses from "./components/Student/IntelligentCourses"
+
+
+
 
   
 
@@ -100,44 +104,7 @@ const Chatbot = () => {
     // Ajout du message utilisateur immédiatement
     setMessages((prev) => [...prev, { sender: "user", text: input }]);
     setInput("");
-
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/chatbot",
-        { question: input },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      // Utilisez reply au lieu de text pour correspondre au backend
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "Trelix",
-          text: res.data.reply || res.data.text || "Pas de réponse",
-        },
-      ]);
-    } catch (err) {
-      console.error("Erreur détaillée:", {
-        status: err.response?.status,
-        data: err.response?.data,
-        message: err.message,
-      });
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "Trelix",
-          text: err.response?.data?.error || "Erreur de connexion au serveur",
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ 
 
   return (
     <div className="chat-container">
@@ -252,7 +219,7 @@ function App() {
           <Route path="/profile/classroom/courses/:courseId" element={<CourseDetailsPage />} />
           <Route path="/profile/preference" element={<Preference />} />
           <Route path="/profile/preferencestat" element={<StatPreference />} />
-
+          <Route path="/profile/intelligent-courses" element={<IntelligentCourses />} />
             <Route path="/profile/allcours" element={<Allcourse />} />
             <Route
               path="assgnedQuizToChapter"

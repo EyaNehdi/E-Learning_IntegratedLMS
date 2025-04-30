@@ -339,7 +339,7 @@ function Header() {
                               fontSize: "20px",
                             }}
                           >
-                            Statistical
+                            Statistics
                           </a>
                         </li>
 
@@ -470,6 +470,11 @@ function Header() {
                                 </li>
                                 {user?.role === "student" && (
                                   <li>
+                                   
+                                  </li>
+                                 
+                                )}
+                                 <li>
                                     <a
                                       className={isActive("/certificates") ? "nav-link active" : "nav-link"}
                                       href="/certificates"
@@ -478,7 +483,6 @@ function Header() {
                                       <span>View Certificates</span>
                                     </a>
                                   </li>
-                                )}
 
                                 {user?.role === "instructor" && (
                                   <>
@@ -522,10 +526,24 @@ function Header() {
                                 )}
 
                                 <li className="border-bottom" />
+
+
+                                {user?.role === "admin" && (
+                                  <li>
+                                    <a
+                                    className="nav-link"
+                                    href="/admin"
+                                  >
+                                    <i className="feather-icon icon-home" />
+                                    <span>Dashboard Admin</span>
+                                  </a>
+                                  </li>
+                                 
+                                )}
                                 <li>
                                   <a
                                     className="nav-link"
-                                    href="instructor-settings.html"
+                                    href="/profile/settings"
                                   >
                                     <i className="feather-icon icon-settings" />
                                     <span>Settings</span>
@@ -533,8 +551,8 @@ function Header() {
                                 </li>
                                 <li>
                                   <a
-                                    className="nav-link"
-                                    href="#"
+                                    className="nav-link cursor-pointer"
+                                    
                                     onClick={handleLogout}
                                   >
                                     <i className="feather-icon icon-log-out" />
@@ -590,6 +608,7 @@ function Header() {
                             className="btn fs-6 fs-md-5 fs-lg-4"
                             style={{
                               backgroundColor: "#6045FF",
+                              color: "white",
                               whiteSpace: "nowrap",
                             }}
                           >
@@ -600,6 +619,7 @@ function Header() {
                             className="btn fs-6 fs-md-5 fs-lg-4"
                             style={{
                               backgroundColor: "#6045FF",
+                              color: "white",
                               whiteSpace: "nowrap",
                             }}
                           >
@@ -635,4 +655,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default Header;  
