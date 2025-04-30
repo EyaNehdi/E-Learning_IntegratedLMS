@@ -1,0 +1,18 @@
+# Ignorer les dépendances Node.js
+node_modules/
+
+# Ignorer les fichiers de build (si vous utilisez un bundler comme Webpack)
+dist/
+build/
+
+# Ignorer les fichiers de configuration locaux
+.env
+.env.local
+
+# Ignorer les fichiers de logs
+*.log
+npm-debug.log*
+
+# Ignorer les fichiers temporaires
+*.tmp
+*.temp
