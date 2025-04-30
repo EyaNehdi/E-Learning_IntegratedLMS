@@ -270,36 +270,37 @@ const ProfileDetails = () => {
               <div className="flex justify-between gap-4 mt-6">
                 {/* Edit/Save Button */}
                 <button
-                  onClick={toggleEdit}
-                  className="btn fs-6 fs-md-5 fs-lg-4 px-6 py-2 rounded-lg flex items-center justify-center"
-                  style={{
-                    backgroundColor: "#6045FF",
-                    color: "white",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {isEditing ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      <FaSave className="mr-2" /> Save Profile
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      <FaEdit className="mr-2" /> Edit Profile
-                    </div>
-                  )}
-                </button>
+  onClick={toggleEdit}
+  className="btn fs-6 fs-md-5 fs-lg-4 px-8 py-2 rounded-lg flex items-center justify-center"
+  style={{
+    backgroundColor: "#6045FF",
+    color: "white",
+    whiteSpace: "nowrap",
+    minWidth: "150px", // Ensures the button is wide enough
+  }}
+>
+  {isEditing ? (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        whiteSpace: "nowrap",
+      }}
+    >
+      <FaSave className="mr-2" /> Save Profile
+    </div>
+  ) : (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        whiteSpace: "nowrap",
+      }}
+    >
+      <FaEdit className="mr-2" /> Edit Profile
+    </div>
+  )}
+</button>
 
                 {/* CV Upload Button */}
                 <button
