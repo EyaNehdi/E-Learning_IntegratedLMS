@@ -87,6 +87,7 @@ import WordleGame from "./components/Leaderboard/WordleGame.jsx";
 import StudentActions from "./components/Admin/activitytrack/StudentActions.jsx";
 import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
 
+
 function App() {
   return (
     <Router>
