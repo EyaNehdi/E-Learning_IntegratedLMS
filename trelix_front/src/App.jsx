@@ -143,7 +143,7 @@ import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
 function App() {
   return (
     <Router>
-      <ChatComponent />
+      
       <Routes>
         {/* **************** */}
         

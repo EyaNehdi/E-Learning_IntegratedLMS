@@ -5,6 +5,7 @@ import Preloader from "../components/Preloader/Preloader";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import ViewSwitcher from "../components/ViewSwitcher";
+import ChatComponent from "../components/ChatComponent";
 const ProtectedRoute = () => {
   const { isAuthenticated, isCheckingAuth, checkAuth ,user} = useAuthStore();
 
@@ -18,6 +19,7 @@ const ProtectedRoute = () => {
         <Preloader />
       ) : isAuthenticated ? (
         <>
+        <ChatComponent />
         {isAdmin && <ViewSwitcher isAdmin={isAdmin} />}
           <Header />
           <Outlet />

@@ -127,7 +127,7 @@ const SimplePDFViewer = ({ pdfUrl, onProgressChange, onComplete }) => {
           Course PDF Document
         </h3>
         <div className="flex items-center">
-          <div className="w-full bg-gray-200 rounded-full h-2 w-40 mr-2">
+          <div className="bg-gray-200 rounded-full h-2 w-40 mr-2">
             <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${scrollPosition}%` }}
