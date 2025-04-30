@@ -82,7 +82,8 @@ import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
 import AuditPage from "./pages/Admin/AuditPage.jsx";
-
+import MfaSetup from "./components/MfaSetup/MfaSetup.jsx";
+import WordleGame from "./components/Leaderboard/WordleGame.jsx";
 import StudentActions from "./components/Admin/activitytrack/StudentActions.jsx";
 import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
 
@@ -92,6 +93,7 @@ function App() {
       <ChatComponent />
       <Routes>
         {/* **************** */}
+        
         {/* Public routes */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<Index />} />
@@ -136,6 +138,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
+            <Route path="test" element={<WordleGame />} />
 
             <Route path="geminichat" element={<GeminiChatbot />} />
             <Route path="chat" element={<ChatComponent />} />
