@@ -20,6 +20,7 @@ const Headeradmin = () => {
     { path: "/admin", icon: "lnr-users", label: "Users" },
     { path: "/monitor", icon: "lnr-layers", label: "Monitoring" },
     { path: "/report", icon: "lnr-rocket", label: "Quizzes" },
+    { path: "/storeAdmin", icon: "lnr-cart", label: "Store Management" },
 
     { path: "/badge", icon: "lnr-rocket", label: "Gamification" },
     { path: "/home", icon: "lnr-home", label: "Return Home" },

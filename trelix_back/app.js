@@ -90,8 +90,10 @@ const adminRoutes = require("./routes/adminRoutes");
 const quizzRoutes = require("./routes/quizzRoutes");
 const Module = require("./routes/module");
 const Course = require("./routes/course");
+const Stripe = require("./routes/stripe.routes");
+const StripeRaw = require("./routes/stripe.routes");
 
-
+app.use('/stripe/raw', StripeRaw);
 
 var app = express();
 
@@ -219,6 +221,7 @@ app.use('/courses', Course);
 app.use('/delete', Course);
 app.use('/preference',preference);
 app.use('/intelligent-recommendation', intelligentRecommendationRoutes);
+app.use('/stripe', Stripe);
 
 
 
