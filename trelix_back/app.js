@@ -384,6 +384,54 @@ app.get('/api/courses/:id/contents', async (req, res) => {
 
 });
 
+const Review = require("./models/Review"); // Your Mongoose model
+
+
+// POST /api/reviews/add
+app.post("/api/reviews/add", async (req, res) => {
+  try {
+    const { chapterId, rating, comment, userId } = req.body;
+
+    if (!chapterId || !rating || !comment || !userId) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    const review = new Review({
+      chapterId,
+      rating,
+      comment,
+      userId,
+      createdAt: new Date(),
+    });
+
+    await review.save();
+
+    res.status(201).json(review);
+  } catch (err) {
+    console.error("Failed to submit review:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+// GET /api/reviews/chapter/:id
+app.get("/api/reviews/chapter/:id", async (req, res) => {
+  try {
+    const reviews = await Review.find({ chapterId: req.params.id })
+      .populate("userId", "firstName lastName profilePhoto");
+
+    const formatted = reviews.map((review) => ({
+      ...review._doc,
+      user: review.userId,
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error("Error fetching reviews:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+
 // catch 404 and forward to error handler
 
 app.use(function(req, res, next) {
@@ -415,6 +463,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 
 
 
