@@ -671,8 +671,9 @@ function Header() {
                                 {user?.firstName} {user?.lastName}{" "}
                               </span>
                             </Tooltip>
-                            {" "}
-                             🪙 {user?.balance } Trelix Coins
+                           
+                            <span>&nbsp;             🪙 {user?.balance}</span>
+
                           </div>
                         ) : (
                           <></>
