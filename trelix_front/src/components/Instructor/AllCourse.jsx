@@ -4,6 +4,10 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import Box from "@mui/material/Box"
 import Slider from "@mui/material/Slider"
+import { useNavigate } from "react-router-dom"
+import Swal from "sweetalert2"
+import { useAuthStore } from "../../store/authStore";
+import { Lock, Unlock } from "lucide-react";
 
 const MAX = 50
 const MIN = 0
@@ -27,6 +31,7 @@ function Allcourse() {
   const [likedCourses, setLikedCourses] = useState({})
   const [userLikedCourseIds, setUserLikedCourseIds] = useState([])
   const [animatingHearts, setAnimatingHearts] = useState({})
+  const [courseAccess, setCourseAccess] = useState({})
 
   const currentUserId = "user123" // à remplacer dynamiquement
 
@@ -64,6 +69,26 @@ function Allcourse() {
     fetchCourses()
     fetchUserLikes()
   }, [])
+  useEffect(() => {
+    const checkCoursesAccess = async () => {
+      if (!courses.length) return
+      const access = {}
+      for (const course of courses) {
+        try {
+          const response = await axios.get(`http://localhost:5000/purchases/access/${course._id}`, {
+            withCredentials: true,
+          })
+          access[course._id] = response.data.hasAccess
+        } catch (err) {
+          console.error(`Error checking access for course ${course._id}:`, err)
+          access[course._id] = false
+        }
+      }
+      setCourseAccess(access)
+      console.log("Course access:", access)
+    }
+    checkCoursesAccess()
+  }, [courses])
 
   useEffect(() => {
     let filtered = courses
@@ -158,6 +183,71 @@ function Allcourse() {
 
   const categories = Array.from(new Set(courses.map((course) => course.categorie)))
   const levels = Array.from(new Set(courses.map((course) => course.level)))
+const navigate = useNavigate();
+const { checkAuth, user } = useAuthStore();
+
+  const handleEnroll = async (course) => {
+    if (course.price === 0 || courseAccess[course._id]) {
+      console.log(`Accessing course: ${course._id}`)
+      navigate(`/chapters/${course._id}`)
+      return
+    }
+
+    // Check balance before showing purchase prompt
+    if (user.balance < course.price) {
+      Swal.fire({
+        icon: "warning",
+        title: "Insufficient Balance",
+        text: `You need ${course.price} Trelix Coins to unlock this course. Your current balance is ${user.balance} Coins.`,
+        confirmButtonText: "Go to Store",
+        showCancelButton: true,
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) navigate("/store")
+      })
+      return
+    }
+
+    // Show SweetAlert for paid, unpurchased course
+    Swal.fire({
+      title: `Purchase ${course.title}?`,
+      text: `This course costs ${course.price} Trelix Coins. Your current balance is ${user.balance} Coins.`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Purchase",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.post(
+            "http://localhost:5000/purchases/purchase",
+            { courseId: course._id },
+            { withCredentials: true }
+          )
+          console.log("Purchase response:", response.data)
+          Swal.fire({
+            icon: "success",
+            title: "Course Purchased!",
+            text: response.data.message,
+            confirmButtonText: "Go to Course",
+          }).then(() => {
+            setCourseAccess((prev) => ({ ...prev, [course._id]: true }))
+            checkAuth() // Update user balance
+            navigate(`/chapters/${course._id}`)
+          })
+        } catch (err) {
+          console.error("Purchase error:", err)
+          Swal.fire({
+            icon: "error",
+            title: "Purchase Failed",
+            text: err.response?.data?.message || "An error occurred while purchasing the course.",
+          })
+        }
+      }
+    })
+  }
 
   return (
     <div>
@@ -190,7 +280,7 @@ function Allcourse() {
 
               <aside className="sidebar sidebar-spacing">
                 <div className="widget">
-                  <h3 className="widget-title">Filtrer par popularité</h3>
+                  <h3 className="widget-title">Filter by Popularity</h3>
                   <div className="widget-inner">
                     <ul className="list-unstyled">
                       <li className="mb-2">
@@ -198,7 +288,7 @@ function Allcourse() {
                           className="btn btn-outline-primary w-100 text-start"
                           onClick={() => handlePopularityFilter("most")}
                         >
-                          Cours les plus likés
+                          Most liked Courses
                         </button>
                       </li>
                       <li className="mb-2">
@@ -206,7 +296,7 @@ function Allcourse() {
                           className="btn btn-outline-secondary w-100 text-start"
                           onClick={() => handlePopularityFilter("least")}
                         >
-                          Cours les moins likés
+                          Least liked Courses
                         </button>
                       </li>
                       <li>
@@ -214,7 +304,7 @@ function Allcourse() {
                           className="btn btn-outline-dark w-100 text-start"
                           onClick={() => handlePopularityFilter("all")}
                         >
-                          Réinitialiser le filtre
+                          Reset the filters
                         </button>
                       </li>
                     </ul>
@@ -289,7 +379,7 @@ function Allcourse() {
 
             <div className="col-lg-8">
               <div className="course-filters d-flex justify-content-between align-items-center">
-                <p>{filteredCourses.length} cours trouvés</p>
+                <p>{filteredCourses.length} Courses found.</p>
               </div>
 
               <div className="course-lists row gy-4 mt-3">
@@ -360,11 +450,23 @@ function Allcourse() {
                           </div>
                           <div className="course-footer d-flex align-items-center justify-content-between pt-3">
                             <div className="price">
-                              {course.price === 0 ? "Free" : `${course.price}$`} 
+                              {course.price === 0 ? "Free" : `${course.price}🪙`}
                             </div>
-                            <a href={`/chapters/${course._id}`}>
-                              Enroll Now <i className="feather-icon icon-arrow-right" />
-                            </a>
+                            <button
+                              onClick={() => handleEnroll(course)}
+                              className="btn btn-link p-0"
+                            >
+                              {course.price > 0 && !courseAccess[course._id] ? (
+                                <>
+                                  <Lock className="inline mr-1" size={16} /> Unlock
+                                </>
+                              ) : (
+                                <>
+                                  <Unlock className="inline mr-1" size={16} /> Access Course
+                                </>
+                              )}
+                              <i className="feather-icon icon-arrow-right ml-1" />
+                            </button>
                           </div>
                         </div>
                       </div>

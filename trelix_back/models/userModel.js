@@ -76,6 +76,10 @@ const User = new Schema({
     default: 0,
   },
   processedSessions: [{ type: String }], // Track processed Stripe session IDs
+  purchasedCourses: [{
+    courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+    purchaseDate: { type: Date, default: Date.now },
+  }]
 },
   { timestamps: true });
 // Hashing Password
