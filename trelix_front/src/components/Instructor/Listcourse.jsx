@@ -68,29 +68,29 @@ function Listcourse() {
             </button>
           </li>
           <li>
-  <a
-    href="/profile/course"
-    className="custom-btn"
-    style={{
-      backgroundColor: "#17a2b8", // Bleu clair (équivalent à btn-info)
-      color: "white",
-      padding: "8px 16px",
-      borderRadius: "50px",
-      display: "inline-flex",
-      alignItems: "center",
-      textDecoration: "none",
-      fontSize: "14px",
-      fontWeight: "bold",
-      marginLeft: "205px",
-      transition: "background-color 0.3s ease-in-out",
-    }}
-    onMouseOver={(e) => (e.target.style.backgroundColor = "#138496")} // Changement de couleur au survol
-    onMouseOut={(e) => (e.target.style.backgroundColor = "#17a2b8")}
-  >
-    <i className="feather-icon icon-plus" style={{ marginRight: "8px" }}></i>
-    Add New Course
-  </a>
-</li>
+            <a
+              href="/profile/course"
+              className="custom-btn"
+              style={{
+                backgroundColor: "#17a2b8", // Bleu clair (équivalent à btn-info)
+                color: "white",
+                padding: "8px 16px",
+                borderRadius: "50px",
+                display: "inline-flex",
+                alignItems: "center",
+                textDecoration: "none",
+                fontSize: "14px",
+                fontWeight: "bold",
+                marginLeft: "205px",
+                transition: "background-color 0.3s ease-in-out",
+              }}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "#138496")} // Changement de couleur au survol
+              onMouseOut={(e) => (e.target.style.backgroundColor = "#17a2b8")}
+            >
+              <i className="feather-icon icon-plus" style={{ marginRight: "8px" }}></i>
+              Add New Course
+            </a>
+          </li>
 
         </ul>
       </div>
@@ -102,11 +102,11 @@ function Listcourse() {
               courses
                 .filter((course) => course.user === user._id)
                 .map((course) => (
-                  <div key={course._id} className="col-xl-4 col-sm-6" style={{width: "fit-content"}}>
+                  <div key={course._id} className="col-xl-4 col-sm-6" style={{ width: "fit-content" }}>
                     <div className="course-entry-3 card rounded-2 bg-info border shadow-1">
                       <div className="card-media position-relative">
 
-                      <a href={`/profile/course-chapter/${course._id}`}>
+                        <a href={`/profile/course-chapter/${course._id}`}>
 
                           <img
                             className="card-img-top"
@@ -134,29 +134,30 @@ function Listcourse() {
                           </span>
                         </div>
                         <h3 className="sub-title my-3">
-                          <a href="single-course.html">{course.title}</a>
+                          <a href={`/profile/course-chapter/${course._id}`}>{course.title}</a>
                         </h3>
                         <div className="course-footer d-flex align-items-center justify-content-between pt-3">
                           <div className="price">
-                          {course.price === 0 ? "Gratuit" : course.price}<del>$10.00</del>
+                            {course.price === 0 ? "Gratuit" : course.price}<del>$10.00</del>
                           </div>
                           <div className="d-flex gap-2">
-  <a
-    className="btn btn-sm btn-primary d-flex align-items-center"
-    onClick={() => handleEdit(course._id)}
-  >
-    <i className="feather-icon icon-edit me-2"></i>
-    Edit
-  </a>
 
-  <a
-    className="btn btn-sm btn-danger d-flex align-items-center"
-    onClick={() => handleDelete(course._id)}
-  >
-    <i className="feather-icon icon-trash me-2"></i>
-    Delete
-  </a>
-</div>
+                            <a
+                              className="btn btn-sm btn-primary d-flex align-items-center"
+                              onClick={() => handleEdit(course._id)}
+                            >
+                              <i className="feather-icon icon-edit me-2"></i>
+                              Edit
+                            </a>
+
+                            <a
+                              className="btn btn-sm btn-danger d-flex align-items-center"
+                              onClick={() => handleDelete(course._id)}
+                            >
+                              <i className="feather-icon icon-trash me-2"></i>
+                              Delete
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>

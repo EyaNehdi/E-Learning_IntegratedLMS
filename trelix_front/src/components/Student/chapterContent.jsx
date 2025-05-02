@@ -22,10 +22,12 @@ import {
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { Progress } from "../ui/progress"
-import "./b.css";
+import "./b.css"
 
 // Import your QuizModal component
 import QuizModal from "../Quiz/QuizModal"
+import { useProfileStore } from "../../store/profileStore"
+import { censorBadWords, censorBadWordsSync } from "../../utils/content-filter"
 
 // Simpler PDF Viewer that doesn't rely on PDF.js
 const SimplePDFViewer = ({ pdfUrl, onProgressChange, onComplete }) => {
@@ -181,11 +183,14 @@ const ChapterContent = () => {
   const [translatedDescription, setTranslatedDescription] = useState("")
   const [isTranslating, setIsTranslating] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState({ code: "en", name: "English" })
-
+  const [userRating, setUserRating] = useState(0)
+  const [reviewComment, setReviewComment] = useState("")
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false)
+  const [userReviews, setUserReviews] = useState([])
+  const { user } = useProfileStore()
   // List of common languages
   const languages = [
     { code: "en", name: "English" },
-    { code: "ar", name: "Arabic" },
     { code: "fr", name: "French" },
     { code: "es", name: "Spanish" },
     { code: "de", name: "German" },
@@ -329,7 +334,7 @@ const ChapterContent = () => {
     setIsTranslating(true)
 
     try {
-      const response = await axios.post("http://localhost:8000/translate", {
+      const response = await axios.post("http://localhost:8001/translate", {
         text: text,
         source_lang: "en", // Assuming original content is in English
         target_lang: targetLang,
@@ -361,6 +366,77 @@ const ChapterContent = () => {
       setTranslatedDescription(translated)
     }
   }
+
+  // Handle review submission
+  const submitReview = async () => {
+    if (userRating === 0 || !reviewComment.trim()) {
+      return
+    }
+
+    setIsSubmittingReview(true)
+
+    try {
+      const userInfo = user
+
+      // Censor bad words in the comment
+      const censoredComment = await censorBadWords(reviewComment)
+
+      // Create the review object
+      const reviewData = {
+        chapterId: id,
+        rating: userRating,
+        comment: censoredComment, // Use the censored comment
+        userId: userInfo._id,
+      }
+
+      const response = await axios.post("http://localhost:5000/api/reviews/add", reviewData)
+
+      if (response.data) {
+        const newReview = {
+          ...reviewData,
+          userName: `${userInfo.firstName || ""} ${userInfo.lastName || ""}`.trim(),
+          userImage: userInfo.profilePhoto ? `http://localhost:5000${userInfo.profilePhoto}` : null,
+          createdAt: new Date().toISOString(),
+        }
+
+        setUserReviews([newReview, ...userReviews])
+        setUserRating(0)
+        setReviewComment("")
+        alert("Your review has been submitted successfully!")
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error)
+      alert("Failed to submit review. Please try again.")
+    } finally {
+      setIsSubmittingReview(false)
+    }
+  }
+
+  // Fetch users reviews for this chapter
+  useEffect(() => {
+    const fetchUserReviews = async () => {
+      if (!id) return
+
+      try {
+        const response = await axios.get(`http://localhost:5000/api/reviews/chapter/${id}`)
+        console.log("Fetched Reviews:", response.data)
+
+        if (response.data && Array.isArray(response.data)) {
+          const formattedReviews = response.data.map((review) => ({
+            ...review,
+            userName: `${review.user?.firstName || "Anonymous"} ${review.user?.lastName || ""}`.trim(),
+            userImage: review.user?.profilePhoto ? `http://localhost:5000${review.user.profilePhoto}` : null,
+          }))
+
+          setUserReviews(formattedReviews)
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error)
+      }
+    }
+
+    fetchUserReviews()
+  }, [id])
 
   if (loading) {
     return (
@@ -413,41 +489,45 @@ const ChapterContent = () => {
             </div>
 
             {/* Learning Card */}
+
             <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-200 flex-grow">
               {/* Check if PDF exists */}
               {currentChapter.pdf === null ? (
                 // If no PDF, show only the description
                 <div className="p-6">
                   {/* Translation button */}
-                  <div className="flex justify-end mb-4">
+                  <div className="flex justify-end">
                     <div className="relative inline-block text-left">
                       <button
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                        onClick={() => document.getElementById("language-dropdown").classList.toggle("hidden")}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                        onClick={() => document.getElementById("overview-language-dropdown").classList.toggle("hidden")}
+                        style={{ marginBottom: "0.75rem", height: "2.25rem", width: "11rem" }}
                         disabled={isTranslating}
                       >
                         {isTranslating ? (
-                          <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
                         ) : (
                           <Globe className="w-4 h-4 mr-1" />
                         )}
                         {isTranslating ? "Translating..." : "Translate"}
-                        <span className="text-xs bg-blue-100 px-2 py-0.5 rounded-full">{selectedLanguage.name}</span>
+                        <span className="text-xs bg-indigo-800 px-2 py-0.5 rounded-md">{selectedLanguage.name}</span>
                         <ChevronDown className="w-4 h-4" />
                       </button>
                       <div
-                        id="language-dropdown"
-                        className="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 py-1"
+                        id="overview-language-dropdown"
+                        className="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-10 py-1 border border-gray-200 overflow-y-auto"
+                        style={{ maxHeight: "12rem" }}
                       >
                         {languages.map((lang) => (
                           <button
                             key={lang.code}
                             onClick={() => {
                               handleTranslate(lang.code)
-                              document.getElementById("language-dropdown").classList.add("hidden")
+                              document.getElementById("overview-language-dropdown").classList.add("hidden")
                             }}
-                            className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left ${
-                              selectedLanguage.code === lang.code ? "bg-blue-50" : ""
+                            style={{ marginBottom: "0.5rem", height: "2.25rem", width: "11rem" }}
+                            className={`block px-4 py-2 text-sm text-gray-800 hover:bg-indigo-50 w-full text-left ${
+                              selectedLanguage.code === lang.code ? "bg-indigo-100" : ""
                             }`}
                           >
                             {lang.name}
@@ -620,22 +700,22 @@ const ChapterContent = () => {
             {/* Tabs Section */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
               <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="flex w-full border-b">
+                <TabsList className="flex w-full border-b border-gray-200 p-0 bg-transparent">
                   <TabsTrigger
                     value="overview"
-                    className="flex-1 py-4 px-6 text-base font-medium data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+                    className="flex-1 py-3 px-6 text-base font-medium text-black bg-blue-500 hover:bg-blue-600 transition-colors duration-200 data-[state=active]:bg-sky-100 data-[state=active]:text-blue-800 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 focus:outline-none"
                   >
                     Overview
                   </TabsTrigger>
                   <TabsTrigger
                     value="instructors"
-                    className="flex-1 py-4 px-6 text-base font-medium data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+                    className="flex-1 py-3 px-6 text-base font-medium text-black bg-blue-500 hover:bg-blue-600 transition-colors duration-200 data-[state=active]:bg-sky-100 data-[state=active]:text-blue-800 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 focus:outline-none"
                   >
                     Instructors
                   </TabsTrigger>
                   <TabsTrigger
                     value="reviews"
-                    className="flex-1 py-4 px-6 text-base font-medium data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+                    className="flex-1 py-3 px-6 text-base font-medium text-black bg-blue-500 hover:bg-blue-600 transition-colors duration-200 data-[state=active]:bg-sky-100 data-[state=active]:text-blue-800 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 focus:outline-none"
                   >
                     Reviews
                   </TabsTrigger>
@@ -650,24 +730,26 @@ const ChapterContent = () => {
                     <div className="flex justify-end">
                       <div className="relative inline-block text-left">
                         <button
-                          className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
                           onClick={() =>
                             document.getElementById("overview-language-dropdown").classList.toggle("hidden")
                           }
+                          style={{ marginBottom: "0.75rem", height: "2.25rem", width: "11rem" }}
                           disabled={isTranslating}
                         >
                           {isTranslating ? (
-                            <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
                           ) : (
                             <Globe className="w-4 h-4 mr-1" />
                           )}
                           {isTranslating ? "Translating..." : "Translate"}
-                          <span className="text-xs bg-blue-100 px-2 py-0.5 rounded-full">{selectedLanguage.name}</span>
+                          <span className="text-xs bg-indigo-800 px-2 py-0.5 rounded-md">{selectedLanguage.name}</span>
                           <ChevronDown className="w-4 h-4" />
                         </button>
                         <div
                           id="overview-language-dropdown"
-                          className="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 py-1"
+                          className="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-10 py-1 border border-gray-200 overflow-y-auto"
+                          style={{ maxHeight: "12rem" }}
                         >
                           {languages.map((lang) => (
                             <button
@@ -676,8 +758,9 @@ const ChapterContent = () => {
                                 handleTranslate(lang.code)
                                 document.getElementById("overview-language-dropdown").classList.add("hidden")
                               }}
-                              className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left ${
-                                selectedLanguage.code === lang.code ? "bg-blue-50" : ""
+                              style={{ marginBottom: "0.5rem", height: "2.25rem", width: "11rem" }}
+                              className={`block px-4 py-2 text-sm text-gray-800 hover:bg-indigo-50 w-full text-left ${
+                                selectedLanguage.code === lang.code ? "bg-indigo-100" : ""
                               }`}
                             >
                               {lang.name}
@@ -791,135 +874,156 @@ const ChapterContent = () => {
                     <div className="flex flex-col md:flex-row justify-between gap-8 pb-6 border-b">
                       {/* Overall Rating */}
                       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 shadow-sm rounded-xl p-6 text-center w-full md:w-auto">
-                        <h3 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">4.8</h3>
+                        <h3 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
+                          {userReviews.length > 0
+                            ? (
+                                userReviews.reduce((total, review) => total + review.rating, 0) / userReviews.length
+                              ).toFixed(1)
+                            : "0"}
+                        </h3>
                         <div className="flex justify-center gap-1 mb-2">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                            <Star
+                              key={star}
+                              className={`w-5 h-5 ${
+                                star <=
+                                (
+                                  userReviews.reduce((total, review) => total + review.rating, 0) / userReviews.length
+                                ).toFixed(1)
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "fill-yellow-400/50 text-yellow-400"
+                              }`}
+                            />
                           ))}
                         </div>
-                        <p className="text-gray-600 text-sm">Based on 12 Ratings</p>
+                        <p className="text-gray-600 text-sm">
+                          Based on {userReviews.length} Rating{userReviews.length === 1 ? "" : "s"}
+                        </p>
                       </div>
 
                       {/* Rating Breakdown */}
                       <div className="flex-1 space-y-3 p-6 bg-white rounded-xl shadow-sm">
                         <h3 className="font-semibold text-gray-800 mb-3">Rating Breakdown</h3>
-                        {[5, 4, 3, 2, 1].map((rating) => (
-                          <div key={rating} className="flex items-center gap-2">
-                            <span className="w-8 text-right font-medium">{rating}</span>
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            <div className="flex-1">
-                              <Progress
-                                value={
-                                  rating === 5 ? 100 : rating === 4 ? 75 : rating === 3 ? 50 : rating === 2 ? 25 : 0
-                                }
-                                className="h-2"
-                              />
+                        {[5, 4, 3, 2, 1].map((rating) => {
+                          const ratingCount = userReviews.filter((review) => review.rating === rating).length
+                          const ratingPercentage = userReviews.length > 0 ? (ratingCount / userReviews.length) * 100 : 0
+                          return (
+                            <div key={rating} className="flex items-center gap-2">
+                              <span className="w-8 text-right font-medium">{rating}</span>
+                              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                              <div className="flex-1">
+                                <Progress value={ratingPercentage} className="h-2" />
+                              </div>
+                              <span className="text-sm text-gray-500 w-8">{ratingPercentage.toFixed(1)}%</span>
                             </div>
-                            <span className="text-sm text-gray-500 w-8">
-                              {rating === 5
-                                ? "75%"
-                                : rating === 4
-                                  ? "15%"
-                                  : rating === 3
-                                    ? "5%"
-                                    : rating === 2
-                                      ? "3%"
-                                      : "2%"}
-                            </span>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     </div>
 
-                    {/* Reviews List */}
+                    {/* Reviews List of all the users */}
                     <div className="space-y-6">
                       <h3 className="font-semibold text-gray-800 text-xl mb-4">Student Reviews</h3>
 
-                      {/* Review 1 */}
-                      <div className="space-y-4">
-                        <div className="flex gap-4">
-                          <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                            <img
-                              src="/assets/images/avatar5.png"
-                              alt="Johnathon Smith"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 bg-gray-50 p-4 rounded-lg">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
-                              <div>
-                                <h4 className="font-semibold">Johnathon Smith</h4>
-                                <p className="text-gray-500 text-xs">Nov 12, 2022 at 12:12 am</p>
-                              </div>
-                              <div className="flex mt-1 sm:mt-0">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <Star key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                ))}
-                              </div>
+                      {userReviews.length > 0 ? (
+                        userReviews.map((review, index) => (
+                          <div key={index} className="flex gap-4">
+                            <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                              <img
+                                src={review.userImage || "/assets/images/default-avatar.png"}
+                                alt={review.userName}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-                            <p className="text-gray-600 text-sm">
-                              Mauris non dignissim purus, ac commodo diam. Donec sit amet lacinia nulla. Aliquam quis
-                              purus in justo pulvinar tempor.
-                            </p>
+                            <div className="flex-1 bg-gray-50 p-4 rounded-lg">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+                                <div>
+                                  <h4 className="font-semibold">{review.userName}</h4>
+                                  <p className="text-gray-500 text-xs">{new Date(review.createdAt).toLocaleString()}</p>
+                                </div>
+                                <div className="flex mt-1 sm:mt-0">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                      key={star}
+                                      className={`w-4 h-4 ${
+                                        star <= review.rating
+                                          ? "fill-yellow-400 text-yellow-400"
+                                          : "fill-yellow-400/50 text-yellow-400"
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              <p className="text-gray-600 text-sm">{censorBadWordsSync(review.comment)}</p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500 text-sm">No reviews yet for this chapter.</p>
+                      )}
+                    </div>
+
+                    {/* Add Review Form */}
+                    <div className="mt-8 pt-6 border-t">
+                      <h3 className="font-semibold text-gray-800 text-xl mb-4">Add Your Review</h3>
+                      <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                        <div className="mb-4">
+                          <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-1">
+                            Your Rating
+                          </label>
+                          <div className="flex gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setUserRating(star)}
+                                className="focus:outline-none"
+                              >
+                                <Star
+                                  className={`w-6 h-6 ${
+                                    userRating >= star
+                                      ? "fill-yellow-400 text-yellow-400"
+                                      : "fill-gray-200 text-gray-200"
+                                  } hover:fill-yellow-400 hover:text-yellow-400 transition-colors`}
+                                />
+                              </button>
+                            ))}
                           </div>
                         </div>
 
-                        {/* Reply */}
-                        <div className="flex gap-4 ml-12">
-                          <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                            <img
-                              src="/assets/images/avatar3.png"
-                              alt="Andrew Dian"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 bg-gray-50 p-4 rounded-lg">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
-                              <div>
-                                <h4 className="font-semibold">Andrew Dian</h4>
-                                <p className="text-gray-500 text-xs">Nov 12, 2022 at 12:12 am</p>
-                              </div>
-                              <div className="flex mt-1 sm:mt-0">
-                                {[1, 2, 3, 4].map((star) => (
-                                  <Star key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                ))}
-                                <Star className="w-4 h-4 fill-yellow-400/50 text-yellow-400" />
-                              </div>
-                            </div>
-                            <p className="text-gray-600 text-sm">
-                              Mauris non dignissim purus, ac commodo diam. Donec sit amet lacinia nulla. Aliquam quis
-                              purus in justo pulvinar tempor.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Review 2 */}
-                      <div className="flex gap-4">
-                        <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                          <img
-                            src="/assets/images/avatar4.png"
-                            alt="Mc Donald"
-                            className="w-full h-full object-cover"
+                        <div className="mb-4">
+                          <label htmlFor="reviewComment" className="block text-sm font-medium text-gray-700 mb-1">
+                            Your Comment
+                          </label>
+                          <textarea
+                            id="reviewComment"
+                            rows={4}
+                            value={reviewComment}
+                            onChange={(e) => setReviewComment(e.target.value)}
+                            placeholder="Share your experience with this chapter..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
-                        <div className="flex-1 bg-gray-50 p-4 rounded-lg">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
-                            <div>
-                              <h4 className="font-semibold">Mc Donald</h4>
-                              <p className="text-gray-500 text-xs">Nov 12, 2022 at 12:12 am</p>
-                            </div>
-                            <div className="flex mt-1 sm:mt-0">
-                              {[1, 2, 3, 4].map((star) => (
-                                <Star key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                              ))}
-                              <Star className="w-4 h-4 fill-yellow-400/50 text-yellow-400" />
-                            </div>
-                          </div>
-                          <p className="text-gray-600 text-sm">
-                            Mauris non dignissim purus, ac commodo diam. Donec sit amet lacinia nulla. Aliquam quis
-                            purus in justo pulvinar tempor.
-                          </p>
+
+                        <div className="flex justify-end">
+                          <button
+                            onClick={submitReview}
+                            disabled={isSubmittingReview || userRating === 0 || !reviewComment.trim()}
+                            className={`px-4 py-2 rounded-md font-medium flex items-center gap-2 ${
+                              isSubmittingReview || userRating === 0 || !reviewComment.trim()
+                                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                : "bg-blue-600 text-white hover:bg-blue-700"
+                            }`}
+                          >
+                            {isSubmittingReview ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                                Submitting...
+                              </>
+                            ) : (
+                              "Submit Review"
+                            )}
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -929,9 +1033,7 @@ const ChapterContent = () => {
             </div>
           </>
         )}
-        
       </div>
-      
     </section>
   )
 }
