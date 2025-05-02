@@ -236,11 +236,18 @@ function Header() {
                             href="/"
                             role="button"
                             aria-expanded="false"
-                            className="nav-link px-3 px-xl-4"
+                            className={`nav-link px-3 px-xl-4 ${
+                              ["/", "/home"].includes(location.pathname)
+                                ? "active"
+                                : ""
+                            }`}
                             style={{
                               paddingInlineEnd: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
+                              color: ["/", "/home"].includes(location.pathname)
+                                ? "#007bff"
+                                : "inherit",
                             }}
                           >
                             Home
@@ -251,11 +258,17 @@ function Header() {
                             href="/calendar"
                             role="button"
                             aria-expanded="false"
-                            className="nav-link px-3 px-xl-4"
+                            className={`nav-link px-3 px-xl-4 ${
+                              location.pathname === "/calendar" ? "active" : ""
+                            }`}
                             style={{
                               paddingInline: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
+                              color:
+                                location.pathname === "/calendar"
+                                  ? "#007bff"
+                                  : "inherit",
                             }}
                           >
                             Dashboard
@@ -267,10 +280,27 @@ function Header() {
                             href="#"
                             role="button"
                             aria-expanded="false"
+                            className={`nav-link px-3 px-xl-4 ${
+                              location.pathname.startsWith("/allcours") ||
+                              location.pathname.startsWith("/Moodle") ||
+                              location.pathname.startsWith("/Classroom") ||
+                              location.pathname.startsWith("/chapters") ||
+                              location.pathname.startsWith("/content")
+                                ? "active"
+                                : ""
+                            }`}
                             style={{
-                              marginRight: "46px",
+                              paddingInline: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
+                              color:
+                                location.pathname.startsWith("/allcours") ||
+                                location.pathname.startsWith("/Moodle") ||
+                                location.pathname.startsWith("/Classroom") ||
+                                location.pathname.startsWith("/chapters") ||
+                                location.pathname.startsWith("/content")
+                                  ? "#007bff"
+                                  : "inherit",
                             }}
                           >
                             Courses
@@ -278,17 +308,36 @@ function Header() {
                           {/* Dropdown menu for Courses */}
                           <ul className="dropdown-menu">
                             <li>
-                              <a className="dropdown-item" href="/allcours  ">
+                              <a
+                                className={`dropdown-item ${
+                                  location.pathname === "/allcours"
+                                    ? "active"
+                                    : ""
+                                }`}
+                                href="/allcours"
+                                style={
+                                  location.pathname === "/allcours"
+                                    ? { color: "#007bff", fontWeight: "bold" }
+                                    : {}
+                                }
+                              >
                                 All Cours
                               </a>
                             </li>
                             <li>
                               <a
-                                className="dropdown-item"
+                                className={`dropdown-item ${
+                                  location.pathname === "/Moodle"
+                                    ? "active"
+                                    : ""
+                                }`}
                                 href="/Moodle"
                                 style={{
                                   display: "flex",
                                   alignItems: "center",
+                                  ...(location.pathname === "/Moodle"
+                                    ? { color: "#007bff", fontWeight: "bold" }
+                                    : {}),
                                 }}
                               >
                                 <img
@@ -304,11 +353,18 @@ function Header() {
                             </li>
                             <li>
                               <a
-                                className="dropdown-item"
+                                className={`dropdown-item ${
+                                  location.pathname === "/Classroom"
+                                    ? "active"
+                                    : ""
+                                }`}
                                 href="/Classroom"
                                 style={{
                                   display: "flex",
                                   alignItems: "center",
+                                  ...(location.pathname === "/Classroom"
+                                    ? { color: "#007bff", fontWeight: "bold" }
+                                    : {}),
                                 }}
                               >
                                 <img
@@ -322,37 +378,29 @@ function Header() {
                                 />
                               </a>
                             </li>
-
                             <li>
                               <hr className="dropdown-divider" />
                             </li>
                           </ul>
                         </li>
-                        <li className="nav-item dropdown">
-                          <a
-                            href="/chart"
-                            role="button"
-                            className="nav-link px-3 px-xl-4"
-                            style={{
-                              paddingInline: "40px",
-                              fontWeight: "bold",
-                              fontSize: "20px",
-                            }}
-                          >
-                            Statistics
-                          </a>
-                        </li>
-
 
                         <li className="nav-item dropdown">
                           <a
                             href="/leaderboard"
                             role="button"
-                            className="nav-link px-3 px-xl-4"
+                            className={`nav-link px-3 px-xl-4 ${
+                              location.pathname === "/leaderboard"
+                                ? "active"
+                                : ""
+                            }`}
                             style={{
                               paddingInline: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
+                              color:
+                                location.pathname === "/leaderboard"
+                                  ? "#007bff"
+                                  : "inherit",
                             }}
                           >
                             Leaderboard
@@ -446,22 +494,40 @@ function Header() {
                               <ul className="list-unstyled nav">
                                 {location.pathname !== "/home" && (
                                   <li>
-                                    <a className={isActive("/home") ? "nav-link active" : "nav-link"} href="/home">
+                                    <a
+                                      className={
+                                        isActive("/home")
+                                          ? "nav-link active"
+                                          : "nav-link"
+                                      }
+                                      href="/home"
+                                    >
                                       <i className="feather-icon icon-home" />
                                       <span>Home</span>
                                     </a>
                                   </li>
                                 )}
                                 <li>
-                                  <a className={isActive("/profile") ? "nav-link active" : "nav-link"} href="/profile">
+                                  <a
+                                    className={
+                                      isActive("/profile")
+                                        ? "nav-link active"
+                                        : "nav-link"
+                                    }
+                                    href="/profile"
+                                  >
                                     <i className="feather-icon icon-user" />
                                     <span>My Profile</span>
                                   </a>
                                 </li>
-                               
+
                                 <li>
                                   <a
-                                    className={isActive("/profile/settings") ? "nav-link active" : "nav-link"}
+                                    className={
+                                      isActive("/profile/settings")
+                                        ? "nav-link active"
+                                        : "nav-link"
+                                    }
                                     href="/profile/settings"
                                   >
                                     <i className="feather-icon icon-shopping-bag" />
@@ -469,27 +535,30 @@ function Header() {
                                     <span>Security</span>
                                   </a>
                                 </li>
-                                {user?.role === "student" && (
-                                  <li>
-                                   
-                                  </li>
-                                 
-                                )}
-                                 <li>
-                                    <a
-                                      className={isActive("/certificates") ? "nav-link active" : "nav-link"}
-                                      href="/certificates"
-                                    >
-                                      <i className="feather-icon icon-award" />
-                                      <span>View Certificates</span>
-                                    </a>
-                                  </li>
+                                {user?.role === "student" && <li></li>}
+                                <li>
+                                  <a
+                                    className={
+                                      isActive("/certificates")
+                                        ? "nav-link active"
+                                        : "nav-link"
+                                    }
+                                    href="/certificates"
+                                  >
+                                    <i className="feather-icon icon-award" />
+                                    <span>View Certificates</span>
+                                  </a>
+                                </li>
 
                                 {user?.role === "instructor" && (
                                   <>
                                     <li>
                                       <a
-                                         className={isActive("/profile/list") ? "nav-link active" : "nav-link"}
+                                        className={
+                                          isActive("/profile/list")
+                                            ? "nav-link active"
+                                            : "nav-link"
+                                        }
                                         href="/profile/list"
                                       >
                                         <i className="feather-icon icon-book" />
@@ -498,7 +567,11 @@ function Header() {
                                     </li>
                                     <li>
                                       <a
-                                         className={isActive("/profile/allquiz") ? "nav-link active" : "nav-link"}
+                                        className={
+                                          isActive("/profile/allquiz")
+                                            ? "nav-link active"
+                                            : "nav-link"
+                                        }
                                         href="/profile/allquiz"
                                       >
                                         <i className="feather-icon icon-briefcase" />
@@ -507,7 +580,11 @@ function Header() {
                                     </li>
                                     <li>
                                       <a
-                                         className={isActive("/profile/Allexams") ? "nav-link active" : "nav-link"}
+                                        className={
+                                          isActive("/profile/Allexams")
+                                            ? "nav-link active"
+                                            : "nav-link"
+                                        }
                                         href="/profile/Allexams"
                                       >
                                         <i className="feather-icon icon-cpu" />
@@ -516,7 +593,11 @@ function Header() {
                                     </li>
                                     <li>
                                       <a
-                                         className={isActive("/profile/addchapter") ? "nav-link active" : "nav-link"}
+                                        className={
+                                          isActive("/profile/addchapter")
+                                            ? "nav-link active"
+                                            : "nav-link"
+                                        }
                                         href="/profile/addchapter"
                                       >
                                         <i className="feather-icon icon-bell" />
@@ -528,18 +609,13 @@ function Header() {
 
                                 <li className="border-bottom" />
 
-
                                 {user?.role === "admin" && (
                                   <li>
-                                    <a
-                                    className="nav-link"
-                                    href="/admin"
-                                  >
-                                    <i className="feather-icon icon-home" />
-                                    <span>Dashboard Admin</span>
-                                  </a>
+                                    <a className="nav-link" href="/admin">
+                                      <i className="feather-icon icon-home" />
+                                      <span>Dashboard Admin</span>
+                                    </a>
                                   </li>
-                                 
                                 )}
                                 <li>
                                   <a
@@ -553,7 +629,6 @@ function Header() {
                                 <li>
                                   <a
                                     className="nav-link cursor-pointer"
-                                    
                                     onClick={handleLogout}
                                   >
                                     <i className="feather-icon icon-log-out" />
