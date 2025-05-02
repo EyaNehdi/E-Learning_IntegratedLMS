@@ -71,6 +71,11 @@ const User = new Schema({
     type: Boolean,
     default: true,
   },
+  balance: {
+    type: Number,
+    default: 0,
+  },
+  processedSessions: [{ type: String }], // Track processed Stripe session IDs
 },
   { timestamps: true });
 // Hashing Password
