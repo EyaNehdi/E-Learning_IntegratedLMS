@@ -6,8 +6,8 @@ import Box from "@mui/material/Box"
 import Slider from "@mui/material/Slider"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
-import { useAuthStore } from "../../store/authStore";
-import { Lock, Unlock } from "lucide-react";
+import { useAuthStore } from "../../store/authStore"
+import { Lock, Unlock, ChevronLeft, ChevronRight } from "lucide-react"
 
 const MAX = 50
 const MIN = 0
@@ -33,7 +33,15 @@ function Allcourse() {
   const [animatingHearts, setAnimatingHearts] = useState({})
   const [courseAccess, setCourseAccess] = useState({})
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
+  const [paginatedCourses, setPaginatedCourses] = useState([])
+  const [totalPages, setTotalPages] = useState(1)
+
   const currentUserId = "user123" // à remplacer dynamiquement
+  const navigate = useNavigate()
+  const { checkAuth, user } = useAuthStore()
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -69,6 +77,7 @@ function Allcourse() {
     fetchCourses()
     fetchUserLikes()
   }, [])
+
   useEffect(() => {
     const checkCoursesAccess = async () => {
       if (!courses.length) return
@@ -110,7 +119,20 @@ function Allcourse() {
     }
 
     setFilteredCourses(filtered)
+
+    // Reset to first page when filters change
+    setCurrentPage(1)
   }, [selectedCategories, selectedLevels, minPrice, maxPrice, courses, popularityFilter])
+
+  // Update paginated courses whenever filtered courses or current page changes
+  useEffect(() => {
+    const totalPages = Math.ceil(filteredCourses.length / itemsPerPage)
+    setTotalPages(totalPages)
+
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    setPaginatedCourses(filteredCourses.slice(startIndex, endIndex))
+  }, [filteredCourses, currentPage, itemsPerPage])
 
   const handleChange = (_, newValue) => {
     setVal(newValue)
@@ -181,12 +203,87 @@ function Allcourse() {
     setPopularityFilter(type)
   }
 
+  // Pagination handlers
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber)
+    // Scroll to top of course list
+    document.querySelector(".course-lists")?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+      document.querySelector(".course-lists")?.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+      document.querySelector(".course-lists")?.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
+  // Generate page numbers
+  const getPageNumbers = () => {
+    const pageNumbers = []
+    const maxPagesToShow = 5
+
+    if (totalPages <= maxPagesToShow) {
+      // Show all pages if total pages are less than max pages to show
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i)
+      }
+    } else {
+      // Always show first page
+      pageNumbers.push(1)
+
+      // Calculate start and end of page range
+      let startPage = Math.max(2, currentPage - 1)
+      let endPage = Math.min(totalPages - 1, currentPage + 1)
+
+      // Adjust if at the beginning
+      if (currentPage <= 2) {
+        endPage = 4
+      }
+
+      // Adjust if at the end
+      if (currentPage >= totalPages - 1) {
+        startPage = totalPages - 3
+      }
+
+      // Add ellipsis after first page if needed
+      if (startPage > 2) {
+        pageNumbers.push("...")
+      }
+
+      // Add middle pages
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(i)
+      }
+
+      // Add ellipsis before last page if needed
+      if (endPage < totalPages - 1) {
+        pageNumbers.push("...")
+      }
+
+      // Always show last page
+      pageNumbers.push(totalPages)
+    }
+
+    return pageNumbers
+  }
+
   const categories = Array.from(new Set(courses.map((course) => course.categorie)))
   const levels = Array.from(new Set(courses.map((course) => course.level)))
-const navigate = useNavigate();
-const { checkAuth, user } = useAuthStore();
 
-  const handleEnroll = async (course) => {
+  // Unified function to handle course access (used for image, title, and button clicks)
+  const handleCourseAccess = async (course, e) => {
+    // If an event is provided, prevent default behavior
+    if (e) {
+      e.preventDefault()
+    }
+
     if (course.price === 0 || courseAccess[course._id]) {
       console.log(`Accessing course: ${course._id}`)
       navigate(`/chapters/${course._id}`)
@@ -224,7 +321,7 @@ const { checkAuth, user } = useAuthStore();
           const response = await axios.post(
             "http://localhost:5000/purchases/purchase",
             { courseId: course._id },
-            { withCredentials: true }
+            { withCredentials: true },
           )
           console.log("Purchase response:", response.data)
           Swal.fire({
@@ -380,6 +477,12 @@ const { checkAuth, user } = useAuthStore();
             <div className="col-lg-8">
               <div className="course-filters d-flex justify-content-between align-items-center">
                 <p>{filteredCourses.length} Courses found.</p>
+                {filteredCourses.length > 0 && (
+                  <p>
+                    Showing {(currentPage - 1) * itemsPerPage + 1} -{" "}
+                    {Math.min(currentPage * itemsPerPage, filteredCourses.length)} of {filteredCourses.length}
+                  </p>
+                )}
               </div>
 
               <div className="course-lists row gy-4 mt-3">
@@ -387,12 +490,18 @@ const { checkAuth, user } = useAuthStore();
                   <div className="col-12 text-center">
                     <p>Loading...</p>
                   </div>
-                ) : filteredCourses.length > 0 ? (
-                  filteredCourses.map((course) => (
+                ) : paginatedCourses.length > 0 ? (
+                  paginatedCourses.map((course) => (
                     <div className="col-xl-6 col-md-6" key={course._id}>
                       <div className="course-entry-3 card rounded-2 bg-white border">
                         <div className="card-media position-relative">
-                          <a href={`/chapters/${course._id}`}>
+                          {/* Modified: Image click now triggers handleCourseAccess */}
+                          <a
+                            href="#"
+                            onClick={(e) => handleCourseAccess(course, e)}
+                            className="course-image-link"
+                            style={{ cursor: "pointer" }}
+                          >
                             <img
                               className="card-img-top"
                               src={
@@ -404,6 +513,14 @@ const { checkAuth, user } = useAuthStore();
                               }
                               alt={course.title}
                             />
+                            {/* Add lock overlay for paid courses that aren't purchased */}
+                            {course.price > 0 && !courseAccess[course._id] && (
+                              <div className="course-lock-overlay">
+                                <div className="lock-icon">
+                                  <Lock size={24} className="text-white" />
+                                </div>
+                              </div>
+                            )}
                           </a>
                           <a
                             href="#"
@@ -442,20 +559,19 @@ const { checkAuth, user } = useAuthStore();
                             <span>{course.level}</span>
                           </div>
                           <h3 className="sub-title mb-0">
-                            <a href={`/chapters/${course._id}`}>{course.title}</a>
+                            {/* Modified: Title click now triggers handleCourseAccess */}
+                            <a href="#" onClick={(e) => handleCourseAccess(course, e)} style={{ cursor: "pointer" }}>
+                              {course.title}
+                            </a>
                           </h3>
                           <div className="author-meta small d-flex pt-2 justify-content-between">
                             <span>By: {course.categorie}</span>
                             <span>{course.module?.name || "No module assigned"}</span>
                           </div>
                           <div className="course-footer d-flex align-items-center justify-content-between pt-3">
-                            <div className="price">
-                              {course.price === 0 ? "Free" : `${course.price}🪙`}
-                            </div>
-                            <button
-                              onClick={() => handleEnroll(course)}
-                              className="btn btn-link p-0"
-                            >
+                            <div className="price">{course.price === 0 ? "Free" : `${course.price}🪙`}</div>
+                            {/* Button now uses the same handler function */}
+                            <button onClick={() => handleCourseAccess(course)} className="btn btn-link p-0">
                               {course.price > 0 && !courseAccess[course._id] ? (
                                 <>
                                   <Lock className="inline mr-1" size={16} /> Unlock
@@ -478,10 +594,81 @@ const { checkAuth, user } = useAuthStore();
                   </div>
                 )}
               </div>
+
+              {/* Pagination Controls */}
+              {filteredCourses.length > itemsPerPage && (
+                <nav aria-label="Course pagination" className="mt-4">
+                  <ul className="pagination justify-content-center">
+                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                      <button className="page-link" onClick={handlePrevPage} aria-label="Previous">
+                        <ChevronLeft size={16} />
+                        <span className="sr-only">Previous</span>
+                      </button>
+                    </li>
+
+                    {getPageNumbers().map((page, index) =>
+                      page === "..." ? (
+                        <li key={`ellipsis-${index}`} className="page-item disabled">
+                          <span className="page-link">...</span>
+                        </li>
+                      ) : (
+                        <li key={page} className={`page-item ${currentPage === page ? "active" : ""}`}>
+                          <button className="page-link" onClick={() => handlePageChange(page)}>
+                            {page}
+                          </button>
+                        </li>
+                      ),
+                    )}
+
+                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                      <button className="page-link" onClick={handleNextPage} aria-label="Next">
+                        <ChevronRight size={16} />
+                        <span className="sr-only">Next</span>
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              )}
             </div>
           </div>
         </div>
       </section>
+
+      {/* Add CSS for lock overlay */}
+      <style jsx>{`
+        .course-image-link {
+          display: block;
+          position: relative;
+        }
+        
+        .course-lock-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        
+        .course-image-link:hover .course-lock-overlay {
+          opacity: 1;
+        }
+        
+        .lock-icon {
+          background-color: rgba(0, 0, 0, 0.7);
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      `}</style>
     </div>
   )
 }
