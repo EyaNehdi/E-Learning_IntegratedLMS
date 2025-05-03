@@ -135,11 +135,11 @@ const Chatbot = () => {
   );
 };
 import WordleGame from "./components/Leaderboard/WordleGame.jsx";
-import StudentActions from "./components/Admin/activitytrack/StudentActions.jsx";
 import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
 import ListPacks from "./components/Admin/ListPacks.jsx";
 import StoreManagement from "./components/Admin/storeManagement.jsx";
 import Store from "./components/Store/Store.jsx";
+import SystemSettings from "./components/Admin/activitytrack/SystemSettings.jsx";
 
 
 
@@ -253,7 +253,7 @@ function App() {
           <Route path="monitor" element={<AuditPage />}>
             <Route index element={<AuditLogs />} />
             <Route path="users-audit" element={<AuthDashboard />} />
-            <Route path="system" element={<StudentActions />} />
+            <Route path="system" element={<SystemSettings />} />
           </Route>
           <Route path="/badge" element={<BadgeFeature />}>
             <Route index element={<ListBadges />} />
