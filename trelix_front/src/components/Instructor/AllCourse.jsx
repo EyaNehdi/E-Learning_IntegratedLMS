@@ -329,7 +329,31 @@ function Allcourse() {
             title: "Course Purchased!",
             text: response.data.message,
             confirmButtonText: "Go to Course",
-          }).then(() => {
+          }).then(async () => {
+            // After successful purchase, check if this is the first purchase and award badge
+           
+              try {
+                const badgeResponse = await axios.post(
+                  "http://localhost:5000/api/info/profile/badge",
+                  {
+                    badge: "First Chapter Explorer Badge 🚀",
+                    email: user.email,
+                    badgeImage: "/assets/Badges/FirstCoursePurchase.png",
+                    description: "Earned for purchasing your first chapter",
+                  },
+                  { withCredentials: true },
+                )
+                console.log("Badge awarded:", badgeResponse.data)
+                Swal.fire({
+                  icon: "success",
+                  title: "Achievement Unlocked!",
+                  text: "You've earned the 'First Chapter Explorer' badge for purchasing your first chapter!",
+                  confirmButtonText: "Awesome!",
+                })
+              } catch (badgeError) {
+                console.error("Error awarding badge:", badgeError)
+              }
+            
             setCourseAccess((prev) => ({ ...prev, [course._id]: true }))
             checkAuth() // Update user balance
             navigate(`/chapters/${course._id}`)
