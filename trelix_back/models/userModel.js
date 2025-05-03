@@ -79,7 +79,16 @@ const User = new Schema({
   purchasedCourses: [{
     courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
     purchaseDate: { type: Date, default: Date.now },
-  }]
+  }],
+  engagementStage: {
+    type: String,
+    enum: ["active", "at_risk", "idle", "churned"],
+    default: "active"
+  },
+  lastEngagementEmailSent: {
+    type: Date,
+    default: null
+  }
 },
   { timestamps: true });
 // Hashing Password
