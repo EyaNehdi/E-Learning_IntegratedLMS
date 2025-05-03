@@ -8,143 +8,150 @@ import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const ListChapters = () => {
-  const { id, courseid } = useParams();
+  const { slugCourse } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [finalCourseId, setFinalCourseId] = useState(null);
   const [chapters, setChapters] = useState([]);
   const [completedChapters, setCompletedChapters] = useState([]);
   const { user, fetchUser } = useProfileStore();
   const [loading, setLoading] = useState(true);
   const [courseDetails, setCourseDetails] = useState(null);
-
-  // Determine if a specific chapter is selected
   const isChapterSelected = location.pathname.includes("/content/");
 
-  // Store courseid in localStorage if it's not already there
-  useEffect(() => {
-    if (courseid) {
-      localStorage.setItem("courseid", courseid);
-    }
-  }, [courseid]);
-
-  // Retrieve courseid from localStorage if it's not available from useParams
-  const storedCourseId = localStorage.getItem("courseid");
-  const finalCourseId = courseid || storedCourseId;
-
-  // Fetch the user data on mount
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
 
-  // Fetch course details
-  useEffect(() => {
-    const fetchCourseDetails = async () => {
-      if (!finalCourseId) {
-        console.error("Course ID is not defined");
-        return;
-      }
-
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/course/${finalCourseId}`
-        );
-        setCourseDetails(response.data);
-        console.log("Course details:", response.data);
-      } catch (error) {
-        console.error("Error fetching course details:", error);
-      }
-    };
-
-    fetchCourseDetails();
-  }, [finalCourseId]);
-
-  // Fetch chapters
-  useEffect(() => {
-    const fetchChapters = async () => {
-      if (!finalCourseId) {
-        console.error("Course ID is not defined");
-        return;
-      }
-
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/chapter/course/${finalCourseId}`
-        );
-        setChapters(response.data.chapters);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching chapters:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchChapters();
-  }, [finalCourseId]);
-
-  // Fetch completed chapters
-  useEffect(() => {
-    if (user && user._id) {
-      axios
-        .get("http://localhost:5000/api/auth/completedchapters", {
-          params: {
-            userId: user._id,
-            chapterId: id,
-          },
-        })
-        .then((response) => {
-          setCompletedChapters(response.data.completedChapters);
-          console.log("Completed chapters data: ", response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching completed chapters:", error);
-        });
-    }
-  }, [user, id]);
-
-  const handleCompleteChapter = (chapterId) => {
-    if (!user || !user._id) {
-      console.error("User is not logged in");
+  const fetchCourseDetails = async () => {
+    if (!slugCourse) {
+      console.error("Course ID is not defined");
       return;
     }
 
-    // When a chapter is completed, update the backend
-    axios
-      .post("http://localhost:5000/user/mark-chapter-completed", {
-        userId: user._id,
-        chapterId: chapterId,
-      })
-      .then((response) => {
-        // Check if the response contains updated completed chapters
-        if (response.data.completedChapters) {
-          setCompletedChapters(response.data.completedChapters);
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/chapter/course/${slugCourse}`
+      );
+      setCourseDetails(response.data.courseInfo);
+      setFinalCourseId(response.data.courseInfo._id);
+      setChapters(response.data.courseInfo.chapters);
+      const chaptersData =
+        response.data.chaptersWithCompletion ||
+        response.data.courseInfo.chapters;
+      const completed = chaptersData
+        .filter((chapter) => chapter.isCompleted)
+        .map((chapter) => chapter._id);
+      setCompletedChapters(completed);
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+
+      if (error.response?.status === 403) {
+        const { courseId, courseSlug, courseTitle, coursePrice, userBalance } =
+          error.response.data;
+
+        const canAfford = userBalance >= coursePrice;
+
+        const result = await Swal.fire({
+          title: "Access Denied",
+          html: `
+            <p>You need to purchase <b>${courseTitle}</b> to view its chapters.</p>
+            <p>Price: $${coursePrice} | Your balance: $${userBalance}</p>
+            ${
+              canAfford
+                ? "<p>You have enough balance to purchase this course.</p>"
+                : '<p style="color:red;">Insufficient balance. Please visit the store.</p>'
+            }
+          `,
+          icon: "warning",
+          showCancelButton: true,
+          cancelButtonText: "Back to All Courses",
+          showDenyButton: true,
+          denyButtonText: "Go to Store",
+          confirmButtonText: canAfford ? "Purchase Now" : "Purchase (Disabled)",
+          confirmButtonColor: canAfford ? "#3085d6" : "#aaa",
+          preConfirm: () => {
+            if (!canAfford) {
+              Swal.showValidationMessage("You do not have enough balance.");
+              return false;
+            }
+          },
+        });
+
+        if (result.isConfirmed && canAfford) {
+          try {
+            const purchaseResponse = await axios.post(
+              "http://localhost:5000/purchases/purchase",
+              { courseId },
+              { withCredentials: true }
+            );
+            Swal.fire("Purchase Successful!", "", "success");
+            fetchCourseDetails();
+          } catch (purchaseError) {
+            console.error("Purchase failed:", purchaseError);
+            Swal.fire("Operation failed", "Please try again later.", "error");
+          }
+        } else if (result.isDenied) {
+          navigate("/store");
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          navigate("/allcours");
         }
-      })
-      .catch((error) => {
-        console.error("Error marking chapter as completed:", error);
-      });
+      } else if (error.response?.status === 404) {
+        navigate("/allcours", {
+          state: { error: "Course not found" },
+        });
+      } else {
+        console.error("Error fetching course details:", error);
+      }
+    }
   };
 
-  // Check if all chapters are completed
+  useEffect(() => {
+    if (slugCourse) {
+      fetchCourseDetails();
+    }
+  }, [slugCourse]);
+
+  const handleCompleteChapter = async (chapterId) => {
+    console.log("Function called with chapterId:", chapterId);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/chapter/markCompleted",
+        {},
+        {
+          params: { userId: user._id, chapterId },
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.completedChapters) {
+        setCompletedChapters(response.data.completedChapters);
+        console.log("am triggered 2");
+      }
+    } catch (error) {
+      console.error("Error marking chapter as completed:", error);
+    }
+  };
+
   const areAllChaptersCompleted = () => {
     if (chapters.length === 0) return false;
     return chapters.every((chapter) => completedChapters.includes(chapter._id));
   };
 
-  // Handle starting the exam
   const handleStartExam = () => {
     if (!areAllChaptersCompleted()) {
       alert("Please complete all chapters before starting the exam.");
       return;
     }
-
-    // Navigate to the exam page
     navigate(`/exams/${finalCourseId}`);
   };
 
-  // Handle earning certificate
   const handleEarnCertificate = async (provider) => {
     try {
       const response = await axios.post(
@@ -156,7 +163,6 @@ const ListChapters = () => {
         }
       );
 
-      console.log("Certificate Earned Successfully:", response.data);
       alert("Congratulations! You have earned a certificate.");
     } catch (error) {
       console.error(
@@ -168,7 +174,6 @@ const ListChapters = () => {
     navigate(`/certificates`);
   };
 
-  // Format price with currency symbol
   const formatPrice = (price, currency = "EUR") => {
     if (price === 0 || price === "0") return "Gratuit";
 
@@ -186,9 +191,35 @@ const ListChapters = () => {
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b py-4 px-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-800">
-          {courseDetails ? courseDetails.title : "Course Content"}
-        </h1>
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 mr-2 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+              />
+            </svg>
+            {courseDetails ? courseDetails.title : "Course Content"}
+          </h1>
+          {courseDetails && (
+            <div className="flex items-center space-x-2">
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                {courseDetails.level || "All Levels"}
+              </span>
+              <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                {formatPrice(courseDetails.price, courseDetails.currency)}
+              </span>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Main content area with sidebar and content */}
@@ -211,139 +242,152 @@ const ListChapters = () => {
 
           <div className="p-4 space-y-3">
             {chapters.map((chapter) => {
-              const isCompleted = completedChapters.includes(chapter._id);
+              const isCompleted =
+                chapter.isCompleted || completedChapters.includes(chapter._id);
               const isActive = location.pathname.includes(
                 `/content/${chapter._id}`
               );
 
               return (
-                <Link
-                  key={chapter._id}
-                  className={`flex items-center justify-between w-full px-5 py-3.5 rounded-md transition-all duration-200 
-                    ${isActive ? "bg-blue-50 shadow-sm" : ""}
-                    ${
-                      isCompleted
-                        ? "bg-white border-l-4 border-l-green-500 border-y border-r border-gray-100 text-gray-800 hover:bg-gray-50"
-                        : "bg-white border border-gray-100 text-gray-800 hover:bg-gray-50 hover:border-gray-200"
-                    } focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-opacity-50`}
-                  to={`/chapters/${finalCourseId}/content/${chapter._id}`}
-                >
-                  <span
-                    className={`font-medium ${isActive ? "text-blue-700" : ""}`}
-                  >
-                    {chapter.title}
-                  </span>
-
-                  {/* Progress Indicator */}
-                  {isCompleted ? (
-                    <span className="text-green-600 flex-shrink-0 bg-green-50 p-1 rounded-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </span>
-                  ) : (
-                    <span
-                      className="text-gray-400 hover:text-blue-500 cursor-pointer flex-shrink-0 bg-gray-50 p-1 rounded-full hover:bg-blue-50"
-                      onClick={(e) => {
-                        e.preventDefault();
+                <div key={chapter._id} className="relative">
+                  <Link
+                    key={chapter._id}
+                    className={`flex items-center justify-between w-full px-5 py-3.5 rounded-md transition-all duration-200 
+              ${isActive ? "bg-blue-50 shadow-sm" : ""}
+              ${
+                isCompleted
+                  ? "bg-white border-l-4 border-l-green-500 border-y border-r border-gray-100 text-gray-800 hover:bg-gray-50"
+                  : "bg-white border border-gray-100 text-gray-800 hover:bg-gray-50 hover:border-gray-200"
+              }`}
+                    to={`/chapters/${slugCourse}/content/${chapter._id}`}
+                    onClick={() => {
+                      if (!isCompleted) {
+                        console.log("sah");
                         handleCompleteChapter(chapter._id);
-                      }}
+                      }
+                    }}
+                  >
+                    <span
+                      className={`font-medium ${
+                        isActive ? "text-blue-700" : ""
+                      }`}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                      {chapter.title}
                     </span>
-                  )}
-                </Link>
+
+                    {isCompleted ? (
+                      <span className="text-green-600 flex-shrink-0 bg-green-50 p-1 rounded-full">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          color: "gray",
+                          fontSize: "1.2rem",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          console.log("sah");
+
+                          handleCompleteChapter(chapter._id);
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </span>
+                    )}
+                  </Link>
+                </div>
               );
             })}
           </div>
 
           {/* Action Buttons */}
           <div className="p-4 border-t mt-4">
+            {/* Exam button */}
             <button
               onClick={handleStartExam}
               disabled={!areAllChaptersCompleted() || loading}
-              className={`w-full py-3.5 px-5 rounded-md font-medium text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 mb-3 shadow-sm ${
-                areAllChaptersCompleted() && !loading
-                  ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:ring-blue-500"
-                  : "bg-gray-400 cursor-not-allowed opacity-75"
-              }`}
+              style={{
+                width: "100%",
+                padding: "14px 20px",
+                borderRadius: "6px",
+                fontWeight: "500",
+                color: "white",
+                backgroundColor:
+                  areAllChaptersCompleted() && !loading ? "#2563eb" : "#9ca3af",
+                border: "none",
+                cursor:
+                  areAllChaptersCompleted() && !loading
+                    ? "pointer"
+                    : "not-allowed",
+                opacity: areAllChaptersCompleted() && !loading ? "1" : "0.75",
+                marginBottom: "12px",
+                transition: "background-color 0.2s",
+              }}
             >
-              {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Loading...
-                </span>
-              ) : (
-                "Start Exam"
-              )}
+              {loading ? "Loading..." : "Start Exam"}
             </button>
-
+            {/* Certificate button - only shown when all chapters are completed */}
             {areAllChaptersCompleted() && !loading && (
               <button
                 onClick={() => handleEarnCertificate("Trelix")}
-                className="w-full py-3.5 px-5 rounded-md font-medium text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-green-500 shadow-sm"
+                style={{
+                  width: "100%",
+                  padding: "14px 20px",
+                  borderRadius: "6px",
+                  fontWeight: "500",
+                  color: "white",
+                  backgroundColor: "#10b981",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s",
+                }}
               >
-                <span className="flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Earn Certificate
-                </span>
+                Earn Certificate
               </button>
             )}
-
             {!areAllChaptersCompleted() && !loading && (
-              <p className="text-sm text-gray-500 mt-2 text-center">
-                Complete all chapters to unlock the exam
-              </p>
+              <div className="text-center p-3 bg-yellow-50 rounded-md border border-yellow-100">
+                <p className="text-sm text-yellow-800">
+                  Complete all {chapters.length} chapters to unlock the exam
+                </p>
+                <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full"
+                    style={{
+                      width: `${
+                        (completedChapters.length / chapters.length) * 100
+                      }%`,
+                    }}
+                  ></div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {completedChapters.length} of {chapters.length} chapters
+                  completed
+                </p>
+              </div>
             )}
           </div>
         </aside>
