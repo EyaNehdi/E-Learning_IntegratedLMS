@@ -159,12 +159,25 @@ function WordleGame() {
       <div className="wordle-header">
         <h1>Wordle Game</h1>
         <div className="wordle-controls">
-          <button onClick={fetchRandomWord} className="wordle-button">
+          <button onClick={fetchRandomWord} style={{
+      paddingLeft: "16px", // Increased padding for more width
+      paddingRight: "16px",
+      minWidth: "120px", // Ensures the button is wide enough
+      whiteSpace: "nowrap", // Prevents text wrapping
+      backgroundColor: "green",
+    }}
+           >
             New Game
           </button>
           <button 
             onClick={() => setShowCustomWordInput(!showCustomWordInput)} 
-            className="wordle-button"
+            style={{
+              paddingLeft: "20px", // Increased padding for more width
+              paddingRight: "20px",
+              minWidth: "180px", // Ensures the button is wide enough
+              whiteSpace: "nowrap", // Prevents text wrapping
+              backgroundColor: "green",
+            }}
           >
             {showCustomWordInput ? "Cancel" : "Set Custom Word"}
           </button>

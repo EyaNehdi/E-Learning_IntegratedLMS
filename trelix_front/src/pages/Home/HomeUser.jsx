@@ -219,7 +219,7 @@ const HomeUser = () => {
         <div className="row g-4">
           {categories.map((cat, index) => (
             <div key={index} className="col-lg-4 col-md-6">
-              <a href="courses.html" className="category-entry d-flex bg-info p-3 p-xl-4 align-items-center">
+              <a className="category-entry d-flex bg-info p-3 p-xl-4 align-items-center">
                 <span className="icon-lg rounded-circle">
                   <svg xmlns="http://www.w3.org/2000/svg" width={32} height={32}>
                     {/* icône fixe ou tu peux l'associer dynamiquement si tu veux */}

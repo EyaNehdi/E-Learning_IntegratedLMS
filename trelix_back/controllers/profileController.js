@@ -18,7 +18,7 @@ const upload = multer({ storage });
 // Get User Profile
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select("firstName lastName email mfa image profilePhoto coverPhoto phone skils badges role Bio certificatesOwned");
+        const user = await User.findById(req.userId).select("firstName lastName email mfa image profilePhoto coverPhoto phone skils badges role Bio certificatesOwned balance"); // Select only the fields you need
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -40,6 +40,7 @@ const getUserProfile = async (req, res) => {
                 role: user.role,
                 Bio: user.Bio,
                 certificateCount,
+                balance: user.balance,
             };
             res.status(200).json(userProfile_Details);
         }

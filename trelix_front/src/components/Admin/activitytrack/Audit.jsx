@@ -9,7 +9,6 @@ import socket from "../../../utils/socket";
 const AuditLogs = () => {
   const [logs, setLogs] = useState([]);
   const { user } = useProfileStore();
-  console.log(logs);
   const [filters, setFilters] = useState({
     action: "",
     user: "",
