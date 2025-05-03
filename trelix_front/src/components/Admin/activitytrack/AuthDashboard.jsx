@@ -27,11 +27,23 @@ const AuthDashboard = () => {
       }
     };
 
+    const fetchRecentLogins = async () => {
+      try {
+        const response = await axios.get("/api/logs/recent-logins");
+        setEvents(response.data);
+      } catch (error) {
+        console.error("Failed to fetch recent logins:", error);
+      }
+    };
+
+    fetchRecentLogins();
+
     fetchUserStats();
 
     socket.on("userEvent", (data) => {
       setEvents((prev) => [data, ...prev.slice(0, 99)]);
       console.log("socket data", data);
+      console.log("socket event", events);
 
       if (data.action === "register") {
         setUserStats((prev) => ({
@@ -83,7 +95,7 @@ const AuthDashboard = () => {
           value={userStats.instructors}
           percentage={getRolePercentage(userStats.instructors)}
           growth={0}
-          icon={<ContactRound className="text-purple-600"/>}
+          icon={<ContactRound className="text-purple-600" />}
         />
       </div>
 
@@ -115,8 +127,8 @@ const AuthDashboard = () => {
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                          {event.user.firstName?.charAt(0)}
-                          {event.user.lastName?.charAt(0)}
+                          {event.user.firstName?.charAt(0).toUpperCase()}
+                          {event.user.lastName?.charAt(0).toUpperCase()}
                         </div>
                       </div>
                       <div className="ml-4">
@@ -193,23 +205,24 @@ const StatCard = ({
           <p className="text-sm font-medium text-gray-500">{title}</p>
           <p className="mt-1 text-2xl font-semibold text-gray-900">
             {value.toLocaleString()}
-            {hasGrowth && (
-              <p
-                className={`mt-1 text-xs ${
-                  isPositive ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {growthText}
-              </p>
-            )}
             {percentage && (
               <span className="ml-2 text-sm font-normal text-gray-500">
                 ({percentage}%)
               </span>
             )}
           </p>
+          {hasGrowth && (
+            <span
+              className={`mt-1 text-xs ${
+                isPositive ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {growthText}
+            </span>
+          )}
           {change && <p className="mt-1 text-xs text-green-600">{change}</p>}
         </div>
+
         <div className="text-3xl">{icon}</div>
       </div>
     </div>
