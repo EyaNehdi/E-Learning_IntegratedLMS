@@ -135,7 +135,7 @@ const StoreManagement = () => {
                   onChange={handleChange}
                   required
                   min={0}
-                  step="0.01"
+                  
                 />
                 {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
               </div>
@@ -151,7 +151,7 @@ const StoreManagement = () => {
                   onChange={handleChange}
                   required
                   min={0}
-                  step="0.01"
+                
                 />
                 {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
               </div>

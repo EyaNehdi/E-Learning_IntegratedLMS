@@ -299,7 +299,9 @@ const createProductWithStripe = async (req, res) => {
   // Adming editing a product in store with stripe
   const updateProductAndPrice = async (req, res) => {
     const { id } = req.params; // MongoDB product ID
-    const { name, description, price } = req.body; // Price in cents from frontend
+
+    const { name, description, price , coinAmoint } = req.body; // Price in cents from frontend
+
   
     try {
       // 1. Validate price
