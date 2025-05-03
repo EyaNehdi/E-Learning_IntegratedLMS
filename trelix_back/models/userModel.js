@@ -71,6 +71,24 @@ const User = new Schema({
     type: Boolean,
     default: true,
   },
+  balance: {
+    type: Number,
+    default: 0,
+  },
+  processedSessions: [{ type: String }], // Track processed Stripe session IDs
+  purchasedCourses: [{
+    courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+    purchaseDate: { type: Date, default: Date.now },
+  }],
+  engagementStage: {
+    type: String,
+    enum: ["active", "at_risk", "idle", "churned"],
+    default: "active"
+  },
+  lastEngagementEmailSent: {
+    type: Date,
+    default: null
+  }
 },
   { timestamps: true });
 // Hashing Password

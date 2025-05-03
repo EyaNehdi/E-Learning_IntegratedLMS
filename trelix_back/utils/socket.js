@@ -79,10 +79,25 @@ const emitLogSolved = (logId) => {
     }
 };
 
+const emitEngagementSummary = (summary) => {
+    if (io) {
+        io.emit('engagementUpdate', {
+            type: 'engagement',
+            message: `${summary.updatedCount} users had engagement status updates`,
+            timestamp: new Date(),
+            details: {
+                updatedUsers: summary.updatedUsers,
+                timestamp: summary.timestamp
+            }
+        });
+    }
+};
+
 module.exports = {
     initSocket,
     emitNewLog,
     emitNewReview,
     emitLogSolved,
     emitNewLoginUser,
+    emitEngagementSummary
 };

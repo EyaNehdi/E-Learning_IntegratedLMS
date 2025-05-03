@@ -135,8 +135,11 @@ const Chatbot = () => {
   );
 };
 import WordleGame from "./components/Leaderboard/WordleGame.jsx";
-import StudentActions from "./components/Admin/activitytrack/StudentActions.jsx";
 import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
+import ListPacks from "./components/Admin/ListPacks.jsx";
+import StoreManagement from "./components/Admin/storeManagement.jsx";
+import Store from "./components/Store/Store.jsx";
+import SystemSettings from "./components/Admin/activitytrack/SystemSettings.jsx";
 
 
 
@@ -188,6 +191,7 @@ function App() {
             path="/classroom/courses/:courseId"
             element={<CourseDetailsPage />}
           />
+          <Route path="/store" element={<Store />} />
           <Route path="/profile" element={<ProfilePage />}>
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
@@ -214,6 +218,7 @@ function App() {
             <Route path="list" element={<Listecourse />} />
             <Route path="module" element={<Module />} />
             <Route path="achievements" element={<Achievements />} />
+            
 
             <Route
               path="/profile/edit-course/:courseId"
@@ -234,6 +239,7 @@ function App() {
           </Route>
         </Route>
         <Route path="/CV" element={<CV />} />
+        
         {/* **************** */}
         {/* Admin routes */}
         <Route element={<AdminRoute />}>
@@ -242,11 +248,12 @@ function App() {
             <Route path="users" element={<ListUsers />} />
             <Route path="update/:id" element={<ManageUser />} />
             <Route path="create" element={<ManageUser />} />
+            
           </Route>
           <Route path="monitor" element={<AuditPage />}>
             <Route index element={<AuditLogs />} />
             <Route path="users-audit" element={<AuthDashboard />} />
-            <Route path="system" element={<StudentActions />} />
+            <Route path="system" element={<SystemSettings />} />
           </Route>
           <Route path="/badge" element={<BadgeFeature />}>
             <Route index element={<ListBadges />} />
@@ -256,6 +263,11 @@ function App() {
           </Route>
 
           <Route path="/report" element={<DailyQuizzes />} />
+          <Route path="/storeAdmin" element={<ListPacks />} />
+          <Route path="/product" element={<StoreManagement />} />
+          <Route path="/product/:id" element={<StoreManagement />} />
+
+          
         </Route>
         {/* **************** */}
         <Route path="/linkedin/callback" element={<LinkedInCallback />} />

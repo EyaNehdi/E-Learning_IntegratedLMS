@@ -411,6 +411,9 @@ function Header() {
                   </div>
                 </div>
                 <div className="col-auto header-actions position-relative order-xl-2 d-flex align-items-center">
+                <a className="text-reset icon rounded-5 bg-shade" href="/store">
+  <i className="feather-icon icon-shopping-bag" />
+</a>
                   {/* Search Icon */}
                   <a
                     className="text-reset icon rounded-5 bg-shade"
@@ -470,6 +473,7 @@ function Header() {
                                       <>
                                         {user.firstName.charAt(0)}
                                         {user.lastName.charAt(0)}
+              
                                       </>
                                     ) : (
                                       "?"
@@ -664,9 +668,12 @@ function Header() {
                                   marginLeft: "4px",
                                 }}
                               >
-                                {user?.firstName} {user?.lastName}
+                                {user?.firstName} {user?.lastName}{" "}
                               </span>
                             </Tooltip>
+                           
+                            <span>&nbsp;             🪙 {user?.balance}</span>
+
                           </div>
                         ) : (
                           <></>

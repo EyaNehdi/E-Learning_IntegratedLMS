@@ -17,7 +17,6 @@ export const useProfileStore = create((set, get) => ({
         },
         withCredentials: true,  // Ensure cookies are sent with the request
       });
-      console.log("User data loaded:", res.data);
       set({ user: res.data, isLoadingUser: false });
       get().calculateAccountCompletion(res.data);
     } catch (error) {
