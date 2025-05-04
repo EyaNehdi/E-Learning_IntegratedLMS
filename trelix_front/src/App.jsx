@@ -9,7 +9,7 @@ import SignUpPage from "./pages/SignUpPage/SignUpPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicy/PrivacyPolicyPage";
 import Manage from "./components/Admin/Manage";
 import Reports from "./components/Admin/Reports";
-import NotFound from "./components/Notfound";
+import NotFound from "./components/NotFound";
 import Settings from "./components/Admin/Settings";
 import { LinkedInCallback } from "react-linkedin-login-oauth2";
 import CV from "./pages/cv";
