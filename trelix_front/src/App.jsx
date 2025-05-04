@@ -128,7 +128,7 @@ const Chatbot = () => {
 import WordleGame from "./components/Leaderboard/WordleGame.jsx";
 import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
 import ListPacks from "./components/Admin/ListPacks.jsx";
-import StoreManagement from "./components/Admin/storeManagement.jsx";
+import StoreManagement from "./components/Admin/storeManagement";
 import Store from "./components/Store/Store.jsx";
 
 import EmotionDetection from "./components/ia/emotion.jsx";
