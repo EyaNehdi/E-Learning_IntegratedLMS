@@ -132,9 +132,24 @@ const getChaptersByCourse = async (req, res) => {
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
+
         const user = await User.findById(userId)
-            .select('purchasedCourses completedChapters balance')
-            .populate('purchasedCourses.courseId');
+            .select('purchasedCourses completedChapters balance certificatesOwned')
+            .populate([
+                {
+                    path: 'purchasedCourses.courseId',
+                    model: 'Course'
+                },
+                {
+                    path: 'certificatesOwned.certificateId',
+                    model: 'Certificate',
+                    select: 'courseId'
+                }
+            ]);
+
+        const certificateForCourse = user.certificatesOwned.find(cert =>
+            cert.certificateId && cert.certificateId.courseId.equals(course._id)
+        );
 
         const chaptersWithCompletion = course.chapters?.map(chapter => ({
             ...chapter,
@@ -163,7 +178,8 @@ const getChaptersByCourse = async (req, res) => {
 
         res.status(200).json({
             courseInfo: course,
-            chaptersWithCompletion
+            chaptersWithCompletion,
+            certificateEarned: !!certificateForCourse,
         });
 
     } catch (error) {

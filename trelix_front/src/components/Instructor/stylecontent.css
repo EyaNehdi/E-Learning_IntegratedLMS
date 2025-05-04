@@ -32,6 +32,7 @@
   align-items: center;
 }
 
+/* skeleton box style CSS */
 .skeleton-box {
   display: inline-block;
   position: relative;
@@ -62,4 +63,52 @@
   100% {
     transform: translateX(100%);
   }
+}
+
+/* swal dialog buttons CSS */
+.swal-custom-popup {
+  width: auto !important;
+}
+
+.swal-custom-confirm-button {
+  background-color: #3085d6;
+  font-size: 1rem;
+  width: auto !important;
+  white-space: nowrap;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+}
+
+.swal-custom-confirm-button:disabled,
+.swal-custom-confirm-button.swal2-confirm[disabled] {
+  background-color: #aaa !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.swal-custom-cancel-button {
+  background-color: transparent !important;
+  border: 2px solid #3085d6 !important; /* adjust color as needed */
+  color: #3085d6 !important;
+  font-size: 1rem;
+  width: auto !important;
+  white-space: nowrap;
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
+  box-shadow: none !important;
+}
+
+.swal-custom-deny-button {
+  background-color: orange !important;
+  color: white !important;
+  font-size: 1rem;
+  width: auto !important;
+  white-space: nowrap;
+  padding: 0.5rem 1.2rem;
+  border: none !important;
+}
+
+.blur-background-access #root {
+  filter: blur(4px);
+  pointer-events: none;
 }

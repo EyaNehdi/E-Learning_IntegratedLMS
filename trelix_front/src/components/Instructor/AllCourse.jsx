@@ -340,6 +340,10 @@ function Allcourse() {
         confirmButtonText: "Go to Store",
         showCancelButton: true,
         cancelButtonText: "Cancel",
+        customClass: {
+          confirmButton: "swal-custom-confirm-button",
+          cancelButton: "swal-custom-cancel-button",
+        },
       }).then((result) => {
         if (result.isConfirmed) navigate("/store");
       });
@@ -356,6 +360,10 @@ function Allcourse() {
       cancelButtonText: "Cancel",
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
+      customClass: {
+        confirmButton: "swal-custom-confirm-button",
+        cancelButton: "swal-custom-cancel-button",
+      },
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -369,6 +377,10 @@ function Allcourse() {
             title: "Course Purchased!",
             text: response.data.message,
             confirmButtonText: "Go to Course",
+            customClass: {
+              confirmButton: "swal-custom-confirm-button",
+              cancelButton: "swal-custom-cancel-button",
+            },
           }).then(() => {
             setCourseAccess((prev) => ({ ...prev, [course._id]: true }));
             checkAuth(); // Update user balance
@@ -382,6 +394,9 @@ function Allcourse() {
             text:
               err.response?.data?.message ||
               "An error occurred while purchasing the course.",
+            customClass: {
+              confirmButton: "swal-custom-confirm-button",
+            },
           });
         }
       }
