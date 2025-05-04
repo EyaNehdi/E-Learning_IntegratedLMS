@@ -130,14 +130,18 @@ import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
 import ListPacks from "./components/Admin/ListPacks.jsx";
 import StoreManagement from "./components/Admin/storeManagement.jsx";
 import Store from "./components/Store/Store.jsx";
+
+import EmotionDetection from "./components/ia/emotion.jsx";
+
 import SystemSettings from "./components/Admin/activitytrack/SystemSettings.jsx";
+
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* **************** */}
-
+        {/* **************** */}        
+        <Route path="/emotion" element={<EmotionDetection />} />
         {/* Public routes */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<Index />} />
@@ -145,7 +149,7 @@ function App() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
-
+          
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
