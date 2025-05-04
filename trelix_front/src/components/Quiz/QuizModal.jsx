@@ -33,7 +33,6 @@ const QuizModal = ({ showQuiz, onClose, selectedQuizId = null }) => {
 
   // Update the useEffect to ensure we're properly handling the case where a user has completed quizzes
   useEffect(() => {
-    console.log("ID chapter:", id)
     if (showQuiz) {
       setIsLoading(true)
 
