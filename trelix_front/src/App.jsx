@@ -53,13 +53,9 @@ import ManageUser from "./components/Admin/ManageUser";
 import ManageBadges from "./components/Admin/ManageBadges";
 import BadgeFeature from "./pages/Admin/BadgeFeature";
 import ListBadges from "./components/Admin/ListBadges";
-import StatPreference from "./components/Student/preference-statistics" 
-import Preference from "./components/Student/AddPreference"
-import IntelligentCourses from "./components/Student/IntelligentCourses"
-
-
-
-
+import StatPreference from "./components/Student/preference-statistics";
+import Preference from "./components/Student/AddPreference";
+import IntelligentCourses from "./components/Student/IntelligentCourses";
 
 import React, { useState } from "react";
 import axios from "axios";
@@ -89,20 +85,15 @@ import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
 import AuditPage from "./pages/Admin/AuditPage.jsx";
 import MfaSetup from "./components/MfaSetup/MfaSetup.jsx";
 
-
 const Chatbot = () => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-
-
-
-    setIsLoading(true);
-    // Ajout du message utilisateur immédiatement
-    setMessages((prev) => [...prev, { sender: "user", text: input }]);
-    setInput("");
- 
+  setIsLoading(true);
+  // Ajout du message utilisateur immédiatement
+  setMessages((prev) => [...prev, { sender: "user", text: input }]);
+  setInput("");
 
   return (
     <div className="chat-container">
@@ -141,15 +132,12 @@ import StoreManagement from "./components/Admin/storeManagement.jsx";
 import Store from "./components/Store/Store.jsx";
 import SystemSettings from "./components/Admin/activitytrack/SystemSettings.jsx";
 
-
-
 function App() {
   return (
     <Router>
-      
       <Routes>
         {/* **************** */}
-        
+
         {/* Public routes */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<Index />} />
@@ -181,7 +169,7 @@ function App() {
           <Route path="/allcours" element={<Allcourse />} />
           <Route path="/chart" element={<CourseChartPage />} />
           <Route path="/exams/:courseid" element={<ExamStudent />} />
-          <Route path="/chapters/:courseid" element={<ListChapters />}>
+          <Route path="/chapters/:slugCourse" element={<ListChapters />}>
             <Route path="content/:id" element={<ChapterContent />} />
           </Route>
           <Route path="/leaderboard" element={<Leaderboard />} />
@@ -218,18 +206,26 @@ function App() {
             <Route path="list" element={<Listecourse />} />
             <Route path="module" element={<Module />} />
             <Route path="achievements" element={<Achievements />} />
-            
 
             <Route
               path="/profile/edit-course/:courseId"
               element={<EditCourse />}
             />
 
-             <Route path="/profile/classroom" element={<ClassroomPage />} />
-          <Route path="/profile/classroom/courses/:courseId" element={<CourseDetailsPage />} />
-          <Route path="/profile/preference" element={<Preference />} />
-          <Route path="/profile/preferencestat" element={<StatPreference />} />
-          <Route path="/profile/intelligent-courses" element={<IntelligentCourses />} />
+            <Route path="/profile/classroom" element={<ClassroomPage />} />
+            <Route
+              path="/profile/classroom/courses/:courseId"
+              element={<CourseDetailsPage />}
+            />
+            <Route path="/profile/preference" element={<Preference />} />
+            <Route
+              path="/profile/preferencestat"
+              element={<StatPreference />}
+            />
+            <Route
+              path="/profile/intelligent-courses"
+              element={<IntelligentCourses />}
+            />
 
             <Route path="/profile/allcours" element={<Allcourse />} />
             <Route
@@ -239,7 +235,7 @@ function App() {
           </Route>
         </Route>
         <Route path="/CV" element={<CV />} />
-        
+
         {/* **************** */}
         {/* Admin routes */}
         <Route element={<AdminRoute />}>
@@ -248,7 +244,6 @@ function App() {
             <Route path="users" element={<ListUsers />} />
             <Route path="update/:id" element={<ManageUser />} />
             <Route path="create" element={<ManageUser />} />
-            
           </Route>
           <Route path="monitor" element={<AuditPage />}>
             <Route index element={<AuditLogs />} />
@@ -266,8 +261,6 @@ function App() {
           <Route path="/storeAdmin" element={<ListPacks />} />
           <Route path="/product" element={<StoreManagement />} />
           <Route path="/product/:id" element={<StoreManagement />} />
-
-          
         </Route>
         {/* **************** */}
         <Route path="/linkedin/callback" element={<LinkedInCallback />} />

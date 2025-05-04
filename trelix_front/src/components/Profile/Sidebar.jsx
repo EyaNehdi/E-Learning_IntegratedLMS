@@ -207,10 +207,10 @@ function Sidebar({ setActivePage }) {
                 <span>Security & Privacy</span>
               </Link>
               <Link
-                className={`nav-link ${location.pathname === "/profile/settings" ? "active" : ""
+                className={`nav-link ${location.pathname === "/profile/test" ? "active" : ""
                   }`}
                 to="/profile/test"
-                onClick={() => setActivePage("Security & Privacy")}
+                onClick={() => setActivePage("Wordle")}
               >
                 <i className="feather-icon icon-shield" />
                 <span>Wordle</span>

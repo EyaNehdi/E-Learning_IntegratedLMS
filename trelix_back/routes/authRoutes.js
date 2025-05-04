@@ -31,7 +31,6 @@ router.post("/login", checkUserIsActive, identifyActingUser, logActivityMiddlewa
 router.post("/logout", authController.signOut);
 
 //others
-router.get("/completedchapters", authController.markChapterAsCompleted);
 router.get('/current-location', verifyToken, authController.trackCurrentLocation);
 
 module.exports = router;

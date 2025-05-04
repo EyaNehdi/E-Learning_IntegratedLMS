@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Tooltip from "@mui/material/Tooltip";
 import Divider from "@mui/material/Divider";
+import { Award, Download } from "lucide-react";
 import { Link, useOutletContext } from "react-router-dom";
 import axios from "axios";
 
@@ -18,7 +19,6 @@ const Achievements = () => {
         `http://localhost:5000/certificates/getProgress?userId=${user._id}`
       );
       setAchievements(response.data);
-      console.log(achievements);
     } catch (error) {
       console.error("Error fetching achievements:", error);
     } finally {
@@ -82,18 +82,6 @@ const Achievements = () => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Link
-          to={linkTo}
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            zIndex: 1,
-            display: isHovered ? "block" : "none",
-          }}
-        >
-          <button className="btn btn-primary btn-sm">View</button>
-        </Link>
         <div style={{ ...cardStyle, height: height }}>{children}</div>
       </div>
     );
@@ -267,119 +255,276 @@ const Achievements = () => {
       </div>
 
       {/* Third Row: Certifications (Full Width) */}
-      <div className="row">
-        <div className="col-12">
-          <div className="card">
-            <div className="card-body">
-              <h3 className="card-title">Certifications Earned</h3>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "1.5rem",
+        }}
+      >
+        {/* Header Section */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            marginBottom: "2rem",
+            paddingBottom: "1rem",
+            borderBottom: "1px solid #e5e7eb",
+          }}
+        >
+          <Award
+            style={{
+              color: "#4f46e5",
+              marginRight: "1rem",
+              width: "1.75rem",
+              height: "1.75rem",
+            }}
+          />
+          <h2
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "600",
+              color: "#1f2937",
+              margin: 0,
+            }}
+          >
+            Certifications Earned
+          </h2>
+        </div>
 
-              {loading ? (
-                <p>Loading certificates...</p>
-              ) : certificates.length === 0 ? (
-                <p>No certifications earned yet.</p>
-              ) : (
-                <div className="row">
-                  {certificates.map((cert, index) => (
-                    <div key={index} className="col-md-6 col-lg-4 mb-3">
-                      <div
+        {loading ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "200px",
+            }}
+          >
+            <div
+              style={{
+                width: "2.5rem",
+                height: "2.5rem",
+                border: "4px solid #e5e7eb",
+                borderTopColor: "#4f46e5",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite",
+              }}
+            ></div>
+          </div>
+        ) : certificates.length === 0 ? (
+          <div
+            style={{
+              backgroundColor: "#f9fafb",
+              borderRadius: "0.5rem",
+              padding: "2rem",
+              textAlign: "center",
+              border: "1px dashed #e5e7eb",
+            }}
+          >
+            <p
+              style={{
+                color: "#6b7280",
+                margin: 0,
+                fontSize: "1rem",
+              }}
+            >
+              No certifications earned yet. Complete courses to earn
+              certificates.
+            </p>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
+              gap: "1.5rem",
+            }}
+          >
+            {certificates.map((cert, index) => (
+              <div
+                key={index}
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "0.5rem",
+                  border: "1px solid #e5e7eb",
+                  overflow: "hidden",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  ":hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  },
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    padding: "1.25rem",
+                    gap: "1rem",
+                  }}
+                >
+                  {/* Certificate Logo */}
+                  <div
+                    style={{
+                      flexShrink: 0,
+                      width: "3.5rem",
+                      height: "3.5rem",
+                      borderRadius: "0.375rem",
+                      border: "1px solid #e5e7eb",
+                      backgroundColor: "#f9fafb",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <img
+                      src={cert.logo}
+                      alt={cert.name}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                        padding: "0.5rem",
+                      }}
+                    />
+                  </div>
+
+                  {/* Certificate Details */}
+                  <div style={{ flex: 1 }}>
+                    <h3
+                      style={{
+                        fontSize: "1rem",
+                        fontWeight: "600",
+                        color: "#1f2937",
+                        margin: "0 0 0.5rem 0",
+                      }}
+                    >
+                      {cert.name}
+                    </h3>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "0.25rem",
+                      }}
+                    >
+                      <span
                         style={{
-                          border: "1px solid #ddd",
-                          padding: "16px",
-                          borderRadius: "10px",
-                          backgroundColor: "#fff",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-                          gap: "16px",
-                          maxWidth: "500px",
+                          fontSize: "0.75rem",
+                          color: "#6b7280",
+                          marginRight: "0.5rem",
                         }}
                       >
-                        <img
-                          src={cert.logo}
-                          alt={cert.name}
+                        Issuer:
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "0.875rem",
+                          color: "#4b5563",
+                          fontWeight: "500",
+                        }}
+                      >
+                        {cert.issuer}
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "0.75rem",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "#6b7280",
+                          marginRight: "0.5rem",
+                        }}
+                      >
+                        Issued:
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "0.875rem",
+                          color: "#4b5563",
+                        }}
+                      >
+                        {new Date(cert.issuedDate).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+
+                    {/* Action Button */}
+                    {cert.pdfUrl ? (
+                      <a
+                        href={`${baseUrl}/download-certificate/${cert.pdfUrl
+                          .split("/")
+                          .pop()}`}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: "0.5rem 1rem",
+                          borderRadius: "0.375rem",
+                          backgroundColor: "#4f46e5",
+                          color: "white",
+                          textDecoration: "none",
+                          fontSize: "0.875rem",
+                          fontWeight: "500",
+                          transition: "background-color 0.2s",
+                          width: "100%",
+                          textAlign: "center",
+                        }}
+                        onMouseOver={(e) =>
+                          (e.currentTarget.style.backgroundColor = "#4338ca")
+                        }
+                        onMouseOut={(e) =>
+                          (e.currentTarget.style.backgroundColor = "#4f46e5")
+                        }
+                      >
+                        <Download
                           style={{
-                            width: "50px",
-                            height: "50px",
-                            objectFit: "cover",
-                            objectPosition: "center",
-                            borderRadius: "6px",
-                            border: "1px solid #ccc",
-                            backgroundColor: "#f0f0f0",
+                            width: "1rem",
+                            height: "1rem",
+                            marginRight: "0.5rem",
                           }}
                         />
-                        <div style={{ flex: 1 }}>
-                          <h4
-                            style={{
-                              fontSize: "1rem",
-                              fontWeight: "600",
-                              margin: "0 0 6px 0",
-                              color: "#333",
-                            }}
-                          >
-                            {cert.name}
-                          </h4>
-                          <p
-                            style={{
-                              fontSize: "0.85rem",
-                              margin: "0 0 4px 0",
-                              color: "#555",
-                            }}
-                          >
-                            <strong>Issuer:</strong> {cert.issuer}
-                          </p>
-                          <p
-                            style={{
-                              fontSize: "0.8rem",
-                              margin: "0 0 8px 0",
-                              color: "#777",
-                            }}
-                          >
-                            <strong>Issued:</strong>{" "}
-                            {new Date(cert.issuedDate).toLocaleDateString()}
-                          </p>
-                          {cert.pdfUrl ? (
-                            <a
-                              href={`${baseUrl}/download-certificate/${cert.pdfUrl
-                                .split("/")
-                                .pop()}`}
-                              className="btn btn-sm btn-primary"
-                              style={{
-                                fontSize: "0.8rem",
-                                padding: "6px 12px",
-                                borderRadius: "4px",
-                                backgroundColor: "#007bff",
-                                color: "#fff",
-                                textDecoration: "none",
-                                display: "inline-block",
-                              }}
-                            >
-                              Download Certificate
-                            </a>
-                          ) : (
-                            <button
-                              className="btn btn-sm btn-secondary"
-                              disabled
-                              style={{
-                                fontSize: "0.8rem",
-                                padding: "6px 12px",
-                                borderRadius: "4px",
-                                backgroundColor: "#ccc",
-                                color: "#666",
-                                cursor: "not-allowed",
-                              }}
-                            >
-                              No PDF Available
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                        Download Certificate
+                      </a>
+                    ) : (
+                      <button
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: "0.5rem 1rem",
+                          borderRadius: "0.375rem",
+                          backgroundColor: "#f3f4f6",
+                          color: "#6b7280",
+                          border: "none",
+                          cursor: "not-allowed",
+                          fontSize: "0.875rem",
+                          fontWeight: "500",
+                          width: "100%",
+                        }}
+                      >
+                        Certificate Not Available
+                      </button>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
