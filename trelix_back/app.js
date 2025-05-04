@@ -491,7 +491,6 @@ async function startApp() {
 
 startApp();
 
-
 const PORT = process.env.PORT || 5000;
 
 // 1. Get the server instance from Express

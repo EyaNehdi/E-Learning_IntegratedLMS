@@ -6,7 +6,6 @@ const purchaseCourse = async (req, res) => {
   const userId = req.userId; // From verifyToken
 
   try {
-    console.log("Purchase course request:", { courseId, userId });
 
     if (!courseId) {
       console.error("Missing courseId");
@@ -19,7 +18,6 @@ const purchaseCourse = async (req, res) => {
       return res.status(404).json({ message: "Course not found" });
     }
     if (course.price === 0) {
-      console.log(`Course is free, no purchase needed: ${courseId}`);
       return res.status(200).json({ message: "Free course, no purchase required" });
     }
 
@@ -31,7 +29,6 @@ const purchaseCourse = async (req, res) => {
 
     // Check if course is already purchased
     if (user.purchasedCourses.some(pc => pc.courseId.toString() === courseId)) {
-      console.log(`Course already purchased: ${courseId} by user: ${userId}`);
       return res.status(400).json({ message: "Course already purchased" });
     }
 
@@ -53,7 +50,6 @@ const purchaseCourse = async (req, res) => {
       { new: true }
     );
 
-    console.log(`Course purchased: ${course.title} by user ${userId}, new balance: ${updatedUser.balance}`);
     res.status(200).json({
       message: `Course ${course.title} purchased successfully!`,
       balance: updatedUser.balance,
@@ -69,27 +65,22 @@ const checkCourseAccess = async (req, res) => {
   const userId = req.userId;
 
   try {
-    console.log("Checking course access:", { courseId, userId });
 
     const course = await Course.findById(courseId);
     if (!course) {
-      console.error(`Course not found: ${courseId}`);
       return res.status(404).json({ message: "Course not found" });
     }
 
     if (course.price === 0) {
-      console.log(`Access granted: course is free (${courseId})`);
       return res.status(200).json({ hasAccess: true });
     }
 
     const user = await User.findById(userId);
     if (!user) {
-      console.error(`User not found: ${userId}`);
       return res.status(404).json({ message: "User not found" });
     }
 
     const hasAccess = user.purchasedCourses.some(pc => pc.courseId.toString() === courseId);
-    console.log(`Access check: user ${userId}, course ${courseId}, hasAccess: ${hasAccess}`);
     res.status(200).json({ hasAccess });
   } catch (err) {
     console.error("Error checking course access:", err);

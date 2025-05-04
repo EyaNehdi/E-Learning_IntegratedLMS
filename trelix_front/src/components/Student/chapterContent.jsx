@@ -419,7 +419,6 @@ const ChapterContent = () => {
 
       try {
         const response = await axios.get(`http://localhost:5000/api/reviews/chapter/${id}`)
-        console.log("Fetched Reviews:", response.data)
 
         if (response.data && Array.isArray(response.data)) {
           const formattedReviews = response.data.map((review) => ({
