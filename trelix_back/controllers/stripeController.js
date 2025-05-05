@@ -2,6 +2,7 @@ require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Product = require('../models/packs.model');
 const User = require('../models/userModel');
+const { recordFinancialEvent } = require('../services/financialEventService');
 
 const checkoutSession = async (req, res) => {
   const { packId, userId } = req.body;
@@ -84,6 +85,23 @@ const verifySession = async (req, res) => {
         return res.status(403).json({ message: "Authentication required for balance update" });
       }
 
+      // Check if user exists first
+      const userExists = await User.exists({ _id: userId });
+      if (!userExists) {
+        console.error(`User not found for userId: ${userId}`);
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if session was already processed
+      const sessionProcessed = await User.exists({ _id: userId, processedSessions: sessionId });
+      if (sessionProcessed) {
+        console.warn(`Session already processed for userId: ${userId}, session: ${sessionId}`);
+        return res.status(200).json({
+          success: true,
+          message: "Session already processed",
+        });
+      }
+
       const product = await Product.findById(packId);
       if (!product) {
         console.error(`Pack not found for packId: ${packId}`);
@@ -97,7 +115,7 @@ const verifySession = async (req, res) => {
 
       // Update user balance and track session
       const user = await User.findOneAndUpdate(
-        { _id: userId, processedSessions: { $ne: sessionId } },
+        { _id: userId },
         {
           $inc: { balance: product.coinAmount },
           $addToSet: { processedSessions: sessionId },
@@ -105,9 +123,19 @@ const verifySession = async (req, res) => {
         { new: true }
       );
 
-      if (!user) {
-        console.error(`User not found or session already processed for userId: ${userId}, session: ${sessionId}`);
-        return res.status(404).json({ message: "User not found or session already processed" });
+      // Record financial event
+      try {
+        await recordFinancialEvent({
+          userId: user._id,
+          type: 'balance_topup',
+          amount: product.coinAmount,
+          relatedObject: product._id,
+          relatedModel: 'Product',
+          metadata: { stripeSessionId: session.id },
+        });
+        console.log(`Financial event recorded for session ${session.id}`);
+      } catch (eventErr) {
+        console.error(`Failed to record financial event for session ${session.id}:`, eventErr);
       }
 
       console.log(`Balance updated for user ${userId}: +${product.coinAmount} coins, new balance: ${user.balance}`);
