@@ -314,6 +314,7 @@ function Allcourse() {
                               }
                               alt={course.title}
                             />
+
                           </a>
                           <a
                             href="#"
