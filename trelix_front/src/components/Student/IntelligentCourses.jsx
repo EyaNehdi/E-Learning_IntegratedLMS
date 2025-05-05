@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -57,11 +58,12 @@ function IntelligentCourses() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 py-12">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
+        <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-purple-700 px-6 py-8">
-            <h1 className="text-3xl font-bold text-center text-white mb-2">Cours Recommandés</h1>
-            <p className="text-center text-blue-100">Découvrez les cours adaptés à vos préférences</p>
+            <h1 className="text-3xl font-bold text-center text-white mb-2">Recommended Courses</h1>
+            <p className="text-center text-blue-100">Discover the courses suited to your preferences</p>
           </div>
+          
 
           <div className="p-6 md:p-8">
             {message.text && (
@@ -82,22 +84,28 @@ function IntelligentCourses() {
             )}
 
             {isLoading ? (
-              <div className="text-center text-gray-600">Chargement des cours...</div>
+              <div className="text-center text-gray-600 py-10">Chargement des cours...</div>
             ) : courses.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="space-y-6">
                 {courses.map((course) => (
                   <div
                     key={course.id}
-                    className="bg-gray-50 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                    className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-100 flex flex-col"
                   >
-                    <h3 className="text-lg font-semibold text-gray-800">{course.title}</h3>
-                    <p className="text-gray-600 mt-2">{course.description}</p>
-                    <p className="text-sm text-gray-500 mt-2 tennis">Niveau : {course.level}</p>
-                    <p className="text-sm text-gray-500">Catégorie : {course.categorie}</p>
-                    <p className="text-sm text-gray-500">Prix : {course.price} €</p>
-                    <p className="text-sm text-gray-500">Module : {course.moduleName}</p>
+                    {/* Placeholder pour une image (optionnel, à remplacer par une URL si disponible) */}
+                    <div className="h-48 bg-gray-200 rounded-t-lg flex items-center justify-center mb-4">
+                      <span className="text-gray-500 text-sm">Aucune image</span>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">{course.title}</h3>
+                    <p className="text-gray-600 text-sm line-clamp-3 mb-4">{course.description}</p>
+                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-500 mb-4">
+                      <p><span className="font-medium text-gray-700">Niveau :</span> {course.level}</p>
+                      <p><span className="font-medium text-gray-700">Catégorie :</span> {course.categorie}</p>
+                      <p><span className="font-medium text-gray-700">Prix :</span> {course.price} €</p>
+                      <p><span className="font-medium text-gray-700">Module :</span> {course.moduleName}</p>
+                    </div>
                     <button
-                      className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                      className="mt-auto bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200"
                       onClick={() => navigate(`/course/${course.id}`)}
                     >
                       Voir le cours
@@ -106,7 +114,7 @@ function IntelligentCourses() {
                 ))}
               </div>
             ) : (
-              <div className="text-center text-gray-600">Aucun cours disponible pour ce module.</div>
+              <div className="text-center text-gray-600 py-10">Aucun cours disponible pour ce module.</div>
             )}
           </div>
         </div>
@@ -114,6 +122,5 @@ function IntelligentCourses() {
     </div>
   );
 }
-
 
 export default IntelligentCourses;

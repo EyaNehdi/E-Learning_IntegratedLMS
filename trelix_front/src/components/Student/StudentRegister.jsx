@@ -15,6 +15,7 @@ import { useLinkedIn, LinkedIn } from "react-linkedin-login-oauth2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
 const StudentRegister = ({ setisRegisterSuccess }) => {
   const location = useLocation();
   const navigate = useNavigate();
