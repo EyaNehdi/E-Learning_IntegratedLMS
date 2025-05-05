@@ -694,6 +694,7 @@ function Allcourse() {
                               }
                               alt={course.title}
                             />
+
                             {/* Add lock overlay for paid courses that aren't purchased */}
                             {course.price > 0 && !courseAccess[course._id] && (
                               <div className="course-lock-overlay">

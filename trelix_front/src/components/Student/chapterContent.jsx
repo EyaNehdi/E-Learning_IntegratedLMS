@@ -704,6 +704,7 @@ const ChapterContent = () => {
                     value="overview"
                     className="flex-1 py-3 px-6 text-base font-medium text-black bg-blue-500 hover:bg-blue-600 transition-colors duration-200 data-[state=active]:bg-sky-100 data-[state=active]:text-blue-800 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 focus:outline-none"
                   >
+                    
                     Overview
                   </TabsTrigger>
                   <TabsTrigger
