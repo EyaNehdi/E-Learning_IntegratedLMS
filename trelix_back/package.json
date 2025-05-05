@@ -1,7 +1,11 @@
 {
   "name": "trelix-back",
   "version": "0.0.0",
-  "private": true,
+  "description": "test",
+  "main": "app.js",
+  "publishConfig": {
+    "registry": "http://192.168.33.10:8081/repository/trelix/"
+  },
   "scripts": {
     "dev": "nodemon ./bin/www",
     "build": "webpack",
@@ -46,6 +50,7 @@
     "simple-oauth2": "^5.1.0",
     "socket.io": "^4.8.1",
     "speakeasy": "^2.0.0",
+    "stripe": "^18.1.0",
     "trelix-back": "file:",
     "yup": "^1.6.1"
   },

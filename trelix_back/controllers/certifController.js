@@ -89,10 +89,7 @@ async function generateCertificate(user, course) {
 
 const issueCertificate = async (req, res) => {
     try {
-        console.log(req.body);
-
         const { userId, courseId, provider } = req.body;
-
         if (!userId || !courseId || !provider) {
             return res.status(400).json({ error: "Missing required fields" });
         }
@@ -186,7 +183,7 @@ const getAllCertifWithOwnedStatus = async (req, res) => {
             return res.status(400).json({ message: "User ID is required" });
         }
 
-        const allCertificates = await Certificate.find();
+        const allCertificates = await Certificate.find().populate('courseId', 'slug');
 
         const user = await User.findById(userId).select("certificatesOwned");
 
@@ -202,7 +199,8 @@ const getAllCertifWithOwnedStatus = async (req, res) => {
             const ownedData = ownedMap.get(cert._id.toString());
             return {
                 id: cert._id,
-                courseId: cert.courseId,
+                courseId: cert.courseId._id,
+                courseSlug: cert.courseId.slug,
                 name: cert.name,
                 description: cert.description,
                 issuer: cert.provider,
