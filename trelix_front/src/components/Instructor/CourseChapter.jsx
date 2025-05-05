@@ -135,6 +135,22 @@ function CourseChapter() {
           chapters: selectedChapters,
         }
       );
+      setCourseChapters((prevChapters) => {
+        // Find the chapter objects that were just assigned
+        const newlyAssigned = chapters.filter((ch) =>
+          selectedChapters.includes(ch._id)
+        );
+
+        // Combine previous chapters with the newly assigned ones
+        const combined = [...prevChapters, ...newlyAssigned];
+
+        // Remove any duplicates by _id
+        const uniqueById = Array.from(
+          new Map(combined.map((ch) => [ch._id, ch])).values()
+        );
+
+        return uniqueById;
+      });
 
       alert("Chapters assigned successfully!");
       setSelectedCourse(slugCourse || ""); // Reset to current slugCourse after assignment
@@ -148,8 +164,10 @@ function CourseChapter() {
     }
   };
 
-  const filteredChapters = courseChapters.filter(
-    (chapter) => chapter.userid === user._id
+  const courseChapterIds = new Set(courseChapters.map((ch) => ch._id));
+  const filteredChapters = chapters.filter(
+    (chapter) =>
+      chapter.userid === user._id && !courseChapterIds.has(chapter._id)
   );
 
   return (
@@ -158,7 +176,7 @@ function CourseChapter() {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="display-5 border-bottom pb-3 mb-0">Course Chapters</h2>
           <div className="badge bg-primary p-2 fs-6">
-            {filteredChapters.length} Chapters
+            {courseChapters.length} Chapters
           </div>
         </div>
 
@@ -229,7 +247,7 @@ function CourseChapter() {
                 id="afficter"
                 role="tabpanel"
               >
-                {filteredChapters.length === 0 ? (
+                {courseChapters.length === 0 ? (
                   <div className="text-center py-5 bg-light rounded">
                     <i
                       className="feather-icon icon-book-open"
@@ -253,7 +271,7 @@ function CourseChapter() {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredChapters.map((chapter) => (
+                        {courseChapters.map((chapter) => (
                           <tr key={chapter._id} className="align-middle">
                             <td>
                               <div className="d-flex flex-column">
@@ -423,14 +441,12 @@ function CourseChapter() {
                         style={{ display: "block" }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[200px]"
                       >
-                        {chapters.length > 0 ? (
-                          chapters
-                            .filter((chapter) => chapter.userid === user._id)
-                            .map((chapter) => (
-                              <option key={chapter._id} value={chapter._id}>
-                                {chapter.title || "Untitled Chapter"}
-                              </option>
-                            ))
+                        {filteredChapters.length > 0 ? (
+                          filteredChapters.map((chapter) => (
+                            <option key={chapter._id} value={chapter._id}>
+                              {chapter.title || "Untitled Chapter"}
+                            </option>
+                          ))
                         ) : (
                           <option disabled>No chapters available</option>
                         )}
