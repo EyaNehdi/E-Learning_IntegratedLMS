@@ -530,6 +530,7 @@ const ChapterContent = () => {
                     value="overview"
                     className="flex-1 py-4 px-6 text-base font-medium data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
                   >
+                    
                     Overview
                   </TabsTrigger>
                   <TabsTrigger

@@ -63,6 +63,7 @@ function IntelligentCourses() {
             <h1 className="text-3xl font-bold text-center text-white mb-2">Recommended Courses</h1>
             <p className="text-center text-blue-100">Discover the courses suited to your preferences</p>
           </div>
+          
 
           <div className="p-6 md:p-8">
             {message.text && (
