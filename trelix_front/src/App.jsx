@@ -134,13 +134,15 @@ import Store from "./components/Store/Store.jsx";
 import EmotionDetection from "./components/ia/emotion.jsx";
 
 import SystemSettings from "./components/Admin/activitytrack/SystemSettings.jsx";
-
+import FinancialOverview from "./components/Admin/Financial/FinancialOverview.jsx";
+import BusinessMetrics from "./components/Admin/Financial/BusinessMetrics.jsx";
+import UserTransactions from "./components/Admin/Financial/UserTransactions.jsx";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* **************** */}        
+        {/* **************** */}
         <Route path="/emotion" element={<EmotionDetection />} />
         {/* Public routes */}
         <Route element={<PublicRoute />}>
@@ -149,7 +151,7 @@ function App() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
-          
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
@@ -204,7 +206,7 @@ function App() {
             <Route path="change-password" element={<ChangePassword />} />
             <Route path="Course" element={<Courses />} />
             <Route
-              path="course-chapter/:courseId"
+              path="course-chapter/:slugCourse"
               element={<CourseChapter />}
             />
             <Route path="list" element={<Listecourse />} />
@@ -260,7 +262,10 @@ function App() {
             <Route path="edit/:id" element={<ManageBadges />} />
             <Route path="list-badges" element={<ListBadges />} />
           </Route>
-
+          <Route path="business-metrics" element={<FinancialOverview />}>
+            <Route index element={<BusinessMetrics />} />
+            <Route path="user-transactions" element={<UserTransactions />} />
+          </Route>
           <Route path="/report" element={<DailyQuizzes />} />
           <Route path="/storeAdmin" element={<ListPacks />} />
           <Route path="/product" element={<StoreManagement />} />
