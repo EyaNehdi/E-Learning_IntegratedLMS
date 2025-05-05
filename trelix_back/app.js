@@ -246,6 +246,7 @@ const certifRoutes = require('./routes/certif.routes');
 const badgesRoutes = require('./routes/badge.routes');
 const logRoutes = require('./routes/log.routes');
 const systemSettingRoutes = require('./routes/systemSetting.routes');
+const financeRoutes = require('./routes/finance.routes');
 app.use('/api/auth', authRoutes);
 app.use('/ia/auth', authRoutesIA);
 app.use('/chapter', authRouteschapter);
@@ -257,6 +258,7 @@ app.use("/certificates", certifRoutes);
 app.use("/api/badges-r", badgesRoutes);
 app.use("/api/logs", logRoutes);
 app.use(systemSettingRoutes);
+app.use("/api/finance", financeRoutes);
 
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);

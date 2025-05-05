@@ -106,7 +106,7 @@ function Listcourse() {
                     <div className="course-entry-3 card rounded-2 bg-info border shadow-1">
                       <div className="card-media position-relative">
 
-                        <a href={`/profile/course-chapter/${course._id}`}>
+                        <a href={`/profile/course-chapter/${course.slug}`}>
 
                           <img
                             className="card-img-top"
@@ -134,7 +134,7 @@ function Listcourse() {
                           </span>
                         </div>
                         <h3 className="sub-title my-3">
-                          <a href={`/profile/course-chapter/${course._id}`}>{course.title}</a>
+                          <a href={`/profile/course-chapter/${course.slug}`}>{course.title}</a>
                         </h3>
                         <div className="course-footer d-flex align-items-center justify-content-between pt-3">
                           <div className="price">

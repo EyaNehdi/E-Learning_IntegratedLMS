@@ -286,7 +286,7 @@ const ProfilePage = () => {
                             placement="top"
                           >
                             <img
-                              src="/assets/Badges/WelcomeBadge.png"
+                              src={badge.image}
                               alt={badge.name}
                               className="badge-image"
                               style={{ width: "80px", height: "auto" }} // Adjust width to 100px, height auto to keep aspect ratio
