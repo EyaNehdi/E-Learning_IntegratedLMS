@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const Course = require('../models/course');
+const { recordFinancialEvent } = require('../services/financialEventService');
 
 const purchaseCourse = async (req, res) => {
   const { courseId } = req.body;
@@ -49,6 +50,14 @@ const purchaseCourse = async (req, res) => {
       },
       { new: true }
     );
+    await recordFinancialEvent({
+      userId: user._id,
+      type: 'purchase',
+      amount: -course.price, 
+      relatedObject: course._id,
+      relatedModel: 'Course',
+      metadata: { courseTitle: course.title },
+    });
 
     res.status(200).json({
       message: `Course ${course.title} purchased successfully!`,

@@ -89,14 +89,14 @@ const updateChapter = async (req, res) => {
 };
 const assignChapters = async (req, res) => {
     try {
-        const { courseId, chapters } = req.body;
+        const { slugCourse, chapters } = req.body;
 
-        if (!courseId || !chapters || chapters.length === 0) {
+        if (!slugCourse || !chapters || chapters.length === 0) {
             return res.status(400).json({ message: "Course ID and chapters are required" });
         }
 
         // Check if course exists
-        const course = await Course.findById(courseId);
+        const course = await Course.findOne({ slug: slugCourse });
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }

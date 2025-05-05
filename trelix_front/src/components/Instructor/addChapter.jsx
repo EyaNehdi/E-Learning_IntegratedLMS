@@ -1,169 +1,200 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import axios from "axios"
-import { useOutletContext } from "react-router-dom"
-import { Search, Plus, Trash2, Edit, FileText, Video, Link2, Calendar } from "lucide-react"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useOutletContext } from "react-router-dom";
+import {
+  Search,
+  Plus,
+  Trash2,
+  Edit,
+  FileText,
+  Video,
+  Link2,
+  Calendar,
+} from "lucide-react";
 
 function AddChapter() {
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [pdf, setPdf] = useState(null)
-  const [video, setVideo] = useState(null)
-  const [chapters, setChapters] = useState([])
-  const { user } = useOutletContext()
-  const [expandedRows, setExpandedRows] = useState({})
-  const maxLength = 100
-  const [selectedCourse, setSelectedCourse] = useState("")
-  const [selectedChapters, setSelectedChapters] = useState([])
-  const [courses, setCourses] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("add")
-  const [searchTerm, setSearchTerm] = useState("")
-  const [pdfName, setPdfName] = useState("")
-  const [videoName, setVideoName] = useState("")
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [pdf, setPdf] = useState(null);
+  const [video, setVideo] = useState(null);
+  const [chapters, setChapters] = useState([]);
+  const { user } = useOutletContext();
+  const [expandedRows, setExpandedRows] = useState({});
+  const maxLength = 100;
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedChapters, setSelectedChapters] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("add");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [pdfName, setPdfName] = useState("");
+  const [videoName, setVideoName] = useState("");
 
   // Fetch courses
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        setLoading(true)
-        const response = await axios.get("http://localhost:5000/course/courses")
-        setCourses(response.data)
-        setLoading(false)
-      } catch (error) {
-        console.error("Error fetching courses:", error)
-        setLoading(false)
-      }
-    }
+        setLoading(true);
+        const response = await axios.get(
+          "http://localhost:5000/course/courses"
+        );
+        setCourses(response.data);
 
-    fetchCourses()
-  }, [])
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   // Fetch chapters
   useEffect(() => {
     const fetchChapters = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/chapter/get")
-        setChapters(response.data)
+        const response = await axios.get("http://localhost:5000/chapter/get");
+        setChapters(response.data);
       } catch (error) {
-        console.error("Error fetching chapters:", error)
+        console.error("Error fetching chapters:", error);
       }
-    }
+    };
 
-    fetchChapters()
-  }, [])
+    fetchChapters();
+  }, []);
 
   // Toggle expanded row
   const toggleExpand = (chapterId) => {
     setExpandedRows((prevState) => ({
       ...prevState,
       [chapterId]: !prevState[chapterId],
-    }))
-  }
+    }));
+  };
 
   // Handle course selection
   const handleCourseChange = (e) => {
-    setSelectedCourse(e.target.value)
-  }
+    setSelectedCourse(e.target.value);
+  };
 
   // Handle chapter selection
   const handleChapterChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value)
-    setSelectedChapters(selectedOptions)
-  }
+    const selectedOptions = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value
+    );
+    setSelectedChapters(selectedOptions);
+  };
 
   // Handle file change
   const handleFileChange = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files[0];
     if (file) {
       if (e.target.name === "pdf") {
-        setPdf(file)
-        setPdfName(file.name)
+        setPdf(file);
+        setPdfName(file.name);
       }
       if (e.target.name === "video") {
-        setVideo(file)
-        setVideoName(file.name)
+        setVideo(file);
+        setVideoName(file.name);
       }
     }
-  }
+  };
 
   // Handle chapter deletion
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:5000/chapter/delete/${id}`)
+      const response = await axios.delete(
+        `http://localhost:5000/chapter/delete/${id}`
+      );
       if (response.status === 200) {
-        setChapters((prevChapters) => prevChapters.filter((chapter) => chapter._id !== id))
-        alert("Chapter deleted successfully")
+        setChapters((prevChapters) =>
+          prevChapters.filter((chapter) => chapter._id !== id)
+        );
+        alert("Chapter deleted successfully");
       }
     } catch (error) {
-      console.error("Error deleting chapter:", error)
-      alert("Error deleting chapter")
+      console.error("Error deleting chapter:", error);
+      alert("Error deleting chapter");
     }
-  }
+  };
 
   // Handle chapter assignment
   const handleAssign = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/chapter/assign-chapters", {
-        courseId: selectedCourse,
-        chapters: selectedChapters,
-      })
+      const response = await axios.post(
+        "http://localhost:5000/chapter/assign-chapters",
+        {
+          slugCourse: selectedCourse,
+          chapters: selectedChapters,
+        }
+      );
 
-      alert("Chapters assigned successfully!")
-      setSelectedCourse("")
-      setSelectedChapters([])
+      alert("Chapters assigned successfully!");
+      setSelectedCourse("");
+      setSelectedChapters([]);
     } catch (error) {
-      console.error("Error assigning chapters:", error.response?.data || error.message)
-      alert("Error assigning chapters")
+      console.error(
+        "Error assigning chapters:",
+        error.response?.data || error.message
+      );
+      alert("Error assigning chapters");
     }
-  }
+  };
 
   // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!title || !description) {
-      alert("Title and description are required.")
-      return
+      alert("Title and description are required.");
+      return;
     }
 
-    const formData = new FormData()
-    formData.append("title", title)
-    formData.append("description", description)
-    formData.append("userid", user._id)
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("userid", user._id);
 
-    if (pdf) formData.append("pdf", pdf)
-    if (video) formData.append("video", video)
+    if (pdf) formData.append("pdf", pdf);
+    if (video) formData.append("video", video);
 
     try {
-      const response = await axios.post("http://localhost:5000/chapter/add", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
+      const response = await axios.post(
+        "http://localhost:5000/chapter/add",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response.status === 201) {
-        alert("Chapter added successfully!")
+        alert("Chapter added successfully!");
         // Refresh chapters list
-        const chaptersResponse = await axios.get("http://localhost:5000/chapter/get")
-        setChapters(chaptersResponse.data)
+        const chaptersResponse = await axios.get(
+          "http://localhost:5000/chapter/get"
+        );
+        setChapters(chaptersResponse.data);
 
         // Reset form
-        setTitle("")
-        setDescription("")
-        setPdf(null)
-        setVideo(null)
-        setPdfName("")
-        setVideoName("")
+        setTitle("");
+        setDescription("");
+        setPdf(null);
+        setVideo(null);
+        setPdfName("");
+        setVideoName("");
       } else {
-        alert("Failed to add chapter.")
+        alert("Failed to add chapter.");
       }
     } catch (error) {
-      console.error("Error:", error)
-      alert(error.response?.data?.message || "Failed to add chapter.")
+      console.error("Error:", error);
+      alert(error.response?.data?.message || "Failed to add chapter.");
     }
-  }
+  };
 
   // Filter chapters based on search term
   const filteredChapters = chapters
@@ -171,30 +202,44 @@ function AddChapter() {
     .filter(
       (chapter) =>
         chapter.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        chapter.description.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
+        chapter.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 border-b pb-4">Chapter Management</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-800 border-b pb-4">
+        Chapter Management
+      </h1>
 
       {/* Tabs */}
       <div className="mb-8">
         <div className="flex flex-wrap border-b">
           <button
-            className={`px-4 py-2 font-medium text-sm rounded-t-lg ${activeTab === "add" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+            className={`px-4 py-2 font-medium text-sm rounded-t-lg ${
+              activeTab === "add"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() => setActiveTab("add")}
           >
             Add Chapter
           </button>
           <button
-            className={`px-4 py-2 font-medium text-sm rounded-t-lg ${activeTab === "list" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+            className={`px-4 py-2 font-medium text-sm rounded-t-lg ${
+              activeTab === "list"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() => setActiveTab("list")}
           >
             All Chapters
           </button>
           <button
-            className={`px-4 py-2 font-medium text-sm rounded-t-lg ${activeTab === "assign" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+            className={`px-4 py-2 font-medium text-sm rounded-t-lg ${
+              activeTab === "assign"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() => setActiveTab("assign")}
           >
             Assign to Course
@@ -205,11 +250,16 @@ function AddChapter() {
       {/* Add Chapter Form */}
       {activeTab === "add" && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-6 text-gray-700">Add New Chapter</h2>
+          <h2 className="text-xl font-semibold mb-6 text-gray-700">
+            Add New Chapter
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Chapter Title
                 </label>
                 <input
@@ -224,7 +274,10 @@ function AddChapter() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="pdfInput" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="pdfInput"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   PDF Document (Optional)
                 </label>
                 <div className="flex items-center">
@@ -246,8 +299,8 @@ function AddChapter() {
                     <button
                       type="button"
                       onClick={() => {
-                        setPdf(null)
-                        setPdfName("")
+                        setPdf(null);
+                        setPdfName("");
                       }}
                       className="ml-2 p-2 text-red-500 hover:text-red-700"
                     >
@@ -258,7 +311,10 @@ function AddChapter() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="videoInput" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="videoInput"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Video (Optional)
                 </label>
                 <div className="flex items-center">
@@ -280,8 +336,8 @@ function AddChapter() {
                     <button
                       type="button"
                       onClick={() => {
-                        setVideo(null)
-                        setVideoName("")
+                        setVideo(null);
+                        setVideoName("");
                       }}
                       className="ml-2 p-2 text-red-500 hover:text-red-700"
                     >
@@ -293,7 +349,10 @@ function AddChapter() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Description
               </label>
               <textarea
@@ -326,7 +385,9 @@ function AddChapter() {
       {activeTab === "list" && (
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-700">All Chapters</h2>
+            <h2 className="text-xl font-semibold text-gray-700">
+              All Chapters
+            </h2>
             <div className="relative">
               <input
                 type="text"
@@ -381,16 +442,21 @@ function AddChapter() {
                     <tr key={chapter._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <div className="text-sm font-medium text-gray-900">{chapter.title}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {chapter.title}
+                          </div>
                           <div className="text-sm text-gray-500 flex items-center mt-1">
                             <Calendar className="h-4 w-4 mr-1" />
-                            {chapter.createdAt ? new Date(chapter.createdAt).toLocaleDateString() : "N/A"}
+                            {chapter.createdAt
+                              ? new Date(chapter.createdAt).toLocaleDateString()
+                              : "N/A"}
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
-                          {chapter.description.length > maxLength && !expandedRows[chapter._id] ? (
+                          {chapter.description.length > maxLength &&
+                          !expandedRows[chapter._id] ? (
                             <>
                               {chapter.description.substring(0, maxLength)}...
                               <button
@@ -462,7 +528,10 @@ function AddChapter() {
                           <button className="text-indigo-600 hover:text-indigo-900">
                             <Edit className="h-5 w-5" />
                           </button>
-                          <button onClick={() => handleDelete(chapter._id)} className="text-red-600 hover:text-red-900">
+                          <button
+                            onClick={() => handleDelete(chapter._id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
                             <Trash2 className="h-5 w-5" />
                           </button>
                         </div>
@@ -471,8 +540,13 @@ function AddChapter() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                      {searchTerm ? "No chapters found matching your search" : "No chapters available"}
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      {searchTerm
+                        ? "No chapters found matching your search"
+                        : "No chapters available"}
                     </td>
                   </tr>
                 )}
@@ -485,11 +559,15 @@ function AddChapter() {
       {/* Assign Chapters to Course */}
       {activeTab === "assign" && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-6 text-gray-700">Assign Chapters to Course</h2>
+          <h2 className="text-xl font-semibold mb-6 text-gray-700">
+            Assign Chapters to Course
+          </h2>
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Select Course</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Select Course
+              </label>
               <select
                 value={selectedCourse}
                 onChange={handleCourseChange}
@@ -503,7 +581,7 @@ function AddChapter() {
                   courses
                     .filter((course) => course.user === user._id)
                     .map((course) => (
-                      <option key={course._id} value={course._id}>
+                      <option key={course._id} value={course.slug}>
                         {course.title}
                       </option>
                     ))
@@ -536,7 +614,9 @@ function AddChapter() {
                   <option disabled>No chapters available</option>
                 )}
               </select>
-              <p className="text-sm text-gray-500 mt-1">Selected: {selectedChapters.length} chapter(s)</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Selected: {selectedChapters.length} chapter(s)
+              </p>
             </div>
 
             <div className="flex justify-end">
@@ -559,8 +639,7 @@ function AddChapter() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default AddChapter
-
+export default AddChapter;
