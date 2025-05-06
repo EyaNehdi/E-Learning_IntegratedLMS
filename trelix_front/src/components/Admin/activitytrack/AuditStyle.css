@@ -1,0 +1,114 @@
+/* Main layout container */
+.audit-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Content wrapper - becomes column on mobile */
+.audit-content-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Sidebar styling */
+.audit-sidebar {
+  width: 250px;
+  min-width: 250px;
+  overflow-y: auto;
+  background-color: transparent;
+}
+
+/* Main content area */
+.audit-main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #f5f5f5;
+  height: 100%;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .audit-content-wrapper {
+    flex-direction: column;
+  }
+
+  .audit-sidebar {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .audit-main-content {
+    height: calc(100vh - 120px); /* Adjust based on header + nav heights */
+  }
+}
+
+/* Main sidebar container */
+.audit-nav {
+  width: 250px;
+  background-color: transparent;
+  padding: 20px 0;
+}
+
+/* Navigation title */
+.audit-nav-title {
+  padding: 0 20px;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* Navigation list */
+.audit-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Navigation items */
+.audit-nav-item {
+  margin: 0 10px;
+}
+
+/* Navigation links - card style */
+.audit-nav-link {
+  display: block;
+  padding: 12px 16px;
+  color: #555;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 3px solid transparent;
+}
+
+/* Hover state */
+.audit-nav-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  color: #333;
+}
+
+/* Active state - more prominent */
+.audit-nav-link.active {
+  background-color: #3498db;
+  color: white;
+  border-left: 3px solid #2980b9;
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* Active hover state */
+.audit-nav-link.active:hover {
+  background-color: #2980b9;
+  box-shadow: 0 4px 8px rgba(41, 128, 185, 0.4);
+}

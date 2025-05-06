@@ -1,8 +1,8 @@
 const path = require('path');
 
 module.exports = {
-    mode: 'development', 
-  target: 'node',  // Set the target to node
+  mode: 'development',
+  target: 'node',
   entry: './app.js',
   output: {
     filename: 'bundle.js',
@@ -13,10 +13,10 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          loader: 'html-loader', // Add this line
-        },
+        use: [
+          'babel-loader',
+          'html-loader'
+        ],
       },
     ],
   },

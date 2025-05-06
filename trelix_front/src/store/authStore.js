@@ -1,9 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
-import { toast } from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URL || "/api/auth";
-
 
 axios.defaults.withCredentials = true;
 
@@ -26,13 +24,13 @@ export const useAuthStore = create((set) => ({
 			throw error;
 		}
 	},
-	login: async (email, password, stayLoggedIn) => {
+	login: async (data) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.post(`${API_URL}/login`, { email, password, stayLoggedIn }, { withCredentials: true });
+			// const response = await axios.post(`${API_URL}/login`, { email, password, stayLoggedIn }, { withCredentials: true });
 			set({
 				isAuthenticated: true,
-				user: response.data.user,
+				user: data.user,
 				error: null,
 				isLoading: false,
 			});
@@ -117,7 +115,7 @@ export const useAuthStore = create((set) => ({
 	checkAuth: async () => {
 		set({ isCheckingAuth: true, error: null });
 		try {
-			const response = await axios.get(`${API_URL}/check-auth`, { credentials : 'include' });
+			const response = await axios.get(`${API_URL}/check-auth`, { credentials: 'include' });
 			if (response.status === 200) {
 				set({
 					user: response.data.user,

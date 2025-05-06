@@ -1,0 +1,114 @@
+/* CSS for lock overlay */
+.course-image-link {
+  display: block;
+  position: relative;
+}
+
+.course-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.course-image-link:hover .course-lock-overlay {
+  opacity: 1;
+}
+
+.lock-icon {
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* skeleton box style CSS */
+.skeleton-box {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+.skeleton-box::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* swal dialog buttons CSS */
+.swal-custom-popup {
+  width: auto !important;
+}
+
+.swal-custom-confirm-button {
+  background-color: #3085d6;
+  font-size: 1rem;
+  width: auto !important;
+  white-space: nowrap;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+}
+
+.swal-custom-confirm-button:disabled,
+.swal-custom-confirm-button.swal2-confirm[disabled] {
+  background-color: #aaa !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.swal-custom-cancel-button {
+  background-color: transparent !important;
+  border: 2px solid #3085d6 !important; /* adjust color as needed */
+  color: #3085d6 !important;
+  font-size: 1rem;
+  width: auto !important;
+  white-space: nowrap;
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
+  box-shadow: none !important;
+}
+
+.swal-custom-deny-button {
+  background-color: orange !important;
+  color: white !important;
+  font-size: 1rem;
+  width: auto !important;
+  white-space: nowrap;
+  padding: 0.5rem 1.2rem;
+  border: none !important;
+}
+
+.blur-background-access #root {
+  filter: blur(4px);
+  pointer-events: none;
+}
