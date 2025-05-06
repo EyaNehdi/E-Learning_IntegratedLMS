@@ -1,4 +1,3 @@
-"use client"
 
 import { useState, useEffect } from "react"
 import axios from "axios"
@@ -29,7 +28,7 @@ const AllExamsInstructor = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
-  const itemsPerPage = 3
+  const itemsPerPage = 40
   const { user } = useOutletContext()
 
   // New state for assign tab
@@ -257,13 +256,13 @@ const handleExportAllResults = async () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <button onClick={() => handleSort("title")} className="flex items-center focus:outline-none">
+                      <button onClick={() => handleSort("title")} className="text-blue-600 hover:underline text-sm px-2 py-1 min-w-[48px] rounded">
                         Exam Title
                         {sortBy === "title" && <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>}
                       </button>
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <button onClick={() => handleSort("date")} className="flex items-center focus:outline-none">
+                      <button onClick={() => handleSort("date")} className="text-blue-600 hover:underline text-sm px-2 py-1 min-w-[48px] rounded">
                         Created Date
                         {sortBy === "date" && <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>}
                       </button>
@@ -280,7 +279,7 @@ const handleExportAllResults = async () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredExams.map((exam) => (
+                  {filteredExams.filter((exam) => exam.user === user._id).map((exam) => (
                     <tr key={exam._id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -411,13 +410,14 @@ const handleExportAllResults = async () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Select Exams</label>
             <div className="mt-2 space-y-2">
-              {exams.map((exam) => (
+              {exams.filter((exam) => exam.user === user._id).map((exam) => (
                 <div key={exam._id} className="flex items-center">
                   <input
                     type="checkbox"
                     id={exam._id}
                     value={exam._id}
                     checked={selectedExams.includes(exam._id)}
+                    
                     onChange={(e) => {
                       if (e.target.checked) {
                         setSelectedExams([...selectedExams, exam._id])

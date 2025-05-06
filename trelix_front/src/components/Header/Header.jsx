@@ -9,24 +9,23 @@ import Tooltip from "@mui/material/Tooltip";
 import MobileMenu from "./MobileMenu";
 import axios from "axios";
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 function Header() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
- 
-  const [filteredCourses, setFilteredCourses] = useState([])
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [filteredCourses, setFilteredCourses] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null)
-  const { isAuthenticated, logout } = useAuthStore()
-  const navigate = useNavigate()
-  const { user, fetchUser, clearUser } = useProfileStore()
-  const location = useLocation()
-
-  
+  const [error, setError] = useState(null);
+  const { isAuthenticated, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const { user, fetchUser, clearUser } = useProfileStore();
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
 
   useEffect(() => {
     fetchUser();
@@ -42,27 +41,29 @@ function Header() {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-
   // Fetch courses from API
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        setLoading(true)
-        const response = await axios.get("http://localhost:5000/course/courses")
-        setCourses(response.data)
-        setFilteredCourses(response.data)
-        setLoading(false)
+        setLoading(true);
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_PROXY}/course/courses`
+        );
+        setCourses(response.data);
+        setFilteredCourses(response.data);
+        setLoading(false);
       } catch (err) {
-        console.error("Erreur lors du chargement des cours:", err)
-        setError("Impossible de charger les cours. Veuillez réessayer plus tard.")
-        setLoading(false)
+        console.error("Erreur lors du chargement des cours:", err);
+        setError(
+          "Impossible de charger les cours. Veuillez réessayer plus tard."
+        );
+        setLoading(false);
       }
-    }
+    };
 
-    fetchCourses()
-    fetchUser()
-  }, [fetchUser])
-  
+    fetchCourses();
+  }, []);
+
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredCourses(courses);
@@ -71,7 +72,24 @@ function Header() {
         course.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredCourses(filtered);
-  
+
+      // Vérifie que l'objet global est défini avant de l'utiliser
+      if (window.courseSearchState) {
+        window.courseSearchState.query = searchQuery;
+        window.courseSearchState.notifyListeners(searchQuery);
+      }
+    }
+  }, [searchQuery, courses]);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredCourses(courses);
+    } else {
+      const filtered = courses.filter((course) =>
+        course.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredCourses(filtered);
+
       // Vérifie que l'objet global est défini avant de l'utiliser
       if (window.courseSearchState) {
         window.courseSearchState.query = searchQuery;
@@ -97,7 +115,11 @@ function Header() {
         </div>
 
         {/* Search panel offcanvas */}
-        <div className="search-popup offcanvas offcanvas-top" id="offcanvas-search" data-bs-scroll="true">
+        <div
+          className="search-popup offcanvas offcanvas-top"
+          id="offcanvas-search"
+          data-bs-scroll="true"
+        >
           <div className="container d-flex flex-row py-5 align-items-center position-relative">
             <button
               type="button"
@@ -127,17 +149,26 @@ function Header() {
                 <div className="alert alert-danger">{error}</div>
               ) : (
                 <div className="product-wrap d-block">
-                  <h6>{searchQuery ? `Résultats pour "${searchQuery}"` : "Our Best Selling Courses"}</h6>
+                  <h6>
+                    {searchQuery
+                      ? `Résultats pour "${searchQuery}"`
+                      : "Our Best Selling Courses"}
+                  </h6>
                   {filteredCourses.length > 0 ? (
                     <div className="row mt-3">
                       {filteredCourses.map((course) => (
-                        <div className="col-sm-4 mb-4" key={course._id || course.id}>
+                        <div
+                          className="col-sm-4 mb-4"
+                          key={course._id || course.id}
+                        >
                           <div className="course-entry-3 card rounded-2 border shadow-1">
                             <div className="card-media position-relative">
-                              <a href={`/courses/${course._id || course.id}`}>
+                              <a href={`/chapters/${course._id}`}>
                                 <img
                                   className="card-img-top"
-                                  src={course.image || "assets/images/course1.jpg"}
+                                  src={
+                                    course.image || "assets/images/course1.jpg"
+                                  }
                                   alt={course.title}
                                 />
                               </a>
@@ -145,21 +176,28 @@ function Header() {
                             <div className="card-body p-3">
                               <div className="d-flex justify-content-between align-items-center small">
                                 <div className="d-flex align-items-center small">
-                                  
-                                  <span className="rating-count">({course.reviews || 0})</span>
+                                  <span className="rating-count">
+                                    ({course.reviews || 0})
+                                  </span>
                                 </div>
                               </div>
                               <h3 className="display-6 mt-1">
-                                <a href={`/courses/${course._id || course.id}`}>{course.title}</a>
+                                <a href={`/courses/${course._id || course.id}`}>
+                                  {course.title}
+                                </a>
                               </h3>
-                              <span className="fw-bold">${course.price?.toFixed(2) || "0.00"}</span>
+                              <span className="fw-bold">
+                                ${course.price?.toFixed(2) || "0.00"}
+                              </span>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="alert alert-info mt-3">Aucun cours ne correspond à votre recherche.</div>
+                    <div className="alert alert-info mt-3">
+                      Aucun cours ne correspond à votre recherche.
+                    </div>
                   )}
                 </div>
               )}
@@ -198,11 +236,18 @@ function Header() {
                             href="/"
                             role="button"
                             aria-expanded="false"
-                            className="nav-link px-3 px-xl-4"
+                            className={`nav-link px-3 px-xl-4 ${
+                              ["/", "/home"].includes(location.pathname)
+                                ? "active"
+                                : ""
+                            }`}
                             style={{
                               paddingInlineEnd: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
+                              color: ["/", "/home"].includes(location.pathname)
+                                ? "#007bff"
+                                : "inherit",
                             }}
                           >
                             Home
@@ -210,61 +255,152 @@ function Header() {
                         </li>
                         <li className="nav-item dropdown">
                           <a
-                            href="#"
+                            href="/calendar"
                             role="button"
-                            data-bs-toggle="dropdown"
                             aria-expanded="false"
-                            className="nav-link px-3 px-xl-4"
+                            className={`nav-link px-3 px-xl-4 ${
+                              location.pathname === "/calendar" ? "active" : ""
+                            }`}
                             style={{
                               paddingInline: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
+                              color:
+                                location.pathname === "/calendar"
+                                  ? "#007bff"
+                                  : "inherit",
                             }}
                           >
                             Dashboard
                           </a>
                         </li>
-                        <li className="nav-item dropdown">
-                        <a
-                          href="#"
-                          role="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                          style={{
-                            marginRight: "46px",
-                            fontWeight: "bold",
-                            fontSize: "20px",
-                          }}
-                        >
-                          Courses
-                        </a>
-                        {/* Dropdown menu for Courses */}
-                        <ul className="dropdown-menu">
-                          <li>
-                            <a className="dropdown-item" href="/chapters  ">
-                              All Chapters
-                            </a>
-                          </li>
-                          <li>
-                            <a className="dropdown-item" href="/allcours">
-                              All Cours
-                            </a>
-                          </li>
-                          <li>
-                            <hr className="dropdown-divider" />
-                          </li>
 
-                        </ul>
-                      </li>
                         <li className="nav-item dropdown">
                           <a
-                            href="/leaderboard"
+                            href="#"
                             role="button"
-                            className="nav-link px-3 px-xl-4"
+                            aria-expanded="false"
+                            className={`nav-link px-3 px-xl-4 ${
+                              location.pathname.startsWith("/allcours") ||
+                              location.pathname.startsWith("/Moodle") ||
+                              location.pathname.startsWith("/Classroom") ||
+                              location.pathname.startsWith("/chapters") ||
+                              location.pathname.startsWith("/content")
+                                ? "active"
+                                : ""
+                            }`}
                             style={{
                               paddingInline: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
+                              color:
+                                location.pathname.startsWith("/allcours") ||
+                                location.pathname.startsWith("/Moodle") ||
+                                location.pathname.startsWith("/Classroom") ||
+                                location.pathname.startsWith("/chapters") ||
+                                location.pathname.startsWith("/content")
+                                  ? "#007bff"
+                                  : "inherit",
+                            }}
+                          >
+                            Courses
+                          </a>
+                          {/* Dropdown menu for Courses */}
+                          <ul className="dropdown-menu">
+                            <li>
+                              <a
+                                className={`dropdown-item ${
+                                  location.pathname === "/allcours"
+                                    ? "active"
+                                    : ""
+                                }`}
+                                href="/allcours"
+                                style={
+                                  location.pathname === "/allcours"
+                                    ? { color: "#007bff", fontWeight: "bold" }
+                                    : {}
+                                }
+                              >
+                                All Cours
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className={`dropdown-item ${
+                                  location.pathname === "/Moodle"
+                                    ? "active"
+                                    : ""
+                                }`}
+                                href="/Moodle"
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  ...(location.pathname === "/Moodle"
+                                    ? { color: "#007bff", fontWeight: "bold" }
+                                    : {}),
+                                }}
+                              >
+                                <img
+                                  src="https://moodle.org/theme/moodleorg/pix/moodle_logo_TM.svg"
+                                  alt="Moodle"
+                                  style={{
+                                    width: "80px",
+                                    height: "20px",
+                                    marginRight: "8px",
+                                  }}
+                                />
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className={`dropdown-item ${
+                                  location.pathname === "/Classroom"
+                                    ? "active"
+                                    : ""
+                                }`}
+                                href="/Classroom"
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  ...(location.pathname === "/Classroom"
+                                    ? { color: "#007bff", fontWeight: "bold" }
+                                    : {}),
+                                }}
+                              >
+                                <img
+                                  src="https://www.gstatic.com/classroom/logo_square_48.svg"
+                                  alt="Classroom"
+                                  style={{
+                                    width: "80px",
+                                    height: "20px",
+                                    marginRight: "8px",
+                                  }}
+                                />
+                              </a>
+                            </li>
+                            <li>
+                              <hr className="dropdown-divider" />
+                            </li>
+                          </ul>
+                        </li>
+
+                        <li className="nav-item dropdown">
+                          <a
+                            href="/leaderboard"
+                            role="button"
+                            className={`nav-link px-3 px-xl-4 ${
+                              location.pathname === "/leaderboard"
+                                ? "active"
+                                : ""
+                            }`}
+                            style={{
+                              paddingInline: "40px",
+                              fontWeight: "bold",
+                              fontSize: "20px",
+                              color:
+                                location.pathname === "/leaderboard"
+                                  ? "#007bff"
+                                  : "inherit",
                             }}
                           >
                             Leaderboard
@@ -275,6 +411,9 @@ function Header() {
                   </div>
                 </div>
                 <div className="col-auto header-actions position-relative order-xl-2 d-flex align-items-center">
+                <a className="text-reset icon rounded-5 bg-shade" href="/store">
+  <i className="feather-icon icon-shopping-bag" />
+</a>
                   {/* Search Icon */}
                   <a
                     className="text-reset icon rounded-5 bg-shade"
@@ -330,10 +469,11 @@ function Header() {
                                   />
                                 ) : (
                                   <span>
-                                    {user?.firstName ? (
+                                    {user?.firstName && user?.lastName ? (
                                       <>
                                         {user.firstName.charAt(0)}
                                         {user.lastName.charAt(0)}
+              
                                       </>
                                     ) : (
                                       "?"
@@ -358,114 +498,133 @@ function Header() {
                               <ul className="list-unstyled nav">
                                 {location.pathname !== "/home" && (
                                   <li>
-                                    <a className="nav-link" href="/home">
+                                    <a
+                                      className={
+                                        isActive("/home")
+                                          ? "nav-link active"
+                                          : "nav-link"
+                                      }
+                                      href="/home"
+                                    >
                                       <i className="feather-icon icon-home" />
                                       <span>Home</span>
                                     </a>
                                   </li>
                                 )}
                                 <li>
-                                  <a className="nav-link" href="/profile">
+                                  <a
+                                    className={
+                                      isActive("/profile")
+                                        ? "nav-link active"
+                                        : "nav-link"
+                                    }
+                                    href="/profile"
+                                  >
                                     <i className="feather-icon icon-user" />
                                     <span>My Profile</span>
                                   </a>
                                 </li>
+
                                 <li>
                                   <a
-                                    className="nav-link"
-                                    href="instructor-enrolled-courses.html"
-                                  >
-                                    <i className="feather-icon icon-book-open" />
-                                    <span>Enrolled Courses</span>
-                                  </a>
-                                </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-wishlist.html"
-                                  >
-                                    <i className="feather-icon icon-gift" />
-                                    <span>Wishlist</span>
-                                  </a>
-                                </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-reviews.html"
-                                  >
-                                    <i className="feather-icon icon-star" />
-                                    <span>Reviews</span>
-                                  </a>
-                                </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-my-quiz-attempts.html"
-                                  >
-                                    <i className="feather-icon icon-box" />
-                                    <span>My Quiz Attempts</span>
-                                  </a>
-                                </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-order-history.html"
+                                    className={
+                                      isActive("/profile/settings")
+                                        ? "nav-link active"
+                                        : "nav-link"
+                                    }
+                                    href="/profile/settings"
                                   >
                                     <i className="feather-icon icon-shopping-bag" />
-                                    <span>Order History</span>
+
+                                    <span>Security</span>
                                   </a>
                                 </li>
-                                <li className="border-bottom" />
+                                {user?.role === "student" && <li></li>}
                                 <li>
                                   <a
-                                    className="nav-link active"
-                                    href="instructor-courses.html"
-                                  >
-                                    <i className="feather-icon icon-book" />
-                                    <span>My Courses</span>
-                                  </a>
-                                </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-assignments.html"
-                                  >
-                                    <i className="feather-icon icon-briefcase" />
-                                    <span>Assignments</span>
-                                  </a>
-                                </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-quiz-attempts.html"
-                                  >
-                                    <i className="feather-icon icon-cpu" />
-                                    <span>Quiz Attempts</span>
-                                  </a>
-                                </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
+                                    className={
+                                      isActive("/certificates")
+                                        ? "nav-link active"
+                                        : "nav-link"
+                                    }
                                     href="/certificates"
                                   >
-                                    <i className="feather-icon icon-bell" />
+                                    <i className="feather-icon icon-award" />
                                     <span>View Certificates</span>
                                   </a>
                                 </li>
-                                <li>
-                                  <a
-                                    className="nav-link"
-                                    href="instructor-announcements.html"
-                                  >
-                                    <i className="feather-icon icon-bell" />
-                                    <span>Announcements</span>
-                                  </a>
-                                </li>
+
+                                {user?.role === "instructor" && (
+                                  <>
+                                    <li>
+                                      <a
+                                        className={
+                                          isActive("/profile/list")
+                                            ? "nav-link active"
+                                            : "nav-link"
+                                        }
+                                        href="/profile/list"
+                                      >
+                                        <i className="feather-icon icon-book" />
+                                        <span>My Courses</span>
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a
+                                        className={
+                                          isActive("/profile/allquiz")
+                                            ? "nav-link active"
+                                            : "nav-link"
+                                        }
+                                        href="/profile/allquiz"
+                                      >
+                                        <i className="feather-icon icon-briefcase" />
+                                        <span>My Quizs</span>
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a
+                                        className={
+                                          isActive("/profile/Allexams")
+                                            ? "nav-link active"
+                                            : "nav-link"
+                                        }
+                                        href="/profile/Allexams"
+                                      >
+                                        <i className="feather-icon icon-cpu" />
+                                        <span>My Exams</span>
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a
+                                        className={
+                                          isActive("/profile/addchapter")
+                                            ? "nav-link active"
+                                            : "nav-link"
+                                        }
+                                        href="/profile/addchapter"
+                                      >
+                                        <i className="feather-icon icon-bell" />
+                                        <span>My Chapters</span>
+                                      </a>
+                                    </li>
+                                  </>
+                                )}
+
                                 <li className="border-bottom" />
+
+                                {user?.role === "admin" && (
+                                  <li>
+                                    <a className="nav-link" href="/admin">
+                                      <i className="feather-icon icon-home" />
+                                      <span>Dashboard Admin</span>
+                                    </a>
+                                  </li>
+                                )}
                                 <li>
                                   <a
                                     className="nav-link"
-                                    href="instructor-settings.html"
+                                    href="/profile/settings"
                                   >
                                     <i className="feather-icon icon-settings" />
                                     <span>Settings</span>
@@ -473,8 +632,7 @@ function Header() {
                                 </li>
                                 <li>
                                   <a
-                                    className="nav-link"
-                                    href="#"
+                                    className="nav-link cursor-pointer"
                                     onClick={handleLogout}
                                   >
                                     <i className="feather-icon icon-log-out" />
@@ -510,9 +668,12 @@ function Header() {
                                   marginLeft: "4px",
                                 }}
                               >
-                                {user?.firstName} {user?.lastName}
+                                {user?.firstName} {user?.lastName}{" "}
                               </span>
                             </Tooltip>
+                           
+                            <span>&nbsp;             🪙 {user?.balance}</span>
+
                           </div>
                         ) : (
                           <></>
@@ -530,6 +691,7 @@ function Header() {
                             className="btn fs-6 fs-md-5 fs-lg-4"
                             style={{
                               backgroundColor: "#6045FF",
+                              color: "white",
                               whiteSpace: "nowrap",
                             }}
                           >
@@ -540,6 +702,7 @@ function Header() {
                             className="btn fs-6 fs-md-5 fs-lg-4"
                             style={{
                               backgroundColor: "#6045FF",
+                              color: "white",
                               whiteSpace: "nowrap",
                             }}
                           >
@@ -575,4 +738,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default Header;  

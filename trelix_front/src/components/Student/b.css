@@ -1,0 +1,48 @@
+/* TranslateButton.module.css */
+.translateButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #EFF6FF;
+    color: #2563EB;
+    border-radius: 0.5rem;
+    transition-property: color, background-color, border-color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+  
+  .translateButton:hover {
+    background-color: #DBEAFE;
+  }
+  
+  .translateButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .spinner {
+    animation: spin 1s linear infinite;
+    height: 1rem;
+    width: 1rem;
+    border: 2px solid #2563EB;
+    border-top-color: transparent;
+    border-radius: 9999px;
+    margin-right: 0.5rem;
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .languageBadge {
+    font-size: 0.75rem;
+    background-color: #DBEAFE;
+    padding: 0 0.5rem 0.125rem 0.5rem;
+    border-radius: 9999px;
+  }

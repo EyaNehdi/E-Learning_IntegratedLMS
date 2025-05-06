@@ -1,0 +1,110 @@
+/* This file ensures the component styling is isolated from other styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Moodle-specific colors */
+:root {
+  --moodle-blue: #0f6cbf;
+  --moodle-blue-dark: #0a5699;
+  --moodle-blue-darker: #084a87;
+  --moodle-blue-light: #e9f2fb;
+  --moodle-blue-lighter: #f0f8ff;
+  --moodle-background: #f7f7f7;
+  --moodle-section-header: #f8f9fa;
+}
+
+/* Custom scrollbar for better UX */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Ensure content doesn't overflow */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Improve focus states for accessibility */
+button:focus,
+a:focus {
+  outline: 2px solid rgba(15, 108, 191, 0.5);
+  outline-offset: 2px;
+}
+
+/* Moodle-specific button styles */
+.moodle-button {
+  background-color: var(--moodle-blue);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.moodle-button:hover {
+  background-color: var(--moodle-blue-dark);
+}
+
+/* Course item hover effect */
+.course-item:hover {
+  background-color: var(--moodle-blue-lighter);
+}
+
+/* Mobile menu animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.mobile-menu-open {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Completion indicator styles */
+.completion-indicator {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.completion-indicator.complete {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.completion-indicator.incomplete {
+  border: 1px solid #d1d5db;
+  background-color: white;
+}

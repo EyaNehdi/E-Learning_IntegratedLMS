@@ -239,13 +239,21 @@ function Header() {
                         >
                           Leaderboard
                         </a>
-
                       </li>
+                     
+
+
+
+
+                      
                     </ul>
                     <a
                       className="navbar-brand d-none d-xl-block m-0"
                       href="index-2.html"
                     ></a>
+                    <a className="text-reset icon rounded-5 bg-shade" href="/store">
+  <i className="feather-icon icon-shopping-bag" />
+</a>
                   </div>
                 </div>
 
@@ -257,6 +265,7 @@ function Header() {
                 >
                   <i className="feather-icon icon-search" />
                 </a>
+             
 
                 <div className="d-flex align-items-center ms-3.5  position-relative">
                   {isAuthenticated ? (
@@ -285,7 +294,7 @@ function Header() {
                                 </h6>
                               ) : (
                                 <h6 className="mb-0">
-                                  Pleas login you dont have account{" "}
+                                  Please login you dont have account{" "}
                                 </h6>
                               )}
                               <small>Founder</small>

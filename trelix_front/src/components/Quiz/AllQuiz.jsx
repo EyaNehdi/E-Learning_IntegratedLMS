@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import axios from "axios"
-import { BookOpen, Edit, Trash2, Plus, Search, Filter, AlertCircle, CheckCircle, Loader2, List, Eye, MoreHorizontal, ArrowUpDown, X } from 'lucide-react'
+import { BookOpen, Edit, Trash2, Plus, Search, Filter, AlertCircle, CheckCircle, Loader2, List, Eye, MoreHorizontal, ArrowUpDown,  ChevronDown,X } from 'lucide-react'
 
 const AllQuiz = () => {
   const [quizzes, setQuizzes] = useState([])
@@ -15,7 +15,8 @@ const AllQuiz = () => {
   const [sortOrder, setSortOrder] = useState("desc")
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteSuccess, setDeleteSuccess] = useState(false)
-
+  const [isOpen, setIsOpen] = useState(false);
+  
   // Fetch all quizzes
   useEffect(() => {
     fetchQuizzes()
@@ -115,15 +116,34 @@ const AllQuiz = () => {
           <h1 className="text-3xl font-bold text-gray-800">Quiz Management</h1>
           <p className="text-gray-600 mt-1">Manage all your quizzes in one place</p>
         </div>
-        <div className="mt-4 md:mt-0">
-          <a 
-            href="/profile/addquiz" 
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Create New Quiz
-          </a>
-        </div>
+        <div className="relative mt-4 md:mt-0">
+        <button
+  onClick={() => setIsOpen(!isOpen)}
+  className="min-w-[150px] px-3 py-1 text-sm leading-tight whitespace-nowrap border rounded disabled:opacity-50"
+>
+  <Plus className="w-5 h-5 mr-2" />
+  Quiz Options
+  <ChevronDown className="w-5 h-5 ml-2" />
+</button>
+
+{isOpen && (
+  <div className="absolute left-0 mt-2 w-48 bg-white shadow-md rounded-md border">
+    <a
+      href="/profile/addquiz"
+      className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+    >
+      Create New Quiz
+    </a>
+    <a
+      href="/profile/assgnedQuizToChapter"
+      className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+    >
+      Assign Quiz to Chapter
+    </a>
+  </div>
+)}
+
+    </div>
       </div>
 
       {/* Search and Filter */}
@@ -144,8 +164,8 @@ const AllQuiz = () => {
           <div className="flex gap-2">
             <button 
               onClick={() => handleSort("quizName")}
-              className={`px-3 py-2 border rounded-md flex items-center ${
-                sortBy === "quizName" ? "bg-blue-50 border-blue-200 text-blue-700" : "bg-white text-gray-700"
+              className={`text-blue-600 hover:underline text-sm px-2 py-1 min-w-[57px] rounded ${
+                sortBy === "quizName" ? "bg-blue-50 border-blue-200 text-blue-700" : " text-gray-700"
               }`}
             >
               <ArrowUpDown className="h-4 w-4 mr-1" />
@@ -153,8 +173,8 @@ const AllQuiz = () => {
             </button>
             <button 
               onClick={() => handleSort("questionCount")}
-              className={`px-3 py-2 border rounded-md flex items-center ${
-                sortBy === "questionCount" ? "bg-blue-50 border-blue-200 text-blue-700" : "bg-white text-gray-700"
+              className={`text-blue-600 hover:underline text-sm px-2 py-1 min-w-[100px] rounded ${
+                sortBy === "questionCount" ? "bg-blue-50 border-blue-200 text-blue-700" : " text-gray-700"
               }`}
             >
               <ArrowUpDown className="h-4 w-4 mr-1" />
@@ -162,10 +182,11 @@ const AllQuiz = () => {
             </button>
             <button 
               onClick={() => handleSort("createdAt")}
-              className={`px-3 py-2 border rounded-md flex items-center ${
-                sortBy === "createdAt" ? "bg-blue-50 border-blue-200 text-blue-700" : "bg-white text-gray-700"
+              className={`"text-blue-600 hover:underline text-sm px-2 py-1 min-w-[48px] rounded ${
+                sortBy === "createdAt" ? "bg-blue-50 border-blue-200 text-blue-700" : " text-gray-700"
               }`}
             >
+              
               <ArrowUpDown className="h-4 w-4 mr-1" />
               Date
             </button>

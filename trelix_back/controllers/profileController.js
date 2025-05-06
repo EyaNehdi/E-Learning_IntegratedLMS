@@ -18,13 +18,33 @@ const upload = multer({ storage });
 // Get User Profile
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select("firstName lastName email mfaEnabled image profilePhoto coverPhoto phone skils badges role Bio");
+        const user = await User.findById(req.userId).select("firstName lastName email mfa image profilePhoto coverPhoto phone skils badges role Bio certificatesOwned balance"); // Select only the fields you need
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
+        if (user) {
+            const certificateCount = user.certificatesOwned.length;
+            const userProfile_Details = {
+                _id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                mfa: user.mfa,
+                image: user.image,
+                profilePhoto: user.profilePhoto,
+                coverPhoto: user.coverPhoto,
+                phone: user.phone,
+                skils: user.skils,
+                badges: user.badges,
+                role: user.role,
+                Bio: user.Bio,
+                certificateCount,
+                balance: user.balance,
+            };
+            res.status(200).json(userProfile_Details);
+        }
 
-        res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
@@ -125,44 +145,55 @@ const editUserProfile = async (req, res) => {
 // Update User Password
 const updateUserPassword = async (req, res) => {
     try {
-        const { oldPassword, newPassword } = req.body;
-
-        // Vérification des mots de passe
-        if (!oldPassword || !newPassword) {
-            return res.status(400).json({ message: "Old and new passwords are required" });
-        }
-
-        if (newPassword.length < 8) {
-            return res.status(400).json({ message: "Password must be at least 8 characters long" });
-        }
-
-        // Recherche de l'utilisateur par ID
-        const user = await User.findById(req.userId);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        // Comparaison du mot de passe actuel
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Incorrect old password" });
-        }
-
-        // Hachage du nouveau mot de passe
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-        // Mise à jour du mot de passe de l'utilisateur
-        user.password = hashedPassword;
-        await user.save();
-
-        res.status(200).json({ message: "Password updated successfully" });
+      const { oldPassword, newPassword } = req.body
+  
+      // Validate passwords
+      if (!oldPassword || !newPassword) {
+        return res.status(400).json({ message: "Old and new passwords are required" })
+      }
+  
+      if (newPassword.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters long" })
+      }
+  
+      // Find user by ID
+      const user = await User.findById(req.userId)
+      if (!user) {
+        return res.status(404).json({ message: "User not found" })
+      }
+  
+      // Compare current password
+      const isMatch = await user.comparePassword(oldPassword)
+      if (!isMatch) {
+        return res.status(400).json({ message: "Incorrect old password" })
+      }
+  
+      console.log("✅ Old password verified successfully")
+  
+      // Set the new password directly - let the pre-save hook handle hashing
+      user.password = newPassword
+      await user.save()
+  
+      // Verify the password was saved correctly
+      const updatedUser = await User.findById(req.userId)
+      console.log("Stored password hash after update:", updatedUser.password)
+  
+      // Test password verification
+      const verificationTest = await updatedUser.comparePassword(newPassword)
+      console.log("Password verification test:", verificationTest ? "PASSED ✅" : "FAILED ❌")
+  
+      res.status(200).json({
+        success: true,
+        message: "Password updated successfully",
+      })
     } catch (error) {
-        console.error("❌ Error updating password:", error);
-        res.status(500).json({ message: "Server error" });
+      console.error("❌ Error updating password:", error)
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+      })
     }
-};
-
+  }
 
 
 
@@ -177,8 +208,8 @@ const editSkils = async (req, res) => {
 
         // Find the user and update their skills
         const updatedUser = await User.findByIdAndUpdate(
-            userId, 
-            { skils: skills }, 
+            userId,
+            { skils: skills },
             { new: true } // Return updated document
         );
 

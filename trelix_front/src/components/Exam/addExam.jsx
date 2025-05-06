@@ -15,6 +15,7 @@ import {
   Download,
 } from "lucide-react"
 import axios from "axios"
+import { useOutletContext, useParams } from "react-router-dom"
 
 const AddExam = () => {
   // State for exam details
@@ -45,7 +46,7 @@ const AddExam = () => {
 
   // Reference for file input
   const fileInputRef = useRef(null)
-
+  const { user, profile, setProfile, completion } = useOutletContext()
   // Add a new question
   const addQuestion = (type) => {
     const newQuestion = {
@@ -138,6 +139,7 @@ const AddExam = () => {
             questions,
             isPublished: publish,
             totalPoints,
+            user: user._id,
             originalFile: originalFile
                 ? {
                       name: originalFile.name,
@@ -382,7 +384,9 @@ const AddExam = () => {
     if (!showImportModal) return null
 
     return (
+      
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        
         <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-auto">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold text-gray-900">Import Exam Content</h3>
@@ -745,39 +749,48 @@ Answer: False"
 
         {/* Tabs */}
         <div className="bg-gray-100 px-6 py-4 border-b flex flex-wrap">
-          <button
-            onClick={() => setCurrentTab("details")}
-            className={`px-4 py-2 rounded-md mr-2 mb-2 font-medium text-sm ${
-              currentTab === "details" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            Exam Details
-          </button>
-          <button
-            onClick={() => setCurrentTab("questions")}
-            className={`px-4 py-2 rounded-md mr-2 mb-2 font-medium text-sm ${
-              currentTab === "questions" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            Questions ({questions.length})
-          </button>
-          <button
-            onClick={() => setCurrentTab("settings")}
-            className={`px-4 py-2 rounded-md mr-2 mb-2 font-medium text-sm ${
-              currentTab === "settings" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            Settings
-          </button>
-          <button
-            onClick={() => setCurrentTab("preview")}
-            className={`px-4 py-2 rounded-md mr-2 mb-2 font-medium text-sm ${
-              currentTab === "preview" ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            Preview
-          </button>
-        </div>
+  <button
+    onClick={() => setCurrentTab("details")}
+    className={`px-4 py-2 rounded-md mr-2 mb-2 font-medium text-sm ${
+      currentTab === "details" 
+        ? "bg-blue-600 text-white" 
+        : "bg-gray-300 text-gray-700 hover:bg-gray-50"
+    }`}
+  >
+    Exam Details
+  </button>
+  <button
+    onClick={() => setCurrentTab("questions")}
+    className={`px-4 py-2 rounded-md mr-2 mb-2 font-medium text-sm ${
+      currentTab === "questions" 
+        ? "bg-blue-600 text-white" 
+        : "bg-gray-300 text-black-700 hover:bg-gray-50"
+    }`}
+  >
+    Questions ({questions.length})
+  </button>
+  <button
+    onClick={() => setCurrentTab("settings")}
+    className={`px-4 py-2 rounded-md mr-2 mb-2 font-medium text-sm ${
+      currentTab === "settings" 
+        ? "bg-blue-600 text-white" 
+        : "bg-gray-300 text-gray-700 hover:bg-gray-50"
+    }`}
+  >
+    Settings
+  </button>
+  <button
+    onClick={() => setCurrentTab("preview")}
+    className={`px-4 py-2 rounded-md mr-2 mb-2 font-medium text-sm ${
+      currentTab === "preview" 
+        ? "bg-blue-600 text-white" 
+        : "bg-gray-300 text-gray-700 hover:bg-gray-50"
+    }`}
+  >
+    Preview
+  </button>
+</div>
+
 
         {/* Content */}
         <div className="p-6">
@@ -1120,13 +1133,13 @@ Answer: False"
                     <div className="flex space-x-3">
                       <button
                         onClick={() => setCurrentTab("details")}
-                        className="px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        className="min-w-[80px] px-3 py-1 text-sm leading-tight whitespace-nowrap border rounded disabled:opacity-50"
                       >
                         Back
                       </button>
                       <button
                         onClick={() => setCurrentTab("settings")}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        className="min-w-[150px] px-3 py-1 text-sm leading-tight whitespace-nowrap border rounded disabled:opacity-50"
                       >
                         Next: Settings
                       </button>
@@ -1139,7 +1152,7 @@ Answer: False"
 
           {/* Settings Tab */}
           {currentTab === "settings" && (
-            <div className="space-y-6">
+              <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-1">
@@ -1156,7 +1169,7 @@ Answer: False"
                     />
                   </div>
                 </div>
-
+        
                 <div>
                   <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-1">
                     End Date & Time
@@ -1173,44 +1186,53 @@ Answer: False"
                   </div>
                 </div>
               </div>
-
+        
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-gray-900">Additional Settings</h3>
-
-                <div className="flex items-center">
-                  <input
-                    id="shuffle-questions"
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="shuffle-questions" className="ml-2 block text-sm text-gray-700">
-                    Shuffle questions for each student
-                  </label>
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    id="show-results"
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="show-results" className="ml-2 block text-sm text-gray-700">
-                    Show results immediately after submission
-                  </label>
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    id="one-attempt"
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="one-attempt" className="ml-2 block text-sm text-gray-700">
-                    Limit to one attempt per student
-                  </label>
+        
+                <div className="space-y-3">
+                  {/* Improved checkbox alignment */}
+                  <div className="flex items-center">
+                    <div className="flex items-center justify-center h-5">
+                      <input
+                        id="shuffle-questions"
+                        type="checkbox"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                    </div>
+                    <label htmlFor="shuffle-questions" className="ml-2 text-sm text-gray-700">
+                      Shuffle questions for each student
+                    </label>
+                  </div>
+        
+                  <div className="flex items-center">
+                    <div className="flex items-center justify-center h-5">
+                      <input
+                        id="show-results"
+                        type="checkbox"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                    </div>
+                    <label htmlFor="show-results" className="ml-2 text-sm text-gray-700">
+                      Show results immediately after submission
+                    </label>
+                  </div>
+        
+                  <div className="flex items-center">
+                    <div className="flex items-center justify-center h-5">
+                      <input
+                        id="one-attempt"
+                        type="checkbox"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                    </div>
+                    <label htmlFor="one-attempt" className="ml-2 text-sm text-gray-700">
+                      Limit to one attempt per student
+                    </label>
+                  </div>
                 </div>
               </div>
-
+        
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setCurrentTab("questions")}
@@ -1340,14 +1362,14 @@ Answer: False"
                 <div className="space-x-3">
                   <button
                     onClick={() => saveExam(false)}
-                    className="px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="min-w-[150px] px-3 py-1 text-sm leading-tight whitespace-nowrap border rounded disabled:opacity-50"
                   >
                     <Save className="h-4 w-4 inline-block mr-1" />
                     Save as Draft
                   </button>
                   <button
                     onClick={() => saveExam(true)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="min-w-[150px] px-3 py-1 text-sm leading-tight whitespace-nowrap border rounded disabled:opacity-50"
                   >
                     <Eye className="h-4 w-4 inline-block mr-1" />
                     Publish Exam

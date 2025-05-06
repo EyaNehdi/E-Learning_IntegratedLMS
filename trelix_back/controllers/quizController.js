@@ -1,18 +1,18 @@
 const Quiz = require("../models/quizModel");  // Your Quiz model
 const multer = require("multer");
 const path = require("path");
-
+const Chapter = require("../models/chapterModels");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../uploads')); 
+        cb(null, path.join(__dirname, '../uploads'));
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname); 
+        cb(null, Date.now() + "-" + file.originalname);
     }
 });
 
-const upload = multer({ storage }); 
+const upload = multer({ storage });
 
 
 const createQuiz = async (req, res) => {
@@ -96,7 +96,7 @@ const updateQuiz = async (req, res) => {
             title,
             description,
             questions,
-            file: req.file ? req.file.path : null, 
+            file: req.file ? req.file.path : null,
         };
 
         const updatedQuiz = await Quiz.findByIdAndUpdate(req.params.quizId, quizData, { new: true });
@@ -114,7 +114,7 @@ const updateQuiz = async (req, res) => {
 
 const deleteQuiz = async (req, res) => {
     try {
-        const deletedQuiz = await Quiz.findByIdAndDelete(req.params.quizId); 
+        const deletedQuiz = await Quiz.findByIdAndDelete(req.params.quizId);
 
         if (!deletedQuiz) {
             return res.status(404).json({ message: "Quiz not found" });
@@ -127,11 +127,163 @@ const deleteQuiz = async (req, res) => {
 };
 
 
+
+
+const assignedQuizToChapter = async (req, res) => {
+    try {
+        const { chapterId, quizIds } = req.body;
+
+        // Validate input
+        if (!chapterId || !quizIds || quizIds.length === 0) {
+            return res.status(400).json({ success: false, message: "Chapter ID and quiz IDs are required." });
+        }
+
+        // Check if the chapter exists
+        const chapter = await Chapter.findById(chapterId);
+        if (!chapter) {
+            return res.status(404).json({ success: false, message: "Chapter not found." });
+        }
+
+        // Check if all quizzes exist
+        const quizzes = await Quiz.find({ _id: { $in: quizIds } });
+        if (quizzes.length !== quizIds.length) {
+            return res.status(404).json({ success: false, message: "One or more quizzes not found." });
+        }
+
+        // Assign quizzes to the chapter
+        chapter.quizzes = [...new Set([...chapter.quizzes, ...quizIds])]; // Avoid duplicates
+        await chapter.save();
+
+        res.status(200).json({ success: true, message: "Quizzes successfully assigned to the chapter." });
+    } catch (error) {
+        console.error("Error assigning quizzes:", error);
+        res.status(500).json({ success: false, message: "Internal server error." });
+    }
+};
+const getQuizzesByChapter = async (req, res) => {
+    try {
+      const { chapterId } = req.params;
+  
+      if (!chapterId) {
+        return res.status(400).json({ message: "Chapter ID is required" });
+      }
+  
+      // Find the chapter and get associated quizzes
+      const chapter = await Chapter.findById(chapterId).populate("quizzes");
+  
+      if (!chapter) {
+        return res.status(404).json({ message: "Chapter not found" });
+      }
+  
+      res.json(chapter.quizzes);
+    } catch (error) {
+      console.error("Error fetching quizzes by chapter:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  };
+  const Result =require('../models/Resultmodels');
+  const saveresultuser = async (req, res) => {
+    try {
+      const { quizId, answers, userId } = req.body;
+  
+      // Validate input
+      if (!quizId || !answers || !userId) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+  
+      // Fetch the quiz from the database
+      const quiz = await Quiz.findById(quizId).populate("questions");
+  
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+  
+      // Calculate the score
+      let correctAnswers = 0;
+      const totalQuestions = quiz.questions.length;
+  
+      quiz.questions.forEach((question, index) => {
+        const userAnswer = answers[index];
+        if (userAnswer && userAnswer === question.correctAnswer) {
+          correctAnswers++;
+        }
+      });
+      
+      const score = (correctAnswers / totalQuestions) * 100;
+  
+      // Save the result to the database
+      const result = new Result({
+        user: userId,
+        quiz: quizId,
+        answers: answers,
+        score: score,
+        date: new Date(),
+      });
+  
+      await result.save();
+  
+      // Respond with the saved result
+      res.status(201).json({
+        message: "Quiz results saved successfully",
+        score: score,
+        totalQuestions: totalQuestions,
+        correctAnswers: correctAnswers,
+        resultId: result._id,
+      });
+    } catch (error) {
+      console.error("Error saving quiz results:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  };
+  const getuserattempts = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        // Fetch all quiz attempts by the user
+        const attempts = await Result.find({ user: userId }).populate("quiz");
+
+        // If no attempts found, return an empty array instead of an error
+        if (!attempts || attempts.length === 0) {
+            return res.json([]); // Returning an empty array instead of a 404 error
+        }
+
+        // Format response data
+        const formattedAttempts = attempts.map((attempt) => ({
+            quizId: attempt.quiz?._id, // Using optional chaining to avoid errors
+            quizTitle: attempt.quiz?.title || "Unknown Quiz",
+            score: attempt.score,
+            date: attempt.date,
+            answers: attempt.answers,
+        }));
+
+        res.json(formattedAttempts);
+    } catch (error) {
+        console.error("Error fetching user attempts:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+  
+
+  
+  
+
+
+
+
 module.exports = {
     createQuiz,
     getAllQuizzes,
     getQuizById,
     updateQuiz,
     deleteQuiz,
-    upload,  
+    assignedQuizToChapter,
+    getQuizzesByChapter,
+    saveresultuser,
+    getuserattempts,
+    upload,
 };

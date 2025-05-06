@@ -1,9 +1,10 @@
-import DailyQuizz from "../../components/dailyQuizz"
-import Leader from "../../components/Leader"
+import DailyQuizz from "../../components/Leaderboard/DailyQuizz"
+import Leader from "../../components/Leaderboard/Leader"
 import axios from 'axios';
 import { useState,useEffect } from "react";
 import io from 'socket.io-client';
 import '../../components/css/Leaderboard.css'
+import Rewards from "../../components/Leaderboard/Rewards";
 
 
 function Leaderboard() {
@@ -40,7 +41,7 @@ function Leaderboard() {
 // Establish socket connection
 useEffect(() => {
   console.log("Setting up socket connection...");
-  const socket = io("http://localhost:5000", {
+  const socket = io(import.meta.env.VITE_API_PROXY, {
     transports: ['websocket', 'polling']
   });
 
@@ -102,57 +103,58 @@ useEffect(() => {
 };
 
 return (
-  <>
-  <Leader />
-  {/* Wrapper for positioning DailyQuizz */}
-  <div style={{
-      position: "absolute",
-      right: "0px",  // Adjust to move it to the right
-      top: "0px",   // Adjust to move it down
-      width: "unset",  // Prevents forced shrinking
-      maxWidth: "100%", // Ensures it doesn’t go beyond screen width
-    }}>
-      <DailyQuizz />
-    </div>
-    <div style={{
-      position: "absolute",
-      right: "400px",
-      top: "600px",
-      textAlign: "center",
-      fontSize: "24px",
-      fontWeight: "bold",
-      color: countdown <= 10 ? "red" : "black", // Red when time is low
-      }}>
-      {loading ? (
-        <p>Loading quiz...</p>
-      ) : error ? (
-        <p style={{ color: "red" }}>{error}</p>
-      ) : quiz ? (
-        <>
-          <div>
-          
-            <h3>{quiz.title}</h3>
-            <h4> ⏳ Time Left: {formatTime(countdown)}</h4>
+  <div className="leaderboard-page-container">
+    <div className="leaderboard-page-content">
+      <div className="leaderboard-left-section">
+        <Leader />
+      </div>
+      
+      {/* Right Section - Split into Two Columns */}
+      <div className="leaderboard-right-section">
+        <div className="leaderboard-main-content">
+          {/* Left Column - Quiz Title, Timer, Instructions, and Daily Quiz */}
+          <div className="quiz-column">
+            <div className="quiz-header-container">
+              {loading ? (
+                <p>Loading quiz...</p>
+              ) : error ? (
+                <p className="error-message">{error}</p>
+              ) : quiz ? (
+                <div className="quiz-details">
+                  <h3>{quiz.title}</h3>
+                  <h4> ⏳ Time Left: {formatTime(countdown)}</h4>
+                </div>
+              ) : (
+                <p>Loading quiz...</p>
+              )}
+            </div>
+
+            <div className="quiz-instructions-container">
+              <ul>
+                <li>You will get 5 questions</li>
+                <li>Your score will be displayed in the leaderboard.</li>
+                <li>Play and earn points to access our paid courses.</li>
+                <li>Be careful , You have to answer within the time limit.</li>
+                <li>Try to manage your time.</li>
+                <li>You can also win badges for playing daily.</li>
+                <li>Good luck!</li>
+              </ul>
+            </div>
+
+            <div className="daily-quiz-container">
+              <DailyQuizz />
+            </div>
           </div>
-          
-        </>
-      ) : (
-      <p>Loading quiz...</p>
-      )}
+
+          {/* Right Column - Rewards */}
+          <div className="rewards-column">
+            <Rewards />
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <ul style={{
-      position: "absolute",
-      right: "300px",
-      top: "700px",
-      listStyle: "circle",
-      textAlign:"left",
-      fontWeight:"bold"
-      }}>
-              <li>You will get 5 questions</li>
-              <li>Play and earn points to have access to our paid courses</li>
-            </ul>
-  </>
-)
+);
 
 }
 

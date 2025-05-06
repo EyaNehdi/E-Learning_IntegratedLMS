@@ -1,19 +1,20 @@
 import InstructorRegister from "../../components/Instructor/InstructorRegister";
 import StudentRegister from "../../components/Student/StudentRegister";
 
-import MfaSetup from "../../components/MfaSetup/MfaSetup"
+import MfaSetup from "../../components/MfaSetup/MfaSetup";
 import React, { useState, useEffect } from "react";
 import { useProfileStore } from "../../store/profileStore";
 
 import "./signupStyle.css";
+import { useLocation } from "react-router-dom";
 
 function SignUpPage() {
   const [isInstructor, setIsInstructor] = useState(true);
-  const [isRegisterSuccess, setisRegisterSuccess] = useState(false);
-
-
-  
-
+  const location = useLocation();
+  const initialRegisterSuccess = location.state?.isRegisterSuccess ?? false;
+  const [isRegisterSuccess, setisRegisterSuccess] = useState(
+    initialRegisterSuccess
+  );
 
   return (
     <div className="vh-100 d-flex align-items-center justify-content-center m-0 p-0">
@@ -32,7 +33,11 @@ function SignUpPage() {
         >
           <div className="w-100 h-100 d-flex justify-content-center align-items-center">
             <div style={{ textAlign: "center" }}>
-              <img src="assets/images/signup-2.png" alt="Sign Up" className="img-fluid" />
+              <img
+                src="assets/images/signup-2.png"
+                alt="Sign Up"
+                className="img-fluid"
+              />
               <div
                 style={{
                   display: "flex",
@@ -62,23 +67,48 @@ function SignUpPage() {
                   Contact support
                 </button>
               </div>
-              <a href="/privacy-policy" className="text-white text-decoration-none" style={{ fontSize: "0.8rem", display: "block", marginTop: "10px" }}>
+              <a
+                href="/privacy-policy"
+                className="text-white text-decoration-none"
+                style={{
+                  fontSize: "0.8rem",
+                  display: "block",
+                  marginTop: "10px",
+                }}
+              >
                 Privacy & Policy
               </a>
             </div>
           </div>
         </div>
 
-        <div className="col-12 col-md-7 col-lg-8 m-0 p-0" style={{ height: "100%", overflow: "auto" }}>
+        <div
+          className="col-12 col-md-7 col-lg-8 m-0 p-0"
+          style={{ height: "100%", overflow: "auto" }}
+        >
           <div className="w-100 d-flex flex-column align-items-center justify-content-start">
             {isRegisterSuccess ? (
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100vh",
+                }}
+              >
                 <MfaSetup />
               </div>
             ) : (
               <>
                 <div className="text-center">
-                  <p style={{ fontSize: "0.9rem", fontWeight: "400", color: "#000", marginTop: "20px" }}>
+                  <p
+                    style={{
+                      fontSize: "0.9rem",
+                      fontWeight: "400",
+                      color: "#000",
+                      marginTop: "20px",
+                    }}
+                  >
                     Select your account type to continue:
                   </p>
                 </div>
@@ -133,9 +163,13 @@ function SignUpPage() {
                 </div>
 
                 {isInstructor ? (
-                  <InstructorRegister setisRegisterSuccess={setisRegisterSuccess} />
+                  <InstructorRegister
+                    setisRegisterSuccess={setisRegisterSuccess}
+                  />
                 ) : (
-                  <StudentRegister setisRegisterSuccess={setisRegisterSuccess} />
+                  <StudentRegister
+                    setisRegisterSuccess={setisRegisterSuccess}
+                  />
                 )}
               </>
             )}
