@@ -33,7 +33,9 @@ var app = express();
 const allowedOrigins = [
   'https://trelix-g9ckx86l8-eyanehdis-projects.vercel.app',
   'https://trelix-xj5h.onrender.com',
-  /https:\/\/trelix-.*-eyanehdis-projects\.vercel\.app/,
+  'https://trelix-qjnmuzya8-eyanehdis-projects.vercel.app', // New deployment URL
+  'https://trelix-livid.vercel.app', // Custom domain
+  /https:\/\/trelix-.*-eyanehdis-projects\.vercel\.app/, // This regex will match all preview deployments
   'http://localhost:5173',
 ];
 
