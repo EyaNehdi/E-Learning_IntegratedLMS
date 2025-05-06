@@ -4,7 +4,7 @@ import { Toaster } from "react-hot-toast";
 import Login from "./pages/SignIn/Login";
 import SignUpPage from "./pages/SignUpPage/SignUpPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicy/PrivacyPolicyPage";
-import NotFound from "./components/Notfound";
+import NotFound from "./components/NotFound";
 import { LinkedInCallback } from "react-linkedin-login-oauth2";
 import CV from "./pages/cv";
 import ProtectedRoute from "./layout/ProtectedRoute";
