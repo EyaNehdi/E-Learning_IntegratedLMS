@@ -72,20 +72,6 @@ app.post('/createRoom', async (req, res) => {
 
 
 // POST /api/goals
-
-
-
-
-
-
-
-
-
-
-require('dotenv').config(); // Charger les variables d'environnement
-
-
-
 const { getMoodleCourses, getCourseContents } = require('./API/Moodle');
 
 
@@ -103,8 +89,6 @@ const StripeRaw = require("./routes/stripe.routes");
 const Purchases = require("./routes/coursesPurchasesRoutes");
 
 app.use('/stripe/raw', StripeRaw);
-
-var app = express();
 
 
 // Configuration du moteur de vues et des middlewares
@@ -155,29 +139,6 @@ app.use((req, res, next) => {
   // console.log('Session ID:', req.sessionID);
   next();
 });
-
-
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'votre_secret_de_session',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-    ttl: 14 * 24 * 60 * 60 // 14 jours
-  }),
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 14 * 24 * 60 * 60 * 1000 // 14 jours
-  }
-}));
-
-
-
-
-
-// Autres routes de ton application
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
@@ -251,12 +212,6 @@ app.use("/api/finance", financeRoutes);
 
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
-
-// Gestion des erreurs
-app.use((err, req, res, next) => {
-  console.error('Upload Error:', err.message);
-  res.status(400).json({ error: err.message });
-});
 
 // Middleware de débogage pour les redirections
 app.use((req, res, next) => {
@@ -537,6 +492,11 @@ if (process.env.NODE_ENV === 'forTest') {
   const cron = require('node-cron');
   cron.schedule('0 0 * * *', runEngagementTasks);
 }
+
+app.use((err, req, res, next) => {
+  console.error('Upload Error:', err.message);
+  res.status(400).json({ error: err.message });
+});
 
 
 module.exports = app;
