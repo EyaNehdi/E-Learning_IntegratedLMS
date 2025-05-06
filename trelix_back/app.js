@@ -485,7 +485,7 @@ const server = app.listen(PORT, () => {
 // 2. Attach Socket.IO to the existing Express server
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",  // Assurez-vous que le frontend utilise ce port
+    origin: process.env.FRONTEND_URL,  // Assurez-vous que le frontend utilise ce port
     methods: ["GET", "POST"],
     credentials: true
   }

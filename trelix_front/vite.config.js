@@ -6,11 +6,12 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
+    base: './',
     plugins: [react(), tailwindcss()],
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_API_PROXY, 
+          target: env.VITE_API_PROXY,
           changeOrigin: true,
           "/cdn-cgi/rum": false
         }
