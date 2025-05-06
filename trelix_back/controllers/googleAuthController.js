@@ -9,7 +9,7 @@ exports.googleLogin = (req, res) => {
     res.redirect(authUrl);
   } catch (error) {
     console.error('Erreur lors de la redirection vers Google:', error);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://trelix-livid.vercel.app';
     res.redirect(`${frontendUrl}/classroom?auth=error`);
   }
 };
@@ -66,12 +66,12 @@ exports.googleCallback = async (req, res) => {
     console.log("Session après sauvegarde:", req.session);
     
     // Rediriger vers le frontend
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://trelix-livid.vercel.app';
     res.redirect(`${frontendUrl}/classroom?auth=success`);
   } catch (error) {
     console.error('Erreur détaillée lors du callback Google:', error);
     
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://trelix-livid.vercel.app';
     res.redirect(`${frontendUrl}/classroom?auth=error&message=${encodeURIComponent(error.message)}`);
   }
 };

@@ -64,7 +64,7 @@ function Login() {
   };
   const { linkedInLogin } = useLinkedIn({
     clientId: "86un9qr2kersxv",
-    redirectUri: "http://localhost:5173/linkedin/callback",
+    redirectUri: "https://trelix-livid.vercel.app/linkedin/callback",
     scope: "openid profile w_member_social email",
     onSuccess: async (code, state) => {
       console.log("LinkedIn code:", code);
@@ -86,7 +86,7 @@ function Login() {
           "This Linkedin account dosn't exists. Redirecting to signup..."
         );
         setTimeout(() => {
-          window.location.href = "http://localhost:5173/signup";
+          window.location.href = "https://trelix-livid.vercel.app/signup";
         }, 2000);
         console.error("Error:", error);
       } finally {
@@ -117,7 +117,7 @@ function Login() {
           "This Google account dosn't exists. Redirecting to signup..."
         );
         setTimeout(() => {
-          window.location.href = "http://localhost:5173/signup";
+          window.location.href = "https://trelix-livid.vercel.app/signup";
         }, 2000);
         setErrorMessage("Account does not exist");
       } else {
@@ -151,7 +151,7 @@ function Login() {
         "This Github account dosn't exists. Redirecting to signup..."
       );
       setTimeout(() => {
-        window.location.href = "http://localhost:5173/signup";
+        window.location.href = "https://trelix-livid.vercel.app/signup";
       }, 2000);
       console.error(err);
     }
@@ -315,7 +315,7 @@ function Login() {
                           <div className="d-none" ref={githubRef}>
                             <GitHubLogin
                               clientId="Ov23liQcQlFtxrCS9Hkz"
-                              redirectUri="http://localhost:5173/login/student"
+                              redirectUri="https://trelix-livid.vercel.app/login/student"
                               onSuccess={handleGitHubLoginSuccess}
                               onFailure={handleGitHubLoginError}
                             />
