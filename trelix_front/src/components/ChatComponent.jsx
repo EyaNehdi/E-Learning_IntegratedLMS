@@ -15,7 +15,7 @@ function ChatComponent() {
   const handleSendMessage = () => {
     const now = Date.now();
 
-    // Get timestamp history from localStorage
+ 
     const storedTimestamps = JSON.parse(localStorage.getItem("messageTimestamps")) || [];
     const oneMinuteAgo = now - 60000;
 

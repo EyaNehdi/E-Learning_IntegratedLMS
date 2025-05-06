@@ -9,7 +9,8 @@ const cors = require('cors');
 const multer = require('multer');
 const socketIo = require('socket.io');
 const preference = require("./routes/preference");
-
+const pdfParse = require('pdf-parse');
+const summarizerRoutes = require('./routes/summarizerRoutes');
 
 
 // Correction des imports pour Google Classroom
@@ -38,9 +39,12 @@ app.use(cors({
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
-
 app.use(express.json({ limit: '100mb' }));
 
+
+
+
+app.use('/summarize-pdf', summarizerRoutes);
 
 
 
@@ -156,6 +160,16 @@ app.use(cors({
 
 
 
+app.get('/api/citation', async (req, res) => {
+  try {
+    const response = await axios.get('https://zenquotes.io/api/random');
+    res.json(response.data[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erreur lors de la récupération de la citation' });
+  }
+});
+
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'votre_secret_de_session',
@@ -211,6 +225,7 @@ app.use('/delete', Course);
 app.use('/preference',preference);
 
 
+
 // Routes Google Classroom (corrigées)
 app.use('/api/auth/google', googleAuthRoutes);
 app.use('/api/classroom', classroomRoutes);
@@ -240,6 +255,7 @@ app.use("/api/badges-r", badgesRoutes);
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
 
+
 // Gestion des erreurs
 app.use((err, req, res, next) => {
   console.error('Upload Error:', err.message);
@@ -256,7 +272,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Placez ce middleware avant vos routes
+
 
 // Route de test pour Google Classroom
 app.get('/api/classroom-test', (req, res) => {

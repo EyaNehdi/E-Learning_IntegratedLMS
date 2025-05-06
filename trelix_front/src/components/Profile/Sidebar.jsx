@@ -46,6 +46,8 @@ function Sidebar({ setActivePage }) {
               >
                 <i className="feather-icon icon-user" />
                 <span>User Account</span>
+                
+
               </Link>
             </li>
 
@@ -185,18 +187,33 @@ function Sidebar({ setActivePage }) {
                 <span>Chatbot</span>
               </Link>
               </li>
+
+              
               <li>
               <Link className="nav-link" to="/profile/meeting">
                 <i className="feather-icon icon-plus" />
                 <span>Meet</span>
               </Link>
               </li>
+
               <li>
-              <Link className="nav-link" to="/profile/chat">
+
+              <Link className="nav-link" to="/profile/dictionary">
+
                 <i className="feather-icon icon-plus" />
-                <span>GroupChat</span>
+                <span>Dictionary</span>
               </Link>
               </li>
+              
+
+              <li>
+
+<Link className="nav-link" to="/profile/CitationGenerator">
+
+  <i className="feather-icon icon-plus" />
+  <span>CitationGenerator</span>
+</Link>
+</li>
 
 
             </ul>

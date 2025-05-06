@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { Progress } from "../ui/progress"
+import Summarizer from "../Summarizer";
 
 // Import your QuizModal component
 import QuizModal from "../Quiz/QuizModal"
@@ -502,6 +503,12 @@ const ChapterContent = () => {
               )}
             </div>
 
+
+            {/* Résumeur de texte */}
+<div className="mb-8">
+  <Summarizer />
+</div>-
+
             {/* Quiz Button */}
             <div className="mb-8 flex justify-center">
               <button
@@ -518,6 +525,11 @@ const ChapterContent = () => {
                 {canStartQuiz && <Play className="w-5 h-5" />}
               </button>
             </div>
+
+
+
+
+
 
             {/* Quiz Modal */}
             <QuizModal showQuiz={showQuiz} onClose={() => setShowQuiz(false)} />

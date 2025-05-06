@@ -55,17 +55,10 @@ import BadgeFeature from "./pages/Admin/BadgeFeature";
 import ListBadges from "./components/Admin/ListBadges";
 import StatPreference from "./components/Student/preference-statistics" 
 import Preference from "./components/Student/AddPreference"
-
-  
-
-
 import React, { useState } from "react"; 
 import axios from "axios"; 
 import GeminiChatbot from "./components/GeminiChatbot";
-
-
 import CourseLearningPlatform from "./components/Quiz/test";
-
 import AssignQuizToChapter from "./components/Quiz/AssignQuizToChapter";
 import Achievements from "./components/Profile/Achievements";
 import MoodleCourses from "./components/MoodleCourses";
@@ -73,103 +66,18 @@ import Calendar from "./components/Calendear/Calendar";
 import JoinRoom from "./components/JoinRoom"
 import MeetingRoom from "./components/MeetingRoom"  
 import ChatComponent from './components/ChatComponent'; 
-
-
 import CertificatesPage from "./pages/Certification/CertificatesPage";
-
-
 import CourseChartPage from "./components/Instructor/CourseChart"
 import ClassroomPage from "./components/classroom/ClassroomPage";
 import CourseDetailsPage from "./components/classroom/CourseDetailsPage";
-
-
-
-
-
 import EmailForm from "./components/mail/EmailSender";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import Dictionary from './components/Dictionary';
 import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
-
-
-
-
-
-
-
-
-
-    setIsLoading(true);
-    // Ajout du message utilisateur immédiatement
-    setMessages(prev => [...prev, { sender: 'user', text: input }]);
-    setInput('');
-
-    try {
-      const res = await axios.post('http://localhost:5000/chatbot',
-        { question: input },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      // Utilisez reply au lieu de text pour correspondre au backend
-      setMessages(prev => [...prev, {
-        sender: 'Trelix',
-        text: res.data.reply || res.data.text || "Pas de réponse"
-      }]);
-
-    } catch (err) {
-      console.error('Erreur détaillée:', {
-        status: err.response?.status,
-        data: err.response?.data,
-        message: err.message
-      });
-
-      setMessages(prev => [...prev, {
-        sender: 'Trelix',
-        text: err.response?.data?.error || "Erreur de connexion au serveur"
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    
-    <div className="chat-container">
-     
-      
-      <div className="messages">
-        {messages.map((msg, i) => (
-          <div key={i} className={`message ${msg.sender}`}>
-            <strong>{msg.sender === 'user' ? 'Vous' : 'Trelix'}:</strong> {msg.text}
-          </div>
-        ))}
-        {isLoading && (
-          <div className="message Trelix">
-            <strong>Trelix:</strong> Réflexion en cours...
-          </div>
-        )}
-      </div>
-      <form onSubmit={handleSubmit} className="chat-form">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Posez votre question..."
-          disabled={isLoading}
-        />
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Envoi...' : 'Envoyer'}
-        </button>
-      </form>
-    </div>
-  );
-};
-
+import Summarizer from './components/Summarizer';
+import CitationGenerator from './components/CitationGenerator';
 
 function App() {
 
@@ -178,6 +86,10 @@ function App() {
 
     
     <Router>
+      <div>
+        
+        <ChatComponent />  
+      
       
       <Routes>
         {/* **************** */}
@@ -214,9 +126,7 @@ function App() {
           <Route path="/home" element={<HomeUser />} />
 
 
-          {/* Route pour le chatbot */}
 
-        <Route path="/chatbot" element={<Chatbot />} />
 
          {/* Route pour la réunion */}
          
@@ -228,7 +138,7 @@ function App() {
             <Route index element={<BrowseCertificates />} />
             <Route path="browse" element={<BrowseCertificates />} />
           </Route>
-
+         
           <Route path="/Moodle" element={<MoodleCourses />} />
           <Route path="/allcours" element={<Allcourse />} />
 
@@ -247,8 +157,10 @@ function App() {
             <Route index element={<ProfileDetails />} />
             <Route path="details" element={<ProfileDetails />} />
             <Route path="geminichat" element={<GeminiChatbot />} />
+            <Route path="dictionary" element={<Dictionary />} />
             <Route path="chat" element={<ChatComponent />} />
             <Route path="meeting" element={<JoinRoom />} />
+            <Route path="CitationGenerator" element={<CitationGenerator />} /> 
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addExam" element={<AddExam />} />
             <Route path="Allexams" element={<AllExamsInstructor />} />
@@ -262,6 +174,8 @@ function App() {
 
             <Route path="course-chapter/:courseId" element={<CourseChapter />} />
             <Route path="list" element={<Listecourse />} />
+            <Route path="summarizer" element={<Summarizer />} />
+
             <Route path="module" element={<Module />} />
 
             <Route path="achievements" element={<Achievements />} />
@@ -318,6 +232,7 @@ function App() {
 
       </Routes>
       <Toaster />
+      </div>
     </Router>
 
     

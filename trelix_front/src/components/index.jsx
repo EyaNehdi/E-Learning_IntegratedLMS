@@ -32,6 +32,7 @@ function Index() {
       };
   
       fetchCourses();
+    }, []);
 
 
     const [categories, setCategories] = useState([]);
