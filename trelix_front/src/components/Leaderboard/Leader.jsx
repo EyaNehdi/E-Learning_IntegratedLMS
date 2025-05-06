@@ -47,7 +47,7 @@ function Leader() {
       });
 
     // WebSocket to listen for leaderboard updates
-    const socket = io("http://localhost:5000");
+    const socket = io(import.meta.env.VITE_API_PROXY);
 
     socket.on("leaderboardUpdate", (updatedLeaderboard) => {
       setLeaderboard(updatedLeaderboard);

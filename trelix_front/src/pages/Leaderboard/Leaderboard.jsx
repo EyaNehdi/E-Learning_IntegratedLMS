@@ -41,7 +41,7 @@ function Leaderboard() {
 // Establish socket connection
 useEffect(() => {
   console.log("Setting up socket connection...");
-  const socket = io("http://localhost:5000", {
+  const socket = io(import.meta.env.VITE_API_PROXY, {
     transports: ['websocket', 'polling']
   });
 

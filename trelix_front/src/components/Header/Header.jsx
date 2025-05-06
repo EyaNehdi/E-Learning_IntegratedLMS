@@ -47,7 +47,7 @@ function Header() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://localhost:5000/course/courses"
+          `${import.meta.env.VITE_API_PROXY}/course/courses`
         );
         setCourses(response.data);
         setFilteredCourses(response.data);

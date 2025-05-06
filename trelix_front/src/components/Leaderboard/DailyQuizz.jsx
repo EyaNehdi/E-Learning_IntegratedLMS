@@ -13,7 +13,7 @@ function DailyQuizz() {
     const [loading, setLoading] = useState(true);
   
     useEffect(() => {
-    const socket = io('http://localhost:5000'); // Adjust to your backend URL
+    const socket = io(import.meta.env.VITE_API_PROXY); // Adjust to your backend URL
         
         socket.on('activeQuizUpdate', (quizData) => {
             console.log("Received active quiz update:", quizData);

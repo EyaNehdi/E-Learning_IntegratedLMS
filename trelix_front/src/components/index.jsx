@@ -44,7 +44,7 @@ const Index = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/courses/categories");
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/courses/categories`);
         setCategories(res.data);
       } catch (err) {
         console.error("Erreur lors du fetch des catégories:", err);
@@ -53,7 +53,7 @@ const Index = () => {
 
     const fetchStudents = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/count/student');
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/count/student`);
         setCountStudent(res.data.count);
       } catch (err) {
         console.error("Error fetching student count:", err);
@@ -62,7 +62,7 @@ const Index = () => {
 
     const fetchInstructors = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/count/instructor');
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/count/instructor`);
         setCountInstructor(res.data.count);
       } catch (err) {
         console.error("Error fetching instructor count:", err);
@@ -71,7 +71,7 @@ const Index = () => {
 
     const fetchCoursesNumber = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/course/count/courses');
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/count/courses`);
         setCountCourses(res.data.count);
       } catch (err) {
         console.error("Error fetching courses count:", err);
@@ -80,7 +80,7 @@ const Index = () => {
 
     const meetOurInstructors = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/instructors');
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/instructors`);
         setInstructorsMeet(res.data);
       } catch (err) {
         console.error("Error fetching instructors:", err);
@@ -99,7 +99,7 @@ const Index = () => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:5000/course/courses");
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/courses`);
         console.log("Courses fetched:", response.data);
         setCourses(response.data);
         setLoading(false);
