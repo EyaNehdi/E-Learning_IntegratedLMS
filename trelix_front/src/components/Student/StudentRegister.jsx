@@ -326,7 +326,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
 
     try {
       const response = await axios.post(
-        "/api/auth/register/student",
+        "https://trelix-xj5h.onrender.com/api/auth/register/student",
         formData,
         { withCredentials: true }
       );
