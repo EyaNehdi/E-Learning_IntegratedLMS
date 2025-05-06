@@ -35,7 +35,7 @@ var app = express();
 
 
 app.use(cors({
-  origin: "http://localhost:5173",  // Assurez-vous que le frontend utilise ce port
+  origin: process.env.FRONTEND_URL,  // Assurez-vous que le frontend utilise ce port
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -147,25 +147,6 @@ app.use((req, res, next) => {
   // console.log('Session ID:', req.sessionID);
   next();
 });
-app.use(cors({
-  origin: "http://localhost:5173", // URL de votre frontend
-  credentials: true, // Important pour les cookies de session
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-
-
-//cors
-
-app.use(cors({
-  origin: "http://localhost:5173",  // Assurez-vous que le frontend utilise ce port
-  credentials: true,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-
 
 
 app.use(session({
