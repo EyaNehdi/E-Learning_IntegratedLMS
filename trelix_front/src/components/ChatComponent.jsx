@@ -20,9 +20,11 @@ function ChatComponent() {
 
     const now = Date.now()
 
+
     // Get timestamp history from localStorage
     const storedTimestamps = JSON.parse(localStorage.getItem("messageTimestamps")) || []
     const oneMinuteAgo = now - 60000
+
 
     // Keep only those from the last minute
     const recentTimestamps = storedTimestamps.filter((ts) => ts > oneMinuteAgo)

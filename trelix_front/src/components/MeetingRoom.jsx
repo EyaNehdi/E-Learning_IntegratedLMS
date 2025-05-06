@@ -167,7 +167,9 @@ export default function MeetingRoom() {
     script.onload = () => {
       const domain = "meet.jit.si"
       const options = {
+
         roomName: roomId,
+
         width: "100%",
         height: "100%",
         parentNode: videoContainerRef.current,
