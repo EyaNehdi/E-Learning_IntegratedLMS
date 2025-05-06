@@ -32,7 +32,7 @@ function Login() {
     setLoading(true);
     try {
       const responseLogin = await axios.post(
-        `/api/auth/login`,
+        `https://trelix-xj5h.onrender.com/api/auth/login`,
         { email, password, stayLoggedIn },
         { withCredentials: true }
       );
