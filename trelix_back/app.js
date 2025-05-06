@@ -30,16 +30,24 @@ const axios = require('axios');
 const fetch = require('node-fetch');
 var app = express();
 
-
-
-
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://trelix-f6idqzqu3-eyanehdis-projects.vercel.app'
+];
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL,  // Assurez-vous que le frontend utilise ce port
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
 
 app.use(express.json({ limit: '100mb' }));
 
@@ -485,7 +493,13 @@ const server = app.listen(PORT, () => {
 // 2. Attach Socket.IO to the existing Express server
 const io = socketIo(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,  // Assurez-vous que le frontend utilise ce port
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST"],
     credentials: true
   }
