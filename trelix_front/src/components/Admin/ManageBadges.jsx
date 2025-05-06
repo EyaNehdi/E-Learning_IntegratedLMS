@@ -3,7 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-const baseUrl = "http://localhost:5000";
+const baseUrl = "https://trelix-xj5h.onrender.com";
 const ManageBadges = () => {
   const location = useLocation();
   const navigate = useNavigate();

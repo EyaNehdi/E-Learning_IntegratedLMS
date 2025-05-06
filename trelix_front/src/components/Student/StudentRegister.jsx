@@ -49,7 +49,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
 
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/auth/register/linkedinStudent",
+          "https://trelix-xj5h.onrender.com/api/auth/register/linkedinStudent",
           { code }
         );
 

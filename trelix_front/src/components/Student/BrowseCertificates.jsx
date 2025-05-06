@@ -13,7 +13,7 @@ const BrowseCertificates = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentCertificates = certificates.slice(indexOfFirstItem, indexOfLastItem);
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = "https://trelix-xj5h.onrender.com";
 
   return (
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>

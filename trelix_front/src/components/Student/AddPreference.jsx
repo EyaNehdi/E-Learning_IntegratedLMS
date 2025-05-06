@@ -91,7 +91,7 @@ function AddPreference() {
   const fetchModules = async () => {
     setIsLoadingModules(true)
     try {
-      const response = await axios.get("http://localhost:5000/module")
+      const response = await axios.get("https://trelix-xj5h.onrender.com/module")
       const data = response.data
       const extractModules = (data) => {
         if (Array.isArray(data)) return data
@@ -146,7 +146,7 @@ function AddPreference() {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/preference/add", {
+      const response = await axios.post("https://trelix-xj5h.onrender.com/preference/add", {
         typeRessource,
         momentEtude,
         langue,

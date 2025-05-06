@@ -35,7 +35,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
 
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/auth/register/linkedinInstructor",
+          "https://trelix-xj5h.onrender.com/api/auth/register/linkedinInstructor",
           { code }
         );
 
@@ -304,7 +304,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register/instructor",
+        "https://trelix-xj5h.onrender.com/api/auth/register/instructor",
         formData,
         { withCredentials: true }
       );

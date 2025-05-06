@@ -71,7 +71,7 @@ function Login() {
 
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/auth/loginLinkedIn",
+          "https://trelix-xj5h.onrender.com/api/auth/loginLinkedIn",
           { code }
         );
 
@@ -136,7 +136,7 @@ function Login() {
 
   const handleGitHubLoginSuccess = async (response) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/loginGit", {
+      const res = await axios.post("https://trelix-xj5h.onrender.com/api/auth/loginGit", {
         code: response.code,
       });
 

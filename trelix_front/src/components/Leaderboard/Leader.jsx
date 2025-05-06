@@ -11,7 +11,7 @@ function Leader() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/info/profile/badge",
+        "https://trelix-xj5h.onrender.com/api/info/profile/badge",
         {
           badge: "Welcome to Trelix Badge 🏅",
           email: firstPlaceUser.email, // Send the user's email
@@ -26,7 +26,7 @@ function Leader() {
 
   useEffect(() => {
     // Fetch leaderboard
-    axios.get("http://localhost:5000/api/quiz/leaderboard")
+    axios.get("https://trelix-xj5h.onrender.com/api/quiz/leaderboard")
       .then(response => {
         setLeaderboard(response.data);
 
@@ -87,7 +87,7 @@ function Leader() {
                     <td className="leaderboard-rank">{index + 1}</td>
                     <td className="leaderboard-name">
                       {user.profilePhoto && (
-                        <img src={`http://localhost:5000${user.profilePhoto}`} alt="profile" className="leaderboard-profile-pic" />
+                        <img src={`https://trelix-xj5h.onrender.com${user.profilePhoto}`} alt="profile" className="leaderboard-profile-pic" />
                       )}
                       </td>
                       <td className="leaderboard-name">

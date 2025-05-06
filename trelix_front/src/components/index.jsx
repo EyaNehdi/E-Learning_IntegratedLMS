@@ -526,7 +526,7 @@ const Index = () => {
                     <div className="instructor-card position-relative overflow-hidden shadow-sm rounded-3 bg-white">
                       <div className="instructor-image text-center pt-4">
                         <img
-                          src={`http://localhost:5000${instructor?.profilePhoto}`}
+                          src={`https://trelix-xj5h.onrender.com${instructor?.profilePhoto}`}
                           className="rounded-circle shadow-sm border border-2 border-white"
                           alt={`${instructor.firstName} ${instructor.lastName}`}
                           style={{

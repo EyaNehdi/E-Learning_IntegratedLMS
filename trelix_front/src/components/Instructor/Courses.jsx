@@ -97,7 +97,7 @@ function Courses() {
   // Fonction pour récupérer les modules
   const fetchModules = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/module")
+      const response = await axios.get("https://trelix-xj5h.onrender.com/module")
       console.log("Modules récupérés:", response.data)
 
       if (response.data.length > 0) {
@@ -293,7 +293,7 @@ function Courses() {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/course/addcourse", {
+      const response = await axios.post("https://trelix-xj5h.onrender.com/course/addcourse", {
         title,
         description,
         price,

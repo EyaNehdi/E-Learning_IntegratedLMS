@@ -87,14 +87,14 @@ export default function PreferenceStatistics() {
     setLoading(true)
     setError("")
     try {
-      const response = await axios.get("http://localhost:5000/preference/get")
+      const response = await axios.get("https://trelix-xj5h.onrender.com/preference/get")
       setPreferences(response.data)
 
       // Extraire les modules uniques pour le filtre
       const uniqueModules = [...new Set(response.data.map((pref) => pref.module?._id || pref.module))]
 
       // Récupérer les détails des modules
-      const moduleResponse = await axios.get("http://localhost:5000/module")
+      const moduleResponse = await axios.get("https://trelix-xj5h.onrender.com/module")
       const moduleData = moduleResponse.data
 
       // Créer la liste des modules pour le filtre

@@ -23,7 +23,7 @@ export default function JoinRoom() {
     try {
       console.log("Demande de création de salle...");
       // Assure-toi que l'URL ici pointe vers le bon port backend
-      const res = await axios.post("http://localhost:5000/createRoom");  // Backend à localhost:5000
+      const res = await axios.post("https://trelix-xj5h.onrender.com/createRoom");  // Backend à localhost:5000
       console.log("Réponse du serveur :", res.data);  // Log de la réponse pour vérifier le contenu
   
       const roomName = res.data.roomName;  // Récupérer le nom de la salle

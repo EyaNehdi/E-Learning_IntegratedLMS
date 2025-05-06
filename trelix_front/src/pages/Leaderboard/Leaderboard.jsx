@@ -17,7 +17,7 @@ function Leaderboard() {
   const fetchActiveQuiz = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/quiz/active');
+      const response = await axios.get('https://trelix-xj5h.onrender.com/api/quiz/active');
       
       if (response.data.quiz) {
         setQuiz(response.data.quiz);

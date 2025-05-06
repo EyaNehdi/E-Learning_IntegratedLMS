@@ -31,7 +31,7 @@ function IntelligentCourses() {
   const fetchRecommendedCourses = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/intelligent-recommendation/recommended-courses", {
+      const response = await axios.get("https://trelix-xj5h.onrender.com/intelligent-recommendation/recommended-courses", {
         params: { moduleId, userId },
       });
 

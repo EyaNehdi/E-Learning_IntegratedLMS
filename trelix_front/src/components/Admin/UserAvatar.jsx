@@ -23,7 +23,7 @@ const UserAvatar = ({ user }) => {
   };
 
   const imageUrl = user?.profilePhoto
-    ? `http://localhost:5000${user.profilePhoto}`
+    ? `https://trelix-xj5h.onrender.com${user.profilePhoto}`
     : "";
 
   return (

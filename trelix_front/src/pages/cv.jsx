@@ -25,7 +25,7 @@ function CV() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/ia/auth/CV',
+        'https://trelix-xj5h.onrender.com/ia/auth/CV',
         formData,
         {
           headers: {

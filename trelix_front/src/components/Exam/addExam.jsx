@@ -154,7 +154,7 @@ const AddExam = () => {
         console.log("Saving exam:", examData);
 
         // Send data to the backend
-        const response = await axios.post("http://localhost:5000/Exam/add", examData);
+        const response = await axios.post("https://trelix-xj5h.onrender.com/Exam/add", examData);
 
         if (response.status === 201) {
             setIsPublished(publish);

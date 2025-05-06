@@ -92,7 +92,7 @@ const ListBadges = () => {
       </div>
     );
   }
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = "https://trelix-xj5h.onrender.com";
   return (
     <div className="card ctm-border-radius shadow-sm">
       <div className="card-header">

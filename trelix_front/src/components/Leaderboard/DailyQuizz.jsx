@@ -42,7 +42,7 @@ return () => {
         try {
             // Ensure activeQuiz has a valid _id
             if (activeQuiz && activeQuiz._id) {
-                const res = await axios.get(`http://localhost:5000/api/quiz/check-attempt/${activeQuiz._id}`)
+                const res = await axios.get(`https://trelix-xj5h.onrender.com/api/quiz/check-attempt/${activeQuiz._id}`)
                 
 
                 // Log the response after the request completes

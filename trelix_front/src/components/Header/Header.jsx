@@ -458,7 +458,7 @@ function Header() {
                               >
                                 {user?.profilePhoto ? (
                                   <img
-                                    src={`http://localhost:5000${user.profilePhoto}`}
+                                    src={`https://trelix-xj5h.onrender.com${user.profilePhoto}`}
                                     className="img-fluid border rounded-circle"
                                     alt="Avatar"
                                     style={{

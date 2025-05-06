@@ -26,7 +26,7 @@ function WordleGame() {
   const fetchRandomWord = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/wordle/word");
+      const response = await axios.get("https://trelix-xj5h.onrender.com/api/wordle/word");
       setWord(response.data.word.toLowerCase());
       resetGame(response.data.word.toLowerCase());
     } catch (error) {

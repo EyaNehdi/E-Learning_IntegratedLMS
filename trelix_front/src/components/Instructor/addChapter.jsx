@@ -38,7 +38,7 @@ function AddChapter() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://localhost:5000/course/courses"
+          "https://trelix-xj5h.onrender.com/course/courses"
         );
         setCourses(response.data);
 
@@ -56,7 +56,7 @@ function AddChapter() {
   useEffect(() => {
     const fetchChapters = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/chapter/get");
+        const response = await axios.get("https://trelix-xj5h.onrender.com/chapter/get");
         setChapters(response.data);
       } catch (error) {
         console.error("Error fetching chapters:", error);
@@ -107,7 +107,7 @@ function AddChapter() {
   const handleDelete = async (id) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/chapter/delete/${id}`
+        `https://trelix-xj5h.onrender.com/chapter/delete/${id}`
       );
       if (response.status === 200) {
         setChapters((prevChapters) =>
@@ -125,7 +125,7 @@ function AddChapter() {
   const handleAssign = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/chapter/assign-chapters",
+        "https://trelix-xj5h.onrender.com/chapter/assign-chapters",
         {
           slugCourse: selectedCourse,
           chapters: selectedChapters,
@@ -163,7 +163,7 @@ function AddChapter() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/chapter/add",
+        "https://trelix-xj5h.onrender.com/chapter/add",
         formData,
         {
           headers: {
@@ -176,7 +176,7 @@ function AddChapter() {
         alert("Chapter added successfully!");
         // Refresh chapters list
         const chaptersResponse = await axios.get(
-          "http://localhost:5000/chapter/get"
+          "https://trelix-xj5h.onrender.com/chapter/get"
         );
         setChapters(chaptersResponse.data);
 
@@ -485,7 +485,7 @@ function AddChapter() {
                         <div className="flex flex-col space-y-2">
                           {chapter.video ? (
                             <a
-                              href={`http://localhost:5000${chapter.video}`}
+                              href={`https://trelix-xj5h.onrender.com${chapter.video}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-500 hover:text-blue-700 flex items-center"
@@ -502,7 +502,7 @@ function AddChapter() {
 
                           {chapter.pdf ? (
                             <a
-                              href={`http://localhost:5000${chapter.pdf}`}
+                              href={`https://trelix-xj5h.onrender.com${chapter.pdf}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-500 hover:text-blue-700 flex items-center"

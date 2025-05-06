@@ -112,7 +112,7 @@ const ChangePassword = () => {
     setPasswordMessage("")
 
     try {
-      const response = await axios.put("http://localhost:5000/api/info/profile/change-password", {
+      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/change-password", {
         oldPassword,
         newPassword,
       })

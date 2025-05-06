@@ -214,7 +214,7 @@ const ChapterContent = () => {
   useEffect(() => {
     setLoading(true)
     axios
-      .get("http://localhost:5000/chapter/get")
+      .get("https://trelix-xj5h.onrender.com/chapter/get")
       .then((response) => {
         setChapters(response.data)
         setLoading(false)
@@ -238,7 +238,7 @@ const ChapterContent = () => {
 
         // Fetch instructor profile
         axios
-          .get(`http://localhost:5000/api/admin/user/${selectedChapter.userid}`)
+          .get(`https://trelix-xj5h.onrender.com/api/admin/user/${selectedChapter.userid}`)
           .then((response) => {
             setProfile(response.data)
           })
@@ -389,13 +389,13 @@ const ChapterContent = () => {
         userId: userInfo._id,
       }
 
-      const response = await axios.post("http://localhost:5000/api/reviews/add", reviewData)
+      const response = await axios.post("https://trelix-xj5h.onrender.com/api/reviews/add", reviewData)
 
       if (response.data) {
         const newReview = {
           ...reviewData,
           userName: `${userInfo.firstName || ""} ${userInfo.lastName || ""}`.trim(),
-          userImage: userInfo.profilePhoto ? `http://localhost:5000${userInfo.profilePhoto}` : null,
+          userImage: userInfo.profilePhoto ? `https://trelix-xj5h.onrender.com${userInfo.profilePhoto}` : null,
           createdAt: new Date().toISOString(),
         }
 
@@ -418,13 +418,13 @@ const ChapterContent = () => {
       if (!id) return
 
       try {
-        const response = await axios.get(`http://localhost:5000/api/reviews/chapter/${id}`)
+        const response = await axios.get(`https://trelix-xj5h.onrender.com/api/reviews/chapter/${id}`)
 
         if (response.data && Array.isArray(response.data)) {
           const formattedReviews = response.data.map((review) => ({
             ...review,
             userName: `${review.user?.firstName || "Anonymous"} ${review.user?.lastName || ""}`.trim(),
-            userImage: review.user?.profilePhoto ? `http://localhost:5000${review.user.profilePhoto}` : null,
+            userImage: review.user?.profilePhoto ? `https://trelix-xj5h.onrender.com${review.user.profilePhoto}` : null,
           }))
 
           setUserReviews(formattedReviews)
@@ -551,7 +551,7 @@ const ChapterContent = () => {
                         muted
                         onTimeUpdate={handleVideoTimeUpdate}
                       >
-                        <source src={`http://localhost:5000${currentChapter.video}`} type="video/mp4" />
+                        <source src={`https://trelix-xj5h.onrender.com${currentChapter.video}`} type="video/mp4" />
                         Your browser does not support the video tag.
                       </video>
                     </div>
@@ -666,7 +666,7 @@ const ChapterContent = () => {
                   {showPDF && currentChapter.pdf && (
                     <div id="pdf-container" className="p-5">
                       <SimplePDFViewer
-                        pdfUrl={`http://localhost:5000${currentChapter.pdf}`}
+                        pdfUrl={`https://trelix-xj5h.onrender.com${currentChapter.pdf}`}
                         onProgressChange={handlePDFProgressChange}
                         onComplete={handlePDFComplete}
                       />
@@ -810,7 +810,7 @@ const ChapterContent = () => {
                         <div className="p-6 flex flex-col md:flex-row gap-6">
                           <div className="w-32 h-32 flex-shrink-0 mx-auto md:mx-0">
                             <img
-                              src={`http://localhost:5000${profile.profilePhoto}`}
+                              src={`https://trelix-xj5h.onrender.com${profile.profilePhoto}`}
                               alt={profile.name}
                               className="w-full h-full object-cover rounded-full border-4 border-white shadow-md"
                             />
