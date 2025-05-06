@@ -9,7 +9,7 @@ import SignUpPage from "./pages/SignUpPage/SignUpPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicy/PrivacyPolicyPage";
 import Manage from "./components/Admin/Manage";
 import Reports from "./components/Admin/Reports";
-import NotFound from "./components/Notfound";
+import NotFound from "./components/NotFound";
 import Settings from "./components/Admin/Settings";
 import { LinkedInCallback } from "react-linkedin-login-oauth2";
 import CV from "./pages/cv";
@@ -128,7 +128,7 @@ const Chatbot = () => {
 import WordleGame from "./components/Leaderboard/WordleGame.jsx";
 import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
 import ListPacks from "./components/Admin/ListPacks.jsx";
-import StoreManagement from "./components/Admin/storeManagement.jsx";
+import StoreManagement from "./components/Admin/storeManagement";
 import Store from "./components/Store/Store.jsx";
 
 import EmotionDetection from "./components/ia/emotion.jsx";
