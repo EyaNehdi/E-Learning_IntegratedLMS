@@ -31,8 +31,10 @@ const fetch = require('node-fetch');
 var app = express();
 
 const allowedOrigins = [
+  'https://trelix-g9ckx86l8-eyanehdis-projects.vercel.app',
+  'https://trelix-xj5h.onrender.com',
+  /https:\/\/trelix-.*-eyanehdis-projects\.vercel\.app/,
   'http://localhost:5173',
-  'https://trelix-f6idqzqu3-eyanehdis-projects.vercel.app'
 ];
 
 app.use(cors({
@@ -448,13 +450,7 @@ const server = app.listen(PORT, () => {
 // 2. Attach Socket.IO to the existing Express server
 const io = socketIo(server, {
   cors: {
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   }
