@@ -76,6 +76,9 @@ const getRecommendedCourses = async (req, res) => {
       return res.status(404).json({ message: "Module non trouvé." });
     }
 
+    
+
+
     // Récupérer les cours associés au module
     const courses = await Course.find({ module: moduleId }).populate("module user");
 

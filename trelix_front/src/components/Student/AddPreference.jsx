@@ -2,23 +2,23 @@
 
 import { useState, useEffect, useRef } from "react"
 import axios from "axios"
-import { AlertCircle, CheckCircle2, Info, ChevronDown, ChevronUp } from "lucide-react"
+import { AlertCircle, CheckCircle2, Info, ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useNavigate, useOutletContext } from "react-router-dom"
 
 function AddPreference() {
-  const [typeRessource, setTypeRessource] = useState("vidéo")
-  const [momentEtude, setMomentEtude] = useState("jour")
-  const [langue, setLangue] = useState("français")
-  const [styleContenu, setStyleContenu] = useState("théorique")
+  const [typeRessource, setTypeRessource] = useState("video")
+  const [momentEtude, setMomentEtude] = useState("day")
+  const [langue, setLangue] = useState("french")
+  const [styleContenu, setStyleContenu] = useState("theoretical")
   const [objectif, setObjectif] = useState("certification")
-  const [methodeEtude, setMethodeEtude] = useState("lecture")
+  const [methodeEtude, setMethodeEtude] = useState("reading")
   const [modules, setModules] = useState([])
-  const [selectedModule, setSelectedModule] = useState("")
-  const [selectedModuleName, setSelectedModuleName] = useState("")
+  const [selectedModules, setSelectedModules] = useState([])
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [clickEffect, setClickEffect] = useState("") // Déplace le hook ici
+  const [clickEffect, setClickEffect] = useState("")
+  const [debugMode, setDebugMode] = useState(false)
 
-  // Préchargement du son pour une lecture instantanée
+  // Preload sound for instant playback
   const [clickSoundObj] = useState(() => {
     const sound = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3")
     sound.volume = 0.5
@@ -31,27 +31,32 @@ function AddPreference() {
   const [isLoadingModules, setIsLoadingModules] = useState(false)
   const [errors, setErrors] = useState({})
   const [formProgress, setFormProgress] = useState(0)
+  const [apiResponses, setApiResponses] = useState([])
 
   const dropdownRef = useRef(null)
   const context = useOutletContext() || {}
   const user = context.user || {}
   const navigate = useNavigate()
 
+  // Reduced list of resource types (ignored options removed)
   const typeRessourceOptions = [
-    "vidéo",
+    "video",
     "pdf",
     "audio",
-    "quiz",
-    "interactive exercice",
-    "webinar",
-    "infographie",
-    "slides",
     "other",
   ]
-  const momentEtudeOptions = ["Day", "Evening"]
-  const langueOptions = ["French", "English", "Spanish"]
-  const styleContenuOptions = ["theoretical", "practice", "interactive exercises"]
-  const objectifOptions = ["certification", "professional skills", "general knowledge"]
+  
+  const momentEtudeOptions = ["day", "evening", "night", "morning", "afternoon", "weekend"]
+  const langueOptions = ["french", "english", "spanish", "german", "chinese", "arabic", "russian"]
+  const contentStyleOptions = ["theoretical", "practical", "interactive", "visual", "textual", "mixed"]
+  const objectifOptions = [
+    "certification",
+    "professional skills",
+    "general knowledge",
+    "academic success",
+    "personal development",
+    "career change",
+  ]
   const methodeEtudeOptions = [
     "reading",
     "discussion",
@@ -59,6 +64,9 @@ function AddPreference() {
     "practical experience",
     "research",
     "tutoring",
+    "video learning",
+    "group study",
+    "self-learning",
     "other",
   ]
 
@@ -75,7 +83,7 @@ function AddPreference() {
 
   useEffect(() => {
     calculateFormProgress()
-  }, [typeRessource, momentEtude, langue, styleContenu, objectif, methodeEtude, selectedModule])
+  }, [typeRessource, momentEtude, langue, styleContenu, objectif, methodeEtude, selectedModules])
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -93,39 +101,17 @@ function AddPreference() {
     try {
       const response = await axios.get("http://localhost:5000/module")
       const data = response.data
-      const extractModules = (data) => {
-        if (Array.isArray(data)) return data
-        if (typeof data === "object") {
-          for (const key of ["modules", "data", "results", "items"]) {
-            if (Array.isArray(data[key])) return data[key]
-          }
-          for (const key in data) {
-            if (Array.isArray(data[key])) return data[key]
-          }
-        }
-        return []
-      }
-      const extracted = extractModules(data)
-      const valid = extracted.filter((m) => m && m._id && (m.title || m.name || m.moduleName || m.nom))
-      setModules(valid)
-      if (valid.length > 0) {
-        setSelectedModule(valid[0]._id)
-        setSelectedModuleName(
-          valid[0].title || valid[0].name || valid[0].moduleName || valid[0].nom || "Module sans nom",
-        )
-      } else {
-        setMessage({ text: "Aucun module valide trouvé", type: "error" })
-      }
+      setModules(Array.isArray(data) ? data : [])
     } catch (error) {
-      setMessage({ text: `Erreur: ${error.message}`, type: "error" })
+      setMessage({ text: `Error: ${error.message}`, type: "error" })
     } finally {
       setIsLoadingModules(false)
     }
   }
 
   const calculateFormProgress = () => {
-    const required = [selectedModule]
-    const filled = required.filter((field) => field !== "").length
+    const required = [selectedModules]
+    const filled = required.filter((field) => (Array.isArray(field) ? field.length > 0 : field !== "")).length
     setFormProgress((filled / required.length) * 100)
   }
 
@@ -133,47 +119,81 @@ function AddPreference() {
     e.preventDefault()
     setMessage({ text: "", type: "" })
     setIsSubmitting(true)
+    setApiResponses([])
     const newErrors = {}
 
-    if (!selectedModule) newErrors.module = "Veuillez sélectionner un module"
-    if (!user || !user._id) newErrors.user = "Utilisateur non identifié. Veuillez vous connecter."
+    if (selectedModules.length === 0) newErrors.module = "Please select at least one module"
+    if (!user || !user._id) newErrors.user = "User not identified. Please log in."
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
-      setMessage({ text: "Veuillez corriger les erreurs dans le formulaire", type: "error" })
+      setMessage({ text: "Please correct the errors in the form", type: "error" })
       setIsSubmitting(false)
       return
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/preference/add", {
-        typeRessource,
-        momentEtude,
-        langue,
-        styleContenu,
-        objectif,
-        methodeEtude,
-        moduleId: selectedModule,
-        userId: user._id,
+      // Create an array of promises for each module submission
+      const submissionPromises = selectedModules.map((module) => {
+        const requestData = {
+          typeRessource,
+          momentEtude,
+          langue,
+          styleContenu,
+          objectif,
+          methodeEtude,
+          moduleId: module.id,
+          userId: user._id,
+        }
+        
+        if (debugMode) {
+          console.log("Sending data for module", module.name, ":", requestData)
+        }
+        
+        return axios.post("http://localhost:5000/preference/add", requestData)
       })
 
-      if (response.status === 200 || response.status === 201) {
-        setMessage({ text: "Préférences ajoutées avec succès !", type: "success" })
-        setTypeRessource("vidéo")
-        setMomentEtude("jour")
-        setLangue("français")
-        setStyleContenu("théorique")
-        setObjectif("certification")
-        setMethodeEtude("lecture")
-        setSelectedModule("")
-        setSelectedModuleName("")
-        setErrors({})
-        setTimeout(() => {
-          navigate(`/profile/intelligent-courses?moduleId=${response.data.moduleId}&userId=${user._id}`)
-        }, 3000)
+      // Wait for all submissions to complete
+      const responses = await Promise.all(submissionPromises)
+      
+      if (debugMode) {
+        setApiResponses(responses.map(r => r.data))
       }
+
+      setMessage({ 
+        text: `Preferences successfully added for ${selectedModules.length} module(s)!`, 
+        type: "success" 
+      })
+      
+      setTypeRessource("video")
+      setMomentEtude("day")
+      setLangue("french")
+      setStyleContenu("theoretical")
+      setObjectif("certification")
+      setMethodeEtude("reading")
+      setSelectedModules([])
+      setErrors({})
+
+      setTimeout(() => {
+        // Navigate to intelligent courses of the first module
+        if (responses.length > 0 && responses[0].data && responses[0].data.moduleId) {
+          navigate(`/profile/intelligent-courses?moduleId=${responses[0].data.moduleId}&userId=${user._id}`)
+        }
+      }, 3000)
     } catch (error) {
-      setMessage({ text: error.response?.data?.message || "Erreur lors de l'ajout des préférences.", type: "error" })
+      console.error("Detailed error:", error.response?.data)
+      setMessage({ 
+        text: error.response?.data?.message || "Error adding preferences.", 
+        type: "error" 
+      })
+      
+      if (debugMode && error.response) {
+        setApiResponses([{
+          error: true,
+          status: error.response.status,
+          data: error.response.data
+        }])
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -189,20 +209,16 @@ function AddPreference() {
     }
 
     const handleClick = (option) => {
-      // Joue le son préchargé
-      clickSoundObj.currentTime = 0 // Réinitialise le son pour permettre des clics rapides
-      clickSoundObj.play().catch((error) => console.error("Erreur de lecture audio :", error))
+      // Play the preloaded sound
+      clickSoundObj.currentTime = 0 // Reset sound for rapid clicks
+      clickSoundObj.play().catch((error) => console.error("Audio playback error:", error))
 
-      // Applique l'effet visuel
+      // Apply visual effect
       setClickEffect("scale-105 shadow-lg")
-      setTimeout(() => setClickEffect(""), 100) // Retire l'effet après 100ms
+      setTimeout(() => setClickEffect(""), 100) // Remove effect after 100ms
 
-      // Logique de bascule
-      if (value === option) {
-        setValue("") // Désélectionne si déjà sélectionné
-      } else {
-        setValue(option) // Sélectionne si non sélectionné
-      }
+      // Always set the value to the clicked option (no toggle behavior)
+      setValue(option)
     }
 
     return (
@@ -211,37 +227,73 @@ function AddPreference() {
           {label} <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {options.map((option) => (
-            <div key={option} className="flex items-center">
-              <input
-                type="radio"
-                id={`${name}-${option}`}
-                name={name}
-                value={option}
-                checked={value === option}
-                onChange={() => handleClick(option)}
-                className="hidden peer"
-              />
-              <label
-                htmlFor={`${name}-${option}`}
-                className={`w-full text-sm text-gray-700 cursor-pointer transition-all duration-300 ease-in-out flex items-center space-x-3 px-4 py-3 rounded-lg border-2 hover:shadow-md ${colors.checked} peer-checked:ring-2 ${colors.ring} ${clickEffect}`}
-              >
-                <span className={`h-5 w-5 border-2 ${colors.border} rounded-full flex items-center justify-center`}>
-                  <span className={`w-2.5 h-2.5 ${colors.bg} rounded-full peer-checked:block hidden`}></span>
-                </span>
-                <span className="font-medium">{option}</span>
-              </label>
-            </div>
-          ))}
+          {options.map((option) => {
+            const isSelected = value === option
+            return (
+              <div key={option} className="flex items-center">
+                <input
+                  type="radio"
+                  id={`${name}-${option}`}
+                  name={name}
+                  value={option}
+                  checked={isSelected}
+                  onChange={() => handleClick(option)}
+                  className="hidden peer"
+                />
+                <label
+                  htmlFor={`${name}-${option}`}
+                  className={`w-full text-sm cursor-pointer transition-all duration-300 ease-in-out flex items-center space-x-3 px-4 py-3 rounded-lg border-2 hover:shadow-md ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500 text-blue-700 ring-2 ring-blue-300"
+                      : "border-gray-200 text-gray-700"
+                  } ${clickEffect}`}
+                  onClick={() => handleClick(option)}
+                >
+                  <span
+                    className={`h-5 w-5 border-2 rounded-full flex items-center justify-center ${
+                      isSelected ? "border-blue-500" : "border-gray-300"
+                    }`}
+                  >
+                    {isSelected && <span className="w-2.5 h-2.5 bg-blue-500 rounded-full"></span>}
+                  </span>
+                  <span className="font-medium">{option}</span>
+                </label>
+              </div>
+            )
+          })}
         </div>
       </div>
     )
   }
 
-  const selectModule = (moduleId, moduleName) => {
-    setSelectedModule(moduleId)
-    setSelectedModuleName(moduleName)
-    setIsDropdownOpen(false)
+  const toggleModule = (module) => {
+    const moduleInfo = {
+      id: module._id,
+      name: module.title || module.name || module.moduleName || module.nom || "Unnamed Module",
+    }
+
+    // Check if the module is already selected
+    const isSelected = selectedModules.some((m) => m.id === moduleInfo.id)
+
+    if (isSelected) {
+      // Remove the module if already selected
+      setSelectedModules(selectedModules.filter((m) => m.id !== moduleInfo.id))
+    } else {
+      // Add the module if not selected
+      setSelectedModules([...selectedModules, moduleInfo])
+    }
+
+    // Play sound effect
+    clickSoundObj.currentTime = 0
+    clickSoundObj.play().catch((error) => console.error("Audio playback error:", error))
+  }
+
+  const removeModule = (moduleId) => {
+    setSelectedModules(selectedModules.filter((m) => m.id !== moduleId))
+
+    // Play sound effect
+    clickSoundObj.currentTime = 0
+    clickSoundObj.play().catch((error) => console.error("Audio playback error:", error))
   }
 
   const isUserLoggedIn = user && user._id
@@ -251,8 +303,20 @@ function AddPreference() {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-purple-700 px-6 py-8">
-            <h1 className="text-3xl font-bold text-center text-white mb-2">Learning preferences</h1>
-            <p className="text-center text-blue-100">Personalize your learning experience</p>
+            <h1 className="text-3xl font-bold text-center text-white mb-2">Learning Preferences</h1>
+            <p className="text-center text-blue-100">Customize your learning experience</p>
+            
+            {/* Debug mode */}
+            <div className="mt-4 flex justify-center">
+              <button 
+                type="button" 
+                onClick={() => setDebugMode(!debugMode)}
+                className={`text-xs px-2 py-1 rounded ${debugMode ? 'bg-red-700 text-white' : 'bg-blue-800 bg-opacity-50 text-blue-100'}`}
+              >
+              </button>
+            </div>
+
+            
           </div>
 
           <div className="p-6 md:p-8">
@@ -276,7 +340,17 @@ function AddPreference() {
             {!isUserLoggedIn && (
               <div className="p-4 mb-6 rounded-md flex items-center bg-yellow-100 border border-yellow-300 text-yellow-700">
                 <AlertCircle className="h-5 w-5 mr-2" />
-                <span>Vous devez être connecté pour enregistrer vos préférences.</span>
+                <span>You must be logged in to save your preferences.</span>
+              </div>
+            )}
+
+            {/* Display API responses in debug mode */}
+            {debugMode && apiResponses.length > 0 && (
+              <div className="p-4 mb-6 rounded-md border border-gray-300 bg-gray-50">
+                <h3 className="font-bold mb-2">API Responses:</h3>
+                <pre className="text-xs overflow-auto max-h-40 p-2 bg-gray-100 rounded">
+                  {JSON.stringify(apiResponses, null, 2)}
+                </pre>
               </div>
             )}
 
@@ -286,8 +360,29 @@ function AddPreference() {
                   htmlFor="module"
                   className="block text-lg font-semibold text-gray-800 mb-2 border-l-4 pl-3 py-1 border-gray-800 bg-gray-50 rounded-r-md shadow-sm"
                 >
-                  Module ? <span className="text-red-500">*</span>
+                  Modules <span className="text-red-500">*</span>
                 </label>
+
+                {/* Display selected modules */}
+                {selectedModules.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {selectedModules.map((module) => (
+                      <div
+                        key={module.id}
+                        className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center"
+                      >
+                        <span className="mr-1">{module.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeModule(module.id)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="relative" ref={dropdownRef}>
                   <button
@@ -296,8 +391,12 @@ function AddPreference() {
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     disabled={isLoadingModules}
                   >
-                    <span className={selectedModuleName ? "text-gray-800 font-medium" : "text-gray-500 italic"}>
-                      {isLoadingModules ? "Chargement des modules..." : selectedModuleName || "Sélectionner un module"}
+                    <span className="text-gray-500 italic">
+                      {isLoadingModules
+                        ? "Loading modules..."
+                        : selectedModules.length > 0
+                          ? "Add more modules"
+                          : "Select modules"}
                     </span>
                     {isDropdownOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
                   </button>
@@ -305,22 +404,27 @@ function AddPreference() {
                   {isDropdownOpen && (
                     <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
                       {modules.length > 0 ? (
-                        modules.map((module) => (
-                          <div
-                            key={module._id}
-                            className="p-3 hover:bg-blue-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                            onClick={() =>
-                              selectModule(
-                                module._id,
-                                module.title || module.name || module.moduleName || module.nom || "Module sans nom",
-                              )
-                            }
-                          >
-                            {module.title || module.name || module.moduleName || module.nom || "Module sans nom"}
-                          </div>
-                        ))
+                        modules.map((module) => {
+                          const isSelected = selectedModules.some((m) => m.id === module._id)
+                          return (
+                            <div
+                              key={module._id}
+                              className={`p-3 hover:bg-blue-100 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center ${isSelected ? "bg-blue-50" : ""}`}
+                              onClick={() => toggleModule(module)}
+                            >
+                              {isSelected && (
+                                <div className="w-4 h-4 bg-blue-500 rounded-full mr-2 flex items-center justify-center">
+                                  <CheckCircle2 className="w-3 h-3 text-white" />
+                                </div>
+                              )}
+                              <span>
+                                {module.title || module.name || module.moduleName || module.nom || "Unnamed Module"}
+                              </span>
+                            </div>
+                          )
+                        })
                       ) : (
-                        <div className="p-3 text-gray-500">Aucun module disponible</div>
+                        <div className="p-3 text-gray-500">No modules available</div>
                       )}
                     </div>
                   )}
@@ -336,7 +440,7 @@ function AddPreference() {
                 {modules.length === 0 && !isLoadingModules && (
                   <div className="text-amber-600 text-sm mt-1 flex items-center">
                     <Info className="h-4 w-4 mr-1" />
-                    Aucun module trouvé. Veuillez créer un module d'abord.
+                    No modules found. Please create a module first.
                   </div>
                 )}
               </div>
@@ -346,39 +450,49 @@ function AddPreference() {
                 typeRessourceOptions,
                 typeRessource,
                 setTypeRessource,
-                "Type de ressource préféré ?",
+                "Preferred resource type?",
               )}
               {renderRadioGroup(
                 "momentEtude",
                 momentEtudeOptions,
                 momentEtude,
                 setMomentEtude,
-                "Moment préféré de la journée pour étudier ?",
+                "Preferred time of day to study?",
               )}
-              {renderRadioGroup("langue", langueOptions, langue, setLangue, "Langue préférée ?")}
+              {renderRadioGroup("langue", langueOptions, langue, setLangue, "Preferred language?")}
               {renderRadioGroup(
                 "styleContenu",
-                styleContenuOptions,
+                contentStyleOptions,
                 styleContenu,
                 setStyleContenu,
-                "Style de contenu ?",
+                "Content style?",
               )}
-              {renderRadioGroup("objectif", objectifOptions, objectif, setObjectif, "Objectif d'apprentissage ?")}
+              {renderRadioGroup(
+                "objectif",
+                objectifOptions,
+                objectif,
+                setObjectif,
+                "Learning objective?",
+              )}
               {renderRadioGroup(
                 "methodeEtude",
                 methodeEtudeOptions,
                 methodeEtude,
                 setMethodeEtude,
-                "Méthode d'étude préférée ?",
+                "Preferred study method?",
               )}
 
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white py-3 px-4 rounded-md hover:from-blue-700 hover:to-purple-800 transition-colors text-lg font-medium shadow-md"
-                  disabled={isSubmitting || !isUserLoggedIn || modules.length === 0}
+                  className={`w-full py-4 px-8 rounded-xl text-lg font-bold text-white transition-all duration-300 ease-in-out shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                    isSubmitting || !isUserLoggedIn || modules.length === 0 || selectedModules.length === 0
+                      ? "bg-gray-300 cursor-not-allowed opacity-70"
+                      : "bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 hover:scale-105 hover:shadow-xl backdrop-blur-md bg-opacity-90"
+                  }`}
+                  disabled={isSubmitting || !isUserLoggedIn || modules.length === 0 || selectedModules.length === 0}
                 >
-                  {isSubmitting ? "Enregistrement en cours..." : "Enregistrer mes préférences"}
+                  {isSubmitting ? "Submitting..." : "Save My Preferences"}
                 </button>
               </div>
 
