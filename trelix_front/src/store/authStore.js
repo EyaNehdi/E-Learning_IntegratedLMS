@@ -17,7 +17,7 @@ export const useAuthStore = create((set) => ({
 	signup: async (firstName, lastName, email, password) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.post(`${API_URL}/signup`, { firstName, lastName, email, password });
+			const response = await axios.post(`https://trelix-xj5h.onrender.com/signup`, { firstName, lastName, email, password });
 			set({ user: response.data.user, isAuthenticated: true, isLoading: false });
 		} catch (error) {
 			set({ error: error.response.data.message || "Error signing up", isLoading: false });
@@ -27,7 +27,7 @@ export const useAuthStore = create((set) => ({
 	login: async (data) => {
 		set({ isLoading: true, error: null });
 		try {
-			// const response = await axios.post(`${API_URL}/login`, { email, password, stayLoggedIn }, { withCredentials: true });
+			// const response = await axios.post(`https://trelix-xj5h.onrender.com/login`, { email, password, stayLoggedIn }, { withCredentials: true });
 			set({
 				isAuthenticated: true,
 				user: data.user,
@@ -42,7 +42,7 @@ export const useAuthStore = create((set) => ({
 	logingoogle: async (email, stayLoggedIn) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.post(`${API_URL}/logingoogle`, { email, stayLoggedIn }, { withCredentials: true });
+			const response = await axios.post(`https://trelix-xj5h.onrender.com/logingoogle`, { email, stayLoggedIn }, { withCredentials: true });
 			set({
 				isAuthenticated: true,
 				user: response.data.user,
@@ -59,7 +59,7 @@ export const useAuthStore = create((set) => ({
 	logout: async () => {
 		set({ isLoading: true, error: null });
 		try {
-			await axios.post(`${API_URL}/logout`);
+			await axios.post(`https://trelix-xj5h.onrender.com/logout`);
 			set({ user: null, isAuthenticated: false, error: null, isLoading: false });
 		} catch (error) {
 			set({ error: "Error logging out", isLoading: false });
@@ -73,7 +73,7 @@ export const useAuthStore = create((set) => ({
 		set({ isLoading: true, error: null });
 
 		try {
-			const response = await axios.post(`${API_URL}/verify-email`, { code });
+			const response = await axios.post(`https://trelix-xj5h.onrender.com/verify-email`, { code });
 			if (response.data.success) {
 				set({ user: response.data.user, isAuthenticated: true, isLoading: false });
 				return response.data;
@@ -88,7 +88,7 @@ export const useAuthStore = create((set) => ({
 	forgotPassword: async (email) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.post(`${API_URL}/forgot-password`, { email });
+			const response = await axios.post(`https://trelix-xj5h.onrender.com/forgot-password`, { email });
 			set({ message: response.data.message, isLoading: false });
 		} catch (error) {
 			set({
@@ -102,7 +102,7 @@ export const useAuthStore = create((set) => ({
 	resetPassword: async (token, password) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.post(`${API_URL}/reset-password/${token}`, { password });
+			const response = await axios.post(`https://trelix-xj5h.onrender.com/reset-password/${token}`, { password });
 			set({ message: response.data.message, isLoading: false });
 		} catch (error) {
 			set({
@@ -115,7 +115,7 @@ export const useAuthStore = create((set) => ({
 	checkAuth: async () => {
 		set({ isCheckingAuth: true, error: null });
 		try {
-			const response = await axios.get(`${API_URL}/check-auth`, { credentials: 'include' });
+			const response = await axios.get(`https://trelix-xj5h.onrender.com/check-auth`, { credentials: 'include' });
 			if (response.status === 200) {
 				set({
 					user: response.data.user,
