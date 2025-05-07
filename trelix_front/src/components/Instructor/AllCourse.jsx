@@ -399,7 +399,7 @@ function Allcourse() {
                   title: "Achievement Unlocked!",
                   text: "You've earned the 'First Chapter Explorer' badge for purchasing your first chapter!",
                   confirmButtonText: "Awesome!",
-                  width : "400px",
+                 
                   
                 })
               } catch (badgeError) {
