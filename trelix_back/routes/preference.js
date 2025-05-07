@@ -5,4 +5,5 @@ const { createpreference, getAllPreference } = require('../controllers/Preferenc
 router.post("/add", createpreference);
 router.get("/get", getAllPreference);
 
+
 module.exports = router;
