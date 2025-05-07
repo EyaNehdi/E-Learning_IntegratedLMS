@@ -408,7 +408,7 @@ const HomeUser = () => {
             </div>
             <div className="course-footer d-flex align-items-center justify-content-between pt-3">
               <div className="price">
-                ${course.price}
+                {course.price}🪙
               
               </div>
               <a href={`/chapters/${course._id}`}>

@@ -187,7 +187,7 @@ function Header() {
                                 </a>
                               </h3>
                               <span className="fw-bold">
-                                ${course.price?.toFixed(2) || "0.00"}
+                                {course.price?.toFixed(2) || "0.00"}🪙
                               </span>
                             </div>
                           </div>
