@@ -245,69 +245,97 @@ const ProfileDetails = () => {
               </div>
 
               <div className="flex justify-between gap-4 mt-6">
-                {/* Edit/Save Button */}
-                <button
-                  onClick={toggleEdit}
-                  className="btn fs-6 fs-md-5 fs-lg-4 px-8 py-2 rounded-lg flex items-center justify-center"
-                  style={{
-                    backgroundColor: "#6045FF",
-                    color: "white",
-                    whiteSpace: "nowrap",
-                    minWidth: "150px", // Ensures the button is wide enough
-                  }}
-                >
-                  {isEditing ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      <FaSave className="mr-2" /> Save Profile
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      <FaEdit className="mr-2" /> Edit Profile
-                    </div>
-                  )}
-                </button>
+              <div >
+  {/* Edit/Save Button */}
+  <button
+    onClick={toggleEdit}
+    className="btn fs-6 fs-md-5 fs-lg-4 px-6 py-2 rounded-lg flex items-center justify-center flex-shrink-0"
+    style={{
+      border: "2px solid #6045FF",
+      color: "#6045FF",
+      backgroundColor: "transparent",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
+      width: "auto",
+      minWidth: "150px",
+    }}
+    onMouseEnter={(e) => {
+      e.target.style.backgroundColor = "#6045FF";
+      e.target.style.color = "#ffffff";
+    }}
+    onMouseLeave={(e) => {
+      e.target.style.backgroundColor = "transparent";
+      e.target.style.color = "#6045FF";
+    }}
+  >
+    <div className="flex items-center justify-center w-full">
+      {isEditing ? (
+        <>
+          <FaSave className="mr-2" /> Save Profile
+        </>
+      ) : (
+        <>
+          <FaEdit className="mr-2" /> Edit Profile
+        </>
+      )}
+    </div>
+  </button>
 
-                {/* CV Upload Button */}
-                <button
-                  onClick={() => setShowPopup(true)}
-                  className="btn fs-6 fs-md-5 fs-lg-4 px-6 py-2 rounded-lg flex items-center justify-center"
-                  style={{
-                    border: "2px solid #6045FF",
-                    color: "#6045FF",
-                    backgroundColor: "transparent",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "#6045FF"
-                    e.target.style.color = "#ffffff"
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "transparent"
-                    e.target.style.color = "#6045FF"
-                  }}
-                >
-                  Import Your CV
-                </button>
-                {/* Change Password Button */}
-                <button
-                  onClick={handleChangePassword}
-                  className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded-lg flex items-center"
-                >
-                  Change Password
-                </button>
+  {/* CV Upload Button */}
+  <button
+    onClick={() => setShowPopup(true)}
+    className="btn fs-6 fs-md-5 fs-lg-4 px-6 py-2 rounded-lg flex items-center justify-center flex-shrink-0"
+    style={{
+      border: "2px solid #6045FF",
+      color: "#6045FF",
+      backgroundColor: "transparent",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
+      width: "auto",
+      minWidth: "150px",
+    }}
+    onMouseEnter={(e) => {
+      e.target.style.backgroundColor = "#6045FF";
+      e.target.style.color = "#ffffff";
+    }}
+    onMouseLeave={(e) => {
+      e.target.style.backgroundColor = "transparent";
+      e.target.style.color = "#6045FF";
+    }}
+  >
+    <div className="flex items-center justify-center w-full">
+      Import Your CV
+    </div>
+  </button>
+  
+  {/* Change Password Button */}
+  <button
+    onClick={handleChangePassword}
+    className="btn fs-6 fs-md-5 fs-lg-4 px-6 py-2 rounded-lg flex items-center justify-center flex-shrink-0"
+    style={{
+      border: "2px solid #6045FF",
+      color: "#6045FF",
+      backgroundColor: "transparent",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
+      width: "auto",
+      minWidth: "150px",
+    }}
+    onMouseEnter={(e) => {
+      e.target.style.backgroundColor = "#6045FF";
+      e.target.style.color = "#ffffff";
+    }}
+    onMouseLeave={(e) => {
+      e.target.style.backgroundColor = "transparent";
+      e.target.style.color = "#6045FF";
+    }}
+  >
+    <div className="flex items-center justify-center w-full">
+      Change Password
+    </div>
+  </button>
+
+</div>
               </div>
             </>
           ) : (
