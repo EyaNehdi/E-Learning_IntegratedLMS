@@ -7,11 +7,13 @@ const UserTransactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filter, setFilter] = useState("all"); // all, purchase, balance_topup
+  const [filter, setFilter] = useState("all");
   const [sortConfig, setSortConfig] = useState({
     key: "createdAt",
     direction: "desc",
   });
+  const [expandedRows, setExpandedRows] = useState({});
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     socket.on("financial_event", handleNewTransaction);
@@ -26,10 +28,19 @@ const UserTransactions = () => {
     setTransactions((prev) => [newTransaction, ...prev.slice(0, 49)]);
   };
 
+  const toggleRowExpansion = (id) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   const fetchTransactions = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("https://trelix-xj5h.onrender.com/api/finance/transactions");
+      const response = await axios.get(
+        "https://trelix-xj5h.onrender.com/api/finance/transactions"
+      );
       setTransactions(response.data);
       setLoading(false);
     } catch (error) {
@@ -37,6 +48,7 @@ const UserTransactions = () => {
       console.error("Failed to fetch transactions:", error);
     }
   };
+
   const handleRefresh = () => {
     fetchTransactions();
   };
@@ -100,6 +112,18 @@ const UserTransactions = () => {
             Top Up
           </span>
         );
+      case "refund":
+        return (
+          <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-md text-xs font-medium">
+            Refund
+          </span>
+        );
+      case "admin_adjustment":
+        return (
+          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md text-xs font-medium">
+            Admin Adjustment
+          </span>
+        );
       default:
         return (
           <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-md text-xs font-medium">
@@ -108,6 +132,120 @@ const UserTransactions = () => {
         );
     }
   };
+
+  const renderDetailContent = (transaction) => {
+    switch (transaction.type) {
+      case "purchase":
+        return (
+          <div className="p-4 bg-gray-50">
+            <h4 className="text-sm font-medium mb-2">Purchase Details</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Course Title</p>
+                <p className="text-sm">
+                  {transaction.metadata?.courseTitle || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Course ID</p>
+                <p className="text-sm">{transaction.relatedObject || "N/A"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Model</p>
+                <p className="text-sm">{transaction.relatedModel || "N/A"}</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "balance_topup":
+        return (
+          <div className="p-4 bg-gray-50">
+            <h4 className="text-sm font-medium mb-2">Top Up Details</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Stripe Session ID</p>
+                <p className="text-sm break-all">
+                  {transaction.metadata?.stripeSessionId || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Product ID</p>
+                <p className="text-sm">{transaction.relatedObject || "N/A"}</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "refund":
+        return (
+          <div className="p-4 bg-gray-50">
+            <h4 className="text-sm font-medium mb-2">Refund Details</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Original Purchase</p>
+                <p className="text-sm">
+                  {transaction.metadata?.originalPurchaseId || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Reason</p>
+                <p className="text-sm">
+                  {transaction.metadata?.reason || "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "admin_adjustment":
+        return (
+          <div className="p-4 bg-gray-50">
+            <h4 className="text-sm font-medium mb-2">
+              Admin Adjustment Details
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Admin User</p>
+                <p className="text-sm">
+                  {transaction.metadata?.adminUser || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Reason</p>
+                <p className="text-sm">
+                  {transaction.metadata?.reason || "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="p-4 bg-gray-50">
+            <h4 className="text-sm font-medium mb-2">Additional Details</h4>
+            <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto">
+              {JSON.stringify(transaction.metadata || {}, null, 2)}
+            </pre>
+          </div>
+        );
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownOpen) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   // Apply filtering and sorting to transactions
   const filteredTransactions = transactions
@@ -121,12 +259,26 @@ const UserTransactions = () => {
           `${transaction.user.firstName} ${transaction.user.lastName}`.toLowerCase();
         const searchLower = searchTerm.toLowerCase();
 
+        // Expanded search to include various metadata fields
+        const hasMatchingCourseTitle =
+          transaction.metadata?.courseTitle &&
+          transaction.metadata.courseTitle.toLowerCase().includes(searchLower);
+
+        const hasMatchingStripeId =
+          transaction.metadata?.stripeSessionId &&
+          transaction.metadata.stripeSessionId
+            .toLowerCase()
+            .includes(searchLower);
+
+        const hasMatchingReason =
+          transaction.metadata?.reason &&
+          transaction.metadata.reason.toLowerCase().includes(searchLower);
+
         return (
           userFullName.includes(searchLower) ||
-          (transaction.metadata?.courseTitle &&
-            transaction.metadata.courseTitle
-              .toLowerCase()
-              .includes(searchLower))
+          hasMatchingCourseTitle ||
+          hasMatchingStripeId ||
+          hasMatchingReason
         );
       }
       return true;
@@ -177,17 +329,90 @@ const UserTransactions = () => {
           />
         </div>
 
-        <div className="flex items-center bg-gray-100 rounded-md px-3 py-2">
-          <Filter size={16} className="text-gray-500 mr-2" />
-          <select
-            value={filter}
-            onChange={handleFilterChange}
-            className="bg-transparent outline-none"
+        {/* Custom dropdown to replace the select element */}
+        <div className="relative">
+          <button
+            className="flex items-center justify-between bg-gray-100 rounded-md px-3 py-2 w-40"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
           >
-            <option value="all">All Types</option>
-            <option value="purchase">Purchases</option>
-            <option value="balance_topup">Top Ups</option>
-          </select>
+            <div className="flex items-center">
+              <Filter size={16} className="text-gray-500 mr-2" />
+              <span>
+                {filter === "all"
+                  ? "All Types"
+                  : filter === "purchase"
+                  ? "Purchases"
+                  : filter === "balance_topup"
+                  ? "Top Ups"
+                  : filter === "refund"
+                  ? "Refunds"
+                  : filter === "admin_adjustment"
+                  ? "Admin Adjustments"
+                  : "All Types"}
+              </span>
+            </div>
+            <ChevronDown size={16} className="ml-2" />
+          </button>
+
+          {dropdownOpen && (
+            <div className="absolute z-10 mt-1 w-40 bg-white rounded-md shadow-lg py-1">
+              <button
+                className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
+                  filter === "all" ? "bg-gray-50" : ""
+                }`}
+                onClick={() => {
+                  setFilter("all");
+                  setDropdownOpen(false);
+                }}
+              >
+                All Types
+              </button>
+              <button
+                className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
+                  filter === "purchase" ? "bg-gray-50" : ""
+                }`}
+                onClick={() => {
+                  setFilter("purchase");
+                  setDropdownOpen(false);
+                }}
+              >
+                Purchases
+              </button>
+              <button
+                className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
+                  filter === "balance_topup" ? "bg-gray-50" : ""
+                }`}
+                onClick={() => {
+                  setFilter("balance_topup");
+                  setDropdownOpen(false);
+                }}
+              >
+                Top Ups
+              </button>
+              <button
+                className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
+                  filter === "refund" ? "bg-gray-50" : ""
+                }`}
+                onClick={() => {
+                  setFilter("refund");
+                  setDropdownOpen(false);
+                }}
+              >
+                Refunds
+              </button>
+              <button
+                className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
+                  filter === "admin_adjustment" ? "bg-gray-50" : ""
+                }`}
+                onClick={() => {
+                  setFilter("admin_adjustment");
+                  setDropdownOpen(false);
+                }}
+              >
+                Admin Adjustments
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -204,6 +429,7 @@ const UserTransactions = () => {
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-50">
               <tr>
+                <th className="w-8 px-4 py-3"></th>
                 <th
                   className="px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => requestSort("user")}
@@ -226,10 +452,7 @@ const UserTransactions = () => {
                   </div>
                 </th>
                 <th className="px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider">
-                  Balance Change
-                </th>
-                <th className="px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider">
-                  Details
+                  Balance
                 </th>
                 <th
                   className="px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
@@ -246,62 +469,71 @@ const UserTransactions = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredTransactions.map((transaction) => (
-                <tr
-                  key={transaction._id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-4 py-4">
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {transaction.user.firstName} {transaction.user.lastName}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {transaction.user._id}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    {getTypeLabel(transaction.type)}
-                  </td>
-                  <td className="px-4 py-4">
-                    <span
-                      className={
-                        transaction.amount > 0
-                          ? "text-green-600 font-medium"
-                          : "text-red-600 font-medium"
-                      }
-                    >
-                      {formatCurrency(transaction.amount)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex flex-col">
-                      <span className="text-xs text-gray-500">
-                        From: {formatCurrency(transaction.balanceBefore)}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        To: {formatCurrency(transaction.balanceAfter)}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    {transaction.type === "purchase" &&
-                      transaction.metadata?.courseTitle && (
-                        <span className="text-sm">
-                          {transaction.metadata.courseTitle}
+                <React.Fragment key={transaction._id}>
+                  <tr
+                    className={`hover:bg-gray-50 transition-colors ${
+                      expandedRows[transaction._id] ? "bg-gray-50" : ""
+                    }`}
+                  >
+                    <td className="px-4 py-4">
+                      <button
+                        onClick={() => toggleRowExpansion(transaction._id)}
+                        className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
+                      >
+                        {expandedRows[transaction._id] ? (
+                          <ChevronDown size={16} className="text-gray-600" />
+                        ) : (
+                          <ChevronRight size={16} className="text-gray-600" />
+                        )}
+                      </button>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-medium">
+                          {transaction.user.firstName}{" "}
+                          {transaction.user.lastName}
                         </span>
-                      )}
-                    {transaction.type === "balance_topup" &&
-                      transaction.metadata?.stripeSessionId && (
-                        <span className="text-xs text-gray-500 break-all">
-                          Session ID: {transaction.metadata.stripeSessionId}
+                        <span className="text-xs text-gray-500 truncate max-w-xs">
+                          {transaction.user._id}
                         </span>
-                      )}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {formatDate(transaction.createdAt)}
-                  </td>
-                </tr>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      {getTypeLabel(transaction.type)}
+                    </td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={
+                          transaction.amount > 0
+                            ? "text-green-600 font-medium"
+                            : "text-red-600 font-medium"
+                        }
+                      >
+                        {formatCurrency(transaction.amount)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-500">
+                          From: {formatCurrency(transaction.balanceBefore)}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          To: {formatCurrency(transaction.balanceAfter)}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      {formatDate(transaction.createdAt)}
+                    </td>
+                  </tr>
+                  {expandedRows[transaction._id] && (
+                    <tr>
+                      <td colSpan={6} className="p-0 border-t-0">
+                        {renderDetailContent(transaction)}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
