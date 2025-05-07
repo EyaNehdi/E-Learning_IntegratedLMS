@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import socket from "../../../utils/socket";
 import axios from "axios";
-import { ArrowDown, ArrowUp, ChevronDown, Filter, RefreshCw, Search } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Filter, RefreshCw, Search } from "lucide-react";
 
 const UserTransactions = () => {
   const [transactions, setTransactions] = useState([]);
