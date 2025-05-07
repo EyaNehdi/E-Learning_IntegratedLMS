@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import socket from "../../../utils/socket";
 import axios from "axios";
-import { ArrowDown, ArrowUp, Filter, RefreshCw, Search } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, Filter, RefreshCw, Search } from "lucide-react";
 
 const UserTransactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -304,6 +304,7 @@ const UserTransactions = () => {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
+      <title>User Transactions</title>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-800">
           Financial Transactions

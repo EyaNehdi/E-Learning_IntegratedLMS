@@ -1,11 +1,23 @@
 import React from "react";
 import { Link, Outlet, Route, Routes } from "react-router-dom";
+import Headeradmin from "../Headeradmin";
 
 const FinancialOverview = () => {
   return (
     <div style={styles.dashboard}>
-      <div style={styles.sidebar}>
-        <h2>Admin Panel</h2>
+      <div>
+        <title>Business Metrics</title>
+        <Headeradmin />
+      </div>
+      <div
+        style={{
+          width: "250px",
+          backgroundColor: "#f8f9fa",
+          padding: "20px",
+          height: "100vh",
+          boxShadow: "2px 0 10px rgba(0,0,0,0.1)",
+        }}
+      >
         <ul>
           <li>
             <Link to="/business-metrics" style={styles.link}>
@@ -20,7 +32,6 @@ const FinancialOverview = () => {
         </ul>
       </div>
       <div style={styles.content}>
-        <h1>Financial Overview</h1>
         <Outlet />
       </div>
     </div>
@@ -36,13 +47,6 @@ const styles = {
   content: {
     flex: 1,
     padding: "20px",
-  },
-  sidebar: {
-    width: "250px",
-    backgroundColor: "#f8f9fa",
-    padding: "20px",
-    height: "100vh",
-    boxShadow: "2px 0 10px rgba(0,0,0,0.1)",
   },
   link: {
     display: "block",
