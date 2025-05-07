@@ -13,9 +13,9 @@ const BusinessMetrics = () => {
   const fetchBusinessMetrics = async () => {
     try {
       const [avgRes, topSpendersRes, totalRevenueRes] = await Promise.all([
-        axios.get("/api/finance/avg-time-to-first-purchase"),
-        axios.get("/api/finance/top-spenders"),
-        axios.get("/api/finance/total-revenue"),
+        axios.get("https://trelix-xj5h.onrender.com/api/finance/avg-time-to-first-purchase"),
+        axios.get("https://trelix-xj5h.onrender.com/api/finance/top-spenders"),
+        axios.get("https://trelix-xj5h.onrender.com/api/finance/total-revenue"),
       ]);
 
       setAvgTimeToFirstPurchase(avgRes.data.avgDaysToFirstPurchase);

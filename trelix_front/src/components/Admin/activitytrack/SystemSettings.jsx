@@ -16,7 +16,7 @@ const SystemSettings = () => {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("/api/system-settings");
+      const res = await axios.get("https://trelix-xj5h.onrender.com/api/system-settings");
       setSettings(res.data.settings);
       setNotificationRecipients(res.data.notificationRecipients || []);
     } catch (err) {
@@ -28,7 +28,7 @@ const SystemSettings = () => {
   const toggleSetting = async (setting) => {
     try {
       const updatedValue = !setting.value;
-      await axios.put(`/api/system-settings/${setting._id}`, {
+      await axios.put(`https://trelix-xj5h.onrender.com/api/system-settings/${setting._id}`, {
         value: updatedValue,
       });
       setSettings((prev) =>
@@ -45,7 +45,7 @@ const SystemSettings = () => {
     setSummaryLoading(true);
     try {
       const res = await axios.get(
-        `/api/user-engagement/summary?format=${summaryFormat}`
+        `https://trelix-xj5h.onrender.com/api/user-engagement/summary?format=${summaryFormat}`
       );
       setEngagementSummary(res.data);
       setShowSummaryModal(true);

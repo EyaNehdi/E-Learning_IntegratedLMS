@@ -104,7 +104,7 @@ const AuditLogs = () => {
 
   const handleReviews = async (log) => {
     try {
-      const { data } = await axios.get(`/api/logs/thread/${log._id}`);
+      const { data } = await axios.get(`https://trelix-xj5h.onrender.com/api/logs/thread/${log._id}`);
       setSelectedLog({ ...log, reviews: data });
       setOpen(true);
     } catch (error) {

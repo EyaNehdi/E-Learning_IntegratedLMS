@@ -29,7 +29,7 @@ const UserTransactions = () => {
   const fetchTransactions = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/api/finance/transactions");
+      const response = await axios.get("https://trelix-xj5h.onrender.com/api/finance/transactions");
       setTransactions(response.data);
       setLoading(false);
     } catch (error) {
