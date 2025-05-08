@@ -399,6 +399,8 @@ function Allcourse() {
                   title: "Achievement Unlocked!",
                   text: "You've earned the 'First Chapter Explorer' badge for purchasing your first chapter!",
                   confirmButtonText: "Awesome!",
+                 
+                  
                 })
               } catch (badgeError) {
                 console.error("Error awarding badge:", badgeError)
@@ -780,17 +782,19 @@ function Allcourse() {
                             {/* Button now uses the same handler function */}
                             <button
                               onClick={() => handleCourseAccess(course)}
-                              className="btn btn-link p-0"
+                              style={{
+                                fontSize: "10px",
+                              }}
                             >
                               {course.price > 0 && !courseAccess[course._id] ? (
                                 <>
                                   <Lock className="inline mr-1" size={16} />{" "}
-                                  Unlock
+                                  
                                 </>
                               ) : (
                                 <>
                                   <Unlock className="inline mr-1" size={16} />{" "}
-                                  Access Course
+                                  
                                 </>
                               )}
                               <i className="feather-icon icon-arrow-right ml-1" />

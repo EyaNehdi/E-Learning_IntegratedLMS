@@ -209,9 +209,9 @@ const ListChapters = () => {
     if (price === 0 || price === "0") return "Gratuit";
 
     const currencySymbols = {
-      USD: "$",
-      EUR: "€",
-      DZD: "د.ج",
+      USD: "🪙",
+      EUR: "🪙",
+      DZD: "🪙",
     };
 
     const symbol = currencySymbols[currency] || currencySymbols.EUR;
@@ -713,7 +713,7 @@ const ListChapters = () => {
                                   clipRule="evenodd"
                                 />
                               </svg>
-                              Commencer le premier chapitre
+                              Start The First Chapter
                             </Link>
                           )}
                         </div>
