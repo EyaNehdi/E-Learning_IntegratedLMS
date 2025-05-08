@@ -23,7 +23,7 @@ const UserAvatar = ({ user }) => {
   };
 
   const imageUrl = user?.profilePhoto
-    ? `http://localhost:5000${user.profilePhoto}`
+    ? `${import.meta.env.VITE_API_PROXY}${user.profilePhoto}`
     : "";
 
   return (

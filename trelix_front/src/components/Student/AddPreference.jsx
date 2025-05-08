@@ -99,7 +99,7 @@ function AddPreference() {
   const fetchModules = async () => {
     setIsLoadingModules(true)
     try {
-      const response = await axios.get("http://localhost:5000/module")
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/module`)
       const data = response.data
       setModules(Array.isArray(data) ? data : [])
     } catch (error) {
@@ -150,7 +150,7 @@ function AddPreference() {
           console.log("Sending data for module", module.name, ":", requestData)
         }
         
-        return axios.post("http://localhost:5000/preference/add", requestData)
+        return axios.post(`${import.meta.env.VITE_API_PROXY}/preference/add`, requestData)
       })
 
       // Wait for all submissions to complete

@@ -23,7 +23,7 @@ const AuditLogs = () => {
   const fetchAuditLogs = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/admin/audit-logs",
+        `${import.meta.env.VITE_API_PROXY}/api/admin/audit-logs`,
         {
           params: { limit: 100 },
           headers: {

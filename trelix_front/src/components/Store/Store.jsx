@@ -26,7 +26,7 @@ function Store() {
       console.log("user:", user);
       const verifySession = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/stripe/verify-session/${sessionId}`, {
+          const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/stripe/verify-session/${sessionId}`, {
             withCredentials: true,
           });
           console.log("Session verification response:", response.data);
@@ -50,7 +50,7 @@ function Store() {
     const fetchPacks = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:5000/api/admin/packs", {
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/packs`, {
           withCredentials: true,
         });
         console.log("Fetched packs:", response.data);
@@ -82,7 +82,7 @@ function Store() {
       setMessage("");
       try {
         const response = await axios.post(
-          "http://localhost:5000/stripe/create-checkout-session",
+          `${import.meta.env.VITE_API_PROXY}/stripe/create-checkout-session`,
           {
             packId: pack._id,
             userId: user._id,

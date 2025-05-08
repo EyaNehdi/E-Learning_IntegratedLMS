@@ -92,7 +92,7 @@ const ListBadges = () => {
       </div>
     );
   }
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = `${import.meta.env.VITE_API_PROXY}`;
   return (
     <div className="card ctm-border-radius shadow-sm">
       <div className="card-header">

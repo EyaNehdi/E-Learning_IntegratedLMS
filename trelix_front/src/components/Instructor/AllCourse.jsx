@@ -51,7 +51,7 @@ function Allcourse() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://localhost:5000/course/courses"
+          `${import.meta.env.VITE_API_PROXY}/course/courses`
         );
         setCourses(response.data);
         setFilteredCourses(response.data);
@@ -73,7 +73,7 @@ function Allcourse() {
     //   if (!currentUserId) return;
     //   try {
     //     const res = await axios.get(
-    //       `http://localhost:5000/user/likes/${currentUserId}`
+    //       `${import.meta.env.VITE_API_PROXY}/user/likes/${currentUserId}`
     //     );
     //     setUserLikedCourseIds(res.data.likedCourseIds || []);
     //   } catch (err) {
@@ -95,7 +95,7 @@ function Allcourse() {
       for (const course of courses) {
         try {
           const response = await axios.get(
-            `http://localhost:5000/purchases/access/${course._id}`,
+            `${import.meta.env.VITE_API_PROXY}/purchases/access/${course._id}`,
             {
               withCredentials: true,
             }
@@ -215,7 +215,7 @@ function Allcourse() {
       }, 1000);
 
       const res = await axios.post(
-        `http://localhost:5000/course/like/${courseId}`,
+        `${import.meta.env.VITE_API_PROXY}/course/like/${courseId}`,
         {
           userId: currentUserId,
         }
@@ -368,7 +368,7 @@ function Allcourse() {
       if (result.isConfirmed) {
         try {
           const response = await axios.post(
-            "http://localhost:5000/purchases/purchase",
+            `${import.meta.env.VITE_API_PROXY}/purchases/purchase`,
             { courseId: course._id },
             { withCredentials: true }
           );
@@ -384,7 +384,7 @@ function Allcourse() {
           }).then(async () => {
               try {
                 const badgeResponse = await axios.post(
-                  "http://localhost:5000/api/info/profile/badge",
+                  `${import.meta.env.VITE_API_PROXY}/api/info/profile/badge`,
                   {
                     badge: "First Chapter Explorer Badge 🚀",
                     email: user.email,

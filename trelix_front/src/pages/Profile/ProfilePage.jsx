@@ -72,7 +72,7 @@ const ProfilePage = () => {
     try {
       // Make sure you send the request with credentials (cookie)
       const response = await axios.get(
-        "http://localhost:5000/api/auth/current-location",
+        `${import.meta.env.VITE_API_PROXY}/api/auth/current-location`,
         {
           withCredentials: true, // This ensures the cookie is sent along with the request
         }
@@ -140,7 +140,7 @@ const ProfilePage = () => {
     const badgeImageUrl = "/assets/Badges/WelcomeBadge.png";
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/info/profile/badge",
+        `${import.meta.env.VITE_API_PROXY}/api/info/profile/badge`,
         {
           badge: " Welcome to Trelix Badge 🏅",
           email: user.email, // Send the user's email
@@ -202,7 +202,7 @@ const ProfilePage = () => {
                       >
                         {user?.profilePhoto ? (
                           <img
-                            src={`http://localhost:5000${user?.profilePhoto}`}
+                            src={`${import.meta.env.VITE_API_PROXY}${user?.profilePhoto}`}
                             className="rounded-circle"
                             alt="Avatar"
                             style={{
