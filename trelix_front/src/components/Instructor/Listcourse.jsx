@@ -11,7 +11,7 @@ function Listcourse() {
   // Fonction pour récupérer les cours
   const fetchCourses = async () => {
     try {
-      const response = await axios.get("https://trelix-xj5h.onrender.com/course/courses");
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/courses`);
       console.log("Cours récupérés:", response.data);
       setCourses(response.data);
     } catch (error) {
@@ -37,7 +37,7 @@ function Listcourse() {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`https://trelix-xj5h.onrender.com/course/delete/${courseId}`);
+      await axios.delete(`${import.meta.env.VITE_API_PROXY}/course/delete/${courseId}`);
 
       setCourses((prevCourses) =>
         prevCourses.filter((course) => course._id !== courseId)

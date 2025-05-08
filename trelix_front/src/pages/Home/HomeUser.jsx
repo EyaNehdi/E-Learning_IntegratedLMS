@@ -21,7 +21,7 @@ const HomeUser = () => {
       useEffect(() => {
         const fetchCategories = async () => {
           try {
-            const res = await axios.get("https://trelix-xj5h.onrender.com/courses/categories");
+            const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/courses/categories`);
             setCategories(res.data);
           } catch (err) {
             console.error("Erreur lors du fetch des catégories:", err);
@@ -54,7 +54,7 @@ const HomeUser = () => {
       useEffect(() => {
         const fetchStudents = async () =>{
           try {
-            const res = await axios.get('https://trelix-xj5h.onrender.com/api/admin/count/student') ;// adapt path if needed
+            const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/count/student`) ;// adapt path if needed
             setCountStudent(res.data.count); // assuming the response has a count property
           }
           catch(err){
@@ -63,7 +63,7 @@ const HomeUser = () => {
         };
         const fetchInstructors = async () =>{
           try {
-            const res = await axios.get('https://trelix-xj5h.onrender.com/api/admin/count/instructor') ;// adapt path if needed
+            const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/count/instructor`) ;// adapt path if needed
             setCountInstructor(res.data.count); // assuming the response has a count property
           }
           catch(err){
@@ -72,7 +72,7 @@ const HomeUser = () => {
         };
         const fetchCoursesNumber = async () =>{
           try {
-            const res = await axios.get('https://trelix-xj5h.onrender.com/course/count/courses') ;// adapt path if needed
+            const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/count/courses`) ;// adapt path if needed
             setCountCourses(res.data.count); // assuming the response has a count property
           }
           catch(err){
@@ -81,7 +81,7 @@ const HomeUser = () => {
         };
         const MeetOurInstructors = async () =>{
           try {
-            const res = await axios.get('https://trelix-xj5h.onrender.com/api/admin/instructors'); // adapt if needed
+            const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/instructors`); // adapt if needed
           setInstructorsMeet(res.data);
         } catch (err) {
           console.error("Error fetching instructors:", err);
@@ -96,7 +96,7 @@ const HomeUser = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("https://trelix-xj5h.onrender.com/courses/categories");
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/courses/categories`);
         setCategories(res.data);
       } catch (err) {
         console.error("Erreur lors du fetch des catégories:", err);
@@ -112,9 +112,8 @@ const HomeUser = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://trelix-xj5h.onrender.com/course/courses"
+          `${import.meta.env.VITE_API_PROXY}/course/courses`
         );
-        console.log("Courses fetched:", response.data);
         setCourses(response.data);
         setLoading(false);
       } catch (error) {
@@ -375,7 +374,7 @@ const HomeUser = () => {
       <SwiperSlide key={course._id}>
         <div className="course-entry-3 card rounded-2 bg-white border">
           <div className="card-media position-relative">
-            <a href={`/chapters/${course._id}`}>
+            <a href={`/chapters/${course.slug}`}>
               <img
                 className="card-img-top"
                 src={course.image || "assets/images/crs.png"}
@@ -396,7 +395,7 @@ const HomeUser = () => {
               </span>
             </div>
             <h3 className="sub-title mb-0">
-              <a href={`/chapters/${course._id}`}>{course.title}</a>
+              <a href={`/chapters/${course.slug}`}>{course.title}</a>
             </h3>
             <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
               <span>
@@ -408,10 +407,10 @@ const HomeUser = () => {
             </div>
             <div className="course-footer d-flex align-items-center justify-content-between pt-3">
               <div className="price">
-                ${course.price}
+                {course.price}🪙
               
               </div>
-              <a href={`/chapters/${course._id}`}>
+              <a href={`/chapters/${course.slug}`}>
                 Enroll Now <i className="feather-icon icon-arrow-right" />
               </a>
             </div>
@@ -538,8 +537,8 @@ const HomeUser = () => {
                   <div className="instructor-card position-relative overflow-hidden shadow-sm rounded-3 bg-white">
                     <div className="instructor-image text-center pt-4">
                       <img
-                        src={`https://trelix-xj5h.onrender.com${instructor?.profilePhoto}`}
-                        className="rounded-circle shadow-sm border border-2 border-white"
+                        src={`${import.meta.env.VITE_API_PROXY}${instructor?.profilePhoto}`}
+                        className="rounded-circle shadow-sm border border-white"
                         alt={`${instructor.firstName} ${instructor.lastName}`}
                         style={{
                           width: "120px",

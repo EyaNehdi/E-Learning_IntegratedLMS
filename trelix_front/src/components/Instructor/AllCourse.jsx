@@ -51,7 +51,7 @@ function Allcourse() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://trelix-xj5h.onrender.com/course/courses"
+          `${import.meta.env.VITE_API_PROXY}/course/courses`
         );
         setCourses(response.data);
         setFilteredCourses(response.data);
@@ -73,7 +73,7 @@ function Allcourse() {
     //   if (!currentUserId) return;
     //   try {
     //     const res = await axios.get(
-    //       `https://trelix-xj5h.onrender.com/user/likes/${currentUserId}`
+    //       `${import.meta.env.VITE_API_PROXY}/user/likes/${currentUserId}`
     //     );
     //     setUserLikedCourseIds(res.data.likedCourseIds || []);
     //   } catch (err) {
@@ -95,7 +95,7 @@ function Allcourse() {
       for (const course of courses) {
         try {
           const response = await axios.get(
-            `https://trelix-xj5h.onrender.com/purchases/access/${course._id}`,
+            `${import.meta.env.VITE_API_PROXY}/purchases/access/${course._id}`,
             {
               withCredentials: true,
             }
@@ -215,7 +215,7 @@ function Allcourse() {
       }, 1000);
 
       const res = await axios.post(
-        `https://trelix-xj5h.onrender.com/course/like/${courseId}`,
+        `${import.meta.env.VITE_API_PROXY}/course/like/${courseId}`,
         {
           userId: currentUserId,
         }
@@ -368,7 +368,7 @@ function Allcourse() {
       if (result.isConfirmed) {
         try {
           const response = await axios.post(
-            "https://trelix-xj5h.onrender.com/purchases/purchase",
+            `${import.meta.env.VITE_API_PROXY}/purchases/purchase`,
             { courseId: course._id },
             { withCredentials: true }
           );
@@ -384,7 +384,7 @@ function Allcourse() {
           }).then(async () => {
               try {
                 const badgeResponse = await axios.post(
-                  "https://trelix-xj5h.onrender.com/api/info/profile/badge",
+                  `${import.meta.env.VITE_API_PROXY}/api/info/profile/badge`,
                   {
                     badge: "First Chapter Explorer Badge 🚀",
                     email: user.email,
@@ -399,6 +399,8 @@ function Allcourse() {
                   title: "Achievement Unlocked!",
                   text: "You've earned the 'First Chapter Explorer' badge for purchasing your first chapter!",
                   confirmButtonText: "Awesome!",
+                 
+                  
                 })
               } catch (badgeError) {
                 console.error("Error awarding badge:", badgeError)
@@ -780,17 +782,19 @@ function Allcourse() {
                             {/* Button now uses the same handler function */}
                             <button
                               onClick={() => handleCourseAccess(course)}
-                              className="btn btn-link p-0"
+                              style={{
+                                fontSize: "10px",
+                              }}
                             >
                               {course.price > 0 && !courseAccess[course._id] ? (
                                 <>
                                   <Lock className="inline mr-1" size={16} />{" "}
-                                  Unlock
+                                  
                                 </>
                               ) : (
                                 <>
                                   <Unlock className="inline mr-1" size={16} />{" "}
-                                  Access Course
+                                  
                                 </>
                               )}
                               <i className="feather-icon icon-arrow-right ml-1" />

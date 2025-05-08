@@ -11,7 +11,7 @@ function Leader() {
 
     try {
       const response = await axios.post(
-        "https://trelix-xj5h.onrender.com/api/info/profile/badge",
+        `${import.meta.env.VITE_API_PROXY}/api/info/profile/badge`,
         {
           badge: "Welcome to Trelix Badge 🏅",
           email: firstPlaceUser.email, // Send the user's email
@@ -26,7 +26,7 @@ function Leader() {
 
   useEffect(() => {
     // Fetch leaderboard
-    axios.get("https://trelix-xj5h.onrender.com/api/quiz/leaderboard")
+    axios.get(`${import.meta.env.VITE_API_PROXY}/api/quiz/leaderboard`)
       .then(response => {
         setLeaderboard(response.data);
 
@@ -47,7 +47,7 @@ function Leader() {
       });
 
     // WebSocket to listen for leaderboard updates
-    const socket = io(import.meta.env.VITE_API_PROXY);
+    const socket = io(`${import.meta.env.VITE_API_PROXY}`);
 
     socket.on("leaderboardUpdate", (updatedLeaderboard) => {
       setLeaderboard(updatedLeaderboard);
@@ -87,7 +87,7 @@ function Leader() {
                     <td className="leaderboard-rank">{index + 1}</td>
                     <td className="leaderboard-name">
                       {user.profilePhoto && (
-                        <img src={`https://trelix-xj5h.onrender.com${user.profilePhoto}`} alt="profile" className="leaderboard-profile-pic" />
+                        <img src={`${import.meta.env.VITE_API_PROXY}${user.profilePhoto}`} alt="profile" className="leaderboard-profile-pic" />
                       )}
                       </td>
                       <td className="leaderboard-name">

@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 
 const fetchUsers = async () => {
-  const res = await axios.get("https://trelix-xj5h.onrender.com/api/admin/allUsers", { withCredentials: true });
+  const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/allUsers`, { withCredentials: true });
   return res.data;
 };
 
@@ -33,7 +33,7 @@ const ListUsers = () => {
 
   const archiveMutation = useMutation({
     mutationFn: (id) =>
-      axios.put(`https://trelix-xj5h.onrender.com/api/admin/archiveUser/${id}`, null, {
+      axios.put(`${import.meta.env.VITE_API_PROXY}/api/admin/archiveUser/${id}`, null, {
         withCredentials: true,
       }),
     onSuccess: () => queryClient.invalidateQueries(["users"]),
@@ -41,7 +41,7 @@ const ListUsers = () => {
 
   const unarchiveMutation = useMutation({
     mutationFn: (id) =>
-      axios.put(`https://trelix-xj5h.onrender.com/api/admin/unarchiveUser/${id}`, null, {
+      axios.put(`${import.meta.env.VITE_API_PROXY}/api/admin/unarchiveUser/${id}`, null, {
         withCredentials: true,
       }),
     onSuccess: () => queryClient.invalidateQueries(["users"]),

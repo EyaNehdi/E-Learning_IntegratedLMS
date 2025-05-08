@@ -14,7 +14,7 @@ function ListPacks() {
     const fetchPacks = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("https://trelix-xj5h.onrender.com/api/admin/packs");
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/packs`);
         setPacks(response.data);
       } catch (error) {
         console.error("Error fetching packs:", error);
@@ -31,7 +31,7 @@ function ListPacks() {
     setLoading(true);
     setMessage("");
     try {
-      await axios.put(`https://trelix-xj5h.onrender.com/api/admin/archive-pack/${packId}`);
+      await axios.put(`${import.meta.env.VITE_API_PROXY}/api/admin/archive-pack/${packId}`);
       // Update the packs state to reflect the inactive status
       setPacks((prevPacks) =>
         prevPacks.map((pack) =>
@@ -52,7 +52,7 @@ function ListPacks() {
     setLoading(true);
     setMessage("");
     try {
-      await axios.put(`https://trelix-xj5h.onrender.com/api/admin/unarchive-pack/${packId}`);
+      await axios.put(`${import.meta.env.VITE_API_PROXY}/api/admin/unarchive-pack/${packId}`);
       // Update the packs state to reflect the active status
       setPacks((prevPacks) =>
         prevPacks.map((pack) =>

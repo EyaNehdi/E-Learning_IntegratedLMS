@@ -32,7 +32,7 @@ function Login() {
     setLoading(true);
     try {
       const responseLogin = await axios.post(
-        `https://trelix-xj5h.onrender.com/api/auth/login`,
+        `${import.meta.env.VITE_API_PROXY}/api/auth/login`,
         { email, password, stayLoggedIn },
         { withCredentials: true }
       );
@@ -71,7 +71,7 @@ function Login() {
 
       try {
         const res = await axios.post(
-          "https://trelix-xj5h.onrender.com/api/auth/loginLinkedIn",
+          `${import.meta.env.VITE_API_PROXY}/api/auth/loginLinkedIn`,
           { code }
         );
 
@@ -136,7 +136,7 @@ function Login() {
 
   const handleGitHubLoginSuccess = async (response) => {
     try {
-      const res = await axios.post("https://trelix-xj5h.onrender.com/api/auth/loginGit", {
+      const res = await axios.post(`${import.meta.env.VITE_API_PROXY}/api/auth/loginGit`, {
         code: response.code,
       });
 

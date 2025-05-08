@@ -47,7 +47,7 @@ const AllExamsInstructor = () => {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await axios.get("https://trelix-xj5h.onrender.com/Exam/get", {
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/Exam/get`, {
         params: {
           page: currentPage,
           limit: itemsPerPage,
@@ -67,7 +67,7 @@ const AllExamsInstructor = () => {
 
   const fetchCourses = async () => {
     try {
-        const response = await axios.get("https://trelix-xj5h.onrender.com/course/courses")
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/courses`)
       setCourses(response.data)
     } catch (error) {
       console.error("Error fetching courses:", error)
@@ -96,7 +96,7 @@ const AllExamsInstructor = () => {
                 console.error("Exam ID is undefined");
                 return;
             }
-            await axios.delete(`https://trelix-xj5h.onrender.com/Exam/delete/${examId}`)
+            await axios.delete(`${import.meta.env.VITE_API_PROXY}/Exam/delete/${examId}`)
 
             fetchExams()
         } catch (error) {
@@ -108,7 +108,7 @@ const AllExamsInstructor = () => {
 
 const handlePublish = async (examId, isPublished) => {
     try {
-        await axios.post(`https://trelix-xj5h.onrender.com/Exam/publish/${examId}`);
+        await axios.post(`${import.meta.env.VITE_API_PROXY}/Exam/publish/${examId}`);
         fetchExams();
     } catch (error) {
         console.error("Error updating exam status:", error);
@@ -118,7 +118,7 @@ const handlePublish = async (examId, isPublished) => {
 
 const handleDuplicate = async (examId) => {
     try {
-        await axios.post(`https://trelix-xj5h.onrender.com/Exam/duplicate/${examId}`);
+        await axios.post(`${import.meta.env.VITE_API_PROXY}/Exam/duplicate/${examId}`);
         fetchExams(); // Refresh exam list after duplication
     } catch (error) {
         console.error("Error duplicating exam:", error);
@@ -129,7 +129,7 @@ const handleDuplicate = async (examId) => {
 
 const   handleExportResults = async (examId) => {
     try {
-        const response = await axios.get(`https://trelix-xj5h.onrender.com/Exam/results/${examId}`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/Exam/results/${examId}`, {
             responseType: "blob",
         })
         const url = window.URL.createObjectURL(new Blob([response.data]))
@@ -147,7 +147,7 @@ const   handleExportResults = async (examId) => {
 }
 const handleExportAllResults = async () => {
     try {
-        const response = await axios.get("https://trelix-xj5h.onrender.com/Exam/results/export-all", {
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/Exam/results/export-all`, {
             responseType: "blob",
         });
 
@@ -172,7 +172,7 @@ const handleExportAllResults = async () => {
     }
   
     try {
-      const response = await axios.post("https://trelix-xj5h.onrender.com/Exam/assign-exams", {
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/Exam/assign-exams`, {
         courseId: selectedCourse,
         examIds: selectedExams,
       });

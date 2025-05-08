@@ -21,7 +21,7 @@ function QuizzLeaderboard() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const res = await axios.get("https://trelix-xj5h.onrender.com/api/quiz/active-questions", {
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/quiz/active-questions`, {
           headers: { Authorization: `Bearer ${user?.token}` },
         })
         setQuestions(res.data.questions)
@@ -79,7 +79,7 @@ function QuizzLeaderboard() {
       })
 
       const res = await axios.post(
-        "https://trelix-xj5h.onrender.com/api/quiz/submit",
+        `${import.meta.env.VITE_API_PROXY}/api/quiz/submit`,
         {
           quizId,
           score,

@@ -18,7 +18,7 @@ const AuthDashboard = () => {
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
-        const response = await axios.get("https://trelix-xj5h.onrender.com/api/admin/users/stats");
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/users/stats`);
         setUserStats(response.data);
       } catch (error) {
         console.error("Failed to fetch user stats:", error);
@@ -29,7 +29,7 @@ const AuthDashboard = () => {
 
     const fetchRecentLogins = async () => {
       try {
-        const response = await axios.get("https://trelix-xj5h.onrender.com/api/logs/recent-logins");
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/logs/recent-logins`);
         setEvents(response.data);
       } catch (error) {
         console.error("Failed to fetch recent logins:", error);

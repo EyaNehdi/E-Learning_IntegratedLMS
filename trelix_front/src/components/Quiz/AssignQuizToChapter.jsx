@@ -31,8 +31,8 @@ const AssignQuizToChapter = () => {
       setError(null)
       try {
         const [chaptersResponse, quizzesResponse] = await Promise.all([
-          axios.get("https://trelix-xj5h.onrender.com/chapter/get"),
-          axios.get("https://trelix-xj5h.onrender.com/quiz/get"),
+          axios.get(`${import.meta.env.VITE_API_PROXY}/chapter/get`),
+          axios.get(`${import.meta.env.VITE_API_PROXY}/quiz/get`),
         ])
         setChapters(chaptersResponse.data)
         setQuizzes(quizzesResponse.data)
@@ -79,7 +79,7 @@ const AssignQuizToChapter = () => {
     setSuccess(null);
   
     try {
-      const response = await axios.post("https://trelix-xj5h.onrender.com/quiz/assign-quizzes", {
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/quiz/assign-quizzes`, {
         chapterId: selectedChapter,
         quizIds: selectedQuizzes,
       });

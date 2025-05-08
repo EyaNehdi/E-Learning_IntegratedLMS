@@ -187,7 +187,7 @@ function Header() {
                                 </a>
                               </h3>
                               <span className="fw-bold">
-                                ${course.price?.toFixed(2) || "0.00"}
+                                {course.price?.toFixed(2) || "0.00"}🪙
                               </span>
                             </div>
                           </div>
@@ -458,7 +458,7 @@ function Header() {
                               >
                                 {user?.profilePhoto ? (
                                   <img
-                                    src={`https://trelix-xj5h.onrender.com${user.profilePhoto}`}
+                                    src={`${import.meta.env.VITE_API_PROXY}${user.profilePhoto}`}
                                     className="img-fluid border rounded-circle"
                                     alt="Avatar"
                                     style={{

@@ -13,7 +13,7 @@ const BrowseCertificates = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentCertificates = certificates.slice(indexOfFirstItem, indexOfLastItem);
-  const baseUrl = "https://trelix-xj5h.onrender.com";
+  const baseUrl = `${import.meta.env.VITE_API_PROXY}`;
 
   return (
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>

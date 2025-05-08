@@ -67,7 +67,7 @@ const ExamStudent = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://trelix-xj5h.onrender.com/exam/check-attempt/${courseid}/${user._id}`
+        `${import.meta.env.VITE_API_PROXY}/exam/check-attempt/${courseid}/${user._id}`
       );
       setCourseSlug(response.data.courseSlug);
 
@@ -95,7 +95,7 @@ const ExamStudent = () => {
       setLoading(true);
       // Make the request to get a random exam from the course
       const response = await axios.get(
-        `https://trelix-xj5h.onrender.com/Exam/random/${courseid}`
+        `${import.meta.env.VITE_API_PROXY}/Exam/random/${courseid}`
       );
 
       console.log("Random Exam API response:", response.data); // Debugging
@@ -209,7 +209,7 @@ const ExamStudent = () => {
   const saveProgress = async () => {
     try {
       // In a real app, you would save to the server here
-      // await axios.post(`https://trelix-xj5h.onrender.com/Exam/progress/${exam._id}`, { answers });
+      // await axios.post(`${import.meta.env.VITE_API_PROXY}/Exam/progress/${exam._id}`, { answers });
 
       // For demo, just show a success message
       alert("Progress saved successfully!");
@@ -318,7 +318,7 @@ const ExamStudent = () => {
 
         // Submit answers to the backend
         const response = await axios.post(
-          `https://trelix-xj5h.onrender.com/exam/submit/${exam._id}`,
+          `${import.meta.env.VITE_API_PROXY}/exam/submit/${exam._id}`,
           {
             userId: user._id,
             answers: answersArray,
@@ -331,7 +331,7 @@ const ExamStudent = () => {
         // If the user passed, update the exam status in the backend
         if (results.passed) {
           try {
-            await axios.post(`https://trelix-xj5h.onrender.com/exam/update-status`, {
+            await axios.post(`${import.meta.env.VITE_API_PROXY}/exam/update-status`, {
               userId: user._id,
               courseId: courseid,
               passed: true,
@@ -396,7 +396,7 @@ const ExamStudent = () => {
     setIsEarningCertificate(true);
     try {
       const response = await axios.post(
-        "https://trelix-xj5h.onrender.com/certificates/issueCertificate",
+        `${import.meta.env.VITE_API_PROXY}/certificates/issueCertificate`,
         {
           userId: user._id,
           courseId: courseid,

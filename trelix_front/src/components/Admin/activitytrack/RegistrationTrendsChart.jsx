@@ -21,7 +21,7 @@ const RegistrationTrendsChart = () => {
     const fetchRegistrationData = async () => {
       try {
         const response = await axios.get(
-          `https://trelix-xj5h.onrender.com/api/admin/users/registration-stats?days=${timeRange}`
+          `${import.meta.env.VITE_API_PROXY}/api/admin/users/registration-stats?days=${timeRange}`
         );
         setRegistrationData(response.data);
       } catch (error) {

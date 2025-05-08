@@ -27,7 +27,7 @@ const QuizPreview = () => {
     const fetchQuiz = async () => {
       setLoading(true)
       try {
-        const response = await axios.get(`https://trelix-xj5h.onrender.com/quiz/get/${idquiz}`)
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/quiz/get/${idquiz}`)
         setQuiz(response.data)
       } catch (err) {
         console.error("Error fetching quiz:", err)

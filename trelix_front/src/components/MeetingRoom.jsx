@@ -40,7 +40,7 @@ export default function MeetingRoom() {
       const response = await axios.get("http://127.0.0.1:8001/api/emotion")
       console.log("API Response:", response.data)
       
-      // Check if the API returned an error
+      // Check if the API returned an errorcd
       if (response.data.error) {
         if (response.data.error === 'Failed to access webcam') {
           setWebcamError(true)
@@ -167,7 +167,9 @@ export default function MeetingRoom() {
     script.onload = () => {
       const domain = "meet.jit.si"
       const options = {
+
         roomName: roomId,
+
         width: "100%",
         height: "100%",
         parentNode: videoContainerRef.current,

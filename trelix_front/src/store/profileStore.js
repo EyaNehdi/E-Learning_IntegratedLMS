@@ -11,7 +11,7 @@ export const useProfileStore = create((set, get) => ({
       // Optionally, you can manually extract token from cookies if needed
       const token = document.cookie.split('token=')[1];  // Or use your method to retrieve token
 
-      const res = await axios.get("https://trelix-xj5h.onrender.com/api/info/profile", {
+      const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/info/profile`, {
         headers: {
           "Authorization": `Bearer ${token}`, // Pass token in the Authorization header
         },

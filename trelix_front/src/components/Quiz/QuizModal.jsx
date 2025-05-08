@@ -38,8 +38,8 @@ const QuizModal = ({ showQuiz, onClose, selectedQuizId = null }) => {
 
       // Fetch both quizzes and user's quiz attempts in parallel
       Promise.all([
-        axios.get(`https://trelix-xj5h.onrender.com/quiz/getquiz/${id}`),
-        axios.get(`https://trelix-xj5h.onrender.com/quiz/user-attempts/${user._id}`),
+        axios.get(`${import.meta.env.VITE_API_PROXY}/quiz/getquiz/${id}`),
+        axios.get(`${import.meta.env.VITE_API_PROXY}/quiz/user-attempts/${user._id}`),
       ])
         .then(([quizzesResponse, attemptsResponse]) => {
           console.log("Quizzes fetched:", quizzesResponse.data)
@@ -123,7 +123,7 @@ const QuizModal = ({ showQuiz, onClose, selectedQuizId = null }) => {
     console.log("User Answers:", answers)
 
     axios
-      .post("https://trelix-xj5h.onrender.com/quiz/submit", {
+      .post(`${import.meta.env.VITE_API_PROXY}/quiz/submit`, {
         quizId: quiz?._id,
         answers: answers,
         userId: user._id,

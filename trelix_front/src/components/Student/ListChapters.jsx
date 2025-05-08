@@ -37,7 +37,7 @@ const ListChapters = () => {
 
     try {
       const response = await axios.get(
-        `https://trelix-xj5h.onrender.com/chapter/course/${slugCourse}`
+        `${import.meta.env.VITE_API_PROXY}/chapter/course/${slugCourse}`
       );
       if (response) {
         setCertificateEarned(response.data.certificateEarned);
@@ -116,7 +116,7 @@ const ListChapters = () => {
         if (result.isConfirmed && canAfford) {
           try {
             const purchaseResponse = await axios.post(
-              "https://trelix-xj5h.onrender.com/purchases/purchase",
+              `${import.meta.env.VITE_API_PROXY}/purchases/purchase`,
               { courseId },
               { withCredentials: true }
             );
@@ -153,7 +153,7 @@ const ListChapters = () => {
 
     try {
       const response = await axios.post(
-        "https://trelix-xj5h.onrender.com/chapter/markCompleted",
+        `${import.meta.env.VITE_API_PROXY}/chapter/markCompleted`,
         {},
         {
           params: { userId: user._id, chapterId },
@@ -187,7 +187,7 @@ const ListChapters = () => {
     setLoadingCertificate(true);
     try {
       const response = await axios.post(
-        "https://trelix-xj5h.onrender.com/certificates/issueCertificate",
+        `${import.meta.env.VITE_API_PROXY}/certificates/issueCertificate`,
         {
           userId: user._id,
           courseId: finalCourseId,
@@ -209,9 +209,9 @@ const ListChapters = () => {
     if (price === 0 || price === "0") return "Gratuit";
 
     const currencySymbols = {
-      USD: "$",
-      EUR: "€",
-      DZD: "د.ج",
+      USD: "🪙",
+      EUR: "🪙",
+      DZD: "🪙",
     };
 
     const symbol = currencySymbols[currency] || currencySymbols.EUR;
@@ -713,7 +713,7 @@ const ListChapters = () => {
                                   clipRule="evenodd"
                                 />
                               </svg>
-                              Commencer le premier chapitre
+                              Start The First Chapter
                             </Link>
                           )}
                         </div>

@@ -115,7 +115,7 @@ function Header() {
                           {/* Affichage des détails du cours */}
                           <a href={`/courses/${course._id}`}>{course.title}</a>
                           <p>{course.description}</p>
-                          <p>Prix: {course.price}€</p>
+                          <p>Prix: {course.price}🪙</p>
                         </li>
                       ))}
                     </ul>

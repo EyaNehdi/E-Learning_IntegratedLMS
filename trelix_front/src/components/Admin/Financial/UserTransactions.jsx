@@ -39,7 +39,7 @@ const UserTransactions = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "https://trelix-xj5h.onrender.com/api/finance/transactions"
+      `"${import.meta.env.VITE_API_PROXY}/api/finance/transactions`
       );
       setTransactions(response.data);
       setLoading(false);

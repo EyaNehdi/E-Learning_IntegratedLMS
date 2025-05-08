@@ -72,7 +72,7 @@ const ProfilePage = () => {
     try {
       // Make sure you send the request with credentials (cookie)
       const response = await axios.get(
-        "https://trelix-xj5h.onrender.com/api/auth/current-location",
+        `${import.meta.env.VITE_API_PROXY}/api/auth/current-location`,
         {
           withCredentials: true, // This ensures the cookie is sent along with the request
         }
@@ -140,7 +140,7 @@ const ProfilePage = () => {
     const badgeImageUrl = "/assets/Badges/WelcomeBadge.png";
     try {
       const response = await axios.post(
-        "https://trelix-xj5h.onrender.com/api/info/profile/badge",
+        `${import.meta.env.VITE_API_PROXY}/api/info/profile/badge`,
         {
           badge: " Welcome to Trelix Badge 🏅",
           email: user.email, // Send the user's email
@@ -166,7 +166,7 @@ const ProfilePage = () => {
                   className="cover-photo-container"
                   style={{
                     backgroundImage: user?.coverPhoto
-                      ? `url(https://trelix-xj5h.onrender.com${user?.coverPhoto})`
+                      ? `url(${import.meta.env.VITE_API_PROXY}${user?.coverPhoto})`
                       : `url('/assets/icons/COVER.png')`,
                   }}
                 >
@@ -202,7 +202,7 @@ const ProfilePage = () => {
                       >
                         {user?.profilePhoto ? (
                           <img
-                            src={`https://trelix-xj5h.onrender.com${user?.profilePhoto}`}
+                            src={`${import.meta.env.VITE_API_PROXY}${user?.profilePhoto}`}
                             className="rounded-circle"
                             alt="Avatar"
                             style={{

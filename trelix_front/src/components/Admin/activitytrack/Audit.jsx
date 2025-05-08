@@ -23,7 +23,7 @@ const AuditLogs = () => {
   const fetchAuditLogs = async () => {
     try {
       const response = await axios.get(
-        "https://trelix-xj5h.onrender.com/api/admin/audit-logs",
+        `${import.meta.env.VITE_API_PROXY}/api/admin/audit-logs`,
         {
           params: { limit: 100 },
           headers: {
@@ -104,7 +104,7 @@ const AuditLogs = () => {
 
   const handleReviews = async (log) => {
     try {
-      const { data } = await axios.get(`https://trelix-xj5h.onrender.com/api/logs/thread/${log._id}`);
+      const { data } = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/logs/thread/${log._id}`);
       setSelectedLog({ ...log, reviews: data });
       setOpen(true);
     } catch (error) {

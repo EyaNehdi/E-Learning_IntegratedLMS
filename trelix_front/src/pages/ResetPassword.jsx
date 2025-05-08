@@ -100,7 +100,7 @@ const ResetPassword = () => {
     setStatus({ type: "info", message: "Resetting your password..." })
 
     try {
-      await axios.post("https://trelix-xj5h.onrender.com/api/auth/reset-password", {
+      await axios.post(`${import.meta.env.VITE_API_PROXY}/api/auth/reset-password`, {
         token,
         newPassword: password,
       })

@@ -68,7 +68,7 @@ const MfaSetup = () => {
   const enableMfa = async () => {
     try {
       const response = await axios.post(
-         `${import.meta.env.VITE_API_PROXY}/signup/mfa/enable`,
+        `${import.meta.env.VITE_API_PROXY}/signup/mfa/enable`,
         { userId: userId }
       );
       setQrCodeUrl(response.data.qrCodeUrl);
@@ -110,7 +110,7 @@ const MfaSetup = () => {
   const fetchBackupCodes = async () => {
     try {
       const response = await axios.get(
-         `${import.meta.env.VITE_API_PROXY}/signup/mfa/backup-codes`,
+        `${import.meta.env.VITE_API_PROXY}/signup/mfa/backup-codes`,
         {
           params: { userId: userId },
         }
@@ -152,7 +152,7 @@ const MfaSetup = () => {
   const handleCancelMfa = async () => {
     try {
       const response = await axios.put(
-         `${import.meta.env.VITE_API_PROXY}/signup/mfa/disable-mfa`,
+        `${import.meta.env.VITE_API_PROXY}/signup/mfa/disable-mfa`,
         { userId },
         {
           headers: { "Content-Type": "application/json" },
@@ -296,7 +296,7 @@ const MfaSetup = () => {
                     onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
                   />
-                  <Divider sx={{ height: 28, mx: 1 }} orientation="vertical" />
+                  <Divider  sx={{ height: 28, mx: 1 }} orientation="vertical" />
                   <Tooltip title="Verify">
                     <Button
                       loading={loading}

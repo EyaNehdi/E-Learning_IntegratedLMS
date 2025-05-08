@@ -174,7 +174,7 @@ const QuizModal = ({ showQuiz, onClose, chapterId }) => {
     // In a real app, fetch from your API
     // const fetchQuiz = async () => {
     //   try {
-    //     const response = await axios.get(`https://trelix-xj5h.onrender.com/quiz/chapter/${chapterId}`);
+    //     const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/quiz/chapter/${chapterId}`);
     //     setQuizData(response.data);
     //     setTimeLeft(response.data.timeLimit * 60); // Convert minutes to seconds
     //   } catch (error) {
@@ -312,7 +312,7 @@ const QuizModal = ({ showQuiz, onClose, chapterId }) => {
     if (timerRef.current) clearInterval(timerRef.current)
 
     // In a real app, send results to your API
-    // axios.post("https://trelix-xj5h.onrender.com/quiz/submit", {
+    // axios.post(`${import.meta.env.VITE_API_PROXY}/quiz/submit`, {
     //   chapterId,
     //   answers: selectedAnswers,
     //   score: finalScore
@@ -633,10 +633,10 @@ const CourseLearningPlatform = () => {
       setLoading(true)
       try {
         // In a real app, fetch from your API
-        // const courseResponse = await axios.get(`https://trelix-xj5h.onrender.com/course/${courseid}`);
+        // const courseResponse = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/${courseid}`);
         // setCourse(courseResponse.data);
 
-        // const chaptersResponse = await axios.get(`https://trelix-xj5h.onrender.com/chapter/course/${courseid}`);
+        // const chaptersResponse = await axios.get(`${import.meta.env.VITE_API_PROXY}/chapter/course/${courseid}`);
         // setChapters(chaptersResponse.data.chapters);
 
         // Mock data for demonstration
@@ -739,7 +739,7 @@ const CourseLearningPlatform = () => {
   useEffect(() => {
     if (user && user._id && courseid) {
       // In a real app, fetch from your API
-      // axios.get("https://trelix-xj5h.onrender.com/api/auth/completedchapters", {
+      // axios.get(`${import.meta.env.VITE_API_PROXY}/api/auth/completedchapters`, {
       //   params: {
       //     userId: user._id,
       //     courseId: courseid
@@ -824,7 +824,7 @@ const CourseLearningPlatform = () => {
     localStorage.setItem(completionKey, "true")
 
     // In a real app, send this to your backend
-    // axios.post("https://trelix-xj5h.onrender.com/user/mark-chapter-progress", {
+    // axios.post(`${import.meta.env.VITE_API_PROXY}/user/mark-chapter-progress`, {
     //   userId: user._id,
     //   chapterId: chapterId,
     //   progressType: type,
@@ -842,7 +842,7 @@ const CourseLearningPlatform = () => {
     }
 
     // In a real app, update the backend
-    // axios.post("https://trelix-xj5h.onrender.com/user/mark-chapter-completed", {
+    // axios.post(`${import.meta.env.VITE_API_PROXY}/user/mark-chapter-completed`, {
     //   userId: user._id,
     //   chapterId: chapterId,
     // })
@@ -1075,7 +1075,7 @@ const CourseLearningPlatform = () => {
                       height="100%"
                       onTimeUpdate={handleVideoTimeUpdate}
                     >
-                      <source src={`https://trelix-xj5h.onrender.com${currentChapter.video}`} type="video/mp4" />
+                      <source src={`${import.meta.env.VITE_API_PROXY}${currentChapter.video}`} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
 
@@ -1175,7 +1175,7 @@ const CourseLearningPlatform = () => {
                         </div>
 
                         <SimplePDFViewer
-                          pdfUrl={`https://trelix-xj5h.onrender.com${currentChapter.pdf}`}
+                          pdfUrl={`${import.meta.env.VITE_API_PROXY}${currentChapter.pdf}`}
                           onProgressChange={handlePDFProgressChange}
                           onComplete={handlePDFComplete}
                         />

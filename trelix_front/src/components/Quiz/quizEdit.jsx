@@ -39,7 +39,7 @@ const QuizEdit = () => {
 
       setLoading(true)
       try {
-        const response = await axios.get(`https://trelix-xj5h.onrender.com/quiz/get/${id}`)
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/quiz/get/${id}`)
         setQuiz(response.data)
       } catch (err) {
         console.error("Error fetching quiz:", err)
@@ -174,10 +174,10 @@ const QuizEdit = () => {
       let response
       if (id && id !== "new") {
         // Update existing quiz
-        response = await axios.put(`https://trelix-xj5h.onrender.com/quiz/update/${id}`, quiz)
+        response = await axios.put(`${import.meta.env.VITE_API_PROXY}/quiz/update/${id}`, quiz)
       } else {
         // Create new quiz
-        response = await axios.post("https://trelix-xj5h.onrender.com/quiz/create", quiz)
+        response = await axios.post(`${import.meta.env.VITE_API_PROXY}/quiz/create`, quiz)
       }
 
       setSuccess(true)

@@ -23,7 +23,7 @@ const UserAvatar = ({ user }) => {
   };
 
   const imageUrl = user?.profilePhoto
-    ? `https://trelix-xj5h.onrender.com${user.profilePhoto}`
+    ? `${import.meta.env.VITE_API_PROXY}${user.profilePhoto}`
     : "";
 
   return (

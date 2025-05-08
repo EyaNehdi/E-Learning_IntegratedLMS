@@ -22,7 +22,11 @@ import {
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { Progress } from "../ui/progress"
+
+import Summarizer from "../Summarizer";
+
 import "./b.css"
+
 
 // Import your QuizModal component
 import QuizModal from "../Quiz/QuizModal"
@@ -214,7 +218,7 @@ const ChapterContent = () => {
   useEffect(() => {
     setLoading(true)
     axios
-      .get("https://trelix-xj5h.onrender.com/chapter/get")
+      .get(`${import.meta.env.VITE_API_PROXY}/chapter/get`)
       .then((response) => {
         setChapters(response.data)
         setLoading(false)
@@ -238,7 +242,7 @@ const ChapterContent = () => {
 
         // Fetch instructor profile
         axios
-          .get(`https://trelix-xj5h.onrender.com/api/admin/user/${selectedChapter.userid}`)
+          .get(`${import.meta.env.VITE_API_PROXY}/api/admin/user/${selectedChapter.userid}`)
           .then((response) => {
             setProfile(response.data)
           })
@@ -389,13 +393,13 @@ const ChapterContent = () => {
         userId: userInfo._id,
       }
 
-      const response = await axios.post("https://trelix-xj5h.onrender.com/api/reviews/add", reviewData)
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/api/reviews/add`, reviewData)
 
       if (response.data) {
         const newReview = {
           ...reviewData,
           userName: `${userInfo.firstName || ""} ${userInfo.lastName || ""}`.trim(),
-          userImage: userInfo.profilePhoto ? `https://trelix-xj5h.onrender.com${userInfo.profilePhoto}` : null,
+          userImage: userInfo.profilePhoto ? `${import.meta.env.VITE_API_PROXY}${userInfo.profilePhoto}` : null,
           createdAt: new Date().toISOString(),
         }
 
@@ -418,13 +422,13 @@ const ChapterContent = () => {
       if (!id) return
 
       try {
-        const response = await axios.get(`https://trelix-xj5h.onrender.com/api/reviews/chapter/${id}`)
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/reviews/chapter/${id}`)
 
         if (response.data && Array.isArray(response.data)) {
           const formattedReviews = response.data.map((review) => ({
             ...review,
             userName: `${review.user?.firstName || "Anonymous"} ${review.user?.lastName || ""}`.trim(),
-            userImage: review.user?.profilePhoto ? `https://trelix-xj5h.onrender.com${review.user.profilePhoto}` : null,
+            userImage: review.user?.profilePhoto ? `${import.meta.env.VITE_API_PROXY}${review.user.profilePhoto}` : null,
           }))
 
           setUserReviews(formattedReviews)
@@ -551,7 +555,7 @@ const ChapterContent = () => {
                         muted
                         onTimeUpdate={handleVideoTimeUpdate}
                       >
-                        <source src={`https://trelix-xj5h.onrender.com${currentChapter.video}`} type="video/mp4" />
+                        <source src={`${import.meta.env.VITE_API_PROXY}${currentChapter.video}`} type='video/mp4' />
                         Your browser does not support the video tag.
                       </video>
                     </div>
@@ -666,7 +670,7 @@ const ChapterContent = () => {
                   {showPDF && currentChapter.pdf && (
                     <div id="pdf-container" className="p-5">
                       <SimplePDFViewer
-                        pdfUrl={`https://trelix-xj5h.onrender.com${currentChapter.pdf}`}
+                        pdfUrl={`${import.meta.env.VITE_API_PROXY}${currentChapter.pdf}`}
                         onProgressChange={handlePDFProgressChange}
                         onComplete={handlePDFComplete}
                       />
@@ -675,6 +679,12 @@ const ChapterContent = () => {
                 </div>
               )}
             </div>
+
+
+            {/* Résumeur de texte */}
+<div className="mb-8">
+  <Summarizer />
+</div>-
 
             {/* Quiz Button */}
             <div className="mb-8 flex justify-center">
@@ -692,6 +702,11 @@ const ChapterContent = () => {
                 {canStartQuiz && <Play className="w-5 h-5" />}
               </button>
             </div>
+
+
+
+
+
 
             {/* Quiz Modal */}
             <QuizModal showQuiz={showQuiz} onClose={() => setShowQuiz(false)} />
@@ -810,7 +825,7 @@ const ChapterContent = () => {
                         <div className="p-6 flex flex-col md:flex-row gap-6">
                           <div className="w-32 h-32 flex-shrink-0 mx-auto md:mx-0">
                             <img
-                              src={`https://trelix-xj5h.onrender.com${profile.profilePhoto}`}
+                              src={`${import.meta.env.VITE_API_PROXY}${profile.profilePhoto}`}
                               alt={profile.name}
                               className="w-full h-full object-cover rounded-full border-4 border-white shadow-md"
                             />

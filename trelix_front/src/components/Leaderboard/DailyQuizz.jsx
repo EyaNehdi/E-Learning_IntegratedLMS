@@ -13,7 +13,7 @@ function DailyQuizz() {
     const [loading, setLoading] = useState(true);
   
     useEffect(() => {
-    const socket = io(import.meta.env.VITE_API_PROXY); // Adjust to your backend URL
+    const socket = io(`${import.meta.env.VITE_API_PROXY}`); // Adjust to your backend URL
         
         socket.on('activeQuizUpdate', (quizData) => {
             console.log("Received active quiz update:", quizData);
@@ -42,7 +42,7 @@ return () => {
         try {
             // Ensure activeQuiz has a valid _id
             if (activeQuiz && activeQuiz._id) {
-                const res = await axios.get(`https://trelix-xj5h.onrender.com/api/quiz/check-attempt/${activeQuiz._id}`)
+                const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/quiz/check-attempt/${activeQuiz._id}`)
                 
 
                 // Log the response after the request completes

@@ -9,7 +9,7 @@ export default function JoinRoom() {
   const [room, setRoom] = useState("");
   const navigate = useNavigate();
 
-  // Fonction pour rejoindre une réunion
+  
   const handleJoin = () => {
     if (room.trim()) {
       navigate(`/meeting/${room.trim()}`);  // Redirige vers la salle de réunion
@@ -22,8 +22,8 @@ export default function JoinRoom() {
   const handleCreate = async () => {
     try {
       console.log("Demande de création de salle...");
-      // Assure-toi que l'URL ici pointe vers le bon port backend
-      const res = await axios.post("https://trelix-xj5h.onrender.com/createRoom");  // Backend à localhost:5000
+      
+      const res = await axios.post(`${import.meta.env.VITE_API_PROXY}/createRoom`);  
       console.log("Réponse du serveur :", res.data);  // Log de la réponse pour vérifier le contenu
   
       const roomName = res.data.roomName;  // Récupérer le nom de la salle

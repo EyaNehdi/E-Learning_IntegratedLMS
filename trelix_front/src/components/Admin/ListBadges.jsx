@@ -92,7 +92,7 @@ const ListBadges = () => {
       </div>
     );
   }
-  const baseUrl = "https://trelix-xj5h.onrender.com";
+  const baseUrl = `${import.meta.env.VITE_API_PROXY}`;
   return (
     <div className="card ctm-border-radius shadow-sm">
       <div className="card-header">

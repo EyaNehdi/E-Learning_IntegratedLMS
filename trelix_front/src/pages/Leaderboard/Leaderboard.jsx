@@ -17,7 +17,7 @@ function Leaderboard() {
   const fetchActiveQuiz = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://trelix-xj5h.onrender.com/api/quiz/active');
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/quiz/active`);
       
       if (response.data.quiz) {
         setQuiz(response.data.quiz);
@@ -41,7 +41,7 @@ function Leaderboard() {
 // Establish socket connection
 useEffect(() => {
   console.log("Setting up socket connection...");
-  const socket = io(import.meta.env.VITE_API_PROXY, {
+  const socket = io(`${import.meta.env.VITE_API_PROXY}`, {
     transports: ['websocket', 'polling']
   });
 

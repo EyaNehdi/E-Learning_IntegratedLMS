@@ -35,7 +35,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
 
       try {
         const response = await axios.post(
-          "https://trelix-xj5h.onrender.com/api/auth/register/linkedinInstructor",
+          `${import.meta.env.VITE_API_PROXY}/api/auth/register/linkedinInstructor`,
           { code }
         );
 
@@ -304,7 +304,7 @@ const InstructorRegister = ({ setisRegisterSuccess }) => {
 
     try {
       const response = await axios.post(
-        "https://trelix-xj5h.onrender.com/api/auth/register/instructor",
+        `${import.meta.env.VITE_API_PROXY}/api/auth/register/instructor`,
         formData,
         { withCredentials: true }
       );

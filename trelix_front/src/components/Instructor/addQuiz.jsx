@@ -165,7 +165,7 @@ const AddQuiz = () => {
     console.log("Sending quiz data:", quizData)
 
     try {
-      const response = await axios.post("https://trelix-xj5h.onrender.com/quiz/add", quizData)
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/quiz/add`, quizData)
       console.log("Quiz added successfully:", response.data)
 
       setSuccess(true)

@@ -51,6 +51,7 @@ const Index = () => {
       }
     };
 
+
     const fetchStudents = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/count/student`);
@@ -81,6 +82,7 @@ const Index = () => {
     const meetOurInstructors = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/instructors`);
+
         setInstructorsMeet(res.data);
       } catch (err) {
         console.error("Error fetching instructors:", err);
@@ -526,8 +528,8 @@ const Index = () => {
                     <div className="instructor-card position-relative overflow-hidden shadow-sm rounded-3 bg-white">
                       <div className="instructor-image text-center pt-4">
                         <img
-                          src={`https://trelix-xj5h.onrender.com${instructor?.profilePhoto}`}
-                          className="rounded-circle shadow-sm border border-2 border-white"
+                          src={`${import.meta.env.VITE_API_PROXY}${instructor?.profilePhoto}`}
+                          className="rounded-circle shadow-sm border border-white"
                           alt={`${instructor.firstName} ${instructor.lastName}`}
                           style={{
                             width: "120px",

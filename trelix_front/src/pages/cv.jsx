@@ -25,7 +25,7 @@ function CV() {
 
     try {
       const response = await axios.post(
-        'https://trelix-xj5h.onrender.com/ia/auth/CV',
+        `${import.meta.env.VITE_API_PROXY}/ia/auth/CV`,
         formData,
         {
           headers: {

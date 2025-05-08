@@ -77,7 +77,7 @@ const MobileMenu = ({ isAuthenticated, handleLogout, user, onClose }) => {
                 <Avatar
                   src={
                     user?.profilePhoto
-                      ? `https://trelix-xj5h.onrender.com${user.profilePhoto}`
+                      ? `${import.meta.env.VITE_API_PROXY}${user.profilePhoto}`
                       : ""
                   }
                   alt={user?.firstName}

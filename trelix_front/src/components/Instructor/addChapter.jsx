@@ -38,7 +38,7 @@ function AddChapter() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://trelix-xj5h.onrender.com/course/courses"
+          `${import.meta.env.VITE_API_PROXY}/course/courses`
         );
         setCourses(response.data);
 
@@ -56,7 +56,7 @@ function AddChapter() {
   useEffect(() => {
     const fetchChapters = async () => {
       try {
-        const response = await axios.get("https://trelix-xj5h.onrender.com/chapter/get");
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/chapter/get`);
         setChapters(response.data);
       } catch (error) {
         console.error("Error fetching chapters:", error);
@@ -107,7 +107,7 @@ function AddChapter() {
   const handleDelete = async (id) => {
     try {
       const response = await axios.delete(
-        `https://trelix-xj5h.onrender.com/chapter/delete/${id}`
+        `${import.meta.env.VITE_API_PROXY}/chapter/delete/${id}`
       );
       if (response.status === 200) {
         setChapters((prevChapters) =>
@@ -125,7 +125,7 @@ function AddChapter() {
   const handleAssign = async () => {
     try {
       const response = await axios.post(
-        "https://trelix-xj5h.onrender.com/chapter/assign-chapters",
+        `${import.meta.env.VITE_API_PROXY}/chapter/assign-chapters`,
         {
           slugCourse: selectedCourse,
           chapters: selectedChapters,
@@ -163,7 +163,7 @@ function AddChapter() {
 
     try {
       const response = await axios.post(
-        "https://trelix-xj5h.onrender.com/chapter/add",
+        `${import.meta.env.VITE_API_PROXY}/chapter/add`,
         formData,
         {
           headers: {
@@ -176,7 +176,7 @@ function AddChapter() {
         alert("Chapter added successfully!");
         // Refresh chapters list
         const chaptersResponse = await axios.get(
-          "https://trelix-xj5h.onrender.com/chapter/get"
+          `${import.meta.env.VITE_API_PROXY}/chapter/get`
         );
         setChapters(chaptersResponse.data);
 
@@ -485,7 +485,7 @@ function AddChapter() {
                         <div className="flex flex-col space-y-2">
                           {chapter.video ? (
                             <a
-                              href={`https://trelix-xj5h.onrender.com${chapter.video}`}
+                              href={`${import.meta.env.VITE_API_PROXY}${chapter.video}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-500 hover:text-blue-700 flex items-center"
@@ -502,7 +502,7 @@ function AddChapter() {
 
                           {chapter.pdf ? (
                             <a
-                              href={`https://trelix-xj5h.onrender.com${chapter.pdf}`}
+                              href={`${import.meta.env.VITE_API_PROXY}${chapter.pdf}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-500 hover:text-blue-700 flex items-center"
