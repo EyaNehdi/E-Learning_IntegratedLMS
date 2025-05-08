@@ -80,3 +80,71 @@
   font-size: 14px;
   margin-left: 5px;
 }
+.dashboard-sidebar {
+  background-color: #ffffff;
+  padding: 1rem;
+  min-height: 100vh;
+}
+
+.sidebar-user-section {
+  background-color: #f9fafb;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.greeting-text {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.user-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.nav-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  color: #374151;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+  background-color: #f3f4f6;
+  color: #1d4ed8;
+}
+
+.nav-link.active {
+  background-color: #e0e7ff;
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.nav-label {
+  margin-left: 10px;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
