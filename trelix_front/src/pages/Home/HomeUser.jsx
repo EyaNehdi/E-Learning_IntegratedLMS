@@ -114,7 +114,6 @@ const HomeUser = () => {
         const response = await axios.get(
           "http://localhost:5000/course/courses"
         );
-        console.log("Courses fetched:", response.data);
         setCourses(response.data);
         setLoading(false);
       } catch (error) {
@@ -375,7 +374,7 @@ const HomeUser = () => {
       <SwiperSlide key={course._id}>
         <div className="course-entry-3 card rounded-2 bg-white border">
           <div className="card-media position-relative">
-            <a href={`/chapters/${course._id}`}>
+            <a href={`/chapters/${course.slug}`}>
               <img
                 className="card-img-top"
                 src={course.image || "assets/images/crs.png"}
@@ -396,7 +395,7 @@ const HomeUser = () => {
               </span>
             </div>
             <h3 className="sub-title mb-0">
-              <a href={`/chapters/${course._id}`}>{course.title}</a>
+              <a href={`/chapters/${course.slug}`}>{course.title}</a>
             </h3>
             <div className="author-meta small d-flex pt-2 justify-content-between align-items-center mb-3">
               <span>
@@ -411,7 +410,7 @@ const HomeUser = () => {
                 {course.price}🪙
               
               </div>
-              <a href={`/chapters/${course._id}`}>
+              <a href={`/chapters/${course.slug}`}>
                 Enroll Now <i className="feather-icon icon-arrow-right" />
               </a>
             </div>
@@ -539,7 +538,7 @@ const HomeUser = () => {
                     <div className="instructor-image text-center pt-4">
                       <img
                         src={`http://localhost:5000${instructor?.profilePhoto}`}
-                        className="rounded-circle shadow-sm border border-2 border-white"
+                        className="rounded-circle shadow-sm border border-white"
                         alt={`${instructor.firstName} ${instructor.lastName}`}
                         style={{
                           width: "120px",

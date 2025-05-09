@@ -388,28 +388,31 @@ function Allcourse() {
               cancelButton: "swal-custom-cancel-button",
             },
           }).then(async () => {
-            try {
-              const badgeResponse = await axios.post(
-                "http://localhost:5000/api/info/profile/badge",
-                {
-                  badge: "First Chapter Explorer Badge 🚀",
-                  email: user.email,
-                  badgeImage: "/assets/Badges/FirstCoursePurchase.png",
-                  description: "Earned for purchasing your first chapter",
-                },
-                { withCredentials: true },
-              )
-              console.log("Badge awarded:", badgeResponse.data)
-              Swal.fire({
-                icon: "success",
-                title: "Achievement Unlocked!",
-                text: "You've earned the 'First Chapter Explorer' badge for purchasing your first chapter!",
-                confirmButtonText: "Awesome!",
-                width: "400px",
-              })
-            } catch (badgeError) {
-              console.error("Error awarding badge:", badgeError)
-            }
+
+              try {
+                const badgeResponse = await axios.post(
+                  "http://localhost:5000/api/info/profile/badge",
+                  {
+                    badge: "First Chapter Explorer Badge 🚀",
+                    email: user.email,
+                    badgeImage: "/assets/Badges/FirstCoursePurchase.png",
+                    description: "Earned for purchasing your first chapter",
+                  },
+                  { withCredentials: true },
+                )
+                console.log("Badge awarded:", badgeResponse.data)
+                Swal.fire({
+                  icon: "success",
+                  title: "Achievement Unlocked!",
+                  text: "You've earned the 'First Chapter Explorer' badge for purchasing your first chapter!",
+                  confirmButtonText: "Awesome!",
+                 
+                  
+                })
+              } catch (badgeError) {
+                console.error("Error awarding badge:", badgeError)
+              }
+            
 
             setCourseAccess((prev) => ({ ...prev, [course._id]: true }))
             checkAuth()

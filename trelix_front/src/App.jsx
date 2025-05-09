@@ -43,11 +43,15 @@ import ManageUser from "./components/Admin/ManageUser";
 import ManageBadges from "./components/Admin/ManageBadges";
 import BadgeFeature from "./pages/Admin/BadgeFeature";
 import ListBadges from "./components/Admin/ListBadges";
+
 import StatPreference from "./components/Student/preference-statistics";
 import Preference from "./components/Student/AddPreference";
 import IntelligentCourses from "./components/Student/IntelligentCourses";
 import React, { useState } from "react";
 import GeminiChatbot from "./components/GeminiChatbot";
+
+import CourseLearningPlatform from "./components/Quiz/test";
+
 import AssignQuizToChapter from "./components/Quiz/AssignQuizToChapter";
 import Achievements from "./components/Profile/Achievements";
 import MoodleCourses from "./components/MoodleCourses";
@@ -62,12 +66,19 @@ import CourseDetailsPage from "./components/classroom/CourseDetailsPage";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import Dictionary from './components/Dictionary';
+import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
+import Summarizer from './components/Summarizer';
+import CitationGenerator from './components/CitationGenerator';
 import AuditPage from "./pages/Admin/AuditPage.jsx";
 import WordleGame from "./components/Leaderboard/WordleGame.jsx";
 import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
 import ListPacks from "./components/Admin/ListPacks.jsx";
 import StoreManagement from "./components/Admin/StoreManagement.jsx";
 import Store from "./components/Store/Store.jsx";
+
+import EmotionDetection from "./components/ia/emotion.jsx";
+
 import SystemSettings from "./components/Admin/activitytrack/SystemSettings.jsx";
 import FinancialOverview from "./components/Admin/Financial/FinancialOverview.jsx";
 import BusinessMetrics from "./components/Admin/Financial/BusinessMetrics.jsx";
@@ -76,6 +87,13 @@ import UserTransactions from "./components/Admin/Financial/UserTransactions.jsx"
 function App() {
   return (
     <Router>
+
+      <div>
+        
+        <ChatComponent />  
+      
+      
+
       <Routes>
         {/* **************** */}
         {/* Public routes */}
@@ -104,6 +122,7 @@ function App() {
             <Route index element={<BrowseCertificates />} />
             <Route path="browse" element={<BrowseCertificates />} />
           </Route>
+
           <Route path="/Moodle" element={<MoodleCourses />} />
           <Route path="/allcours" element={<Allcourse />} />
           <Route path="/chart" element={<CourseChartPage />} />
@@ -125,8 +144,11 @@ function App() {
             <Route path="test" element={<WordleGame />} />
 
             <Route path="geminichat" element={<GeminiChatbot />} />
+            <Route path="dictionary" element={<Dictionary />} />
             <Route path="chat" element={<ChatComponent />} />
             <Route path="meeting" element={<JoinRoom />} />
+
+            <Route path="CitationGenerator" element={<CitationGenerator />} /> 
 
             <Route path="addchapter" element={<AddChapter />} />
             <Route path="addExam" element={<AddExam />} />
@@ -143,6 +165,8 @@ function App() {
               element={<CourseChapter />}
             />
             <Route path="list" element={<Listecourse />} />
+            <Route path="summarizer" element={<Summarizer />} />
+
             <Route path="module" element={<Module />} />
             <Route path="achievements" element={<Achievements />} />
 
@@ -209,6 +233,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
+      </div>
     </Router>
   );
 }

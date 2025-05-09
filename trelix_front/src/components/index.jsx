@@ -51,6 +51,7 @@ const Index = () => {
       }
     };
 
+
     const fetchStudents = async () => {
       try {
         const res = await axios.get('http://localhost:5000/api/admin/count/student');
@@ -81,6 +82,7 @@ const Index = () => {
     const meetOurInstructors = async () => {
       try {
         const res = await axios.get('http://localhost:5000/api/admin/instructors');
+
         setInstructorsMeet(res.data);
       } catch (err) {
         console.error("Error fetching instructors:", err);
