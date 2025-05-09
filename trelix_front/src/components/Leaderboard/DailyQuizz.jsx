@@ -55,6 +55,13 @@ return () => {
                         title: "Quiz Completed",
                         text: "You have already passed this quiz! Come back tomorrow for a new one.",
                         confirmButtonColor: "#3085d6",
+                        width: "400px",
+                        customClass: {
+                            confirmButton: "swal-wide-button",
+
+                        },
+                        
+                        
                     });
               } else if (res.data.attempted) {
                 Swal.fire({
@@ -62,6 +69,11 @@ return () => {
                     title: "Already Attempted",
                     text: "You have already attempted this quiz today. Come back tomorrow.",
                     confirmButtonColor: "#f39c12",
+                    width: "400px",
+                    customClass: {
+                        confirmButton: "swal-wide-button",
+
+                    },
                 });
               } else {
                   navigate("/quiz");

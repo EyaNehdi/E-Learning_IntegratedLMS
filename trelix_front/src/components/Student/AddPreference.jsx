@@ -43,6 +43,15 @@ function AddPreference() {
     "video",
     "pdf",
     "audio",
+
+    "texte",
+    "image",
+    "quiz",
+    "interactive exercice",
+    "webinar",
+    "infographie",
+    "slides",
+
     "other",
   ]
   

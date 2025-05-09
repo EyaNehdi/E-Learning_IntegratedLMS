@@ -13,6 +13,10 @@
   width: 100%;
   padding: 30px;
 }
+.swal-confirm-button {
+  font-size: 0.85rem !important; /* Smaller font size */
+  padding: 10px 24px !important; /* Slightly larger button */
+}
 
 @media (max-width: 768px) {
   #container {
