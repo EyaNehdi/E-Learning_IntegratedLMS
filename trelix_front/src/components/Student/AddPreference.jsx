@@ -41,6 +41,8 @@ function AddPreference() {
     "vidéo",
     "pdf",
     "audio",
+    "texte",
+    "image",
     "quiz",
     "interactive exercice",
     "webinar",

@@ -93,6 +93,7 @@ const Course = require("./routes/course");
 const Stripe = require("./routes/stripe.routes");
 const StripeRaw = require("./routes/stripe.routes");
 const Purchases = require("./routes/coursesPurchasesRoutes");
+const Recommendation = require("./routes/recommendationRoutes");
 
 app.use('/stripe/raw', StripeRaw);
 
@@ -224,6 +225,7 @@ app.use('/preference', preference);
 app.use('/intelligent-recommendation', intelligentRecommendationRoutes);
 app.use('/stripe', Stripe);
 app.use('/purchases', Purchases);
+app.use('/recommendation', Recommendation);
 
 
 
