@@ -101,7 +101,7 @@ function IntelligentCourses() {
                     <div className="grid grid-cols-2 gap-2 text-sm text-gray-500 mb-4">
                       <p><span className="font-medium text-gray-700">Niveau :</span> {course.level}</p>
                       <p><span className="font-medium text-gray-700">Catégorie :</span> {course.categorie}</p>
-                      <p><span className="font-medium text-gray-700">Prix :</span> {course.price} €</p>
+                      <p><span className="font-medium text-gray-700">Prix :</span> {course.price} 🪙</p>
                       <p><span className="font-medium text-gray-700">Module :</span> {course.moduleName}</p>
                     </div>
                     <button

@@ -103,5 +103,22 @@ const getRecommendedCourses = async (req, res) => {
     res.status(500).json({ message: "Erreur du serveur" });
   }
 };
+const getPreferencesByUserId = async (req, res) => {
+  const { id } = req.params;
 
-module.exports = { createpreference, getAllPreference, getRecommendedCourses };
+  try {
+    const preferences = await Preference.find({ user: id }).populate("module user");
+
+    if (!preferences || preferences.length === 0) {
+      return res.status(404).json({ message: "Aucune préférence trouvée pour cet utilisateur." });
+    }
+
+    res.status(200).json(preferences);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des préférences utilisateur:", error);
+    res.status(500).json({ message: "Erreur du serveur" });
+  }
+};
+
+
+module.exports = { createpreference, getAllPreference, getRecommendedCourses, getPreferencesByUserId };
