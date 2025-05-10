@@ -57,14 +57,16 @@ const updateProfilePhoto = async (req, res) => {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
-        const profilePhotoUrl = `/uploads/${req.file.filename}`;
+        const profilePhotoUrl = req.file.path; // Cloudinary-hosted URL
         await User.findByIdAndUpdate(req.userId, { profilePhoto: profilePhotoUrl });
 
         res.status(200).json({ profilePhoto: profilePhotoUrl });
     } catch (error) {
+        console.error("Update error:", error);
         res.status(500).json({ message: "Error updating profile photo" });
     }
 };
+
 
 // Update Cover Photo
 const updateCoverPhoto = async (req, res) => {
@@ -73,14 +75,16 @@ const updateCoverPhoto = async (req, res) => {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
-        const coverPhotoUrl = `/uploads/${req.file.filename}`;
+        const coverPhotoUrl = req.file.path; // Cloudinary-hosted URL
         await User.findByIdAndUpdate(req.userId, { coverPhoto: coverPhotoUrl });
 
         res.status(200).json({ coverPhoto: coverPhotoUrl });
     } catch (error) {
+        console.error("Update error:", error);
         res.status(500).json({ message: "Error updating cover photo" });
     }
 };
+
 
 // Update User Badges
 const updatebadge = async (req, res) => {
