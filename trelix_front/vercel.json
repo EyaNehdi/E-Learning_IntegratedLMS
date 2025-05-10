@@ -4,5 +4,12 @@
             "source": "/(.*)",
             "destination": "/"
         }
-    ]
+    ],
+     "routes": [
+    {
+      "src": "/(.*)",
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "dest": "/api/$1"
+    }
+  ]
 }
