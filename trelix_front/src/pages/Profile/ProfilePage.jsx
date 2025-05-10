@@ -165,9 +165,10 @@ const ProfilePage = () => {
                 <div
                   className="cover-photo-container"
                   style={{
-                    backgroundImage: user?.coverPhoto
-                      ? `url(${import.meta.env.VITE_API_PROXY}${user?.coverPhoto})`
-                      : `url('/assets/icons/COVER.png')`,
+                   backgroundImage: user?.coverPhoto
+  ? `url(${user.coverPhoto})`
+  : `url('/assets/icons/COVER.png')`
+
                   }}
                 >
                   {/* Change Cover Photo Button */}
