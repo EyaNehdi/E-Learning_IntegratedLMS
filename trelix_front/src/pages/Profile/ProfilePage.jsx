@@ -72,7 +72,7 @@ const ProfilePage = () => {
     try {
       // Make sure you send the request with credentials (cookie)
       const response = await axios.get(
-        `${import.meta.env.VITE_API_PROXY}/api/auth/current-location`,
+        "https://trelix-xj5h.onrender.com/api/auth/current-location",
         {
           withCredentials: true, // This ensures the cookie is sent along with the request
         }
@@ -93,50 +93,41 @@ const ProfilePage = () => {
     }
   };
 
- const handleProfilePhotoChange = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+  const handleProfilePhotoChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-  const formData = new FormData();
-  formData.append("profilePhoto", file);
+    const formData = new FormData();
+    formData.append("profilePhoto", file);
 
-  try {
-    const response = await axios.put(
-      `${import.meta.env.VITE_API_PROXY}/api/info/profile/photo`,
-      formData,
-      {
+    try {
+      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/photo", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true, // if using cookies for auth
+      });
+      updateUser({ profilePhoto: response.data.profilePhoto }); // Update state with server response
+    } catch (error) {
+      console.error("Error updating profile photo:", error);
+    }
+  };
+
+  const handleCoverPhotoChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("coverPhoto", file);
+
+    try {
+      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/cover", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
-      }
-    );
-    updateUser({ profilePhoto: response.data.profilePhoto });
-  } catch (error) {
-    console.error("Error updating profile photo:", error);
-  }
-};
-
-const handleCoverPhotoChange = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const formData = new FormData();
-  formData.append("coverPhoto", file);
-
-  try {
-    const response = await axios.put(
-      `${import.meta.env.VITE_API_PROXY}/api/info/profile/cover`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      }
-    );
-    updateUser({ coverPhoto: response.data.coverPhoto });
-  } catch (error) {
-    console.error("Error updating cover photo:", error);
-  }
-};
-
+      });
+      updateUser({ coverPhoto: response.data.coverPhoto });
+    } catch (error) {
+      console.error("Error updating cover photo:", error);
+    }
+  };
 
   const awardBadge = async () => {
     const description = "Earned for completing profile";
@@ -149,7 +140,7 @@ const handleCoverPhotoChange = async (event) => {
     const badgeImageUrl = "/assets/Badges/WelcomeBadge.png";
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_PROXY}/api/info/profile/badge`,
+        "https://trelix-xj5h.onrender.com/api/info/profile/badge",
         {
           badge: " Welcome to Trelix Badge 🏅",
           email: user.email, // Send the user's email
@@ -174,10 +165,9 @@ const handleCoverPhotoChange = async (event) => {
                 <div
                   className="cover-photo-container"
                   style={{
-                   backgroundImage: user?.coverPhoto
-  ? `url(${user.coverPhoto})`
-  : `url('/assets/icons/COVER.png')`
-
+                    backgroundImage: user?.coverPhoto
+                      ? `url(https://trelix-xj5h.onrender.com${user?.coverPhoto})`
+                      : `url('/assets/icons/COVER.png')`,
                   }}
                 >
                   {/* Change Cover Photo Button */}
@@ -212,7 +202,7 @@ const handleCoverPhotoChange = async (event) => {
                       >
                         {user?.profilePhoto ? (
                           <img
-                            src={`${import.meta.env.VITE_API_PROXY}${user?.profilePhoto}`}
+                            src={`https://trelix-xj5h.onrender.com${user?.profilePhoto}`}
                             className="rounded-circle"
                             alt="Avatar"
                             style={{
