@@ -1,16 +1,16 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
-const path = require("path");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { cloudinary } = require("../utils/cloudinary");
 
-// Configure multer storage for file uploads (profile and cover photos)
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../uploads')); // Set upload directory
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname); // Generate unique filename
-    }
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => ({
+    folder: "uploads", // optional: separate folders for profile/cover
+    format: file.mimetype.split("/")[1], // keep original format
+    public_id: Date.now() + "-" + file.originalname,
+  }),
 });
 
 const upload = multer({ storage });
