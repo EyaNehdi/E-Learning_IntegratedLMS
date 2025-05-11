@@ -1,0 +1,303 @@
+.fadeQR-in {
+  opacity: 1;
+  transition: opacity 1s ease-in;
+}
+
+.fadeQR-out {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+
+.mfa-method-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mfa-method-toggle .mfa-toggle-btn {
+  border: 1px solid #0d6efd;
+  background-color: #fff;
+  color: #0d6efd;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  width: 100%;
+  border-radius: 6px;
+}
+
+.mfa-method-toggle .mfa-btn-divider {
+  width: 1px;
+  height: 36px; /* Adjust based on your button size */
+  background-color: #0d6efd;
+  margin: 0 1rem; /* Space between buttons */
+}
+
+.mfa-method-toggle .mfa-toggle-btn:hover {
+  background-color: #f0f8ff;
+  cursor: pointer;
+}
+
+.mfa-method-toggle .mfa-btn-active {
+  background-color: #0d6efd;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
+  transform: translateY(-1px);
+}
+
+.mfa-form-fields-wrapper {
+  position: relative;
+}
+
+.mfa-form-fields {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.mfa-form-fields.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mfa-instructions {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+}
+
+/* Sweet Alert styled overridden */
+.custom-popup {
+  padding: 20px !important;
+}
+
+.custom-confirm-button {
+  color: white !important;
+  width: auto !important;
+  padding: 5px !important;
+}
+
+/* Buttons Remove MFA / BackupCodes */
+.custom-buttonMFA-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.custom-buttonMFA {
+  flex: 1 1 200px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 2rem;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.custom-buttonMFA.primary {
+  background-color: #6045ff;
+  color: #ffffff;
+}
+
+.custom-buttonMFA.primary:hover {
+  background-color: #5038e0;
+}
+
+.custom-buttonMFA.remove-auth {
+  color: #dc3545;
+  background-color: transparent;
+  border: 2px solid #dc3545;
+  position: relative;
+}
+
+.custom-buttonMFA.remove-auth:hover {
+  color: white;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.custom-buttonMFA .remove-auth-span {
+  display: block;
+  font-size: 0.65rem;
+  color: #999;
+  white-space: normal;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* backup codes */
+.underlined-buttons-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.generate-codes-link {
+  background: none;
+  border: none;
+  color: #6045ff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.generate-codes-link:hover {
+  color: #3a2d99;
+}
+
+.hide-codes-link {
+  background: transparent;
+  border: none;
+  color: #ccc;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.hide-codes-link:hover {
+  color: #999; /* Darker gray for hover effect */
+}
+
+/* Styling for the Trusted Devices Section */
+
+.info-device-text {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 1rem;
+}
+
+.device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.device-card {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.device-info {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.device-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.device-details {
+  font-size: 0.9rem;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+}
+
+.device-os,
+.device-browser,
+.device-date {
+  margin-bottom: 5px;
+}
+
+.device-os span {
+  margin-left: 5px;
+}
+
+.device-browser span,
+.device-date span {
+  display: block;
+  margin-left: 5px;
+}
+
+.btn-remove-device {
+  background-color: #e57373;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-remove-device:hover {
+  background-color: #d65c5c;
+}
+
+.device-os svg {
+  margin-right: 8px;
+}
+
+/* Mobile View */
+@media (max-width: 576px) {
+  .custom-button-group {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .custom-button,
+  .custom-buttonMFA {
+    width: 80%;
+    max-width: 300px;
+  }
+
+  .generate-codes-link {
+    margin: 0;
+  }
+  .device-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .device-info {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .btn-remove-device {
+    align-self: flex-end;
+    margin-top: 10px;
+    width: 100%; 
+    text-align: center;
+  }
+
+  .device-name {
+    font-size: 1rem;
+  }
+
+  .device-details {
+    font-size: 0.85rem;
+  }
+
+  .device-os,
+  .device-browser,
+  .device-date {
+    flex-wrap: wrap;
+  }
+}
+
+.divider-profile {
+  border: none;
+  border-top: 3px solid #ddd;
+  margin: 20px 0;
+  opacity: 0.8;
+}

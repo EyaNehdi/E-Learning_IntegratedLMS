@@ -1,6 +1,7 @@
 import { useNavigate, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useProfileStore } from "../../store/profileStore";
+import UserAvatar from "./UserAvatar";
 
 const Headeradmin = () => {
   const navigate = useNavigate();
@@ -17,11 +18,12 @@ const Headeradmin = () => {
 
   const navLinks = [
     { path: "/admin", icon: "lnr-users", label: "Users" },
-    { path: "/Audit", icon: "lnr-layers", label: "Audit" },
-    { path: "/report", icon: "lnr-rocket", label: "Reports" },
-    { path: "/manage", icon: "lnr-sync", label: "Manage" },
-    { path: "/badge", icon: "lnr-trophy", label: "Gamification" },
-    { path: "/set", icon: "lnr-cog", label: "Settings" },
+    { path: "/monitor", icon: "lnr-layers", label: "Monitoring" },
+    { path: "/report", icon: "lnr-rocket", label: "Quizzes" },
+    { path: "/storeAdmin", icon: "lnr-cart", label: "Store Management" },
+
+    { path: "/badge", icon: "lnr-rocket", label: "Gamification" },
+    { path: "/home", icon: "lnr-home", label: "Return Home" },
   ];
 
   return (
@@ -129,29 +131,7 @@ const Headeradmin = () => {
                         className="menu-style dropdown-toggle"
                         onClick={(e) => e.preventDefault()}
                       >
-                        {user?.profilePhoto ? (
-                          <img
-                            src={`http://localhost:5000${user?.profilePhoto}`}
-                            className="rounded-circle"
-                            alt="Avatar"
-                            style={{
-                              width: "50px",
-                              height: "50px",
-                              objectFit: "cover",
-                            }}
-                          />
-                        ) : (
-                          <span>
-                            {user?.firstName && user?.lastName ? (
-                              <>
-                                {user.firstName.charAt(0)}
-                                {user.lastName.charAt(0)}
-                              </>
-                            ) : (
-                              "?"
-                            )}
-                          </span>
-                        )}
+                        <UserAvatar user={user} />
                       </a>
                       {/* Dropdown Menu */}
                       <div className="dropdown-menu notification-dropdown-menu shadow-lg border-0 p-3 m-0 dropdown-menu-right">
@@ -221,12 +201,7 @@ const Headeradmin = () => {
                       className="d-block menu-style text-white"
                     >
                       <div className="user-avatar d-inline-block mr-3">
-                        <img
-                          src={`http://localhost:5000${user?.profilePhoto}`}
-                          alt="user avatar"
-                          className="rounded-circle"
-                          width={50}
-                        />
+                        <UserAvatar user={user} />
                       </div>
                     </a>
                   </div>

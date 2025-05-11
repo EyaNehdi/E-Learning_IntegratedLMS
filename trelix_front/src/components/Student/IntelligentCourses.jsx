@@ -170,6 +170,7 @@ function IntelligentCourses() {
                         <p className="mb-1">By: {course.categorie}</p>
                         <p>{course.moduleName}</p>
                       </div>
+
                     </div>
                   </div>
                 ))}

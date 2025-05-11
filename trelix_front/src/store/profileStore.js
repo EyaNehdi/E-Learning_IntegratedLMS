@@ -17,7 +17,6 @@ export const useProfileStore = create((set, get) => ({
         },
         withCredentials: true,  // Ensure cookies are sent with the request
       });
-      console.log("User data loaded:", res.data);
       set({ user: res.data, isLoadingUser: false });
       get().calculateAccountCompletion(res.data);
     } catch (error) {
@@ -34,20 +33,37 @@ export const useProfileStore = create((set, get) => ({
       "coverPhoto",
       "phone",
       "Bio",
-    ];
-    const filledFields = fields.filter((field) => profileData[field]);
-    const percentage = Math.round((filledFields.length / fields.length) * 100);
-    set({ accountCompletion: percentage });
+      "skils", // Added skills to the completion calculation
+    ]
+    const filledFields = fields.filter((field) => {
+      // Special check for skills array - consider it filled if it has at least one skill
+      if (field === "skils") {
+        return profileData[field] && profileData[field].length > 0
+      }
+      return profileData[field]
+    })
+    const percentage = Math.round((filledFields.length / fields.length) * 100)
+    set({ accountCompletion: percentage })
   },
   toggleMFA: () => {
     set((state) => ({
-      user: { ...state.user, mfaEnabled: !state.user.mfaEnabled, backupCodes: [] },
+      user: {
+        ...state.user, mfa: {
+          ...state.user.mfa,
+          enabled: !state.user.mfa?.enabled,
+          backupCodes: [],
+        },
+      },
     }));
-    console.log("MFA toggled");
   },
-  setBackupCodes: (newbackupCodes) => {
+  setBackupCodes: (newBackupCodes) => {
     set((state) => ({
-      user: { ...state.user, backupCodes: newbackupCodes },
+      user: {
+        ...state.user, mfa: {
+          ...state.user.mfa,
+          backupCodes: newBackupCodes,
+        },
+      },
     }));
   },
   updateProfilePhoto: (photo) => {

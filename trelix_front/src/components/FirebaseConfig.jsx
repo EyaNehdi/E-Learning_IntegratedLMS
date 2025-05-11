@@ -1,7 +1,7 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getDatabase } from "firebase/database";  // Importer la méthode pour accéder à la base de données Firebase
 
-// Ta configuration Firebase
+
 const firebaseConfig = {
   apiKey: "AIzaSyBrijvp0hHPlJZST5qHd5FvKgfjaGUejqk",
   authDomain: "trelixchat.firebaseapp.com",
