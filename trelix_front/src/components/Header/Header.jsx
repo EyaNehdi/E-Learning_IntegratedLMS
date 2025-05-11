@@ -236,11 +236,10 @@ function Header() {
                             href="/"
                             role="button"
                             aria-expanded="false"
-                            className={`nav-link px-3 px-xl-4 ${
-                              ["/", "/home"].includes(location.pathname)
+                            className={`nav-link px-3 px-xl-4 ${["/", "/home"].includes(location.pathname)
                                 ? "active"
                                 : ""
-                            }`}
+                              }`}
                             style={{
                               paddingInlineEnd: "40px",
                               fontWeight: "bold",
@@ -258,9 +257,8 @@ function Header() {
                             href="/calendar"
                             role="button"
                             aria-expanded="false"
-                            className={`nav-link px-3 px-xl-4 ${
-                              location.pathname === "/calendar" ? "active" : ""
-                            }`}
+                            className={`nav-link px-3 px-xl-4 ${location.pathname === "/calendar" ? "active" : ""
+                              }`}
                             style={{
                               paddingInline: "40px",
                               fontWeight: "bold",
@@ -280,25 +278,24 @@ function Header() {
                             href="#"
                             role="button"
                             aria-expanded="false"
-                            className={`nav-link px-3 px-xl-4 ${
-                              location.pathname.startsWith("/allcours") ||
-                              location.pathname.startsWith("/Moodle") ||
-                              location.pathname.startsWith("/Classroom") ||
-                              location.pathname.startsWith("/chapters") ||
-                              location.pathname.startsWith("/content")
+                            className={`nav-link px-3 px-xl-4 ${location.pathname.startsWith("/allcours") ||
+                                location.pathname.startsWith("/Moodle") ||
+                                location.pathname.startsWith("/Classroom") ||
+                                location.pathname.startsWith("/chapters") ||
+                                location.pathname.startsWith("/content")
                                 ? "active"
                                 : ""
-                            }`}
+                              }`}
                             style={{
                               paddingInline: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
                               color:
                                 location.pathname.startsWith("/allcours") ||
-                                location.pathname.startsWith("/Moodle") ||
-                                location.pathname.startsWith("/Classroom") ||
-                                location.pathname.startsWith("/chapters") ||
-                                location.pathname.startsWith("/content")
+                                  location.pathname.startsWith("/Moodle") ||
+                                  location.pathname.startsWith("/Classroom") ||
+                                  location.pathname.startsWith("/chapters") ||
+                                  location.pathname.startsWith("/content")
                                   ? "#007bff"
                                   : "inherit",
                             }}
@@ -309,11 +306,10 @@ function Header() {
                           <ul className="dropdown-menu">
                             <li>
                               <a
-                                className={`dropdown-item ${
-                                  location.pathname === "/allcours"
+                                className={`dropdown-item ${location.pathname === "/allcours"
                                     ? "active"
                                     : ""
-                                }`}
+                                  }`}
                                 href="/allcours"
                                 style={
                                   location.pathname === "/allcours"
@@ -326,11 +322,10 @@ function Header() {
                             </li>
                             <li>
                               <a
-                                className={`dropdown-item ${
-                                  location.pathname === "/Moodle"
+                                className={`dropdown-item ${location.pathname === "/Moodle"
                                     ? "active"
                                     : ""
-                                }`}
+                                  }`}
                                 href="/Moodle"
                                 style={{
                                   display: "flex",
@@ -353,11 +348,10 @@ function Header() {
                             </li>
                             <li>
                               <a
-                                className={`dropdown-item ${
-                                  location.pathname === "/Classroom"
+                                className={`dropdown-item ${location.pathname === "/Classroom"
                                     ? "active"
                                     : ""
-                                }`}
+                                  }`}
                                 href="/Classroom"
                                 style={{
                                   display: "flex",
@@ -388,11 +382,10 @@ function Header() {
                           <a
                             href="/leaderboard"
                             role="button"
-                            className={`nav-link px-3 px-xl-4 ${
-                              location.pathname === "/leaderboard"
+                            className={`nav-link px-3 px-xl-4 ${location.pathname === "/leaderboard"
                                 ? "active"
                                 : ""
-                            }`}
+                              }`}
                             style={{
                               paddingInline: "40px",
                               fontWeight: "bold",
@@ -411,9 +404,9 @@ function Header() {
                   </div>
                 </div>
                 <div className="col-auto header-actions position-relative order-xl-2 d-flex align-items-center">
-                <a className="text-reset icon rounded-5 bg-shade" href="/store">
-  <i className="feather-icon icon-shopping-bag" />
-</a>
+                  <a className="text-reset icon rounded-5 bg-shade" href="/store">
+                    <i className="feather-icon icon-shopping-bag" />
+                  </a>
                   {/* Search Icon */}
                   <a
                     className="text-reset icon rounded-5 bg-shade"
@@ -437,9 +430,8 @@ function Header() {
                         </a>
                         {menuOpen && (
                           <div
-                            className={`admin-menu pt-3 bg-white ${
-                              menuOpen ? "open" : ""
-                            }`}
+                            className={`admin-menu pt-3 bg-white ${menuOpen ? "open" : ""
+                              }`}
                           >
                             <div className="d-flex avatar border-bottom">
                               <div
@@ -458,7 +450,11 @@ function Header() {
                               >
                                 {user?.profilePhoto ? (
                                   <img
-                                    src={`${import.meta.env.VITE_API_PROXY}${user.profilePhoto}`}
+                                    src={
+                                      user?.profilePhoto?.startsWith("http")
+                                        ? user.profilePhoto
+                                        : `${import.meta.env.VITE_API_PROXY}${user?.profilePhoto}`
+                                    }
                                     className="img-fluid border rounded-circle"
                                     alt="Avatar"
                                     style={{
@@ -473,7 +469,7 @@ function Header() {
                                       <>
                                         {user.firstName.charAt(0)}
                                         {user.lastName.charAt(0)}
-              
+
                                       </>
                                     ) : (
                                       "?"
@@ -671,7 +667,7 @@ function Header() {
                                 {user?.firstName} {user?.lastName}{" "}
                               </span>
                             </Tooltip>
-                           
+
                             <span>&nbsp;             🪙 {user?.balance}</span>
 
                           </div>

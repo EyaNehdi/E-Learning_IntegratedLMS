@@ -87,7 +87,11 @@ function Leader() {
                     <td className="leaderboard-rank">{index + 1}</td>
                     <td className="leaderboard-name">
                       {user.profilePhoto && (
-                        <img src={`${import.meta.env.VITE_API_PROXY}${user.profilePhoto}`} alt="profile" className="leaderboard-profile-pic" />
+                        <img src={
+                                      user?.profilePhoto?.startsWith("http")
+                                        ? user.profilePhoto
+                                        : `${import.meta.env.VITE_API_PROXY}${user?.profilePhoto}`
+                                    } alt="profile" className="leaderboard-profile-pic" />
                       )}
                       </td>
                       <td className="leaderboard-name">

@@ -134,7 +134,7 @@ const Index = () => {
 
     // Nettoyage (optionnel, pour arrêter l'audio si le composant est démonté)
     return () => {
-      document.removeEventListener("click", () => {});
+      document.removeEventListener("click", () => { });
     };
   }, []);
 
@@ -528,7 +528,11 @@ const Index = () => {
                     <div className="instructor-card position-relative overflow-hidden shadow-sm rounded-3 bg-white">
                       <div className="instructor-image text-center pt-4">
                         <img
-                          src={`${import.meta.env.VITE_API_PROXY}${instructor?.profilePhoto}`}
+                          src={
+                            instructor?.profilePhoto?.startsWith("http")
+                              ? instructor.profilePhoto
+                              : `${import.meta.env.VITE_API_PROXY}${instructor?.profilePhoto}`
+                          }
                           className="rounded-circle shadow-sm border border-white"
                           alt={`${instructor.firstName} ${instructor.lastName}`}
                           style={{
@@ -540,6 +544,7 @@ const Index = () => {
                           onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
                           onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
                         />
+
                       </div>
 
                       <div className="instructor-info p-4 text-center">
@@ -566,9 +571,8 @@ const Index = () => {
                           </button>
 
                           <ul
-                            className={`social-links list-unstyled d-flex gap-2 position-absolute mb-0 ${
-                              showSocialIndex === index ? "show-social" : ""
-                            }`}
+                            className={`social-links list-unstyled d-flex gap-2 position-absolute mb-0 ${showSocialIndex === index ? "show-social" : ""
+                              }`}
                             style={{
                               left: "50%",
                               transform: `translateX(-50%) translateY(${showSocialIndex === index ? "0" : "10px"})`,
