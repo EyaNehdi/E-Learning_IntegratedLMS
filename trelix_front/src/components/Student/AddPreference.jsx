@@ -43,15 +43,6 @@ function AddPreference() {
     "video",
     "pdf",
     "audio",
-
-    "texte",
-    "image",
-    "quiz",
-    "interactive exercice",
-    "webinar",
-    "infographie",
-    "slides",
-
     "other",
   ]
   
@@ -517,10 +508,9 @@ function AddPreference() {
         </div>
       </div>
     </div>
-    
   )
-
-
 }
+
+
 
 export default AddPreference

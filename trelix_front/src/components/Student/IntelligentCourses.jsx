@@ -155,9 +155,6 @@ function IntelligentCourses() {
                       </button>
                     </div>
                     
-
-
-                    
                     <div className="p-4">
                       <div className="flex justify-between items-center mb-2">
                         <div className="flex items-center">
@@ -173,7 +170,6 @@ function IntelligentCourses() {
                         <p className="mb-1">By: {course.categorie}</p>
                         <p>{course.moduleName}</p>
                       </div>
-
                     </div>
                   </div>
                 ))}
@@ -187,5 +183,7 @@ function IntelligentCourses() {
     </div>
   );
 }
+
+
 
 export default IntelligentCourses;
