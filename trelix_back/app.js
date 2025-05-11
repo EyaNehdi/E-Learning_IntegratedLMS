@@ -220,6 +220,7 @@ app.use('/intelligent-recommendation', intelligentRecommendationRoutes);
 
 
 
+
 // Routes Google Classroom (corrigées)
 app.use('/api/auth/google', googleAuthRoutes);
 app.use('/api/classroom', classroomRoutes);

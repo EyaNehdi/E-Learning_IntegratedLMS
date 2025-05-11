@@ -154,6 +154,8 @@ function IntelligentCourses() {
                         <Heart className="h-5 w-5 text-white" />
                       </button>
                     </div>
+
+                    
                     
                     <div className="p-4">
                       <div className="flex justify-between items-center mb-2">

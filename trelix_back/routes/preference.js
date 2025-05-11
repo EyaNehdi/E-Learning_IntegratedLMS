@@ -6,4 +6,8 @@ router.post("/add", createpreference);
 router.get("/get", getAllPreference);
 router.put("/update/:id", updatePreference);
 
+
+
+
+
 module.exports = router;

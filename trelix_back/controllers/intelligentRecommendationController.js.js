@@ -8,6 +8,10 @@ const natural = require('natural');
 const tokenizer = new natural.WordTokenizer();
 const stemmer = natural.PorterStemmer;
 
+
+
+
+
 // Dictionnaire de termes liés pour différents domaines
 const domainDictionary = {
   "frontend": [

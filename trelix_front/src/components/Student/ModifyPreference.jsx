@@ -30,6 +30,7 @@ function ModifyPreference() {
       });
       return;
     }
+    
 
     fetchModules();
   }, [preference, userId, moduleId]);
