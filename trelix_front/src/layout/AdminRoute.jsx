@@ -4,7 +4,7 @@ import Preloader from "../components/Preloader/Preloader";
 import { Navigate, Outlet } from "react-router-dom";
 import ViewSwitcher from "../components/ViewSwitcher";
 import Headeradmin from "../components/Admin/Headeradmin";
-import SidebarAdmin from "../components/Admin/SideBarAdmin";
+import SidebarAdmin from "../components/Admin/SidebarAdmin";
 
 const AdminRoute = () => {
   const { isAuthenticated, isCheckingAuth, checkAuth, user } = useAuthStore();
