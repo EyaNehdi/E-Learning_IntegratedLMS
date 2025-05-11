@@ -7,7 +7,7 @@ dotenv.config();
      // Get recommendations for a user
   const recommendUser = async (req, res) => {
     const userId = req.userId; // Use userId from verifyToken middleware
-    const topN = req.query.topN || 5;
+    const topN = req.query.topN || 10;
   
     try {
       const response = await axios.get(`${RECOMMENDATION_SERVICE_URL}/${userId}?top_n=${topN}`);
