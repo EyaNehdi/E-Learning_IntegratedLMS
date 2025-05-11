@@ -42,6 +42,7 @@ const allowedOrigins = [
   'https://trelix-livid.vercel.app', // Custom domain
   /https:\/\/trelix-.*-eyanehdis-projects\.vercel\.app/, // This regex will match all preview deployments
   'https://trelix-livid.vercel.app',
+  'http://localhost:5173'
 ];
 
 app.use(cors({
@@ -118,12 +119,7 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-
-
-
 
 app.use(cookieParser());
 app.use(session({

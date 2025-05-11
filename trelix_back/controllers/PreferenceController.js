@@ -180,6 +180,7 @@ const getRecommendedCourses = async (req, res) => {
       level: course.level,
       categorie: course.categorie,
       moduleName: moduleExists.name,
+      courseSlug: course.slug,
     }));
 
     console.log("Recommended courses:", recommendedCourses);

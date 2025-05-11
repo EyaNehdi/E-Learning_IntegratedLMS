@@ -3,6 +3,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import "./ResponsiveStyle.css";
+
 const baseUrl = `${import.meta.env.VITE_API_PROXY}`;
 const ManageBadges = () => {
   const location = useLocation();
@@ -452,12 +454,12 @@ const ManageBadges = () => {
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="custom-form-actions">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 ${
-                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                className={`custom-outline-btn create-btn ${
+                  isSubmitting ? "opacity-20 cursor-not-allowed" : ""
                 }`}
               >
                 {isSubmitting
@@ -471,7 +473,7 @@ const ManageBadges = () => {
               <button
                 type="button"
                 onClick={() => navigate("/badge/list-badges")}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded text-sm font-medium hover:bg-gray-300"
+                className="custom-outline-btn archive-btn"
               >
                 Cancel
               </button>
