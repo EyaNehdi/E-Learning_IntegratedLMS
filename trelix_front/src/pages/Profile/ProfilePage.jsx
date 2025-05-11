@@ -6,6 +6,7 @@ import { useOutletContext, useNavigate } from "react-router-dom"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
 import axios from "axios"
+import { useProfileStore } from "../../store/profileStore" // Import the store directly
 
 // Common programming languages and technologies for autocomplete
 const SKILL_SUGGESTIONS = [
@@ -64,7 +65,15 @@ const SKILL_SUGGESTIONS = [
 ]
 
 const ProfileDetails = () => {
-  const { user, accountCompletion, updateUser, locationData } = useOutletContext()
+  // Get context safely with fallback to direct store access
+  const outletContext = useOutletContext() || {}
+  const profileStore = useProfileStore()
+
+  // Use context if available, otherwise use store directly
+  const user = outletContext.user || profileStore.user
+  const accountCompletion = outletContext.accountCompletion || profileStore.accountCompletion
+  const updateUser = outletContext.updateUser || profileStore.updateUser
+  const locationData = outletContext.locationData || {}
 
   const [isEditing, setIsEditing] = useState(false)
   let timeoutId
@@ -83,6 +92,13 @@ const ProfileDetails = () => {
   const inputRef = useRef(null)
 
   const navigate = useNavigate()
+
+  // Fetch user data if not available
+  useEffect(() => {
+    if (!user && profileStore.fetchUser) {
+      profileStore.fetchUser()
+    }
+  }, [user, profileStore])
 
   useEffect(() => {
     // Set user skills when user data is loaded
@@ -120,7 +136,7 @@ const ProfileDetails = () => {
         console.log("🟢 Updating profile...", name)
         const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/edit", {
           [name]: value,
-          email: user.email,
+          email: user?.email,
         })
 
         console.log("Update successful:", response.data)
@@ -143,6 +159,8 @@ const ProfileDetails = () => {
   }
 
   const updateskilsWithEntities = async (entities) => {
+    if (!user) return
+
     try {
       const filteredSkills = entities.filter((ent) => ent.label === "PRODUCT").map((ent) => ent.text)
 
@@ -166,7 +184,7 @@ const ProfileDetails = () => {
 
   const handleSubmit = async () => {
     const file = cvFile
-    if (!file) return
+    if (!file || !user) return
 
     const formData = new FormData()
     formData.append("cvFile", file)
@@ -232,7 +250,7 @@ const ProfileDetails = () => {
   }
 
   const addSkill = async (skill = newSkill) => {
-    if (!skill.trim()) return
+    if (!skill.trim() || !user) return
 
     // Don't add duplicate skills
     if (userSkills.includes(skill)) {
@@ -257,6 +275,8 @@ const ProfileDetails = () => {
   }
 
   const removeSkill = async (skillToRemove) => {
+    if (!user) return
+
     const updatedSkills = userSkills.filter((skill) => skill !== skillToRemove)
 
     try {
@@ -284,6 +304,18 @@ const ProfileDetails = () => {
   const region = locationData?.region || "Unknown Region"
   const country = locationData?.country || "Unknown Country"
   const lastLoggedInAt = locationData?.loggedInAt || "Unknown Date"
+
+  // If user data is not available yet, show loading
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile data...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -445,8 +477,8 @@ const ProfileDetails = () => {
               <div className="flex flex-col items-center mt-6">
                 <div className="relative w-24 h-24">
                   <CircularProgressbar
-                    value={accountCompletion}
-                    text={`${accountCompletion}%`}
+                    value={accountCompletion || 0}
+                    text={`${accountCompletion || 0}%`}
                     styles={buildStyles({
                       textSize: "16px",
                       pathColor: accountCompletion === 100 ? "#4CAF50" : "#FF9800",
