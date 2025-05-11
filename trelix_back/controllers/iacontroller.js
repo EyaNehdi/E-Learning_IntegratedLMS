@@ -98,7 +98,7 @@ const extractText = async (file) => {
         console.log('Structured CV Data:', cvData);
 
         // Sending structured input to the AI model (optional)
-        const response = await axios.post('https://ia-mdels-resume-analyser-and-translate-ia-w7s9.onrender.com/analyze', {
+        const response = await axios.post('https://cv-resuem-analyse.onrender.com/analyze', {
             cvText: cvText,
             metadata: {
                 fileName: file.originalname,
