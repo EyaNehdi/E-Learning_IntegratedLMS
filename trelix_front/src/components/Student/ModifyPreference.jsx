@@ -30,8 +30,6 @@ function ModifyPreference() {
       });
       return;
     }
-    
-
 
     fetchModules();
   }, [preference, userId, moduleId]);
@@ -280,5 +278,7 @@ function ModifyPreference() {
     </div>
   );
 }
+
+
 
 export default ModifyPreference;

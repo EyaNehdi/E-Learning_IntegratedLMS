@@ -181,6 +181,7 @@ const getRecommendedCourses = async (req, res) => {
       categorie: course.categorie,
       moduleName: moduleExists.name,
     }));
+    
 
     console.log("Recommended courses:", recommendedCourses);
     res.status(200).json(recommendedCourses);
@@ -189,9 +190,5 @@ const getRecommendedCourses = async (req, res) => {
     res.status(500).json({ message: "Erreur du serveur", error: error.message });
   }
 };
-const getPreferencesByUserId = async (req, res) => {
-  const { id } = req.params;
 
 module.exports = { createpreference, updatePreference, getAllPreference, getRecommendedCourses };
-
-

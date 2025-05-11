@@ -115,6 +115,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          
         </Route>
         <Route path="/test" element={<MoodleCourses />} />
         <Route path="/test1" element={<Calendar />} />
@@ -190,6 +191,8 @@ function App() {
           <Route path="/profile/modify-preference" element={<ModifyPreference />} />
           <Route path="/profile/preferencestat" element={<StatPreference />} />
           <Route path="/profile/intelligent-courses" element={<IntelligentCourses />} />
+          <Route path="/profile/modify-preference" element={<ModifyPreference />} />
+
 
             <Route path="/profile/allcours" element={<Allcourse />} />
             <Route
