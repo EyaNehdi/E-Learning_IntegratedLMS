@@ -43,17 +43,6 @@ function AddPreference() {
     "video",
     "pdf",
     "audio",
-
-
-    "texte",
-    "image",
-    "quiz",
-    "interactive exercice",
-    "webinar",
-    "infographie",
-    "slides",
-
-
     "other",
   ]
   
@@ -153,19 +142,15 @@ function AddPreference() {
           styleContenu,
           objectif,
           methodeEtude,
-
-          module: module.id, // Changé de moduleId à module
-          user: user._id,   // Changé de userId à user
-
+          moduleId: module.id,
+          userId: user._id,
         }
         
         if (debugMode) {
           console.log("Sending data for module", module.name, ":", requestData)
         }
         
-
         return axios.post(`${import.meta.env.VITE_API_PROXY}/preference/add`, requestData)
-
       })
 
       // Wait for all submissions to complete
@@ -328,11 +313,10 @@ function AddPreference() {
                 onClick={() => setDebugMode(!debugMode)}
                 className={`text-xs px-2 py-1 rounded ${debugMode ? 'bg-red-700 text-white' : 'bg-blue-800 bg-opacity-50 text-blue-100'}`}
               >
-
-                {debugMode ? "Disable Debug Mode" : "Enable Debug Mode"}
               </button>
             </div>
 
+            
           </div>
 
           <div className="p-6 md:p-8">

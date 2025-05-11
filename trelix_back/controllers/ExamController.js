@@ -5,7 +5,7 @@ const { Parser } = require("json2csv");
 const Course = require("../models/course");
 const mongoose = require('mongoose');
 
-const moment = require('moment'); 
+const moment = require('moment'); // Assure-toi que cette ligne est présente
 const notifier = require('node-notifier');
 const ExamAttempt = require("../models/ExamAttempt");
 
@@ -107,15 +107,12 @@ const getExamById = async (req, res) => {
 
 
 const sendDesktopNotification = (subject, message) => {
-
-
   notifier.notify({
     title: subject,
     message: message,
     sound: true, // optionnel, pour jouer un son
     wait: true    // optionnel, pour attendre que l'utilisateur ferme la notification
   });
-
 };
 
 // Create new exam

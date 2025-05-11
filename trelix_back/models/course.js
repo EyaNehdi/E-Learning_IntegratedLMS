@@ -17,7 +17,6 @@ const Course = new Schema({
   price: Number,
   level: String,
   categorie: String,
-  typeRessource: String,
   module: { type: Schema.Types.ObjectId, ref: 'Module', required: true },
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   chapters: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chapter' }],

@@ -9,14 +9,9 @@ const cors = require('cors');
 const multer = require('multer');
 const socketIo = require('socket.io');
 const preference = require("./routes/preference");
-
-const pdfParse = require('pdf-parse');
-const summarizerRoutes = require('./routes/summarizerRoutes');
-
 const intelligentRecommendationRoutes = require("./routes/intelligentRecommendation");
 
 const Goal = require('./models/calanderGoal'); // Assurez-vous que le chemin est correct
-
 
 
 // Correction des imports pour Google Classroom
@@ -51,12 +46,9 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
+
 app.use(express.json({ limit: '100mb' }));
 
-
-
-
-app.use('/summarize-pdf', summarizerRoutes);
 
 
 
@@ -93,7 +85,6 @@ const Course = require("./routes/course");
 const Stripe = require("./routes/stripe.routes");
 const StripeRaw = require("./routes/stripe.routes");
 const Purchases = require("./routes/coursesPurchasesRoutes");
-const Recommendation = require("./routes/recommendationRoutes");
 
 app.use('/stripe/raw', StripeRaw);
 
@@ -149,7 +140,6 @@ app.use((req, res, next) => {
 
 
 
-
 // Middleware de logging pour déboguer les requêtes
 // app.use((req, res, next) => {
 //   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
@@ -182,8 +172,6 @@ app.use('/preference', preference);
 app.use('/intelligent-recommendation', intelligentRecommendationRoutes);
 app.use('/stripe', Stripe);
 app.use('/purchases', Purchases);
-app.use('/recommendation', Recommendation);
-
 
 
 
@@ -223,7 +211,6 @@ app.use("/api/finance", financeRoutes);
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
 
-
 // Middleware de débogage pour les redirections
 app.use((req, res, next) => {
   const originalRedirect = res.redirect;
@@ -234,7 +221,7 @@ app.use((req, res, next) => {
   next();
 });
 
-
+// Placez ce middleware avant vos routes
 
 // Route de test pour Google Classroom
 app.get('/api/classroom-test', (req, res) => {
