@@ -178,6 +178,7 @@ function App() {
           <Route path="/chart" element={<CourseChartPage />} />
           <Route path="/exams/:courseid" element={<ExamStudent />} />
           <Route path="/chapters/:courseid" element={<ListChapters />}>
+          
             <Route path="content/:id" element={<ChapterContent />} />
           </Route>
           <Route path="/leaderboard" element={<Leaderboard />} />
