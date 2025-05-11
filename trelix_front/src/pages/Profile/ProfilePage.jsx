@@ -1,833 +1,350 @@
-"use client"
+import { useProfileStore } from "../../store/profileStore";
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import { Outlet } from "react-router-dom";
+import Sidebar from "../../components/Profile/Sidebar";
+import Preloader from "../../components/Preloader/Preloader";
+import { ToastContainer } from "react-toastify";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import "./profilestyle.css";
+import { Tooltip } from "@mui/material";
+import { siderbarProfileLinks } from "../../config/siderbarProfileLinks";
 
-import { useState, useEffect, useRef } from "react"
-import { FaEdit, FaSave, FaTimes, FaPlus } from "react-icons/fa"
-import { useOutletContext, useNavigate } from "react-router-dom"
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
-import "react-circular-progressbar/dist/styles.css"
-import axios from "axios"
-import { useProfileStore } from "../../store/profileStore" // Import the store directly
-
-// Common programming languages and technologies for autocomplete
-const SKILL_SUGGESTIONS = [
-  "JavaScript",
-  "TypeScript",
-  "Python",
-  "Java",
-  "C#",
-  "C++",
-  "C",
-  "PHP",
-  "Ruby",
-  "Swift",
-  "Kotlin",
-  "Go",
-  "Rust",
-  "HTML",
-  "CSS",
-  "SASS",
-  "LESS",
-  "React",
-  "Angular",
-  "Vue",
-  "Next.js",
-  "Node.js",
-  "Express",
-  "Django",
-  "Flask",
-  "Spring",
-  "ASP.NET",
-  "Laravel",
-  "Ruby on Rails",
-  "TensorFlow",
-  "PyTorch",
-  "SQL",
-  "MongoDB",
-  "PostgreSQL",
-  "MySQL",
-  "Redis",
-  "AWS",
-  "Azure",
-  "GCP",
-  "Docker",
-  "Kubernetes",
-  "Git",
-  "GitHub",
-  "GitLab",
-  "CI/CD",
-  "Jenkins",
-  "Agile",
-  "Scrum",
-  "Jira",
-  "Figma",
-  "Adobe XD",
-  "Photoshop",
-]
-
-const ProfileDetails = () => {
-  // Get context safely with fallback to direct store access
-  const outletContext = useOutletContext() || {}
-  const profileStore = useProfileStore()
-
-  // Use context if available, otherwise use store directly
-  const user = outletContext.user || profileStore.user
-  const accountCompletion = outletContext.accountCompletion || profileStore.accountCompletion
-  const updateUser = outletContext.updateUser || profileStore.updateUser
-  const locationData = outletContext.locationData || {}
-
-  const [isEditing, setIsEditing] = useState(false)
-  let timeoutId
-  const [showPopup, setShowPopup] = useState(false)
-  const [selectedFile, setSelectedFile] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const readonlyFields = ["email", "userName"]
-
-  // Skills management state
-  const [newSkill, setNewSkill] = useState("")
-  const [filteredSuggestions, setFilteredSuggestions] = useState([])
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const [userSkills, setUserSkills] = useState([])
-  const suggestionsRef = useRef(null)
-  const inputRef = useRef(null)
-
-  const navigate = useNavigate()
-
-  // Fetch user data if not available
-  useEffect(() => {
-    if (!user && profileStore.fetchUser) {
-      profileStore.fetchUser()
+const ProfilePage = () => {
+  const [locationTracked, setLocationTracked] = useState(false);
+  const {
+    user,
+    fetchUser,
+    updateUser,
+    isLoadingUser,
+    toggleMFA,
+    setBackupCodes,
+    accountCompletion,
+  } = useProfileStore();
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
     }
-  }, [user, profileStore])
+    return color;
+  };
+  const bgColor = useMemo(() => getRandomColor(), [user?.firstName]);
+  const [activePage, setActivePage] = useState("My Profile");
+  useEffect(() => {
+    const matchedPage = siderbarProfileLinks.find(
+      (link) => link.path === location.pathname
+    );
+    setActivePage(matchedPage ? matchedPage.label : "My Profile");
+  }, [location.pathname]);
 
   useEffect(() => {
-    // Set user skills when user data is loaded
-    if (user && user.skils) {
-      setUserSkills(user.skils)
+    if (accountCompletion === 100) {
+      awardBadge();
     }
-  }, [user])
+  }, [accountCompletion]);
+  const [locationData, setLocationData] = useState(null);
 
-  // Close suggestions when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        suggestionsRef.current &&
-        !suggestionsRef.current.contains(event.target) &&
-        inputRef.current &&
-        !inputRef.current.contains(event.target)
-      ) {
-        setShowSuggestions(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+  // Ensure that tracking location and fetching user data are done sequentially
+  // useEffect(() => {
+  //   const trackAndFetchData = async () => {
+  //     if (!locationTracked) {
+  //       console.log("Tracking location...");
+  //       const locationResponse = await trackLocation();
+  //       if (locationResponse) {
+  //         console.log("Location tracking completed.");
+  //         // Fetch user data AFTER location tracking completes
+  //         await fetchUser();
+  //       }
+  //     } else if (!isLoadingUser && !user) {
+  //       console.log("Fetching user data...");
+  //       await fetchUser();
+  //     }
+  //   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
+  //   trackAndFetchData();
+  // }, []);
 
-    updateUser({ [name]: value })
-
-    clearTimeout(timeoutId)
-    timeoutId = setTimeout(async () => {
-      try {
-        console.log("🟢 Updating profile...", name)
-        const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/edit", {
-          [name]: value,
-          email: user?.email,
-        })
-
-        console.log("Update successful:", response.data)
-      } catch (error) {
-        console.error("Error updating profile:", error)
-      }
-    }, 500)
-  }
-
-  const toggleEdit = () => {
-    setIsEditing(!isEditing)
-  }
-
-  const [cvFile, setCvFile] = useState(null)
-  const [entities, setEntities] = useState([])
-
-  const handleFileChange = (event) => {
-    setCvFile(event.target.files[0])
-    setError(null)
-  }
-
-  const updateskilsWithEntities = async (entities) => {
-    if (!user) return
+  // Function to track the user's current location
+  const trackLocation = async () => {
+    console.log("Tracking location...");
 
     try {
-      const filteredSkills = entities.filter((ent) => ent.label === "PRODUCT").map((ent) => ent.text)
+      // Make sure you send the request with credentials (cookie)
+      const response = await axios.get(
+        "https://trelix-xj5h.onrender.com/api/auth/current-location",
+        {
+          withCredentials: true, // This ensures the cookie is sent along with the request
+        }
+      );
 
-      if (filteredSkills.length === 0) {
-        console.warn("No relevant skills found.")
-        return
-      }
-
-      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/updateskils", {
-        userId: user._id,
-        skills: filteredSkills,
-      })
-
-      console.log("Skills updated successfully:", response.data)
-      // Update local state with new skills
-      setUserSkills(filteredSkills)
+      console.log("Location tracking triggered successfully:", response.data);
+      // Save the location data to state
+      const location = response.data.location;
+      setLocationData(location);
+      setLocationTracked(true); // Set the tracking flag to true
+      console.log("Location:", location);
+      return location;
     } catch (error) {
-      console.error("Failed to update profile:", error.response?.data || error.message)
+      console.error(
+        "Error tracking location:",
+        error.response?.data || error.message
+      );
     }
-  }
+  };
 
-  const handleSubmit = async () => {
-    const file = cvFile
-    if (!file || !user) return
+  const handleProfilePhotoChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-    const formData = new FormData()
-    formData.append("cvFile", file)
-
-    setIsLoading(true)
-    setError(null)
+    const formData = new FormData();
+    formData.append("profilePhoto", file);
 
     try {
-      const response = await axios.post("https://trelix-xj5h.onrender.com/ia/auth/CV", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        timeout: 30000,
-      })
-
-      setEntities(response.data.entities)
-      updateskilsWithEntities(response.data.entities)
-
-      // Show success message and refresh page
-      alert("CV successfully analyzed and skills updated!")
-      setTimeout(() => {
-        window.location.reload()
-      }, 1500)
+      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/photo", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true, // if using cookies for auth
+      });
+      updateUser({ profilePhoto: response.data.profilePhoto }); // Update state with server response
     } catch (error) {
-      setError(error.response?.data?.error || error.message)
-      console.error("Error:", error.response?.data || error.message)
-    } finally {
-      setIsLoading(false)
+      console.error("Error updating profile photo:", error);
     }
-  }
+  };
 
-  useEffect(() => {
-    if (user) {
-      setIsLoading(false)
-      console.log("User data loaded:", user)
-    }
-  }, [user])
+  const handleCoverPhotoChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-  // Function to navigate to the password change page
-  const handleChangePassword = () => {
-    navigate("/profile/change-password")
-  }
-
-  // Skills management functions
-  const handleSkillInputChange = (e) => {
-    const input = e.target.value
-    setNewSkill(input)
-
-    if (input.trim()) {
-      const filtered = SKILL_SUGGESTIONS.filter((skill) => skill.toLowerCase().includes(input.toLowerCase()))
-      setFilteredSuggestions(filtered)
-      setShowSuggestions(true)
-    } else {
-      setShowSuggestions(false)
-      setFilteredSuggestions([])
-    }
-  }
-
-  const selectSuggestion = (suggestion) => {
-    setNewSkill("")
-    setShowSuggestions(false)
-    addSkill(suggestion)
-  }
-
-  const addSkill = async (skill = newSkill) => {
-    if (!skill.trim() || !user) return
-
-    // Don't add duplicate skills
-    if (userSkills.includes(skill)) {
-      setNewSkill("")
-      return
-    }
-
-    const updatedSkills = [...userSkills, skill]
+    const formData = new FormData();
+    formData.append("coverPhoto", file);
 
     try {
-      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/updateskils", {
-        userId: user._id,
-        skills: updatedSkills,
-      })
-
-      console.log("Skill added successfully:", response.data)
-      setUserSkills(updatedSkills)
-      setNewSkill("")
+      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/cover", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
+      updateUser({ coverPhoto: response.data.coverPhoto });
     } catch (error) {
-      console.error("Failed to add skill:", error.response?.data || error.message)
+      console.error("Error updating cover photo:", error);
     }
-  }
+  };
 
-  const removeSkill = async (skillToRemove) => {
-    if (!user) return
-
-    const updatedSkills = userSkills.filter((skill) => skill !== skillToRemove)
-
+  const awardBadge = async () => {
+    const description = "Earned for completing profile";
+    const hasBadge = user.badges?.some(
+      (badge) => badge.description === description
+    );
+    if (hasBadge) {
+      return;
+    }
+    const badgeImageUrl = "/assets/Badges/WelcomeBadge.png";
     try {
-      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/updateskils", {
-        userId: user._id,
-        skills: updatedSkills,
-      })
-
-      console.log("Skill removed successfully:", response.data)
-      setUserSkills(updatedSkills)
+      const response = await axios.post(
+        "https://trelix-xj5h.onrender.com/api/info/profile/badge",
+        {
+          badge: " Welcome to Trelix Badge 🏅",
+          email: user.email, // Send the user's email
+          badgeImage: badgeImageUrl, // Send the badge image URL
+        }
+      );
+      console.log("Badge awarded:", response.data);
     } catch (error) {
-      console.error("Failed to remove skill:", error.response?.data || error.message)
+      console.error("Error awarding badge:", error);
     }
-  }
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault()
-      addSkill()
-    }
-  }
-
-  // Extracting location from user
-  const city = locationData?.city || "Unknown City"
-  const region = locationData?.region || "Unknown Region"
-  const country = locationData?.country || "Unknown Country"
-  const lastLoggedInAt = locationData?.loggedInAt || "Unknown Date"
-
-  // If user data is not available yet, show loading
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading profile data...</p>
-        </div>
-      </div>
-    )
-  }
-
+  };
   return (
     <>
-      <h2 className="">My Profile</h2>
+      <ToastContainer position="top-right" autoClose={2000} />
+      <div className="">
+        {/* Dashboard Cover Start */}
+        <div className="dashbaord-cover bg-shade pt-15 pb-15">
+          <div className="container">
+            <div className="row">
+              <div className="col-lg-12 position-relative">
+                {/* Cover Photo */}
+                <div
+                  className="cover-photo-container"
+                  style={{
+                    backgroundImage: user?.coverPhoto
+                      ? `url(${user.coverPhoto.startsWith('http') ? user.coverPhoto : `https://trelix-xj5h.onrender.com${user.coverPhoto}`})`
+                      : `url('/assets/icons/COVER.png')`
+                  }}
+                >
+                  {/* Change Cover Photo Button */}
+                  <label className="change-cover-icon">
+                    <ModeEditIcon fontSize="small" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleCoverPhotoChange}
+                      className="d-none"
+                    />
+                  </label>
+                </div>
 
-      <div className="d-flex justify-content-center align-items-start">
-        <div className="bg-white rounded-lg w-full max-w-2xl p-8">
-          {user ? (
-            <>
-              {/* Profile Info */}
-              <ul className="space-y-3 text-gray-700">
-                {[
-                  {
-                    label: "Location",
-                    value: `${city}${region ? `, ${region}` : ""}${country ? `, ${country}` : ""}`,
-                    name: "location",
-                  },
-                  {
-                    label: "Last Logged In At",
-                    value: `${lastLoggedInAt}`,
-                    name: "loggedInAt",
-                  },
-                  {
-                    label: "UserName",
-                    value: `${user?.firstName} ${user?.lastName}`,
-                    name: "userName",
-                  },
-                  { label: "Email", value: user?.email, name: "email" },
-                  {
-                    label: "First Name",
-                    value: user?.firstName,
-                    name: "firstName",
-                  },
-                  {
-                    label: "Last Name",
-                    value: user?.lastName,
-                    name: "lastName",
-                  },
-                  {
-                    label: "Phone Number",
-                    value: user?.phone || "No phone number provided",
-                    name: "phone",
-                    type: "number",
-                  },
-                  {
-                    label: "Biography",
-                    value: user?.Bio || "",
-                    name: "Bio",
-                    type: "textarea",
-                  },
-                ].map((field, index) => (
-                  <li key={index} className="flex flex-col sm:flex-row items-start sm:items-center">
-                    <span className="font-semibold w-40">{field.label}:</span>
-                    {isEditing ? (
-                      field.type === "textarea" ? (
-                        <textarea
-                          name={field.name}
-                          value={field.value}
-                          onChange={handleInputChange}
-                          className={`border p-2 rounded w-full sm:w-auto ${
-                            readonlyFields.includes(field.name) ? "bg-gray-200 cursor-not-allowed" : ""
-                          }`}
-                          readOnly={readonlyFields.includes(field.name)}
-                        />
-                      ) : (
-                        <input
-                          type={field.type || "text"}
-                          name={field.name}
-                          value={field.value}
-                          onChange={handleInputChange}
-                          className={`border p-2 rounded w-full sm:w-auto ${
-                            readonlyFields.includes(field.name) ? "bg-gray-200 cursor-not-allowed" : ""
-                          }`}
-                          readOnly={readonlyFields.includes(field.name)}
-                        />
-                      )
-                    ) : (
-                      <span className="ml-2">{field.value}</span>
-                    )}
-                  </li>
-                ))}
-
-                {/* Skills/Occupation */}
-                <li>
-                  <div className="flex flex-col">
-                    <span className="font-semibold mb-2">Skills/Occupation:</span>
-
-                    {/* Skills input and add button */}
-                    <div className="flex mb-3 relative">
-                      <input
-                        ref={inputRef}
-                        type="text"
-                        value={newSkill}
-                        onChange={handleSkillInputChange}
-                        onKeyDown={handleKeyDown}
-                        onFocus={() => {
-                          if (newSkill.trim()) {
-                            setShowSuggestions(true)
-                          }
+                {/* Profile Photo */}
+                <div className="dash-cover-info d-sm-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center position-relative">
+                    <div className="profile-photo-container">
+                      <div
+                        className="d-flex align-items-center justify-content-center"
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          backgroundColor: user?.profilePhoto
+                            ? "transparent"
+                            : bgColor,
+                          fontSize: "40px",
+                          fontWeight: "bold",
+                          color: "#fff",
+                          textTransform: "uppercase",
                         }}
-                        placeholder="Add a new skill..."
-                        className="border p-2 rounded flex-grow mr-2"
-                      />
-                      <button
-                        onClick={() => addSkill()}
-                        className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors flex items-center"
                       >
-                        <FaPlus className="mr-1" /> Add
-                      </button>
+                        {user?.profilePhoto ? (
+                          <img
+                            src={
+                              user?.profilePhoto?.startsWith("http")
+                                ? user.profilePhoto
+                                : `https://trelix-xj5h.onrender.com${user?.profilePhoto}`
+                            }
+                            className="rounded-circle"
+                            alt="Avatar"
+                            style={{
+                              width: "100px",
+                              height: "100px",
+                              objectFit: "cover",
+                            }}
+                          />
 
-                      {/* Suggestions dropdown */}
-                      {showSuggestions && filteredSuggestions.length > 0 && (
-                        <div
-                          ref={suggestionsRef}
-                          className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-10 max-h-60 overflow-y-auto"
-                          style={{ zIndex: 1000 }}
-                        >
-                          {filteredSuggestions.map((suggestion, index) => (
-                            <div
-                              key={index}
-                              onClick={() => selectSuggestion(suggestion)}
-                              className="p-2 hover:bg-gray-100 cursor-pointer"
-                            >
-                              {suggestion}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Skills tags */}
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {userSkills && userSkills.length > 0 ? (
-                        userSkills.map((skill, index) => (
-                          <div key={index} className="bg-gray-200 px-3 py-1 rounded text-sm flex items-center group">
-                            {skill}
-                            <button
-                              onClick={() => removeSkill(skill)}
-                              className="ml-2 text-gray-500 hover:text-red-500 transition-colors"
-                            >
-                              <FaTimes size={12} />
-                            </button>
-                          </div>
-                        ))
-                      ) : (
-                        <p>No skills found. Add skills manually or import from your CV.</p>
-                      )}
-                    </div>
-                  </div>
-                </li>
-
-                {/* Registration Date */}
-                <li>
-                  <span className="font-semibold">Registration Date:</span> September 29, 2024, 8:30 AM
-                </li>
-              </ul>
-
-              {/* Profile Completion & Badge */}
-              <div className="flex flex-col items-center mt-6">
-                <div className="relative w-24 h-24">
-                  <CircularProgressbar
-                    value={accountCompletion || 0}
-                    text={`${accountCompletion || 0}%`}
-                    styles={buildStyles({
-                      textSize: "16px",
-                      pathColor: accountCompletion === 100 ? "#4CAF50" : "#FF9800",
-                      textColor: "#333",
-                      trailColor: "#ddd",
-                    })}
-                  />
-                </div>
-                {accountCompletion === 100 && (
-                  <div className="mt-3 p-3 bg-green-500 text-white rounded-lg text-sm text-center">
-                    🎉 Congratulations! You have completed your profile and earned a special badge! 🏅
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-between gap-4 mt-6">
-                <div className="flex flex-col gap-3">
-                  {/* Edit/Save Button */}
-                  <button
-                    onClick={toggleEdit}
-                    className="btn fs-6 fs-md-5 fs-lg-4 px-6 py-2 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{
-                      border: "2px solid #6045FF",
-                      color: "#6045FF",
-                      backgroundColor: "transparent",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      width: "auto",
-                      minWidth: "150px",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = "#6045FF"
-                      e.target.style.color = "#ffffff"
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = "transparent"
-                      e.target.style.color = "#6045FF"
-                    }}
-                  >
-                    <div className="flex items-center justify-center w-full">
-                      {isEditing ? (
-                        <>
-                          <FaSave className="mr-2" /> Save Profile
-                        </>
-                      ) : (
-                        <>
-                          <FaEdit className="mr-2" /> Edit Profile
-                        </>
-                      )}
-                    </div>
-                  </button>
-
-                  {/* CV Upload Button */}
-                  <button
-                    onClick={() => setShowPopup(true)}
-                    className="btn fs-6 fs-md-5 fs-lg-4 px-6 py-2 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{
-                      border: "2px solid #6045FF",
-                      color: "#6045FF",
-                      backgroundColor: "transparent",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      width: "auto",
-                      minWidth: "150px",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = "#6045FF"
-                      e.target.style.color = "#ffffff"
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = "transparent"
-                      e.target.style.color = "#6045FF"
-                    }}
-                  >
-                    <div className="flex items-center justify-center w-full">Import Your CV</div>
-                  </button>
-
-                  {/* Change Password Button */}
-                  <button
-                    onClick={handleChangePassword}
-                    className="btn fs-6 fs-md-5 fs-lg-4 px-6 py-2 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{
-                      border: "2px solid #6045FF",
-                      color: "#6045FF",
-                      backgroundColor: "transparent",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      width: "auto",
-                      minWidth: "150px",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = "#6045FF"
-                      e.target.style.color = "#ffffff"
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = "transparent"
-                      e.target.style.color = "#6045FF"
-                    }}
-                  >
-                    <div className="flex items-center justify-center w-full">Change Password</div>
-                  </button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <p className="text-center">Loading user data...</p>
-          )}
-        </div>
-
-        {/* CV Upload Popup Modal */}
-        {showPopup && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm relative">
-              {/* Close button */}
-              <button
-                onClick={() => setShowPopup(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Close popup"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-
-              {/* Header */}
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-800">Upload Your CV</h3>
-                <p className="text-gray-500 mt-2">We'll analyze your CV to extract your skills and experience</p>
-              </div>
-
-              {/* Upload area */}
-              <div
-                className={`border-2 border-dashed rounded-lg p-8 mb-6 text-center transition-colors
-                ${cvFile ? "border-green-400 bg-green-50" : "border-gray-300 hover:border-blue-400 bg-gray-50"}`}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault()
-                  const files = e.dataTransfer.files
-                  if (files.length) {
-                    const file = files[0]
-                    if (
-                      file.type === "application/pdf" ||
-                      file.type === "application/msword" ||
-                      file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    ) {
-                      setCvFile(file)
-                      setError(null)
-                    } else {
-                      setError("Please upload a PDF or Word document")
-                    }
-                  }
-                }}
-              >
-                {!cvFile ? (
-                  <>
-                    <div className="mb-4 flex justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="text-gray-400"
-                      >
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="12" y1="18" x2="12" y2="12"></line>
-                        <line x1="9" y1="15" x2="15" y2="15"></line>
-                      </svg>
-                    </div>
-                    <p className="text-gray-600 mb-2">Drag and drop your CV here, or</p>
-                    <label className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md cursor-pointer hover:bg-blue-700 transition-colors">
-                      Browse Files
-                      <input type="file" accept=".pdf,.doc,.docx" onChange={handleFileChange} className="hidden" />
-                    </label>
-                    <p className="text-xs text-gray-500 mt-3">Supported formats: PDF, DOC, DOCX</p>
-                  </>
-                ) : (
-                  <div className="flex items-center">
-                    <div className="bg-white p-3 rounded-md shadow-sm mr-4">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="32"
-                        height="32"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className={cvFile.name.endsWith(".pdf") ? "text-red-500" : "text-blue-500"}
-                      >
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                      </svg>
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-medium text-gray-800 truncate">{cvFile.name}</p>
-                      <p className="text-xs text-gray-500">{(cvFile.size / 1024).toFixed(1)} KB</p>
-                      <div className="flex items-center mt-1">
-                        <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                        <span className="text-xs text-green-600">Ready to analyze</span>
+                        ) : (
+                          <span>
+                            {user?.firstName && user?.lastName ? (
+                              <>
+                                {user.firstName.charAt(0)}
+                                {user.lastName.charAt(0)}
+                              </>
+                            ) : (
+                              "?"
+                            )}
+                          </span>
+                        )}
                       </div>
+                      <label className="edit-icon">
+                        <div className="edit-button">
+                          <ModeEditIcon fontSize="small" />
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleProfilePhotoChange}
+                          className="d-none"
+                        />
+                      </label>
                     </div>
-                    <button
-                      onClick={() => {
-                        setCvFile(null)
-                        setError(null)
-                      }}
-                      className="ml-2 text-gray-400 hover:text-gray-600"
-                      aria-label="Remove file"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="15" y1="9" x2="9" y2="15"></line>
-                        <line x1="9" y1="9" x2="15" y2="15"></line>
-                      </svg>
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Error message */}
-              {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
-                  <div className="flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-2"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {error}
                   </div>
                 </div>
-              )}
-
-              {/* Buttons */}
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  onClick={() => setShowPopup(false)}
-                  className="px-5 py-2.5 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={!cvFile || isLoading}
-                  className={`px-5 py-2.5 rounded-lg font-medium flex items-center justify-center min-w-[120px] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500
-                  ${
-                    !cvFile || isLoading
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-green-600 text-white hover:bg-green-700 shadow-sm hover:shadow"
-                  }`}
-                >
-                  {isLoading ? (
-                    <>
-                      <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-2"
-                      >
-                        <path d="M2 12h4l3 8 3-16 3 8h7"></path>
-                      </svg>
-                      Analyze CV
-                    </>
-                  )}
-                </button>
               </div>
+              <div
+                className="ava-info d-flex justify-content-between align-items-start flex-wrap"
+                style={{ paddingTop: "8px" }}
+              >
+                <div style={{ marginInlineStart: "130px" }}>
+                  <h4
+                    className="display-5 text-black mb-0"
+                    style={{ fontWeight: "bold", textTransform: "capitalize" }}
+                  >
+                    {user?.firstName} {user?.lastName}
+                  </h4>
+                  <div className="ava-meta text-black mt-1">
+                    <span>
+                      <i className="feather-icon icon-book" /> 0 Courses
+                      Enrolled{" "}
+                    </span>
+                    <span>
+                      <i className="feather-icon icon-award" />
+                      {user?.certificateCount} Certificates
+                    </span>
+                  </div>
+                </div>
+                <div
+                  className={`${location.pathname !== "/profile/achievements"
+                    ? ""
+                    : "d-none"
+                    }`}
+                >
+                  {/* Check if the user has badges */}
+                  {user?.badges && user.badges.length > 0 ? (
+                    <div
+                      className="pt-2 px-2 text-white rounded-lg"
+                      style={{ backgroundColor: "#A3A3A3" }}
+                    >
+                      {user?.badges.map((badge, index) => (
+                        <div key={index} className="badge-item">
+                          <Tooltip
+                            title={
+                              <div>
+                                <div>Name: {badge?.name}</div>
+                              </div>
+                            }
+                            arrow
+                            placement="top"
+                          >
+                            <img
+                              src={badge.image}
+                              alt={badge.name}
+                              className="badge-image"
+                              style={{ width: "80px", height: "auto" }} // Adjust width to 100px, height auto to keep aspect ratio
+                            />
+                          </Tooltip>
+                        </div>
+                      ))}
+                      <p style={{ color: "#F3F4F7" }}>
+                        🏆 Congratulations! You have earned these badges keep
+                        earning more
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-gray-500">
+                      You haven't earned any badges yet. Keep going! 🚀
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
 
-              {/* Help text */}
-              <p className="text-xs text-gray-500 mt-6 text-center">
-                We'll extract your skills and experience to enhance your profile
-              </p>
+            {/* Dashboard Inner Start */}
+            <div className="row">
+              <div className="col-lg-3">
+                <Sidebar setActivePage={setActivePage} />
+              </div>
+              <div className="col-lg-9 ps-lg-4">
+                <section className="dashboard-sec">
+
+                  {isLoadingUser ? (
+                    <Preloader />
+                  ) : (
+                    <Outlet
+                      context={{
+                        user,
+                        updateUser,
+                        accountCompletion,
+                        toggleMFA,
+                        setBackupCodes,
+                        locationData,
+                      }}
+                    />
+                  )}
+                </section>
+              </div>
             </div>
           </div>
-        )}
+        </div>
+        <div className="back-top">
+          <i className="feather-icon icon-chevron-up" />
+        </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default ProfileDetails
+export default ProfilePage;
