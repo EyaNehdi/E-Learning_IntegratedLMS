@@ -306,16 +306,7 @@ function AddPreference() {
             <h1 className="text-3xl font-bold text-center text-white mb-2">Learning Preferences</h1>
             <p className="text-center text-blue-100">Customize your learning experience</p>
             
-            {/* Debug mode */}
-            <div className="mt-4 flex justify-center">
-              <button 
-                type="button" 
-                onClick={() => setDebugMode(!debugMode)}
-                className={`text-xs px-2 py-1 rounded ${debugMode ? 'bg-red-700 text-white' : 'bg-blue-800 bg-opacity-50 text-blue-100'}`}
-              >
-                {debugMode ? "Disable Debug Mode" : "Enable Debug Mode"}
-              </button>
-            </div>
+          
           </div>
 
           <div className="p-6 md:p-8">
