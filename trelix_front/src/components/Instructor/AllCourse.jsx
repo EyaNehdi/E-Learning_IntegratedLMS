@@ -443,7 +443,7 @@ function Allcourse() {
     }, 600)
 
     try {
-      const response = await axios.get(`http://localhost:5000/recommendation/recommendation`, {
+      const response = await axios.get(`https://trelix-xj5h.onrender.com/recommendation/recommendation`, {
         withCredentials: true,
       })
 
