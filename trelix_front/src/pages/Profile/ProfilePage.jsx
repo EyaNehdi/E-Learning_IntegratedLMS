@@ -166,8 +166,8 @@ const ProfilePage = () => {
                   className="cover-photo-container"
                   style={{
                     backgroundImage: user?.coverPhoto
-                      ? `url(https://trelix-xj5h.onrender.com${user?.coverPhoto})`
-                      : `url('/assets/icons/COVER.png')`,
+                      ? `url(${user.coverPhoto.startsWith('http') ? user.coverPhoto : `https://trelix-xj5h.onrender.com${user.coverPhoto}`})`
+                      : `url('/assets/icons/COVER.png')`
                   }}
                 >
                   {/* Change Cover Photo Button */}
@@ -202,7 +202,11 @@ const ProfilePage = () => {
                       >
                         {user?.profilePhoto ? (
                           <img
-                            src={`https://trelix-xj5h.onrender.com${user?.profilePhoto}`}
+                            src={
+                              user?.profilePhoto?.startsWith("http")
+                                ? user.profilePhoto
+                                : `https://trelix-xj5h.onrender.com${user?.profilePhoto}`
+                            }
                             className="rounded-circle"
                             alt="Avatar"
                             style={{
@@ -211,6 +215,7 @@ const ProfilePage = () => {
                               objectFit: "cover",
                             }}
                           />
+
                         ) : (
                           <span>
                             {user?.firstName && user?.lastName ? (
@@ -262,11 +267,10 @@ const ProfilePage = () => {
                   </div>
                 </div>
                 <div
-                  className={`${
-                    location.pathname !== "/profile/achievements"
-                      ? ""
-                      : "d-none"
-                  }`}
+                  className={`${location.pathname !== "/profile/achievements"
+                    ? ""
+                    : "d-none"
+                    }`}
                 >
                   {/* Check if the user has badges */}
                   {user?.badges && user.badges.length > 0 ? (
