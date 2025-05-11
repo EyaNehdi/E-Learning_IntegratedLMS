@@ -23,54 +23,68 @@ export default function MeetingRoom() {
   // Mock emotions for testing when webcam is not available
   const mockEmotions = ["happy", "sad", "angry", "surprised", "neutral", "fearful", "disgusted"]
 
-const fetchEmotion = async (retryCount = 0) => {
-  if (!autoDetectActive) return;
-  
-  setLoading(true);
-  setError(null);
+  const fetchEmotion = async (retryCount = 0) => {
+    if (!autoDetectActive) return
+    
+    setLoading(true)
+    setError(null)
 
-  try {
-    // If in mock mode, return a random emotion
-    if (mockMode) {
-      const randomEmotion = mockEmotions[Math.floor(Math.random() * mockEmotions.length)];
-      handleEmotionDetected(randomEmotion);
-      return;
+    try {
+      // If in mock mode, return a random emotion
+      if (mockMode) {
+        const randomEmotion = mockEmotions[Math.floor(Math.random() * mockEmotions.length)]
+        handleEmotionDetected(randomEmotion)
+        return
+      }
+      
+      const response = await axios.get("https://facerecognition-qoya.onrender.com/api/emotion")
+      console.log("API Response:", response.data)
+      
+      // Check if the API returned an errorcd
+      if (response.data.error) {
+        if (response.data.error === 'Failed to access webcam') {
+          setWebcamError(true)
+          setError("Failed to access webcam. Please check your camera permissions.")
+          
+          // If we have fewer than 3 retries, try again after a delay
+          if (retryCount < 3) {
+            const retryDelay = 2000 * (retryCount + 1) // Exponential backoff
+            console.log(`Retrying webcam access in ${retryDelay/1000} seconds...`)
+            
+            // Clear any existing retry timeout
+            if (retryTimeoutRef.current) {
+              clearTimeout(retryTimeoutRef.current)
+            }
+            
+            // Set a new retry timeout
+            retryTimeoutRef.current = setTimeout(() => {
+              fetchEmotion(retryCount + 1)
+            }, retryDelay)
+          }
+        } else {
+          setError(`API Error: ${response.data.error}`)
+        }
+        return
+      }
+      
+      // Reset webcam error state if we successfully get a response
+      if (webcamError) {
+        setWebcamError(false)
+      }
+      
+      // If we have an emotion property, use it
+      if (response.data.emotion) {
+        handleEmotionDetected(response.data.emotion)
+      } else {
+        setError("No emotion detected in API response")
+      }
+    } catch (err) {
+      setError(`Error fetching emotion data: ${err.message}`)
+      console.error("Emotion detection error:", err)
+    } finally {
+      setLoading(false)
     }
-
-    // Capture webcam image (frame)
-    const videoElement = document.querySelector("video");
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    canvas.width = videoElement.videoWidth;
-    canvas.height = videoElement.videoHeight;
-    context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-    const imageData = canvas.toDataURL("image/jpeg");
-
-    const response = await axios.post("https://facerecognition-qoya.onrender.com/api/emotion", {
-      image: imageData
-    });
-    console.log("API Response:", response.data);
-
-    // Check for error in response
-    if (response.data.error) {
-      setError(response.data.error);
-      return;
-    }
-
-    // Emotion detected
-    if (response.data.emotion) {
-      handleEmotionDetected(response.data.emotion);
-    } else {
-      setError("No emotion detected in API response");
-    }
-  } catch (err) {
-    setError(`Error fetching emotion data: ${err.message}`);
-    console.error("Emotion detection error:", err);
-  } finally {
-    setLoading(false);
   }
-};
-
   
   // Helper function to handle detected emotions
   const handleEmotionDetected = (detectedEmotion) => {
