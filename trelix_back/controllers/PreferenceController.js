@@ -194,3 +194,4 @@ const getPreferencesByUserId = async (req, res) => {
 
 module.exports = { createpreference, updatePreference, getAllPreference, getRecommendedCourses };
 
+

@@ -48,6 +48,10 @@ import ModifyPreference from "./components/Student/ModifyPreference.jsx"
 
 
 
+
+
+import axios from "axios"; 
+
 import StatPreference from "./components/Student/preference-statistics";
 import Preference from "./components/Student/AddPreference";
 import IntelligentCourses from "./components/Student/IntelligentCourses";
@@ -131,6 +135,7 @@ function App() {
           <Route path="/allcours" element={<Allcourse />} />
           <Route path="/chart" element={<CourseChartPage />} />
           <Route path="/exams/:courseid" element={<ExamStudent />} />
+
           <Route path="/chapters/:slugCourse" element={<ListChapters />}>
             <Route path="content/:id" element={<ChapterContent />} />
           </Route>

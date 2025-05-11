@@ -248,7 +248,6 @@ app.use('/recommendation', Recommendation);
 
 
 
-
 // Routes Google Classroom (corrigées)
 app.use('/api/auth/google', googleAuthRoutes);
 app.use('/api/classroom', classroomRoutes);
