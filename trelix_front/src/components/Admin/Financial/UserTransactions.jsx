@@ -1,84 +1,112 @@
-import React, { useState, useEffect } from "react";
-import socket from "../../../utils/socket";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Filter, RefreshCw, Search } from "lucide-react";
+import { ChevronDown, ChevronRight, RefreshCw, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const UserTransactions = () => {
   const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filter, setFilter] = useState("all");
-  const [sortConfig, setSortConfig] = useState({
-    key: "createdAt",
-    direction: "desc",
-  });
   const [expandedRows, setExpandedRows] = useState({});
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [dateRange, setDateRange] = useState("all");
+  const [format, setFormat] = useState("csv");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage] = useState(10);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [users, setUsers] = useState([]);
+  const [userSearch, setUserSearch] = useState("");
+  const [showAllUsers, setShowAllUsers] = useState(false);
+  const [highlightIndex, setHighlightIndex] = useState(0);
+  const [isUserInputFocused, setIsUserInputFocused] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    socket.on("financial_event", handleNewTransaction);
-
     fetchTransactions();
-    return () => {
-      socket.off("financial_event");
-    };
+    fetchUsers();
   }, []);
 
-  const handleNewTransaction = (newTransaction) => {
-    setTransactions((prev) => [newTransaction, ...prev.slice(0, 49)]);
-  };
-
-  const toggleRowExpansion = (id) => {
-    setExpandedRows((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_PROXY}/api/admin/allUsers`
+      );
+      setUsers(res.data);
+    } catch (err) {
+      console.error("Failed to fetch users", err);
+    }
   };
 
   const fetchTransactions = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
-      `"${import.meta.env.VITE_API_PROXY}/api/finance/transactions`
+        `${import.meta.env.VITE_API_PROXY}/api/finance/transactions`
       );
       setTransactions(response.data);
-      setLoading(false);
     } catch (error) {
+      console.error("Error fetching transactions:", error);
+    } finally {
       setLoading(false);
-      console.error("Failed to fetch transactions:", error);
     }
   };
 
-  const handleRefresh = () => {
-    fetchTransactions();
+  const toggleRow = (id) => {
+    setExpandedRows((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
+  const handleExport = async () => {
+    try {
+      const params = {
+        range: dateRange,
+        format,
+        ...(typeFilter !== "all" && { type: [typeFilter] }),
+        ...(selectedUserId && { userId: selectedUserId }),
+      };
 
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value);
-  };
-
-  const requestSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const getSortIndicator = (key) => {
-    if (sortConfig.key === key) {
-      return sortConfig.direction === "asc" ? (
-        <ArrowUp size={16} />
-      ) : (
-        <ArrowDown size={16} />
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_PROXY}/api/finance/export`,
+        {
+          params,
+          paramsSerializer: (params) =>
+            Object.entries(params)
+              .flatMap(([key, val]) =>
+                Array.isArray(val)
+                  ? val.map((v) => `${key}=${v}`)
+                  : `${key}=${val}`
+              )
+              .join("&"),
+          responseType: "blob",
+        }
       );
+
+      const blob = new Blob([res.data], {
+        type: format === "csv" ? "text/csv" : "application/pdf",
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `transactions.${format}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Export failed:", error);
     }
-    return null;
   };
+
+  const filtered = transactions
+    .filter((t) => (typeFilter === "all" ? true : t.type === typeFilter))
+    .filter((t) => {
+      const userName = `${t.user.firstName} ${t.user.lastName}`.toLowerCase();
+      return userName.includes(search.toLowerCase());
+    });
+
+  const paginated = filtered.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-US", {
@@ -88,449 +116,275 @@ const UserTransactions = () => {
     }).format(amount);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  const isExportValid =
+    (typeFilter !== "all" || selectedUserId || dateRange !== "all") &&
+    format &&
+    (typeFilter !== "all" || dateRange !== "all" || selectedUserId);
 
-  const getTypeLabel = (type) => {
-    switch (type) {
-      case "purchase":
-        return (
-          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-xs font-medium">
-            Purchase
-          </span>
-        );
-      case "balance_topup":
-        return (
-          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium">
-            Top Up
-          </span>
-        );
-      case "refund":
-        return (
-          <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-md text-xs font-medium">
-            Refund
-          </span>
-        );
-      case "admin_adjustment":
-        return (
-          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md text-xs font-medium">
-            Admin Adjustment
-          </span>
-        );
-      default:
-        return (
-          <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-md text-xs font-medium">
-            {type}
-          </span>
-        );
-    }
-  };
+  const filteredUsers = users.filter((u) =>
+    `${u.firstName} ${u.lastName}`
+      .toLowerCase()
+      .includes(userSearch.toLowerCase())
+  );
 
-  const renderDetailContent = (transaction) => {
-    switch (transaction.type) {
-      case "purchase":
-        return (
-          <div className="p-4 bg-gray-50">
-            <h4 className="text-sm font-medium mb-2">Purchase Details</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Course Title</p>
-                <p className="text-sm">
-                  {transaction.metadata?.courseTitle || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Course ID</p>
-                <p className="text-sm">{transaction.relatedObject || "N/A"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Model</p>
-                <p className="text-sm">{transaction.relatedModel || "N/A"}</p>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "balance_topup":
-        return (
-          <div className="p-4 bg-gray-50">
-            <h4 className="text-sm font-medium mb-2">Top Up Details</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Stripe Session ID</p>
-                <p className="text-sm break-all">
-                  {transaction.metadata?.stripeSessionId || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Product ID</p>
-                <p className="text-sm">{transaction.relatedObject || "N/A"}</p>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "refund":
-        return (
-          <div className="p-4 bg-gray-50">
-            <h4 className="text-sm font-medium mb-2">Refund Details</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Original Purchase</p>
-                <p className="text-sm">
-                  {transaction.metadata?.originalPurchaseId || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Reason</p>
-                <p className="text-sm">
-                  {transaction.metadata?.reason || "N/A"}
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "admin_adjustment":
-        return (
-          <div className="p-4 bg-gray-50">
-            <h4 className="text-sm font-medium mb-2">
-              Admin Adjustment Details
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Admin User</p>
-                <p className="text-sm">
-                  {transaction.metadata?.adminUser || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Reason</p>
-                <p className="text-sm">
-                  {transaction.metadata?.reason || "N/A"}
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return (
-          <div className="p-4 bg-gray-50">
-            <h4 className="text-sm font-medium mb-2">Additional Details</h4>
-            <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto">
-              {JSON.stringify(transaction.metadata || {}, null, 2)}
-            </pre>
-          </div>
-        );
-    }
-  };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownOpen) {
-        setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownOpen]);
-
-  // Apply filtering and sorting to transactions
-  const filteredTransactions = transactions
-    .filter((transaction) => {
-      // Apply type filter
-      if (filter !== "all" && transaction.type !== filter) return false;
-
-      // Apply search term
-      if (searchTerm) {
-        const userFullName =
-          `${transaction.user.firstName} ${transaction.user.lastName}`.toLowerCase();
-        const searchLower = searchTerm.toLowerCase();
-
-        // Expanded search to include various metadata fields
-        const hasMatchingCourseTitle =
-          transaction.metadata?.courseTitle &&
-          transaction.metadata.courseTitle.toLowerCase().includes(searchLower);
-
-        const hasMatchingStripeId =
-          transaction.metadata?.stripeSessionId &&
-          transaction.metadata.stripeSessionId
-            .toLowerCase()
-            .includes(searchLower);
-
-        const hasMatchingReason =
-          transaction.metadata?.reason &&
-          transaction.metadata.reason.toLowerCase().includes(searchLower);
-
-        return (
-          userFullName.includes(searchLower) ||
-          hasMatchingCourseTitle ||
-          hasMatchingStripeId ||
-          hasMatchingReason
-        );
-      }
-      return true;
-    })
-    .sort((a, b) => {
-      if (sortConfig.key === "createdAt") {
-        return sortConfig.direction === "asc"
-          ? new Date(a.createdAt) - new Date(b.createdAt)
-          : new Date(b.createdAt) - new Date(a.createdAt);
-      } else if (sortConfig.key === "amount") {
-        return sortConfig.direction === "asc"
-          ? a.amount - b.amount
-          : b.amount - a.amount;
-      } else if (sortConfig.key === "user") {
-        const nameA = `${a.user.firstName} ${a.user.lastName}`.toLowerCase();
-        const nameB = `${b.user.firstName} ${b.user.lastName}`.toLowerCase();
-        return sortConfig.direction === "asc"
-          ? nameA.localeCompare(nameB)
-          : nameB.localeCompare(nameA);
-      }
-      return 0;
-    });
+  const displayedUsers = showAllUsers
+    ? filteredUsers
+    : filteredUsers.slice(0, 5);
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <title>User Transactions</title>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">
-          Financial Transactions
-        </h2>
-        <button
-          onClick={handleRefresh}
-          className="flex items-center px-3 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-        >
-          <RefreshCw size={16} className="mr-2" />
-          <span>Refresh</span>
+    <div className="user-details-container">
+      <div className="flex flex-wrap gap-4 justify-between items-center">
+        <h2 className="text-lg font-semibold">User Transactions</h2>
+        <button onClick={fetchTransactions} className="custom-outline-btn">
+          <RefreshCw size={16} />
+          Refresh
         </button>
       </div>
+      <div className="filter-export-container">
+        {/* FILTER BOX */}
+        <div className="filter-box">
+          <h3 className="box-title">🔍 Filter Transactions</h3>
 
-      <div className="flex flex-wrap items-center gap-4 mb-6">
-        <div className="flex items-center bg-gray-100 rounded-md px-3 py-2 flex-grow md:flex-grow-0 w-full md:w-auto">
-          <Search size={16} className="text-gray-500 mr-2" />
-          <input
-            type="text"
-            placeholder="Search by name or course..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="bg-transparent outline-none flex-grow"
-          />
+          <div className="form-group">
+            <label htmlFor="search" className="form-label">
+              Search User <span className="form-hint">by full name</span>
+            </label>
+            <div className="input-custom-icon">
+              <Search size={16} />
+              <input
+                type="text"
+                id="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="form-input"
+                placeholder="e.g. John Doe"
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="type" className="form-label">
+              Transaction Type
+            </label>
+            <select
+              id="type"
+              className="form-select"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+            >
+              <option value="all">All Types</option>
+              <option value="purchase">Purchase</option>
+              <option value="balance_topup">Top Up</option>
+              <option value="refund">Refund</option>
+              <option value="admin_adjustment">Admin Adjustment</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="range" className="form-label">
+              Date Range
+            </label>
+            <select
+              id="range"
+              className="form-select"
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+            >
+              <option value="all">All Time</option>
+              <option value="week">Past Week</option>
+              <option value="month">Past Month</option>
+              <option value="3months">Last 3 Months</option>
+              <option value="6months">Last 6 Months</option>
+            </select>
+          </div>
         </div>
 
-        {/* Custom dropdown to replace the select element */}
-        <div className="relative">
-          <button
-            className="flex items-center justify-between bg-gray-100 rounded-md px-3 py-2 w-40"
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-          >
-            <div className="flex items-center">
-              <Filter size={16} className="text-gray-500 mr-2" />
-              <span>
-                {filter === "all"
-                  ? "All Types"
-                  : filter === "purchase"
-                  ? "Purchases"
-                  : filter === "balance_topup"
-                  ? "Top Ups"
-                  : filter === "refund"
-                  ? "Refunds"
-                  : filter === "admin_adjustment"
-                  ? "Admin Adjustments"
-                  : "All Types"}
-              </span>
-            </div>
-            <ChevronDown size={16} className="ml-2" />
-          </button>
+        {/* EXPORT BOX */}
+        <div className="export-box">
+          <h3 className="box-title">📤 Export Options</h3>
 
-          {dropdownOpen && (
-            <div className="absolute z-10 mt-1 w-40 bg-white rounded-md shadow-lg py-1">
+          <div className="export-buttons">
+            {["csv", "pdf"].map((f) => (
               <button
-                className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
-                  filter === "all" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setFilter("all");
-                  setDropdownOpen(false);
-                }}
+                key={f}
+                onClick={() => setFormat(f)}
+                className={`export-option ${format === f ? "active" : ""}`}
               >
-                All Types
+                {f.toUpperCase()}
               </button>
-              <button
-                className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
-                  filter === "purchase" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setFilter("purchase");
-                  setDropdownOpen(false);
-                }}
-              >
-                Purchases
-              </button>
-              <button
-                className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
-                  filter === "balance_topup" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setFilter("balance_topup");
-                  setDropdownOpen(false);
-                }}
-              >
-                Top Ups
-              </button>
-              <button
-                className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
-                  filter === "refund" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setFilter("refund");
-                  setDropdownOpen(false);
-                }}
-              >
-                Refunds
-              </button>
-              <button
-                className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
-                  filter === "admin_adjustment" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setFilter("admin_adjustment");
-                  setDropdownOpen(false);
-                }}
-              >
-                Admin Adjustments
-              </button>
-            </div>
-          )}
+            ))}
+          </div>
+
+          <div className="form-group user-search-wrapper">
+            <label htmlFor="user" className="form-label">
+              Select User
+            </label>
+            <input
+              type="text"
+              id="user-search"
+              className="form-input"
+              value={userSearch}
+              onFocus={() => setIsUserInputFocused(true)}
+              onBlur={() => setTimeout(() => setIsUserInputFocused(false), 150)} // delay to allow click
+              onChange={(e) => {
+                setUserSearch(e.target.value);
+                setShowAllUsers(false);
+                setHighlightIndex(0);
+              }}
+              placeholder="Search user..."
+              onKeyDown={(e) => {
+                if (e.key === "ArrowDown") {
+                  setHighlightIndex((prev) =>
+                    Math.min(prev + 1, displayedUsers.length - 1)
+                  );
+                } else if (e.key === "ArrowUp") {
+                  setHighlightIndex((prev) => Math.max(prev - 1, 0));
+                } else if (e.key === "Enter") {
+                  const selected = displayedUsers[highlightIndex];
+                  if (selected) {
+                    setSelectedUserId(selected._id);
+                    setUserSearch(`${selected.firstName} ${selected.lastName}`);
+                  }
+                }
+              }}
+            />
+
+            {isUserInputFocused && (
+              <ul className="user-dropdown-list">
+                {displayedUsers.map((u, i) => (
+                  <li
+                    key={u._id}
+                    className={`dropdown-item ${
+                      i === highlightIndex ? "highlight" : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedUserId(u._id);
+                      setUserSearch(`${u.firstName} ${u.lastName}`);
+                      setIsUserInputFocused(false);
+                    }}
+                  >
+                    {u.firstName} {u.lastName}
+                  </li>
+                ))}
+
+                {!showAllUsers && filteredUsers.length > 5 && (
+                  <li
+                    className="dropdown-item more-option"
+                    onClick={() => setShowAllUsers(true)}
+                  >
+                    + Show all results
+                  </li>
+                )}
+
+                {filteredUsers.length === 0 && (
+                  <li className="dropdown-item text-muted">No users found.</li>
+                )}
+              </ul>
+            )}
+          </div>
+
+          <button
+            className="export-trigger"
+            onClick={handleExport}
+            disabled={!isExportValid}
+            title={
+              !isExportValid
+                ? "Please select at least one filter or a user to enable export"
+                : "Export transactions"
+            }
+          >
+            Export
+          </button>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-600"></div>
-        </div>
-      ) : filteredTransactions.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          No transactions found.
-        </div>
+        <p>Loading...</p>
+      ) : paginated.length === 0 ? (
+        <p>No transactions found.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-gray-50">
+        <div className="table-responsive">
+          <table className="table custom-table">
+            <thead>
               <tr>
-                <th className="w-8 px-4 py-3"></th>
-                <th
-                  className="px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => requestSort("user")}
-                >
-                  <div className="flex items-center">
-                    <span>User</span>
-                    <span className="ml-1">{getSortIndicator("user")}</span>
-                  </div>
-                </th>
-                <th className="px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider">
-                  Type
-                </th>
-                <th
-                  className="px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => requestSort("amount")}
-                >
-                  <div className="flex items-center">
-                    <span>Amount</span>
-                    <span className="ml-1">{getSortIndicator("amount")}</span>
-                  </div>
-                </th>
-                <th className="px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider">
-                  Balance
-                </th>
-                <th
-                  className="px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => requestSort("createdAt")}
-                >
-                  <div className="flex items-center">
-                    <span>Date</span>
-                    <span className="ml-1">
-                      {getSortIndicator("createdAt")}
-                    </span>
-                  </div>
-                </th>
+                <th></th>
+                <th>User</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Balance</th>
+                <th>Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredTransactions.map((transaction) => (
-                <React.Fragment key={transaction._id}>
-                  <tr
-                    className={`hover:bg-gray-50 transition-colors ${
-                      expandedRows[transaction._id] ? "bg-gray-50" : ""
-                    }`}
-                  >
-                    <td className="px-4 py-4">
+            <tbody>
+              {paginated.map((t) => (
+                <React.Fragment key={t._id}>
+                  <tr>
+                    <td>
                       <button
-                        onClick={() => toggleRowExpansion(transaction._id)}
-                        className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
+                        onClick={() => toggleRow(t._id)}
+                        className="accordion-toggle-icon"
                       >
-                        {expandedRows[transaction._id] ? (
-                          <ChevronDown size={16} className="text-gray-600" />
+                        {expandedRows[t._id] ? (
+                          <ChevronDown className="accordion-icon" />
                         ) : (
-                          <ChevronRight size={16} className="text-gray-600" />
+                          <ChevronRight className="accordion-icon" />
                         )}
                       </button>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-medium">
-                          {transaction.user.firstName}{" "}
-                          {transaction.user.lastName}
-                        </span>
-                        <span className="text-xs text-gray-500 truncate max-w-xs">
-                          {transaction.user._id}
+
+                    <td>
+                      <div className="flex items-center justify-between gap-2">
+                        <span>
+                          {t.user.firstName} {t.user.lastName}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      {getTypeLabel(transaction.type)}
-                    </td>
-                    <td className="px-4 py-4">
-                      <span
-                        className={
-                          transaction.amount > 0
-                            ? "text-green-600 font-medium"
-                            : "text-red-600 font-medium"
-                        }
-                      >
-                        {formatCurrency(transaction.amount)}
+                    <td>
+                      <span className={`type-badge type-${t.type}`}>
+                        {t.type.replace("_", " ")}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-gray-500">
-                          From: {formatCurrency(transaction.balanceBefore)}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          To: {formatCurrency(transaction.balanceAfter)}
-                        </span>
+
+                    <td
+                      className={
+                        t.amount > 0 ? "amount-positive" : "amount-negative"
+                      }
+                    >
+                      {formatCurrency(t.amount)}
+                    </td>
+
+                    <td>
+                      <div className="text-xs text-gray-600">
+                        <div>From: {formatCurrency(t.balanceBefore)}</div>
+                        <div>To: {formatCurrency(t.balanceAfter)}</div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      {formatDate(transaction.createdAt)}
+                    <td>
+                      {new Date(t.createdAt).toLocaleDateString()}{" "}
+                      {new Date(t.createdAt).toLocaleTimeString()}
                     </td>
                   </tr>
-                  {expandedRows[transaction._id] && (
+                  {expandedRows[t._id] && (
                     <tr>
-                      <td colSpan={6} className="p-0 border-t-0">
-                        {renderDetailContent(transaction)}
+                      <td colSpan="6">
+                        <div className="bg-gray-50 p-4 rounded text-sm">
+                          <h4 className="font-semibold mb-2">
+                            Transaction Details
+                          </h4>
+                          <pre className="overflow-x-auto whitespace-pre-wrap text-xs bg-white p-2 rounded border">
+                            {JSON.stringify(t.metadata || {}, null, 2)}
+                          </pre>
+                          <div className="mt-3 text-right">
+                            <button
+                              className="custom-outline-btn view-btn"
+                              onClick={() =>
+                                navigate(`/admin/details/${t.user._id}`)
+                              }
+                            >
+                              View User Details
+                            </button>
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   )}
@@ -540,6 +394,33 @@ const UserTransactions = () => {
           </table>
         </div>
       )}
+
+      {/* Pagination Controls */}
+      <div className="pagination-controls">
+        <span className="text-sm">
+          Page {currentPage} of {Math.ceil(filtered.length / rowsPerPage)}
+        </span>
+        <div className="flex gap-2">
+          <button
+            className="custom-outline-btn pagination-btn"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </button>
+          <button
+            className="custom-outline-btn pagination-btn"
+            onClick={() =>
+              setCurrentPage((prev) =>
+                Math.min(prev + 1, Math.ceil(filtered.length / rowsPerPage))
+              )
+            }
+            disabled={currentPage === Math.ceil(filtered.length / rowsPerPage)}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

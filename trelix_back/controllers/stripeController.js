@@ -50,8 +50,8 @@ const checkoutSession = async (req, res) => {
       ],
       mode: "payment",
       customer_email: userEmail || undefined,
-      success_url: `https://trelix-livid.vercel.app/store?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://trelix-livid.vercel.app/store`,
+      success_url: `${process.env.BASE_URL_FRONTEND}/store?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.BASE_URL_FRONTEND}/store`,
       metadata: {
         userId: authUserId || userId,
         packId: product._id.toString(),

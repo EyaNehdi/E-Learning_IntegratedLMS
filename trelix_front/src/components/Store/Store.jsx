@@ -17,7 +17,6 @@ function Store() {
   const [message, setMessage] = useState("");
   const [redirecting, setRedirecting] = useState(false);
 
-
   // Verify session after redirect
   useEffect(() => {
     const sessionId = new URLSearchParams(location.search).get("session_id");
@@ -26,9 +25,14 @@ function Store() {
       console.log("user:", user);
       const verifySession = async () => {
         try {
-          const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/stripe/verify-session/${sessionId}`, {
-            withCredentials: true,
-          });
+          const response = await axios.get(
+            `${
+              import.meta.env.VITE_API_PROXY
+            }/stripe/verify-session/${sessionId}`,
+            {
+              withCredentials: true,
+            }
+          );
           console.log("Session verification response:", response.data);
           setMessage(response.data.message || "Payment successful!");
           navigate("/store", { replace: true }); // Clear session_id from URL
@@ -36,7 +40,9 @@ function Store() {
           console.log("User balance updated:", user.balance);
         } catch (err) {
           console.error("Session verification failed:", err);
-          setMessage(err.response?.data?.message || "Payment verification failed.");
+          setMessage(
+            err.response?.data?.message || "Payment verification failed."
+          );
           navigate("/store", { replace: true });
         }
       };
@@ -50,11 +56,14 @@ function Store() {
     const fetchPacks = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/packs`, {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_PROXY}/api/admin/packs`,
+          {
+            withCredentials: true,
+          }
+        );
         console.log("Fetched packs:", response.data);
-        const activePacks = response.data.filter(pack => pack.isActive);
+        const activePacks = response.data.filter((pack) => pack.isActive);
         console.log("Active packs:", activePacks);
         setPacks(activePacks);
         setError(null);
@@ -94,13 +103,18 @@ function Store() {
         );
         console.log("Checkout session response:", response.data);
         if (response.data.url) {
+          console.log(response.data.url);
+
           window.location.href = response.data.url;
         } else {
           throw new Error("No checkout URL returned");
         }
       } catch (err) {
         console.error("Error initiating checkout:", err);
-        setMessage(err.response?.data?.message || "Failed to initiate checkout. Please try again.");
+        setMessage(
+          err.response?.data?.message ||
+            "Failed to initiate checkout. Please try again."
+        );
         setRedirecting(false);
       }
     }
@@ -134,7 +148,9 @@ function Store() {
           <div className="text-red-500 text-5xl mb-4">
             <i className="fa fa-exclamation-circle"></i>
           </div>
-          <h2 className="text-xl font-bold text-red-700 mb-2">Something went wrong</h2>
+          <h2 className="text-xl font-bold text-red-700 mb-2">
+            Something went wrong
+          </h2>
           <p className="text-gray-700 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -159,21 +175,27 @@ function Store() {
             </div>
             {isAuthenticated && (
               <div className="text-lg font-semibold text-gray-700">
-                Your Balance: <span className="text-yellow-600">🪙 {user?.balance || 0} Trelix Coins</span>
+                Your Balance:{" "}
+                <span className="text-yellow-600">
+                  🪙 {user?.balance || 0} Trelix Coins
+                </span>
               </div>
             )}
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Trelix Store</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Select from our range of Trelix packs to get started. Each pack offers different amounts of our digital
-            currency at competitive prices.
+            Select from our range of Trelix packs to get started. Each pack
+            offers different amounts of our digital currency at competitive
+            prices.
           </p>
         </header>
 
         {message && (
           <div
             className={`mb-8 p-4 rounded-lg max-w-2xl mx-auto ${
-              message.includes("successful") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+              message.includes("successful")
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
             }`}
           >
             {message}
@@ -182,7 +204,9 @@ function Store() {
 
         {packs.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-xl text-gray-500">No active packs available at the moment.</p>
+            <p className="text-xl text-gray-500">
+              No active packs available at the moment.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -195,13 +219,19 @@ function Store() {
                   onClick={() => handlePackClick(pack)}
                   className={`
                     relative overflow-hidden rounded-xl shadow-md transition-all duration-300
-                    ${isDisabled ? "opacity-60 cursor-not-allowed" : "hover:shadow-lg transform hover:-translate-y-1 cursor-pointer"}
+                    ${
+                      isDisabled
+                        ? "opacity-60 cursor-not-allowed"
+                        : "hover:shadow-lg transform hover:-translate-y-1 cursor-pointer"
+                    }
                   `}
                 >
                   {isDisabled && (
                     <div className="absolute inset-0 bg-gray-200 bg-opacity-50 flex items-center justify-center z-10">
                       <span className="bg-gray-800 text-white px-4 py-2 rounded-full text-sm font-medium">
-                        {redirecting ? "Redirecting..." : "Currently Unavailable"}
+                        {redirecting
+                          ? "Redirecting..."
+                          : "Currently Unavailable"}
                       </span>
                     </div>
                   )}
@@ -210,26 +240,35 @@ function Store() {
                       <h3 className="text-xl font-bold">{pack.name}</h3>
                       <div className="flex items-center text-2xl font-bold text-blue-600">
                         <span className="text-yellow-500 mr-1">🪙</span>
-                        {(pack.price / 100).toFixed(2)} {pack.currency.toUpperCase()}
+                        {(pack.price / 100).toFixed(2)}{" "}
+                        {pack.currency.toUpperCase()}
                       </div>
                     </div>
                     <div className="mb-6">
                       <div className="flex justify-center my-4">
                         <div className="relative">
                           <div className="absolute -top-1 -right-1 flex">
-                            <span className="text-yellow-500 text-2xl transform -rotate-12">🪙</span>
+                            <span className="text-yellow-500 text-2xl transform -rotate-12">
+                              🪙
+                            </span>
                           </div>
                           <div className="absolute -top-1 -left-1 flex">
-                            <span className="text-yellow-500 text-xl transform rotate-12">🪙</span>
+                            <span className="text-yellow-500 text-xl transform rotate-12">
+                              🪙
+                            </span>
                           </div>
                           <div className="bg-yellow-100 rounded-full p-4 flex items-center justify-center w-20 h-20">
                             <span className="text-yellow-800 font-bold text-xl">
-                              {pack.coinAmount || pack.description.match(/\d+/)?.[0] || "?"}
+                              {pack.coinAmount ||
+                                pack.description.match(/\d+/)?.[0] ||
+                                "?"}
                             </span>
                           </div>
                         </div>
                       </div>
-                      <p className="text-gray-600 text-center">{pack.description}</p>
+                      <p className="text-gray-600 text-center">
+                        {pack.description}
+                      </p>
                     </div>
                   </div>
                 </div>

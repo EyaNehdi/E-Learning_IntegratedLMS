@@ -1,14 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/authStore";
 import Preloader from "../components/Preloader/Preloader";
 import { Navigate, Outlet } from "react-router-dom";
 import ViewSwitcher from "../components/ViewSwitcher";
+import Headeradmin from "../components/Admin/Headeradmin";
+import SidebarAdmin from "../components/Admin/SideBarAdmin";
+
 const AdminRoute = () => {
   const { isAuthenticated, isCheckingAuth, checkAuth, user } = useAuthStore();
+  const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  const toggleSidebar = () => {
+    setCollapsed((prev) => !prev);
+  };
 
   const isAdmin = user?.role === "admin";
 
@@ -20,8 +28,21 @@ const AdminRoute = () => {
 
   return (
     <>
-      {isAdmin && <ViewSwitcher isAdmin={isAdmin} />}
-      <Outlet />;
+      <Headeradmin onToggleSidebar={toggleSidebar} />
+      <div className="flex">
+        <SidebarAdmin
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          onToggleSidebar={toggleSidebar}
+        />
+        <main
+          className={`flex-grow p-4 transition-all duration-300 ${
+            collapsed ? "" : "ml-[240px]"
+          }`}
+        >
+          <Outlet />
+        </main>
+      </div>
     </>
   );
 };

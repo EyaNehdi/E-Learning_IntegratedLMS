@@ -42,6 +42,7 @@ const allowedOrigins = [
   'https://trelix-livid.vercel.app', // Custom domain
   /https:\/\/trelix-.*-eyanehdis-projects\.vercel\.app/, // This regex will match all preview deployments
   'https://trelix-livid.vercel.app',
+  'http://localhost:5173'
 ];
 
 app.use(cors({
