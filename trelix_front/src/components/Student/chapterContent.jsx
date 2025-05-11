@@ -343,6 +343,7 @@ const ChapterContent = () => {
         source_lang: "en", // Assuming original content is in English
         target_lang: targetLang,
       })
+      
 
       setIsTranslating(false)
       return response.data.translated_text
