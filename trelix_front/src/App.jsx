@@ -56,6 +56,8 @@ import ListBadges from "./components/Admin/ListBadges";
 import StatPreference from "./components/Student/preference-statistics" 
 import Preference from "./components/Student/AddPreference"
 import IntelligentCourses from "./components/Student/IntelligentCourses"
+import ModifyPreference from "./components/Student/ModifyPreference.jsx"
+
 
 
 
@@ -218,6 +220,7 @@ function App() {
              <Route path="/profile/classroom" element={<ClassroomPage />} />
           <Route path="/profile/classroom/courses/:courseId" element={<CourseDetailsPage />} />
           <Route path="/profile/preference" element={<Preference />} />
+          <Route path="/profile/modify-preference" element={<ModifyPreference />} />
           <Route path="/profile/preferencestat" element={<StatPreference />} />
           <Route path="/profile/intelligent-courses" element={<IntelligentCourses />} />
             <Route path="/profile/allcours" element={<Allcourse />} />
