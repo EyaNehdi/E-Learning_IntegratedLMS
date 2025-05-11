@@ -20,7 +20,7 @@ const EmailSender = () => {
     setStatus('Sending...');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/send-email', {
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/api/send-email`, {
         to: formData.to,
         subject: formData.subject,
         html: `<p>${formData.message}</p>`, // use 'html' field as expected by backend

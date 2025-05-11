@@ -112,7 +112,7 @@ const ProfileDetails = () => {
     timeoutId = setTimeout(async () => {
       try {
         console.log("🟢 Updating profile...", name)
-        const response = await axios.put("http://localhost:5000/api/info/profile/edit", {
+        const response = await axios.put(`${import.meta.env.VITE_API_PROXY}/api/info/profile/edit`, {
           [name]: value,
           email: user.email,
         })
@@ -145,7 +145,7 @@ const ProfileDetails = () => {
         return
       }
 
-      const response = await axios.put("http://localhost:5000/api/info/profile/updateskils", {
+      const response = await axios.put(`${import.meta.env.VITE_API_PROXY}/api/info/profile/updateskils`, {
         userId: user._id,
         skills: filteredSkills,
       })
@@ -169,7 +169,7 @@ const ProfileDetails = () => {
     setError(null)
 
     try {
-      const response = await axios.post("http://localhost:5000/ia/auth/CV", formData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/ia/auth/CV`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -448,6 +448,7 @@ const ProfileDetails = () => {
               </div>
 
               <div className="flex justify-between gap-4 mt-6">
+
                 <div className="flex flex-row gap-4"> {/* Changed to flex-row for horizontal layout */}
                   {/* Edit/Save Button */}
                   <button
@@ -534,6 +535,7 @@ const ProfileDetails = () => {
                     <div className="flex items-center justify-center w-full">Change Password</div>
                   </button>
                 </div>
+
               </div>
             </>
           ) : (

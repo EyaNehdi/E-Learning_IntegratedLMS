@@ -26,7 +26,7 @@ const AllQuiz = () => {
     setLoading(true)
     setError(null)
     try {
-      const response = await axios.get("http://localhost:5000/quiz/get")
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/quiz/get`)
       setQuizzes(response.data)
     } catch (err) {
       console.error("Error fetching quizzes:", err)
@@ -47,7 +47,7 @@ const AllQuiz = () => {
     
     setDeleteLoading(true)
     try {
-      await axios.delete(`http://localhost:5000/quiz/delete/${quizToDelete._id}`)
+      await axios.delete(`${import.meta.env.VITE_API_PROXY}/quiz/delete/${quizToDelete._id}`)
       setQuizzes(quizzes.filter(quiz => quiz._id !== quizToDelete._id))
       setDeleteSuccess(true)
       

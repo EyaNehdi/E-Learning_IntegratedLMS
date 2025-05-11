@@ -72,7 +72,7 @@ const ProfilePage = () => {
     try {
       // Make sure you send the request with credentials (cookie)
       const response = await axios.get(
-        "http://localhost:5000/api/auth/current-location",
+        "https://trelix-xj5h.onrender.com/api/auth/current-location",
         {
           withCredentials: true, // This ensures the cookie is sent along with the request
         }
@@ -101,7 +101,7 @@ const ProfilePage = () => {
     formData.append("profilePhoto", file);
 
     try {
-      const response = await axios.put("/api/info/profile/photo", formData, {
+      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/photo", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true, // if using cookies for auth
       });
@@ -119,7 +119,7 @@ const ProfilePage = () => {
     formData.append("coverPhoto", file);
 
     try {
-      const response = await axios.put("/api/info/profile/cover", formData, {
+      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/cover", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -140,7 +140,7 @@ const ProfilePage = () => {
     const badgeImageUrl = "/assets/Badges/WelcomeBadge.png";
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/info/profile/badge",
+        "https://trelix-xj5h.onrender.com/api/info/profile/badge",
         {
           badge: " Welcome to Trelix Badge 🏅",
           email: user.email, // Send the user's email
@@ -166,8 +166,8 @@ const ProfilePage = () => {
                   className="cover-photo-container"
                   style={{
                     backgroundImage: user?.coverPhoto
-                      ? `url(http://localhost:5000${user?.coverPhoto})`
-                      : `url('/assets/icons/COVER.png')`,
+                      ? `url(${user.coverPhoto.startsWith('http') ? user.coverPhoto : `https://trelix-xj5h.onrender.com${user.coverPhoto}`})`
+                      : `url('/assets/icons/COVER.png')`
                   }}
                 >
                   {/* Change Cover Photo Button */}
@@ -202,7 +202,11 @@ const ProfilePage = () => {
                       >
                         {user?.profilePhoto ? (
                           <img
-                            src={`http://localhost:5000${user?.profilePhoto}`}
+                            src={
+                              user?.profilePhoto?.startsWith("http")
+                                ? user.profilePhoto
+                                : `https://trelix-xj5h.onrender.com${user?.profilePhoto}`
+                            }
                             className="rounded-circle"
                             alt="Avatar"
                             style={{
@@ -211,6 +215,7 @@ const ProfilePage = () => {
                               objectFit: "cover",
                             }}
                           />
+
                         ) : (
                           <span>
                             {user?.firstName && user?.lastName ? (
@@ -262,11 +267,10 @@ const ProfilePage = () => {
                   </div>
                 </div>
                 <div
-                  className={`${
-                    location.pathname !== "/profile/achievements"
-                      ? ""
-                      : "d-none"
-                  }`}
+                  className={`${location.pathname !== "/profile/achievements"
+                    ? ""
+                    : "d-none"
+                    }`}
                 >
                   {/* Check if the user has badges */}
                   {user?.badges && user.badges.length > 0 ? (

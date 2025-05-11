@@ -65,7 +65,7 @@ async function generateCertificate(user, course) {
     const verificationCode = Math.random().toString(36).substring(2, 10).toUpperCase();
     const qrCodeDir = path.join(__dirname, "../certificates");
     const qrCodePath = path.join(qrCodeDir, `qrcode-${user._id}-${cleanTitle}.png`);
-    await QRCode.toFile(qrCodePath, `http://localhost:5173/verify/${verificationCode}`);
+    await QRCode.toFile(qrCodePath, `https://trelix-livid.vercel.app/verify/${verificationCode}`);
 
     // Embed QR Code in the PDF
     const qrImageBytes = fs.readFileSync(qrCodePath);

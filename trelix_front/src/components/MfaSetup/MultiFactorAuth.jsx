@@ -69,7 +69,7 @@ const MultiFactorAuth = () => {
   const qrRef = useRef(null);
   const [trustedDevices, setTrustedDevices] = useState([]);
   const [loading, setLoading] = useState(false);
-  const MFA_Route = `http://localhost:5000/signup/mfa`;
+  const MFA_Route = `${import.meta.env.VITE_API_PROXY}/signup/mfa`;
   const fetchTrustedDevices = async () => {
     setLoading(true);
     try {

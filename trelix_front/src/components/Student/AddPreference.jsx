@@ -44,6 +44,7 @@ function AddPreference() {
     "pdf",
     "audio",
 
+
     "texte",
     "image",
     "quiz",
@@ -51,6 +52,7 @@ function AddPreference() {
     "webinar",
     "infographie",
     "slides",
+
 
     "other",
   ]
@@ -108,7 +110,7 @@ function AddPreference() {
   const fetchModules = async () => {
     setIsLoadingModules(true)
     try {
-      const response = await axios.get("http://localhost:5000/module")
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/module`)
       const data = response.data
       setModules(Array.isArray(data) ? data : [])
     } catch (error) {
@@ -151,15 +153,19 @@ function AddPreference() {
           styleContenu,
           objectif,
           methodeEtude,
+
           module: module.id, // Changé de moduleId à module
           user: user._id,   // Changé de userId à user
+
         }
         
         if (debugMode) {
           console.log("Sending data for module", module.name, ":", requestData)
         }
         
-        return axios.post("http://localhost:5000/preference/add", requestData)
+
+        return axios.post(`${import.meta.env.VITE_API_PROXY}/preference/add`, requestData)
+
       })
 
       // Wait for all submissions to complete
@@ -322,9 +328,11 @@ function AddPreference() {
                 onClick={() => setDebugMode(!debugMode)}
                 className={`text-xs px-2 py-1 rounded ${debugMode ? 'bg-red-700 text-white' : 'bg-blue-800 bg-opacity-50 text-blue-100'}`}
               >
+
                 {debugMode ? "Disable Debug Mode" : "Enable Debug Mode"}
               </button>
             </div>
+
           </div>
 
           <div className="p-6 md:p-8">

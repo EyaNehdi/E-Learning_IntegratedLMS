@@ -31,8 +31,10 @@ function IntelligentCourses() {
   const fetchRecommendedCourses = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/intelligent-recommendation/recommended-courses", {
-        params: { module: moduleId, user: userId },
+
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/intelligent-recommendation/recommended-courses`, {
+        params: { moduleId, userId },
+
       });
 
       if (response.status === 200) {

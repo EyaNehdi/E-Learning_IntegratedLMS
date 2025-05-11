@@ -35,16 +35,22 @@ const axios = require('axios');
 const fetch = require('node-fetch');
 var app = express();
 
-
-
-
+const allowedOrigins = [
+  'https://trelix-g9ckx86l8-eyanehdis-projects.vercel.app',
+  'https://trelix-xj5h.onrender.com',
+  'https://trelix-qjnmuzya8-eyanehdis-projects.vercel.app', // New deployment URL
+  'https://trelix-livid.vercel.app', // Custom domain
+  /https:\/\/trelix-.*-eyanehdis-projects\.vercel\.app/, // This regex will match all preview deployments
+  'https://trelix-livid.vercel.app',
+];
 
 app.use(cors({
-  origin: "http://localhost:5173",  // Assurez-vous que le frontend utilise ce port
+  origin: allowedOrigins,
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
 app.use(express.json({ limit: '100mb' }));
 
 
@@ -72,20 +78,6 @@ app.post('/createRoom', async (req, res) => {
 
 
 // POST /api/goals
-
-
-
-
-
-
-
-
-
-
-require('dotenv').config(); // Charger les variables d'environnement
-
-
-
 const { getMoodleCourses, getCourseContents } = require('./API/Moodle');
 
 
@@ -104,8 +96,6 @@ const Purchases = require("./routes/coursesPurchasesRoutes");
 const Recommendation = require("./routes/recommendationRoutes");
 
 app.use('/stripe/raw', StripeRaw);
-
-var app = express();
 
 
 // Configuration du moteur de vues et des middlewares
@@ -156,58 +146,7 @@ app.use((req, res, next) => {
   // console.log('Session ID:', req.sessionID);
   next();
 });
-app.use(cors({
-  origin: "http://localhost:5173", // URL de votre frontend
-  credentials: true, // Important pour les cookies de session
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
 
-
-
-//cors
-
-app.use(cors({
-  origin: "http://localhost:5173",  // Assurez-vous que le frontend utilise ce port
-  credentials: true,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-
-
-app.get('/api/citation', async (req, res) => {
-  try {
-    const response = await axios.get('https://zenquotes.io/api/random');
-    res.json(response.data[0]);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Erreur lors de la récupération de la citation' });
-  }
-});
-
-
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'votre_secret_de_session',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-    ttl: 14 * 24 * 60 * 60 // 14 jours
-  }),
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 14 * 24 * 60 * 60 * 1000 // 14 jours
-  }
-}));
-
-
-
-
-
-// Autres routes de ton application
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
@@ -284,12 +223,6 @@ app.use("/api/finance", financeRoutes);
 app.use("/quiz", quizRoutes);
 app.use("/Exam", ExamRoutes);
 
-
-// Gestion des erreurs
-app.use((err, req, res, next) => {
-  console.error('Upload Error:', err.message);
-  res.status(400).json({ error: err.message });
-});
 
 // Middleware de débogage pour les redirections
 app.use((req, res, next) => {
@@ -526,7 +459,7 @@ const server = app.listen(PORT, () => {
 // 2. Attach Socket.IO to the existing Express server
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",  // Assurez-vous que le frontend utilise ce port
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -564,6 +497,11 @@ if (process.env.NODE_ENV === 'forTest') {
   const cron = require('node-cron');
   cron.schedule('0 0 * * *', runEngagementTasks);
 }
+
+app.use((err, req, res, next) => {
+  console.error('Upload Error:', err.message);
+  res.status(400).json({ error: err.message });
+});
 
 
 module.exports = app;

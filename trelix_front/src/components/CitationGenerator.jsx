@@ -8,7 +8,9 @@ const CitationGenerator = () => {
   const fetchCitation = async () => {
     try {
       // Appel à ton serveur backend local
-      const response = await axios.get('http://localhost:5000/api/citation');
+
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/citation`);
+
       setCitation(response.data.q);
       setAuthor(response.data.a);
     } catch (error) {

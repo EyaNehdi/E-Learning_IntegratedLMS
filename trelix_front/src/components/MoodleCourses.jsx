@@ -40,7 +40,7 @@ function MoodleCourses() {
       setIsLoading(true)
       setError(null)
       try {
-        const response = await fetch("http://localhost:5000/api/courses")
+        const response = await fetch(`${import.meta.env.VITE_API_PROXY}/api/courses`)
         if (!response.ok) throw new Error("Failed to fetch courses")
 
         const data = await response.json()
@@ -73,7 +73,7 @@ function MoodleCourses() {
     setSelectedCourse(course)
 
     try {
-      const response = await fetch(`http://localhost:5000/api/courses/${courseId}/contents`)
+      const response = await fetch(`${import.meta.env.VITE_API_PROXY}/api/courses/${courseId}/contents`)
       if (!response.ok) throw new Error("Failed to fetch course contents")
       const data = await response.json()
       setCourseContents(data)

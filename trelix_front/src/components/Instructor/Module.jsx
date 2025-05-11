@@ -18,7 +18,7 @@ function Module() {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/module/addmodule", {
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/module/addmodule`, {
         name,
         description,
         StartDate,

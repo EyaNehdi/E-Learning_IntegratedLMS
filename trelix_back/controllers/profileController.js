@@ -1,16 +1,16 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
-const path = require("path");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { cloudinary } = require("../utils/cloudinary");
 
-// Configure multer storage for file uploads (profile and cover photos)
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../uploads')); // Set upload directory
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname); // Generate unique filename
-    }
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => ({
+    folder: "uploads", // optional: separate folders for profile/cover
+    format: file.mimetype.split("/")[1], // keep original format
+    public_id: Date.now() + "-" + file.originalname,
+  }),
 });
 
 const upload = multer({ storage });
@@ -57,14 +57,16 @@ const updateProfilePhoto = async (req, res) => {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
-        const profilePhotoUrl = `/uploads/${req.file.filename}`;
+        const profilePhotoUrl = req.file.path; // Cloudinary-hosted URL
         await User.findByIdAndUpdate(req.userId, { profilePhoto: profilePhotoUrl });
 
         res.status(200).json({ profilePhoto: profilePhotoUrl });
     } catch (error) {
+        console.error("Update error:", error);
         res.status(500).json({ message: "Error updating profile photo" });
     }
 };
+
 
 // Update Cover Photo
 const updateCoverPhoto = async (req, res) => {
@@ -73,14 +75,16 @@ const updateCoverPhoto = async (req, res) => {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
-        const coverPhotoUrl = `/uploads/${req.file.filename}`;
+        const coverPhotoUrl = req.file.path; // Cloudinary-hosted URL
         await User.findByIdAndUpdate(req.userId, { coverPhoto: coverPhotoUrl });
 
         res.status(200).json({ coverPhoto: coverPhotoUrl });
     } catch (error) {
+        console.error("Update error:", error);
         res.status(500).json({ message: "Error updating cover photo" });
     }
 };
+
 
 // Update User Badges
 const updatebadge = async (req, res) => {

@@ -37,7 +37,7 @@ const MfaChallenge = ({ userId, backupCodesExist }) => {
         setOtpCode("");
       }
       const response = await axios.post(
-        "http://localhost:5000/signup/mfa/verifyMfaCode",
+        `${import.meta.env.VITE_API_PROXY}/signup/mfa/verifyMfaCode`,
         {
           userId,
           otpCode,
