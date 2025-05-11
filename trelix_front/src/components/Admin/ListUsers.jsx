@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import moment from "moment";
-
 import {
   FormControl,
   FormLabel,
@@ -12,9 +11,13 @@ import {
   RadioGroup,
   Radio,
 } from "@mui/material";
+import "./ResponsiveStyle.css";
 
 const fetchUsers = async () => {
-  const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/allUsers`, { withCredentials: true });
+  const res = await axios.get(
+    `${import.meta.env.VITE_API_PROXY}/api/admin/allUsers`,
+    { withCredentials: true }
+  );
   return res.data;
 };
 
@@ -33,53 +36,23 @@ const ListUsers = () => {
 
   const archiveMutation = useMutation({
     mutationFn: (id) =>
-      axios.put(`${import.meta.env.VITE_API_PROXY}/api/admin/archiveUser/${id}`, null, {
-        withCredentials: true,
-      }),
+      axios.put(
+        `${import.meta.env.VITE_API_PROXY}/api/admin/archiveUser/${id}`,
+        null,
+        { withCredentials: true }
+      ),
     onSuccess: () => queryClient.invalidateQueries(["users"]),
   });
 
   const unarchiveMutation = useMutation({
     mutationFn: (id) =>
-      axios.put(`${import.meta.env.VITE_API_PROXY}/api/admin/unarchiveUser/${id}`, null, {
-        withCredentials: true,
-      }),
+      axios.put(
+        `${import.meta.env.VITE_API_PROXY}/api/admin/unarchiveUser/${id}`,
+        null,
+        { withCredentials: true }
+      ),
     onSuccess: () => queryClient.invalidateQueries(["users"]),
   });
-
-  const handleArchive = (id) => {
-    Swal.fire({
-      title: "Archive User?",
-      text: "Are you sure you want to archive this user?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#aaa",
-      confirmButtonText: "Yes, archive",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        archiveMutation.mutate(id);
-        Swal.fire("Archived!", "User has been archived.", "success");
-      }
-    });
-  };
-
-  const handleUnarchive = (id) => {
-    Swal.fire({
-      title: "Unarchive User?",
-      text: "Are you sure you want to unarchive this user?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#28a745",
-      cancelButtonColor: "#aaa",
-      confirmButtonText: "Yes, unarchive",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        unarchiveMutation.mutate(id);
-        Swal.fire("Unarchived!", "User has been unarchived.", "success");
-      }
-    });
-  };
 
   const [showArchived, setShowArchived] = useState(false);
   const [emailSearch, setEmailSearch] = useState("");
@@ -94,8 +67,7 @@ const ListUsers = () => {
   const [showAll, setShowAll] = useState(true);
 
   const handleChangeStatus = (event) => {
-    const value = event.target.value;
-    setShowArchived(value === "archived");
+    setShowArchived(event.target.value === "archived");
   };
 
   const handleShowAllChange = () => {
@@ -106,72 +78,47 @@ const ListUsers = () => {
     setShowStudents(newShowAll);
   };
 
-  const handleIndividualChange = (type) => {
-    return (event) => {
-      const newValue = event.target.checked;
-      let newShowAdmins = showAdmins;
-      let newShowInstructors = showInstructors;
-      let newShowStudents = showStudents;
-
-      if (type === "admins") newShowAdmins = newValue;
-      if (type === "instructors") newShowInstructors = newValue;
-      if (type === "students") newShowStudents = newValue;
-
-      setShowAdmins(newShowAdmins);
-      setShowInstructors(newShowInstructors);
-      setShowStudents(newShowStudents);
-
-      if (!newShowAdmins || !newShowInstructors || !newShowStudents) {
-        setShowAll(false);
-      } else {
-        setShowAll(true);
-      }
-    };
+  const handleIndividualChange = (type) => (event) => {
+    const newValue = event.target.checked;
+    setShowAdmins(type === "admins" ? newValue : showAdmins);
+    setShowInstructors(type === "instructors" ? newValue : showInstructors);
+    setShowStudents(type === "students" ? newValue : showStudents);
+    setShowAll(newValue && showAdmins && showInstructors && showStudents);
   };
 
   const sortedFilteredUsers = useMemo(() => {
     if (!users) return [];
-
     let filtered = users.filter((user) =>
       showArchived ? !user.isActive : user.isActive
     );
-
-    if (!showAdmins) {
-      filtered = filtered.filter((user) => user.role !== "admin");
-    }
-    if (!showInstructors) {
-      filtered = filtered.filter((user) => user.role !== "instructor");
-    }
-    if (!showStudents) {
-      filtered = filtered.filter((user) => user.role !== "student");
-    }
-
-    if (emailSearch) {
-      filtered = filtered.filter((user) =>
-        user.email.toLowerCase().includes(emailSearch.toLowerCase())
+    if (!showAdmins) filtered = filtered.filter((u) => u.role !== "admin");
+    if (!showInstructors)
+      filtered = filtered.filter((u) => u.role !== "instructor");
+    if (!showStudents) filtered = filtered.filter((u) => u.role !== "student");
+    if (emailSearch)
+      filtered = filtered.filter((u) =>
+        u.email.toLowerCase().includes(emailSearch.toLowerCase())
       );
-    }
-
-    const sorted = [...filtered].sort((a, b) => {
-      let valA, valB;
-
-      if (sortBy === "fullName") {
-        valA = `${a.firstName} ${a.lastName}`.toLowerCase();
-        valB = `${b.firstName} ${b.lastName}`.toLowerCase();
-      } else if (sortBy === "accountCreatedAt") {
-        valA = a.accountCreatedAt ? new Date(a.accountCreatedAt) : new Date(0);
-        valB = b.accountCreatedAt ? new Date(b.accountCreatedAt) : new Date(0);
-      } else {
-        valA = a[sortBy]?.toLowerCase?.() ?? "";
-        valB = b[sortBy]?.toLowerCase?.() ?? "";
-      }
-
-      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-      return 0;
+    return [...filtered].sort((a, b) => {
+      const getValue = (key, obj) => {
+        if (key === "fullName")
+          return `${obj.firstName} ${obj.lastName}`.toLowerCase();
+        if (key === "accountCreatedAt")
+          return obj.accountCreatedAt
+            ? new Date(obj.accountCreatedAt)
+            : new Date(0);
+        return obj[key]?.toLowerCase?.() ?? "";
+      };
+      const valA = getValue(sortBy, a);
+      const valB = getValue(sortBy, b);
+      return sortOrder === "asc"
+        ? valA < valB
+          ? -1
+          : 1
+        : valA > valB
+        ? -1
+        : 1;
     });
-
-    return sorted;
   }, [
     users,
     showArchived,
@@ -205,249 +152,308 @@ const ListUsers = () => {
   ]);
 
   const changeSort = (key) => {
-    if (sortBy === key) {
-      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      setSortBy(key);
-      setSortOrder("asc");
-    }
+    setSortBy(key);
+    setSortOrder((prev) =>
+      sortBy === key ? (prev === "asc" ? "desc" : "asc") : "asc"
+    );
+  };
+
+  const handleUserStatusChange = ({ id, action }) => {
+    const isArchiving = action === "archive";
+
+    Swal.fire({
+      title: isArchiving ? "Archive User?" : "Unarchive User?",
+      text: `Are you sure you want to ${
+        isArchiving ? "archive" : "unarchive"
+      } this user?`,
+      icon: isArchiving ? "warning" : "question",
+      showCancelButton: true,
+      confirmButtonColor: isArchiving ? "#ffc107" : "#28a745",
+      cancelButtonColor: "#aaa",
+      confirmButtonText: isArchiving ? "Yes, archive" : "Yes, unarchive",
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        confirmButton: "custom-swal-confirm",
+        cancelButton: "custom-swal-cancel",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const mutation = isArchiving ? archiveMutation : unarchiveMutation;
+        mutation.mutate(id);
+        Swal.fire(
+          isArchiving ? "Archived!" : "Unarchived!",
+          `User has been ${isArchiving ? "archived" : "unarchived"}.`,
+          "success"
+        );
+      }
+    });
   };
 
   if (isLoading) return <div>Loading users...</div>;
   if (isError) return <div>Failed to load users</div>;
 
   return (
-    <div className="col-xl-9 col-lg-8 col-md-12">
-      <div className="card shadow-sm ctm-border-radius">
-        <div className="card-body">
-          <div className="mb-4 flex flex-wrap gap-2 items-center">
-            <FormControl component="fieldset">
-              <FormLabel component="legend">User Status</FormLabel>
-              <RadioGroup
-                aria-label="user-status"
-                name="user-status"
-                value={showArchived ? "archived" : "active"} // Manage selected value
-                onChange={handleChangeStatus}
-                row
-              >
-                <FormControlLabel
-                  value="active"
-                  control={<Radio color="primary" />}
-                  label="Active Users"
-                />
-                <FormControlLabel
-                  value="archived"
-                  control={<Radio color="primary" />}
-                  label="Archived Users"
-                />
-              </RadioGroup>
-            </FormControl>
+    <div className="page-container">
+      <div className="flex justify-between items-center mb-4 flex-wrap gap-3">
+        <h2 className="text-xl font-semibold">Users List</h2>
+        <button
+          className="custom-btn-create"
+          onClick={() => navigate("/admin/create")}
+        >
+          + Create User
+        </button>
+      </div>
 
-            <input
-              type="text"
-              value={emailSearch}
-              onChange={(e) => setEmailSearch(e.target.value)}
-              placeholder="Search by email"
-              className="border p-2 rounded ml-auto"
-            />
-
-            <div>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={showAll}
-                  onChange={handleShowAllChange}
-                />
-                Show All
-              </label>
-              <label className="ml-4">
-                <input
-                  type="checkbox"
-                  checked={showAdmins}
-                  onChange={handleIndividualChange("admins")}
-                />
-                Show Admins
-              </label>
-              <label className="ml-4">
-                <input
-                  type="checkbox"
-                  checked={showInstructors}
-                  onChange={handleIndividualChange("instructors")}
-                />
-                Show Instructors
-              </label>
-              <label className="ml-4">
-                <input
-                  type="checkbox"
-                  checked={showStudents}
-                  onChange={handleIndividualChange("students")}
-                />
-                Show Students
-              </label>
-            </div>
-
-            <select
-              className="ml-4 border p-2 rounded"
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(parseInt(e.target.value));
-                setCurrentPage(1); // reset
-              }}
-            >
-              {[5, 10, 25, 50].map((n) => (
-                <option key={n} value={n}>
-                  {n} per page
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div
-            className="table-responsive"
-            style={{ maxHeight: "500px", overflowY: "auto" }}
+      <div className="user-filters">
+        <FormControl component="fieldset" className="form-control">
+          <FormLabel component="legend">User Status</FormLabel>
+          <RadioGroup
+            row
+            value={showArchived ? "archived" : "active"}
+            onChange={handleChangeStatus}
           >
-            <table
-              className="table custom-table table-hover"
-              style={{ borderCollapse: "collapse" }}
-            >
-              <thead>
-                <tr>
-                  <th
-                    onClick={() => changeSort("fullName")}
-                    className="cursor-pointer border px-2 py-1"
-                  >
-                    User FullName{" "}
-                    {sortBy === "fullName" && (sortOrder === "asc" ? "▲" : "▼")}
-                  </th>
-                  <th
-                    onClick={() => changeSort("email")}
-                    className="cursor-pointer border px-2 py-1"
-                  >
-                    Email{" "}
-                    {sortBy === "email" && (sortOrder === "asc" ? "▲" : "▼")}
-                  </th>
-                  <th
-                    onClick={() => changeSort("role")}
-                    className="cursor-pointer border px-2 py-1"
-                  >
-                    Role{" "}
-                    {sortBy === "role" && (sortOrder === "asc" ? "▲" : "▼")}
-                  </th>
-                  <th
-                    onClick={() => changeSort("accountCreatedAt")}
-                    className="cursor-pointer border px-2 py-1"
-                  >
-                    accountCreatedAt{" "}
-                    {sortBy === "accountCreatedAt" &&
-                      (sortOrder === "asc" ? "▲" : "▼")}
-                  </th>
-                  <th className="border px-2 py-1">Actions</th>
+            <FormControlLabel
+              value="active"
+              control={<Radio color="primary" />}
+              label="Active Users"
+            />
+            <FormControlLabel
+              value="archived"
+              control={<Radio color="primary" />}
+              label="Archived Users"
+            />
+          </RadioGroup>
+        </FormControl>
+
+        <input
+          type="text"
+          value={emailSearch}
+          onChange={(e) => setEmailSearch(e.target.value)}
+          placeholder="Search by email"
+          className="search-input"
+        />
+
+        <div className="checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={showAll}
+              onChange={handleShowAllChange}
+            />{" "}
+            Show All
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={showAdmins}
+              onChange={handleIndividualChange("admins")}
+            />{" "}
+            Show Admins
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={showInstructors}
+              onChange={handleIndividualChange("instructors")}
+            />{" "}
+            Show Instructors
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={showStudents}
+              onChange={handleIndividualChange("students")}
+            />{" "}
+            Show Students
+          </label>
+        </div>
+
+        <select
+          value={rowsPerPage}
+          onChange={(e) => {
+            setRowsPerPage(parseInt(e.target.value));
+            setCurrentPage(1);
+          }}
+          className="form-control"
+        >
+          {[5, 10, 25, 50].map((n) => (
+            <option key={n} value={n}>
+              {n} per page
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Desktop Table */}
+      <div className="desktop-table table-responsive">
+        <table className="table custom-table">
+          <thead>
+            <tr>
+              <th onClick={() => changeSort("fullName")}>
+                User FullName{" "}
+                {sortBy === "fullName" && (sortOrder === "asc" ? "▲" : "▼")}
+              </th>
+              <th onClick={() => changeSort("email")}>
+                Email {sortBy === "email" && (sortOrder === "asc" ? "▲" : "▼")}
+              </th>
+              <th onClick={() => changeSort("role")}>
+                Role {sortBy === "role" && (sortOrder === "asc" ? "▲" : "▼")}
+              </th>
+              <th onClick={() => changeSort("accountCreatedAt")}>
+                Created At{" "}
+                {sortBy === "accountCreatedAt" &&
+                  (sortOrder === "asc" ? "▲" : "▼")}
+              </th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedUsers.map((user) => {
+              const isArchived = !user.isActive;
+              const isAdmin = user.role === "admin";
+              let rowClass = "text-gray-900";
+              if (isArchived) rowClass = "bg-gray-100 text-gray-500 italic";
+              if (isAdmin) rowClass += " bg-blue-50 font-semibold";
+              return (
+                <tr key={user._id} className={rowClass}>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <span>
+                        {user.firstName} {user.lastName}
+                      </span>
+                      {isArchived && (
+                        <span className="badge muted">Archived</span>
+                      )}
+                      {isAdmin && <span className="badge info">Admin</span>}
+                    </div>
+                  </td>
+                  <td>{user.email}</td>
+                  <td className="capitalize">{user.role}</td>
+                  <td>
+                    {user.accountCreatedAt
+                      ? moment(user.accountCreatedAt).format("YYYY-MM-DD HH:mm")
+                      : "N/A"}
+                  </td>
+                  <td className="flex justify-center items-center gap-2 flex-wrap">
+                    <button
+                      onClick={() => navigate(`/admin/details/${user._id}`)}
+                      className="custom-icon-btn view-btn"
+                      title="View User"
+                    >
+                      <i className="fa fa-eye" />
+                    </button>
+                    <button
+                      onClick={() => navigate(`/admin/update/${user._id}`)}
+                      className="custom-icon-btn edit-btn"
+                      title="Edit User"
+                    >
+                      <i className="fa fa-pencil" />
+                    </button>
+                    {!isAdmin &&
+                      (isArchived ? (
+                        <button
+                          onClick={() =>
+                            handleUserStatusChange({
+                              id: user._id,
+                              action: "unarchive",
+                            })
+                          }
+                          className="custom-icon-btn unarchive-btn"
+                          title="Unarchive User"
+                        >
+                          <i className="fa fa-undo" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            handleUserStatusChange({
+                              id: user._id,
+                              action: "archive",
+                            })
+                          }
+                          className="custom-icon-btn archive-btn"
+                          title="Archive User"
+                        >
+                          <i className="fa fa-archive" />
+                        </button>
+                      ))}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {paginatedUsers.map((user) => {
-                  const isArchived = !user.isActive;
-                  const isAdmin = user.role === "admin";
-                  let rowClass = "text-gray-900";
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
-                  if (isArchived) rowClass = "bg-gray-100 text-gray-500 italic";
-                  if (isAdmin) rowClass += " bg-blue-50 font-semibold";
-
-                  return (
-                    <tr key={user._id} className={rowClass}>
-                      <td className="border px-2 py-1">
-                        <div className="flex items-center gap-2">
-                          <span>
-                            {user.firstName} {user.lastName}
-                          </span>
-                          {isArchived && (
-                            <span className="text-xs bg-gray-300 text-gray-700 px-2 py-0.5 rounded-full">
-                              Archived
-                            </span>
-                          )}
-                          {isAdmin && (
-                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-                              Admin
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="border px-2 py-1">{user.email}</td>
-                      <td className="capitalize border px-2 py-1">
-                        {user.role}
-                      </td>
-                      <td className="border px-2 py-1">
-                        {user.accountCreatedAt
-                          ? moment(user.accountCreatedAt).format(
-                              "YYYY-MM-DD HH:mm"
-                            )
-                          : "N/A"}{" "}
-                      </td>
-                      <td className="border px-2 py-1">
-                        <span
-                          title="View User"
-                          onClick={() => navigate(`/admin/users/${user._id}`)}
-                          className="text-blue-500 hover:text-blue-700 cursor-pointer mr-2"
-                        >
-                          <i className="fa fa-eye" />
-                        </span>
-                        <span
-                          title="Edit User"
-                          onClick={() => navigate(`/admin/update/${user._id}`)}
-                          className="text-green-600 hover:text-green-800 cursor-pointer mr-2"
-                        >
-                          <i className="fa fa-pencil" />
-                        </span>
-                        {!isAdmin &&
-                          (isArchived ? (
-                            <span
-                              title="Unarchive User"
-                              onClick={() => handleUnarchive(user._id)}
-                              className="text-gray-500 hover:text-black cursor-pointer"
-                            >
-                              <i className="fa fa-undo" />
-                            </span>
-                          ) : (
-                            <span
-                              title="Archive User"
-                              onClick={() => handleArchive(user._id)}
-                              className="text-yellow-600 hover:text-yellow-800 cursor-pointer"
-                            >
-                              <i className="fa fa-archive" />
-                            </span>
-                          ))}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination Controls */}
-          <div className="flex justify-between items-center mt-4">
-            <span className="text-sm text-gray-700">
-              Page {currentPage} of {totalPages}
-            </span>
-            <div className="flex gap-2">
+      {/* Mobile Cards */}
+      <div className="mobile-cards">
+        {paginatedUsers.map((user) => (
+          <div key={user._id} className="user-card">
+            <p className="font-semibold">
+              {user.firstName} {user.lastName}
+            </p>
+            <p>{user.email}</p>
+            <p className="capitalize">{user.role}</p>
+            <p className="text-sm text-gray-500">
+              Created:{" "}
+              {user.accountCreatedAt
+                ? moment(user.accountCreatedAt).format("YYYY-MM-DD")
+                : "N/A"}
+            </p>
+            <div className="flex gap-2 mt-3 flex-wrap">
               <button
-                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                disabled={currentPage === 1}
-                className="min-w-[64px] px-3 py-1 text-sm leading-tight whitespace-nowrap border rounded disabled:opacity-50"
+                onClick={() => navigate(`/admin/details/${user._id}`)}
+                className="custom-outline-btn view-btn"
               >
-                Prev
+                View
               </button>
               <button
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(p + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-                className="min-w-[64px] px-3 py-1 text-sm leading-tight whitespace-nowrap border rounded disabled:opacity-50"
+                onClick={() => navigate(`/admin/update/${user._id}`)}
+                className="custom-outline-btn edit-btn"
               >
-                Next
+                Edit
               </button>
+              {!user.role.includes("admin") &&
+                (user.isActive ? (
+                  <button
+                    onClick={() => handleArchive(user._id)}
+                    className="custom-outline-btn archive-btn"
+                  >
+                    Archive
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleUnarchive(user._id)}
+                    className="custom-outline-btn unarchive-btn"
+                  >
+                    Unarchive
+                  </button>
+                ))}
             </div>
           </div>
+        ))}
+      </div>
+
+      <div className="pagination-controls">
+        <span className="text-sm text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+        <div className="flex gap-2">
+          <button
+            className="custom-outline-btn"
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </button>
+          <button
+            className="custom-outline-btn"
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
