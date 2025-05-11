@@ -5,8 +5,8 @@ const generateToken = (res, userId, stayLoggedIn) => {
         expiresIn: stayLoggedIn ? "1d" : "1h",
     });
 
-    console.log("Generating Token:", token);
-    console.log("Stay Logged In:", stayLoggedIn);
+    // console.log("Generating Token:", token);
+    // console.log("Stay Logged In:", stayLoggedIn);
 
     const cookieOptions = {
         httpOnly: true,
@@ -18,7 +18,7 @@ const generateToken = (res, userId, stayLoggedIn) => {
     if (stayLoggedIn) {
         cookieOptions.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
     }
-    console.log("Setting Cookie:", cookieOptions);
+    // console.log("Setting Cookie:", cookieOptions);
     res.cookie("token", token, cookieOptions);
 
     return token;

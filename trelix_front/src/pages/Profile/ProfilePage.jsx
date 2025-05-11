@@ -46,24 +46,24 @@ const ProfilePage = () => {
   const [locationData, setLocationData] = useState(null);
 
   // Ensure that tracking location and fetching user data are done sequentially
-  useEffect(() => {
-    const trackAndFetchData = async () => {
-      if (!locationTracked) {
-        console.log("Tracking location...");
-        const locationResponse = await trackLocation();
-        if (locationResponse) {
-          console.log("Location tracking completed.");
-          // Fetch user data AFTER location tracking completes
-          await fetchUser();
-        }
-      } else if (!isLoadingUser && !user) {
-        console.log("Fetching user data...");
-        await fetchUser();
-      }
-    };
+  // useEffect(() => {
+  //   const trackAndFetchData = async () => {
+  //     if (!locationTracked) {
+  //       console.log("Tracking location...");
+  //       const locationResponse = await trackLocation();
+  //       if (locationResponse) {
+  //         console.log("Location tracking completed.");
+  //         // Fetch user data AFTER location tracking completes
+  //         await fetchUser();
+  //       }
+  //     } else if (!isLoadingUser && !user) {
+  //       console.log("Fetching user data...");
+  //       await fetchUser();
+  //     }
+  //   };
 
-    trackAndFetchData();
-  }, []);
+  //   trackAndFetchData();
+  // }, []);
 
   // Function to track the user's current location
   const trackLocation = async () => {
@@ -286,7 +286,7 @@ const ProfilePage = () => {
                             placement="top"
                           >
                             <img
-                              src="/assets/Badges/WelcomeBadge.png"
+                              src={badge.image}
                               alt={badge.name}
                               className="badge-image"
                               style={{ width: "80px", height: "auto" }} // Adjust width to 100px, height auto to keep aspect ratio

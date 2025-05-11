@@ -433,7 +433,7 @@ const ListUsers = () => {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 border rounded disabled:opacity-50"
+                className="min-w-[64px] px-3 py-1 text-sm leading-tight whitespace-nowrap border rounded disabled:opacity-50"
               >
                 Prev
               </button>
@@ -442,7 +442,7 @@ const ListUsers = () => {
                   setCurrentPage((p) => Math.min(p + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 border rounded disabled:opacity-50"
+                className="min-w-[64px] px-3 py-1 text-sm leading-tight whitespace-nowrap border rounded disabled:opacity-50"
               >
                 Next
               </button>

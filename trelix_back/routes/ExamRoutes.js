@@ -15,7 +15,8 @@ const {
     handleSubmitExam,
     checkAttempt,
     checkstatus,
-    upload
+    upload,
+    getallExams
 } = require("../controllers/ExamController");
 
 const { verifyToken } = require("../middlewares/verifyToken");
@@ -23,6 +24,7 @@ const { verifyToken } = require("../middlewares/verifyToken");
 const router = express.Router();
 
 router.get("/get", verifyToken, getExams);
+router.get("/getall", verifyToken, getallExams);
 router.get("/gett", verifyToken, getExamss);
 router.get("/get/:id", verifyToken, getExamById);
 
