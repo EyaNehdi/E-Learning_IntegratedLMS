@@ -363,8 +363,8 @@ const ProfileDetails = () => {
                     <span className="font-semibold mb-2">Skills/Occupation:</span>
 
                     {/* Skills input and add button */}
-                    <div className="flex items-center w-full max-w-sm">
-                      <input
+                    <div className="flex mb-3 relative">
+                     <input
                         type="text"
                         value={newSkill}
                         onChange={handleSkillInputChange}
