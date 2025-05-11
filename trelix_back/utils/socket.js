@@ -96,8 +96,9 @@ const emitEngagementSummary = (summary) => {
 const emitNewFinancialEvent = (data) => {
     if (io) {
         io.emit('financial_event', data);
-    }financial_event
-}
+    }
+};
+
 
 module.exports = {
     initSocket,

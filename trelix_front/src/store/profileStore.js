@@ -33,10 +33,17 @@ export const useProfileStore = create((set, get) => ({
       "coverPhoto",
       "phone",
       "Bio",
-    ];
-    const filledFields = fields.filter((field) => profileData[field]);
-    const percentage = Math.round((filledFields.length / fields.length) * 100);
-    set({ accountCompletion: percentage });
+      "skils", // Added skills to the completion calculation
+    ]
+    const filledFields = fields.filter((field) => {
+      // Special check for skills array - consider it filled if it has at least one skill
+      if (field === "skils") {
+        return profileData[field] && profileData[field].length > 0
+      }
+      return profileData[field]
+    })
+    const percentage = Math.round((filledFields.length / fields.length) * 100)
+    set({ accountCompletion: percentage })
   },
   toggleMFA: () => {
     set((state) => ({

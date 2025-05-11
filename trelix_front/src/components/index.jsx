@@ -81,7 +81,9 @@ const Index = () => {
 
     const meetOurInstructors = async () => {
       try {
+
         const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/instructors`);
+
 
         setInstructorsMeet(res.data);
       } catch (err) {

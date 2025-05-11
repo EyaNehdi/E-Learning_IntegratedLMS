@@ -3,10 +3,10 @@ const Module = require("../models/module");
 
 // Créer un cours
 const createCourse = async (req, res) => {
-    const { title, description, price, level, categorie, moduleId, userId } = req.body;
+    const { title, description, price, level, categorie,typeRessource, moduleId, userId } = req.body;
 
     try {
-        if (!title || !description || !price || !level || !categorie || !moduleId || !userId) {
+        if (!title || !description || !price || !level || !categorie || !typeRessource || !moduleId || !userId) {
             return res.status(400).json({ message: "Tous les champs sont requis." });
         }
 
@@ -21,6 +21,7 @@ const createCourse = async (req, res) => {
             price,
             level,
             categorie,
+            typeRessource,
             module: moduleId,
             user: userId
         });
@@ -60,11 +61,11 @@ const getCourseById = async (req, res) => {
 // Mettre à jour un cours
 const updateCourse = async (req, res) => {
     try {
-        const { title, description, price, level, categorie } = req.body;
+        const { title, description, price, level, categorie, typeRessource } = req.body;
 
         const updatedCourse = await Course.findByIdAndUpdate(
             req.params.id,
-            { title, description, price, level, categorie },
+            { title, description, price, level, categorie, typeRessource },
             { new: true }
         );
 

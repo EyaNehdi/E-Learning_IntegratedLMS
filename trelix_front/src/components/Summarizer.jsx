@@ -7,7 +7,9 @@ const Summarizer = () => {
   const [loading, setLoading] = useState(false);
 
   // URL de l'API backend
+
   const SUMMARIZE_PDF_URL =`${import.meta.env.VITE_API_PROXY}/summarize-pdf/pdf`;
+
   ;  // Ajoute l'URL directement ici
 
   // Gérer le changement de fichier

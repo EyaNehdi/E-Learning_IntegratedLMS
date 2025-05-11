@@ -14,6 +14,7 @@ function Courses() {
   const [price, setPrice] = useState("")
   const [level, setLevel] = useState("")
   const [categorie, setCategorie] = useState("")
+  const [typeRessource, setTypeRessource] = useState("")
   const [modules, setModules] = useState([])
   const { user } = useOutletContext()
   const [selectedModules, setSelectedModules] = useState([])
@@ -40,6 +41,7 @@ function Courses() {
     price: "",
     level: "",
     categorie: "",
+    typeRessource: "",
     modules: "",
   })
 
@@ -160,6 +162,7 @@ function Courses() {
       price: "",
       level: "",
       categorie: "",
+      typeRessource: "",
       modules: "",
     }
 
@@ -200,6 +203,11 @@ function Courses() {
       newErrors.categorie = "La catégorie est requise"
       isValid = false
     }
+     // Vérifier la catégorie
+     if (!typeRessource) {
+      newErrors.typeRessource = "Le type du cours est requis"
+      isValid = false
+    }
 
     // Vérifier les modules
     if (selectedModules.length === 0) {
@@ -215,7 +223,7 @@ function Courses() {
 
   // Update this function to calculate form progress
   const calculateFormProgress = () => {
-    const fields = [title, description, price, level, categorie]
+    const fields = [title, description, price, level, categorie, typeRessource]
     const filledFields = fields.filter((field) => field !== "").length
     const progress = (filledFields / fields.length) * 100
     setFormProgress(progress)
@@ -249,6 +257,9 @@ function Courses() {
       case "categorie":
         setCategorie(value)
         break
+        case "typeRessource":
+        setTypeRessource(value)
+        break
       default:
         break
     }
@@ -278,6 +289,7 @@ function Courses() {
       price,
       level,
       categorie,
+      typeRessource,
       currency, // Ajout de la devise
       moduleId: selectedModules,
     })
@@ -299,6 +311,7 @@ function Courses() {
         price,
         level,
         categorie,
+        typeRessource,
         currency, // Ajout de la devise
         moduleId: selectedModules[0],
         userId: user._id, // Envoyer seulement le premier module sélectionné
@@ -321,6 +334,7 @@ function Courses() {
         setPrice("")
         setLevel("")
         setCategorie("")
+        setTypeRessource("")
         setCurrency("eur") // Réinitialiser la devise
         setSelectedModules([])
         setErrors({
@@ -329,6 +343,7 @@ function Courses() {
           price: "",
           level: "",
           categorie: "",
+          typeRessource: "",
           modules: "",
         })
 
@@ -466,28 +481,7 @@ function Courses() {
                           <span className="h-6 w-6 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:bg-blue-500">
                             <span className="w-3 h-3 bg-white rounded-full peer-checked:block hidden"></span>
                           </span>
-                          Dollar($)
-                        </label>
-                      </div>
-
-                      <div className="flex items-center space-x-1">
-                        <input
-                          type="radio"
-                          id="eur"
-                          name="currency"
-                          value="eur"
-                          checked={currency === "eur"}
-                          onChange={() => handleCurrencyChange("eur")}
-                          className="hidden peer"
-                        />
-                        <label
-                          htmlFor="eur"
-                          className="text-sm text-gray-700 cursor-pointer peer-checked:text-green-500 peer-checked:bg-green-100 peer-checked:border-green-500 peer-checked:ring-2 peer-checked:ring-green-300 transition-all duration-300 ease-in-out flex items-center space-x-2 px-4 py-2 rounded-lg"
-                        >
-                          <span className="h-6 w-6 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:bg-green-500">
-                            <span className="w-3 h-3 bg-white rounded-full peer-checked:block hidden"></span>
-                          </span>
-                          Euro(€)
+                          Trelix Coin (🪙)
                         </label>
                       </div>
 
@@ -620,7 +614,54 @@ function Courses() {
                   )}
                 </div>
               </div>
+{/* Type Ressource */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2 relative">
+                  <label htmlFor="level" className="block text-sm font-medium text-gray-700">
+                  Ressource Type <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="typeRessource"
+                      value={typeRessource}
+                      onChange={(e) => handleInputChange("typeRessource", e.target.value)}
+                      className={`w-full p-3 border rounded-md appearance-none bg-gray-50 ${
+                        errors.typeRessource ? "border-red-500" : "border-gray-300"
+                      }`}
+                      style={{
+                        display: "block",
+                        position: "relative",
+                        zIndex: 10,
+                      }}
+                    >
+                      <option value="" disabled>
+                      Select a Ressource Type
 
+                      </option>
+                      <option value="pdf">Pdf</option>
+                      <option value="video">Video</option>
+                      <option value="audio">Audio</option>
+                      <option value="image">Image</option>
+                      <option value="texte">Text</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                      </svg>
+                    </div>
+                  </div>
+                  {errors.typeRessource && (
+                    <div className="text-red-500 text-sm mt-1 flex items-center">
+                      <Info className="h-4 w-4 mr-1" />
+                      {errors.typeRessource}
+                    </div>
+                  )}
+                </div>
+
+               
+              </div>
+{/* Fin Type Ressource */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label htmlFor="modules" className="block text-sm font-medium text-gray-700">

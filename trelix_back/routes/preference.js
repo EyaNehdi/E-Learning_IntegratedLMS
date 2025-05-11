@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
-const { createpreference, getAllPreference } = require('../controllers/PreferenceController');
+const { createpreference, getAllPreference ,updatePreference, deletePreference} = require('../controllers/PreferenceController');
 
 router.post("/add", createpreference);
 router.get("/get", getAllPreference);
+router.put("/update/:id", updatePreference);
+
 
 module.exports = router;

@@ -537,11 +537,13 @@ const HomeUser = () => {
                   <div className="instructor-card position-relative overflow-hidden shadow-sm rounded-3 bg-white">
                     <div className="instructor-image text-center pt-4">
                       <img
+
                         src={
                                       instructor?.profilePhoto?.startsWith("http")
                                         ? instructor.profilePhoto
                                         : `${import.meta.env.VITE_API_PROXY}${instructor?.profilePhoto}`
                                     }
+
                         className="rounded-circle shadow-sm border border-white"
                         alt={`${instructor.firstName} ${instructor.lastName}`}
                         style={{

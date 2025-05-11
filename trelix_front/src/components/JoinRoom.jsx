@@ -23,7 +23,9 @@ export default function JoinRoom() {
     try {
       console.log("Demande de création de salle...");
       
+
       const res = await axios.post(`${import.meta.env.VITE_API_PROXY}/createRoom`);  
+
       console.log("Réponse du serveur :", res.data);  // Log de la réponse pour vérifier le contenu
   
       const roomName = res.data.roomName;  // Récupérer le nom de la salle
