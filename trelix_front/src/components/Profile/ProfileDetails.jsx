@@ -236,7 +236,7 @@ const ProfileDetails = () => {
     const updatedSkills = [...userSkills, skill]
 
     try {
-      const response = await axios.put("http://localhost:5000/api/info/profile/updateskils", {
+      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/updateskils", {
         userId: user._id,
         skills: updatedSkills,
       })
@@ -253,7 +253,7 @@ const ProfileDetails = () => {
     const updatedSkills = userSkills.filter((skill) => skill !== skillToRemove)
 
     try {
-      const response = await axios.put("http://localhost:5000/api/info/profile/updateskils", {
+      const response = await axios.put("https://trelix-xj5h.onrender.com/api/info/profile/updateskils", {
         userId: user._id,
         skills: updatedSkills,
       })

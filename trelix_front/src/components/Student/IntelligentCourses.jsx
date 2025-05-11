@@ -59,7 +59,7 @@ function IntelligentCourses() {
 
   const fetchUserPreference = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/preference/get?user=${userId}`);
+      const response = await axios.get(`https://trelix-xj5h.onrender.com/preference/get?user=${userId}`);
       if (response.status === 200 && response.data.length > 0) {
         setPreference(response.data[0]);
         console.log("Preference fetched:", response.data[0]);
