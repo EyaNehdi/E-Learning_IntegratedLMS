@@ -338,7 +338,7 @@ const ChapterContent = () => {
     setIsTranslating(true)
 
     try {
-      const response = await axios.post("http://localhost:8001/translate", {
+      const response = await axios.post("https://ia-mdels-resume-analyser-and-translate-ia.onrender.com/translate", {
         text: text,
         source_lang: "en", // Assuming original content is in English
         target_lang: targetLang,
