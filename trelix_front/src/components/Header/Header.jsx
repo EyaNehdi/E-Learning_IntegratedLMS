@@ -1,102 +1,99 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../store/authStore";
-import { useProfileStore } from "../../store/profileStore";
-import "./Header.css";
-import CloseIcon from "@mui/icons-material/Close";
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import Tooltip from "@mui/material/Tooltip";
-import MobileMenu from "./MobileMenu";
-import axios from "axios";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+"use client"
+
+import { useEffect, useState, useRef } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { useAuthStore } from "../../store/authStore"
+import { useProfileStore } from "../../store/profileStore"
+import "./Header.css"
+import CloseIcon from "@mui/icons-material/Close"
+import MenuOpenIcon from "@mui/icons-material/MenuOpen"
+import Tooltip from "@mui/material/Tooltip"
+import MobileMenu from "./MobileMenu"
+import axios from "axios"
+import Slider from "react-slick"
+import "slick-carousel/slick/slick.css"
+import "slick-carousel/slick/slick-theme.css"
 
 function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const coursesPerPage = 3
+  const sliderRef = useRef(null)
 
-  const [filteredCourses, setFilteredCourses] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { isAuthenticated, logout } = useAuthStore();
-  const navigate = useNavigate();
-  const { user, fetchUser, clearUser } = useProfileStore();
-  const location = useLocation();
-  const isActive = (path) => location.pathname === path;
+  const [filteredCourses, setFilteredCourses] = useState([])
+  const [courses, setCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const { isAuthenticated, logout } = useAuthStore()
+  const navigate = useNavigate()
+  const { user, fetchUser, clearUser } = useProfileStore()
+  const location = useLocation()
+  const isActive = (path) => location.pathname === path
 
   useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+    fetchUser()
+  }, [fetchUser])
 
   const handleLogout = () => {
-    logout();
-    clearUser();
-    navigate("/");
-  };
+    logout()
+    clearUser()
+    navigate("/")
+  }
 
   const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
 
   // Fetch courses from API
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        setLoading(true);
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_PROXY}/course/courses`
-        );
-        setCourses(response.data);
-        setFilteredCourses(response.data);
-        setLoading(false);
+        setLoading(true)
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/courses`)
+        setCourses(response.data)
+        setFilteredCourses(response.data)
+        setLoading(false)
       } catch (err) {
-        console.error("Erreur lors du chargement des cours:", err);
-        setError(
-          "Impossible de charger les cours. Veuillez réessayer plus tard."
-        );
-        setLoading(false);
+        console.error("Erreur lors du chargement des cours:", err)
+        setError("Impossible de charger les cours. Veuillez réessayer plus tard.")
+        setLoading(false)
       }
-    };
+    }
 
-    fetchCourses();
-  }, []);
+    fetchCourses()
+  }, [])
 
   useEffect(() => {
     if (!searchQuery.trim()) {
-      setFilteredCourses(courses);
+      setFilteredCourses(courses)
     } else {
-      const filtered = courses.filter((course) =>
-        course.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredCourses(filtered);
+      const filtered = courses.filter((course) => course.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      setFilteredCourses(filtered)
 
       // Vérifie que l'objet global est défini avant de l'utiliser
       if (window.courseSearchState) {
-        window.courseSearchState.query = searchQuery;
-        window.courseSearchState.notifyListeners(searchQuery);
+        window.courseSearchState.query = searchQuery
+        window.courseSearchState.notifyListeners(searchQuery)
       }
     }
-  }, [searchQuery, courses]);
+  }, [searchQuery, courses])
 
   useEffect(() => {
     if (!searchQuery.trim()) {
-      setFilteredCourses(courses);
+      setFilteredCourses(courses)
     } else {
-      const filtered = courses.filter((course) =>
-        course.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredCourses(filtered);
+      const filtered = courses.filter((course) => course.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      setFilteredCourses(filtered)
 
       // Vérifie que l'objet global est défini avant de l'utiliser
       if (window.courseSearchState) {
-        window.courseSearchState.query = searchQuery;
-        window.courseSearchState.notifyListeners(searchQuery);
+        window.courseSearchState.query = searchQuery
+        window.courseSearchState.notifyListeners(searchQuery)
       }
     }
-  }, [searchQuery, courses]);
+  }, [searchQuery, courses])
   return (
     <>
       <header className="header header-1">
@@ -115,11 +112,7 @@ function Header() {
         </div>
 
         {/* Search panel offcanvas */}
-        <div
-          className="search-popup offcanvas offcanvas-top"
-          id="offcanvas-search"
-          data-bs-scroll="true"
-        >
+        <div className="search-popup offcanvas offcanvas-top" id="offcanvas-search" data-bs-scroll="true">
           <div className="container d-flex flex-row py-5 align-items-center position-relative">
             <button
               type="button"
@@ -149,55 +142,85 @@ function Header() {
                 <div className="alert alert-danger">{error}</div>
               ) : (
                 <div className="product-wrap d-block">
-                  <h6>
-                    {searchQuery
-                      ? `Résultats pour "${searchQuery}"`
-                      : "Our Best Selling Courses"}
-                  </h6>
+                  <h6>{searchQuery ? `Résultats pour "${searchQuery}"` : "Our Best Selling Courses"}</h6>
                   {filteredCourses.length > 0 ? (
-                    <div className="row mt-3">
-                      {filteredCourses.map((course) => (
-                        <div
-                          className="col-sm-4 mb-4"
-                          key={course._id || course.id}
+                    <div className="mt-3">
+                      <div className="d-flex justify-content-between mb-3">
+                        <button
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => sliderRef.current?.slickPrev()}
+                          aria-label="Previous courses"
                         >
-                          <div className="course-entry-3 card rounded-2 border shadow-1">
-                            <div className="card-media position-relative">
-                              <a href={`/chapters/${course._id}`}>
-                                <img
-                                  className="card-img-top"
-                                  src={
-                                    course.image || "assets/images/course1.jpg"
-                                  }
-                                  alt={course.title}
-                                />
-                              </a>
-                            </div>
-                            <div className="card-body p-3">
-                              <div className="d-flex justify-content-between align-items-center small">
-                                <div className="d-flex align-items-center small">
-                                  <span className="rating-count">
-                                    ({course.reviews || 0})
-                                  </span>
+                          <i className="feather-icon icon-chevron-left"></i>
+                        </button>
+                        <span className="text-muted">
+                          {currentPage} / {Math.ceil(filteredCourses.length / coursesPerPage)}
+                        </span>
+                        <button
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => sliderRef.current?.slickNext()}
+                          aria-label="Next courses"
+                        >
+                          <i className="feather-icon icon-chevron-right"></i>
+                        </button>
+                      </div>
+                      <div className="course-slider">
+                        <Slider
+                          ref={sliderRef}
+                          dots={false}
+                          infinite={false}
+                          speed={500}
+                          slidesToShow={3}
+                          slidesToScroll={3}
+                          responsive={[
+                            {
+                              breakpoint: 992,
+                              settings: {
+                                slidesToShow: 2,
+                                slidesToScroll: 2,
+                              },
+                            },
+                            {
+                              breakpoint: 576,
+                              settings: {
+                                slidesToShow: 1,
+                                slidesToScroll: 1,
+                              },
+                            },
+                          ]}
+                          beforeChange={(current, next) => setCurrentPage(Math.floor(next / coursesPerPage) + 1)}
+                        >
+                          {filteredCourses.map((course) => (
+                            <div className="px-2" key={course._id || course.id}>
+                              <div className="course-entry-3 card rounded-2 border shadow-1 h-100">
+                                <div className="card-media position-relative">
+                                  <a href={`/chapters/${course._id}`}>
+                                    <img
+                                      className="card-img-top"
+                                      src={course.image || "assets/images/course1.jpg"}
+                                      alt={course.title}
+                                    />
+                                  </a>
+                                </div>
+                                <div className="card-body p-3">
+                                  <div className="d-flex justify-content-between align-items-center small">
+                                    <div className="d-flex align-items-center small">
+                                      <span className="rating-count">({course.reviews || 0})</span>
+                                    </div>
+                                  </div>
+                                  <h3 className="display-6 mt-1">
+                                    <a href={`/courses/${course._id || course.id}`}>{course.title}</a>
+                                  </h3>
+                                  <span className="fw-bold">{course.price?.toFixed(2) || "0.00"}🪙</span>
                                 </div>
                               </div>
-                              <h3 className="display-6 mt-1">
-                                <a href={`/courses/${course._id || course.id}`}>
-                                  {course.title}
-                                </a>
-                              </h3>
-                              <span className="fw-bold">
-                                {course.price?.toFixed(2) || "0.00"}🪙
-                              </span>
                             </div>
-                          </div>
-                        </div>
-                      ))}
+                          ))}
+                        </Slider>
+                      </div>
                     </div>
                   ) : (
-                    <div className="alert alert-info mt-3">
-                      Aucun cours ne correspond à votre recherche.
-                    </div>
+                    <div className="alert alert-info mt-3">Aucun cours ne correspond à votre recherche.</div>
                   )}
                 </div>
               )}
@@ -213,11 +236,7 @@ function Header() {
                 {/* Logo */}
                 <div className="col-auto py-0">
                   <a className=" align-items-center" href="/">
-                    <img
-                      src="/assets/images/ss.png"
-                      alt="Logo"
-                      className="d-none py-0 d-xl-block"
-                    />
+                    <img src="/assets/images/ss.png" alt="Logo" className="d-none py-0 d-xl-block" />
                     <img
                       src="/assets/images/ss.png"
                       alt="Logo"
@@ -236,17 +255,14 @@ function Header() {
                             href="/"
                             role="button"
                             aria-expanded="false"
-                            className={`nav-link px-3 px-xl-4 ${["/", "/home"].includes(location.pathname)
-                                ? "active"
-                                : ""
-                              }`}
+                            className={`nav-link px-3 px-xl-4 ${
+                              ["/", "/home"].includes(location.pathname) ? "active" : ""
+                            }`}
                             style={{
                               paddingInlineEnd: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
-                              color: ["/", "/home"].includes(location.pathname)
-                                ? "#007bff"
-                                : "inherit",
+                              color: ["/", "/home"].includes(location.pathname) ? "#007bff" : "inherit",
                             }}
                           >
                             Home
@@ -257,16 +273,12 @@ function Header() {
                             href="/calendar"
                             role="button"
                             aria-expanded="false"
-                            className={`nav-link px-3 px-xl-4 ${location.pathname === "/calendar" ? "active" : ""
-                              }`}
+                            className={`nav-link px-3 px-xl-4 ${location.pathname === "/calendar" ? "active" : ""}`}
                             style={{
                               paddingInline: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
-                              color:
-                                location.pathname === "/calendar"
-                                  ? "#007bff"
-                                  : "inherit",
+                              color: location.pathname === "/calendar" ? "#007bff" : "inherit",
                             }}
                           >
                             Dashboard
@@ -278,24 +290,25 @@ function Header() {
                             href="#"
                             role="button"
                             aria-expanded="false"
-                            className={`nav-link px-3 px-xl-4 ${location.pathname.startsWith("/allcours") ||
-                                location.pathname.startsWith("/Moodle") ||
-                                location.pathname.startsWith("/Classroom") ||
-                                location.pathname.startsWith("/chapters") ||
-                                location.pathname.startsWith("/content")
+                            className={`nav-link px-3 px-xl-4 ${
+                              location.pathname.startsWith("/allcours") ||
+                              location.pathname.startsWith("/Moodle") ||
+                              location.pathname.startsWith("/Classroom") ||
+                              location.pathname.startsWith("/chapters") ||
+                              location.pathname.startsWith("/content")
                                 ? "active"
                                 : ""
-                              }`}
+                            }`}
                             style={{
                               paddingInline: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
                               color:
                                 location.pathname.startsWith("/allcours") ||
-                                  location.pathname.startsWith("/Moodle") ||
-                                  location.pathname.startsWith("/Classroom") ||
-                                  location.pathname.startsWith("/chapters") ||
-                                  location.pathname.startsWith("/content")
+                                location.pathname.startsWith("/Moodle") ||
+                                location.pathname.startsWith("/Classroom") ||
+                                location.pathname.startsWith("/chapters") ||
+                                location.pathname.startsWith("/content")
                                   ? "#007bff"
                                   : "inherit",
                             }}
@@ -306,15 +319,10 @@ function Header() {
                           <ul className="dropdown-menu">
                             <li>
                               <a
-                                className={`dropdown-item ${location.pathname === "/allcours"
-                                    ? "active"
-                                    : ""
-                                  }`}
+                                className={`dropdown-item ${location.pathname === "/allcours" ? "active" : ""}`}
                                 href="/allcours"
                                 style={
-                                  location.pathname === "/allcours"
-                                    ? { color: "#007bff", fontWeight: "bold" }
-                                    : {}
+                                  location.pathname === "/allcours" ? { color: "#007bff", fontWeight: "bold" } : {}
                                 }
                               >
                                 All Cours
@@ -322,17 +330,12 @@ function Header() {
                             </li>
                             <li>
                               <a
-                                className={`dropdown-item ${location.pathname === "/Moodle"
-                                    ? "active"
-                                    : ""
-                                  }`}
+                                className={`dropdown-item ${location.pathname === "/Moodle" ? "active" : ""}`}
                                 href="/Moodle"
                                 style={{
                                   display: "flex",
                                   alignItems: "center",
-                                  ...(location.pathname === "/Moodle"
-                                    ? { color: "#007bff", fontWeight: "bold" }
-                                    : {}),
+                                  ...(location.pathname === "/Moodle" ? { color: "#007bff", fontWeight: "bold" } : {}),
                                 }}
                               >
                                 <img
@@ -348,10 +351,7 @@ function Header() {
                             </li>
                             <li>
                               <a
-                                className={`dropdown-item ${location.pathname === "/Classroom"
-                                    ? "active"
-                                    : ""
-                                  }`}
+                                className={`dropdown-item ${location.pathname === "/Classroom" ? "active" : ""}`}
                                 href="/Classroom"
                                 style={{
                                   display: "flex",
@@ -382,18 +382,12 @@ function Header() {
                           <a
                             href="/leaderboard"
                             role="button"
-                            className={`nav-link px-3 px-xl-4 ${location.pathname === "/leaderboard"
-                                ? "active"
-                                : ""
-                              }`}
+                            className={`nav-link px-3 px-xl-4 ${location.pathname === "/leaderboard" ? "active" : ""}`}
                             style={{
                               paddingInline: "40px",
                               fontWeight: "bold",
                               fontSize: "20px",
-                              color:
-                                location.pathname === "/leaderboard"
-                                  ? "#007bff"
-                                  : "inherit",
+                              color: location.pathname === "/leaderboard" ? "#007bff" : "inherit",
                             }}
                           >
                             Leaderboard
@@ -429,19 +423,14 @@ function Header() {
                           <i className="feather-icon icon-user" />
                         </a>
                         {menuOpen && (
-                          <div
-                            className={`admin-menu pt-3 bg-white ${menuOpen ? "open" : ""
-                              }`}
-                          >
+                          <div className={`admin-menu pt-3 bg-white ${menuOpen ? "open" : ""}`}>
                             <div className="d-flex avatar border-bottom">
                               <div
                                 className="avatar p-2 rounded-circle d-flex align-items-center justify-content-center"
                                 style={{
                                   width: "50px",
                                   height: "50px",
-                                  backgroundColor: user?.profilePhoto
-                                    ? "transparent"
-                                    : "#007bff",
+                                  backgroundColor: user?.profilePhoto ? "transparent" : "#007bff",
                                   fontSize: "20px",
                                   fontWeight: "bold",
                                   color: "#fff",
@@ -469,7 +458,6 @@ function Header() {
                                       <>
                                         {user.firstName.charAt(0)}
                                         {user.lastName.charAt(0)}
-
                                       </>
                                     ) : (
                                       "?"
@@ -483,9 +471,7 @@ function Header() {
                                     {user.firstName} {user.lastName}
                                   </h6>
                                 ) : (
-                                  <h6 className="mb-0">
-                                    Please login, you don't have an account
-                                  </h6>
+                                  <h6 className="mb-0">Please login, you don't have an account</h6>
                                 )}
                                 <small>{user.role}</small>
                               </div>
@@ -494,28 +480,14 @@ function Header() {
                               <ul className="list-unstyled nav">
                                 {location.pathname !== "/home" && (
                                   <li>
-                                    <a
-                                      className={
-                                        isActive("/home")
-                                          ? "nav-link active"
-                                          : "nav-link"
-                                      }
-                                      href="/home"
-                                    >
+                                    <a className={isActive("/home") ? "nav-link active" : "nav-link"} href="/home">
                                       <i className="feather-icon icon-home" />
                                       <span>Home</span>
                                     </a>
                                   </li>
                                 )}
                                 <li>
-                                  <a
-                                    className={
-                                      isActive("/profile")
-                                        ? "nav-link active"
-                                        : "nav-link"
-                                    }
-                                    href="/profile"
-                                  >
+                                  <a className={isActive("/profile") ? "nav-link active" : "nav-link"} href="/profile">
                                     <i className="feather-icon icon-user" />
                                     <span>My Profile</span>
                                   </a>
@@ -523,11 +495,7 @@ function Header() {
 
                                 <li>
                                   <a
-                                    className={
-                                      isActive("/profile/settings")
-                                        ? "nav-link active"
-                                        : "nav-link"
-                                    }
+                                    className={isActive("/profile/settings") ? "nav-link active" : "nav-link"}
                                     href="/profile/settings"
                                   >
                                     <i className="feather-icon icon-shopping-bag" />
@@ -538,11 +506,7 @@ function Header() {
                                 {user?.role === "student" && <li></li>}
                                 <li>
                                   <a
-                                    className={
-                                      isActive("/certificates")
-                                        ? "nav-link active"
-                                        : "nav-link"
-                                    }
+                                    className={isActive("/certificates") ? "nav-link active" : "nav-link"}
                                     href="/certificates"
                                   >
                                     <i className="feather-icon icon-award" />
@@ -554,11 +518,7 @@ function Header() {
                                   <>
                                     <li>
                                       <a
-                                        className={
-                                          isActive("/profile/list")
-                                            ? "nav-link active"
-                                            : "nav-link"
-                                        }
+                                        className={isActive("/profile/list") ? "nav-link active" : "nav-link"}
                                         href="/profile/list"
                                       >
                                         <i className="feather-icon icon-book" />
@@ -567,11 +527,7 @@ function Header() {
                                     </li>
                                     <li>
                                       <a
-                                        className={
-                                          isActive("/profile/allquiz")
-                                            ? "nav-link active"
-                                            : "nav-link"
-                                        }
+                                        className={isActive("/profile/allquiz") ? "nav-link active" : "nav-link"}
                                         href="/profile/allquiz"
                                       >
                                         <i className="feather-icon icon-briefcase" />
@@ -580,11 +536,7 @@ function Header() {
                                     </li>
                                     <li>
                                       <a
-                                        className={
-                                          isActive("/profile/Allexams")
-                                            ? "nav-link active"
-                                            : "nav-link"
-                                        }
+                                        className={isActive("/profile/Allexams") ? "nav-link active" : "nav-link"}
                                         href="/profile/Allexams"
                                       >
                                         <i className="feather-icon icon-cpu" />
@@ -593,11 +545,7 @@ function Header() {
                                     </li>
                                     <li>
                                       <a
-                                        className={
-                                          isActive("/profile/addchapter")
-                                            ? "nav-link active"
-                                            : "nav-link"
-                                        }
+                                        className={isActive("/profile/addchapter") ? "nav-link active" : "nav-link"}
                                         href="/profile/addchapter"
                                       >
                                         <i className="feather-icon icon-bell" />
@@ -618,19 +566,13 @@ function Header() {
                                   </li>
                                 )}
                                 <li>
-                                  <a
-                                    className="nav-link"
-                                    href="/profile/settings"
-                                  >
+                                  <a className="nav-link" href="/profile/settings">
                                     <i className="feather-icon icon-settings" />
                                     <span>Settings</span>
                                   </a>
                                 </li>
                                 <li>
-                                  <a
-                                    className="nav-link cursor-pointer"
-                                    onClick={handleLogout}
-                                  >
+                                  <a className="nav-link cursor-pointer" onClick={handleLogout}>
                                     <i className="feather-icon icon-log-out" />
                                     <span>Logout</span>
                                   </a>
@@ -667,9 +609,7 @@ function Header() {
                                 {user?.firstName} {user?.lastName}{" "}
                               </span>
                             </Tooltip>
-
-                            <span>&nbsp;             🪙 {user?.balance}</span>
-
+                            <span>&nbsp; 🪙 {user?.balance}</span>
                           </div>
                         ) : (
                           <></>
@@ -709,10 +649,7 @@ function Header() {
                     </>
                   )}
                   {/* Mobile Menu Toggle Button */}
-                  <button
-                    onClick={toggleMobileMenu}
-                    className="mobile-menu-button d-md-none"
-                  >
+                  <button onClick={toggleMobileMenu} className="mobile-menu-button d-md-none">
                     {mobileMenuOpen ? <CloseIcon /> : <MenuOpenIcon />}
                   </button>
                 </div>
@@ -731,7 +668,7 @@ function Header() {
         )}
       </header>
     </>
-  );
+  )
 }
 
-export default Header;  
+export default Header
