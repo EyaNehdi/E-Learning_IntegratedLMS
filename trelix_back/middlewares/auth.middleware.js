@@ -1,18 +1,14 @@
 // middlewares/auth.middleware.js
 const isAuthenticated = (req, res, next) => {
-  
-  if (req.session && req.session.isAuthenticated) {
-    // Ajouter les informations utilisateur à la requête
-    req.user = {
-      _id: req.session.userId,
-      email: req.session.email,
-      accessToken: req.session.accessToken,
-      refreshToken: req.session.refreshToken,
-      tokenExpiry: req.session.tokenExpiry
-    };
+  console.log('Middleware isAuthenticated - Session:', req.session);
+
+  if (req.session.user && req.session.user.accessToken) {
+    req.user = req.session.user;
+    console.log('Utilisateur authentifié:', req.user);
     next();
   } else {
-    res.status(401).json({ error: "Non authentifié" });
+    console.log('Utilisateur non authentifié');
+    return res.status(401).json({ success: false, error: 'Non authentifié' });
   }
 };
 
