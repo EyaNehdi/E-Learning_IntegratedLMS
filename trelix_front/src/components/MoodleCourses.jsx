@@ -501,17 +501,25 @@ function MoodleCourses() {
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center max-w-3xl mx-auto">
-              <div className="bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <BookOpen className="h-10 w-10 text-indigo-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome to TrelixMoodle</h2>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                Your personalized learning platform. Select a course from the list to view its contents and start
-                learning.
-              </p>
-              
-            </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center max-w-3xl mx-auto">
+  <div className="bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+    <BookOpen className="h-10 w-10 text-indigo-600" />
+  </div>
+  <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome to TrelixMoodle</h2>
+  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+    Your personalized learning platform. Select a course from the list to view its contents and start
+    learning.
+  </p>
+  <a
+    href="https://trelix.moodlecloud.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block mt-4 text-indigo-600 hover:text-indigo-800 font-semibold"
+  >
+    Visit MoodleCloud Platform →
+  </a>
+</div>
+
           )}
         </main>
       </div>
