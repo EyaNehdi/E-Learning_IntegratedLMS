@@ -11,7 +11,7 @@ const fetchCitation = async (req, res) => {
     res.json({
       q: quote.q,
       a: quote.a
-    });
+    });hn
   } catch (error) {
     console.error('Error fetching quote:', error.message);
 

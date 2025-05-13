@@ -607,7 +607,7 @@ function AddChapter() {
                           Active
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="px-20 py-10 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-3">
                           <button className="text-indigo-600 hover:text-indigo-900">
                             <Edit className="h-5 w-5" />
