@@ -15,7 +15,7 @@ router.get('/callback', async (req, res) => {
 
   if (!code) {
     console.error("Code d'authentification manquant dans la requête de callback");
-    return res.redirect('http://localhost:5173/classroom?auth=error&reason=no_code');
+    return res.redirect('https://trelix-livid.vercel.app/classroom?auth=error&reason=no_code');
   }
 
   try {
@@ -36,10 +36,10 @@ router.get('/callback', async (req, res) => {
     await req.session.save();
     console.log("Session après sauvegarde:", req.session.user);
 
-    res.redirect('http://localhost:5173/classroom?auth=success');
+    res.redirect('https://trelix-livid.vercel.app/classroom?auth=success');
   } catch (error) {
     console.error('Erreur lors du callback Google:', error.message);
-    res.redirect('http://localhost:5173/classroom?auth=error&reason=token_exchange_failed');
+    res.redirect('https://trelix-livid.vercel.app/classroom?auth=error&reason=token_exchange_failed');
   }
 });
 
