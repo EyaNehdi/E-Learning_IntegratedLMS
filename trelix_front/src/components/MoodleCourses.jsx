@@ -22,6 +22,7 @@ import {
   Award,
   Settings,
 } from "lucide-react"
+import "./moodle-courses.css"
 
 function MoodleCourses() {
   const [courses, setCourses] = useState([])
@@ -112,7 +113,23 @@ function MoodleCourses() {
 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-     
+      {/* Mobile header with menu toggle */}
+      <header className="md:hidden bg-white border-b border-gray-200 py-3 px-4 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="btn-icon" aria-label="Toggle menu">
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+        <div className="flex items-center">
+          <h1 className="text-lg font-bold text-gray-800">TrelixMoodle</h1>
+        </div>
+        <div className="flex items-center space-x-1">
+          <button className="btn-icon" aria-label="Notifications">
+            <Bell className="w-5 h-5" />
+          </button>
+          <button className="btn-icon" aria-label="User profile">
+            <User className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
 
       {/* Mobile search - only visible on small screens */}
       <div className="md:hidden px-4 py-2 bg-white border-b border-gray-200">
@@ -122,7 +139,7 @@ function MoodleCourses() {
           </div>
           <input
             type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+            className="search-input"
             placeholder="Search courses..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -131,32 +148,80 @@ function MoodleCourses() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-       
         {/* Sidebar - hidden on mobile unless menu is open */}
         <aside
           className={`${
             mobileMenuOpen ? "block" : "hidden"
           } md:block w-full md:w-72 lg:w-80 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0 transition-all duration-300 ease-in-out z-20 md:relative absolute inset-0`}
         >
-            <div className="hidden md:flex items-center flex-1 max-w-md mx-4">
+          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+            <h1 className="text-xl font-bold text-gray-800 hidden md:block">TrelixMoodle</h1>
+            <div className="hidden md:flex items-center space-x-2">
+              <button className="btn-icon" aria-label="Notifications">
+                <Bell className="w-5 h-5" />
+              </button>
+              <button className="btn-icon" aria-label="User profile">
+                <User className="w-5 h-5" />
+              </button>
+            </div>
+            <button className="md:hidden btn-icon" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="p-4">
+            <div className="hidden md:flex items-center flex-1 max-w-md mx-auto mb-4">
               <div className="relative w-full">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type="text"
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="search-input"
                   placeholder="Search courses..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
-          <div className="p-4">
+
             <h2 className="text-lg font-semibold text-gray-800 mb-4">My Courses</h2>
 
             {/* Navigation */}
-           
+            <nav className="mb-6">
+              <ul className="space-y-1">
+                <li>
+                  <a href="#" className="nav-link">
+                    <Home className="w-5 h-5 mr-3" />
+                    <span>Dashboard</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="nav-link active">
+                    <BookOpen className="w-5 h-5 mr-3" />
+                    <span>My Courses</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="nav-link">
+                    <Calendar className="w-5 h-5 mr-3" />
+                    <span>Calendar</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="nav-link">
+                    <Bookmark className="w-5 h-5 mr-3" />
+                    <span>Saved Items</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="nav-link">
+                    <Award className="w-5 h-5 mr-3" />
+                    <span>Certificates</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
 
             {/* Course list */}
             {isLoading ? (
@@ -177,17 +242,9 @@ function MoodleCourses() {
                   <button
                     key={course.id}
                     onClick={() => fetchCourseContents(course.id)}
-                    className={` text-left p-3 rounded-lg flex items-center transition-colors min-w-[250px] ${
-                      selectedCourseId === course.id
-                        ? "bg-indigo-50 border border-indigo-100"
-                        : "hover:bg-gray-50 border border-transparent"
-                    }`}
+                    className={`course-item ${selectedCourseId === course.id ? "course-item-active" : ""}`}
                   >
-                    <div
-                      className={`w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 mr-3 ${
-                        selectedCourseId === course.id ? "bg-indigo-600 text-white" : "bg-indigo-100 text-indigo-600"
-                      }`}
-                    >
+                    <div className={`course-icon ${selectedCourseId === course.id ? "course-icon-active" : ""}`}>
                       {course.shortname ? course.shortname.charAt(0) : course.fullname.charAt(0)}
                     </div>
                     <div className="overflow-hidden">
@@ -217,7 +274,7 @@ function MoodleCourses() {
         {/* Main content */}
         <main className="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6">
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md shadow-sm">
+            <div className="error-alert">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
@@ -245,10 +302,10 @@ function MoodleCourses() {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
               {/* Course header */}
               {selectedCourse && (
-                <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white p-6">
+                <div className="course-header">
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold">{selectedCourse.fullname}</h2>
-                    <button className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                    <button className="btn-icon-light">
                       <Settings className="w-5 h-5" />
                     </button>
                   </div>
@@ -257,29 +314,19 @@ function MoodleCourses() {
                   {/* Course tabs */}
                   <div className="flex mt-6 border-b border-indigo-500/30">
                     <button
-                      className={`px-4 py-2 text-sm font-medium ${
-                        activeTab === "content"
-                          ? "border-b-2 border-white text-white"
-                          : "text-indigo-200 hover:text-white"
-                      }`}
+                      className={`tab-button ${activeTab === "content" ? "tab-active" : ""}`}
                       onClick={() => setActiveTab("content")}
                     >
                       Course Content
                     </button>
                     <button
-                      className={`px-4 py-2 text-sm font-medium ${
-                        activeTab === "info" ? "border-b-2 border-white text-white" : "text-indigo-200 hover:text-white"
-                      }`}
+                      className={`tab-button ${activeTab === "info" ? "tab-active" : ""}`}
                       onClick={() => setActiveTab("info")}
                     >
                       Information
                     </button>
                     <button
-                      className={`px-4 py-2 text-sm font-medium ${
-                        activeTab === "grades"
-                          ? "border-b-2 border-white text-white"
-                          : "text-indigo-200 hover:text-white"
-                      }`}
+                      className={`tab-button ${activeTab === "grades" ? "tab-active" : ""}`}
                       onClick={() => setActiveTab("grades")}
                     >
                       Grades
@@ -355,12 +402,12 @@ function MoodleCourses() {
                                         {mod.completionstate !== undefined && (
                                           <div className="ml-4 flex-shrink-0">
                                             {mod.completionstate ? (
-                                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                              <span className="status-badge status-completed">
                                                 <CheckCircle className="w-3 h-3 mr-1" />
                                                 Completed
                                               </span>
                                             ) : (
-                                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                              <span className="status-badge status-pending">
                                                 <Clock className="w-3 h-3 mr-1" />
                                                 Pending
                                               </span>
@@ -435,9 +482,7 @@ function MoodleCourses() {
                             <p className="font-medium text-gray-900">Professor Smith</p>
                             <p className="text-sm text-gray-500">smith@example.edu</p>
                           </div>
-                          <button className="ml-auto bg-indigo-600 text-white px-3 py-1 rounded-md text-sm hover:bg-indigo-700 transition-colors">
-                            Contact
-                          </button>
+                          <button className="ml-auto btn-primary">Contact</button>
                         </div>
                       </div>
                     </div>
@@ -501,25 +546,19 @@ function MoodleCourses() {
               )}
             </div>
           ) : (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center max-w-3xl mx-auto">
-  <div className="bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-    <BookOpen className="h-10 w-10 text-indigo-600" />
-  </div>
-  <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome to TrelixMoodle</h2>
-  <p className="text-gray-600 mb-6 max-w-md mx-auto">
-    Your personalized learning platform. Select a course from the list to view its contents and start
-    learning.
-  </p>
-  <a
-    href="https://trelix.moodlecloud.com"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="inline-block mt-4 text-indigo-600 hover:text-indigo-800 font-semibold"
-  >
-    Visit MoodleCloud Platform →
-  </a>
-</div>
-
+            <div className="welcome-card">
+              <div className="bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <BookOpen className="h-10 w-10 text-indigo-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome to TrelixMoodle</h2>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Your personalized learning platform. Select a course from the list to view its contents and start
+                learning.
+              </p>
+              <a href="https://trelix.moodlecloud.com" target="_blank" rel="noopener noreferrer" className="btn-link">
+                Visit MoodleCloud Platform →
+              </a>
+            </div>
           )}
         </main>
       </div>
