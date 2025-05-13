@@ -187,7 +187,6 @@ function App() {
               element={<IntelligentCourses />}
             />
            
-              <Route path="CitationGenerator" element={<CitationGenerator />} />
 
               <Route path="addchapter" element={<AddChapter />} />
               <Route path="addExam" element={<AddExam />} />

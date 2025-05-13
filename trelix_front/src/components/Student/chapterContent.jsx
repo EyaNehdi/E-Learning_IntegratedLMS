@@ -23,10 +23,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { Progress } from "../ui/progress"
 
-import Summarizer from "../Summarizer";
+import Summarizer from "../Summarizer"
 
 import "./b.css"
-
 
 // Import your QuizModal component
 import QuizModal from "../Quiz/QuizModal"
@@ -316,7 +315,7 @@ const ChapterContent = () => {
   }
 
   // Check if quiz can be started
-  const canStartQuiz = videoCompleted && (pdfCompleted || !currentChapter?.pdf)
+  const canStartQuiz = (videoCompleted || !currentChapter?.video) && (pdfCompleted || !currentChapter?.pdf)
 
   // Start quiz
   const handleStartQuiz = () => {
@@ -338,12 +337,14 @@ const ChapterContent = () => {
     setIsTranslating(true)
 
     try {
-      const response = await axios.post("https://ia-mdels-resume-analyser-and-translate-ia-w7s9.onrender.com/translate", {
-        text: text,
-        source_lang: "en", // Assuming original content is in English
-        target_lang: targetLang,
-      })
-      
+      const response = await axios.post(
+        "https://ia-mdels-resume-analyser-and-translate-ia-w7s9.onrender.com/translate",
+        {
+          text: text,
+          source_lang: "en", // Assuming original content is in English
+          target_lang: targetLang,
+        },
+      )
 
       setIsTranslating(false)
       return response.data.translated_text
@@ -429,7 +430,9 @@ const ChapterContent = () => {
           const formattedReviews = response.data.map((review) => ({
             ...review,
             userName: `${review.user?.firstName || "Anonymous"} ${review.user?.lastName || ""}`.trim(),
-            userImage: review.user?.profilePhoto ? `${import.meta.env.VITE_API_PROXY}${review.user.profilePhoto}` : null,
+            userImage: review.user?.profilePhoto
+              ? `${import.meta.env.VITE_API_PROXY}${review.user.profilePhoto}`
+              : null,
           }))
 
           setUserReviews(formattedReviews)
@@ -491,9 +494,7 @@ const ChapterContent = () => {
                 </div>
               </div>
             </div>
-
             {/* Learning Card */}
-
             <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-200 flex-grow">
               {/* Check if PDF exists */}
               {currentChapter.pdf === null ? (
@@ -556,7 +557,7 @@ const ChapterContent = () => {
                         muted
                         onTimeUpdate={handleVideoTimeUpdate}
                       >
-                        <source src={`${currentChapter.video}`} type='video/mp4' />
+                        <source src={`${currentChapter.video}`} type="video/mp4" />
                         Your browser does not support the video tag.
                       </video>
                     </div>
@@ -680,14 +681,11 @@ const ChapterContent = () => {
                 </div>
               )}
             </div>
-
-
             {/* Résumeur de texte */}
-<div className="mb-8">
-  <Summarizer />
-</div>-
-
-            {/* Quiz Button */}
+            <div className="mb-8">
+              <Summarizer />
+            </div>
+            -{/* Quiz Button */}
             <div className="mb-8 flex justify-center">
               <button
                 className={`py-4 px-10 rounded-lg text-lg transition-all duration-300 shadow-lg focus:outline-none flex items-center gap-3 ${
@@ -703,15 +701,8 @@ const ChapterContent = () => {
                 {canStartQuiz && <Play className="w-5 h-5" />}
               </button>
             </div>
-
-
-
-
-
-
             {/* Quiz Modal */}
             <QuizModal showQuiz={showQuiz} onClose={() => setShowQuiz(false)} />
-
             {/* Tabs Section */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
               <Tabs defaultValue="overview" className="w-full">
@@ -720,7 +711,6 @@ const ChapterContent = () => {
                     value="overview"
                     className="flex-1 py-3 px-6 text-base font-medium text-black bg-blue-500 hover:bg-blue-600 transition-colors duration-200 data-[state=active]:bg-sky-100 data-[state=active]:text-blue-800 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 focus:outline-none"
                   >
-                    
                     Overview
                   </TabsTrigger>
                   <TabsTrigger
