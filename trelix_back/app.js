@@ -123,7 +123,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cookieParser());
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'classroom_secret_key',
+  secret: process.env.SESSION_SECRET || '`classroom_secret_key`',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
@@ -131,10 +131,11 @@ app.use(session({
     ttl: 14 * 24 * 60 * 60 // 14 jours
   }),
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
     httpOnly: true,
-    maxAge: 14 * 24 * 60 * 60 * 1000 // 14 jours
-  }
+    sameSite: "none",
+    maxAge: 14 * 24 * 60 * 60 * 1000,
+  },
 }));
 
 app.use((req, res, next) => {
@@ -486,9 +487,8 @@ async function runEngagementTasks() {
     .catch(err => console.error('❌ Error during log cleanup:', err));
 }
 
-if (process.env.NODE_ENV === 'forTest') {
-  runEngagementTasks();
-} else if (process.env.NODE_ENV === 'production') {
+
+if (process.env.NODE_ENV === 'production') {
   const cron = require('node-cron');
   cron.schedule('0 0 * * *', runEngagementTasks);
 }

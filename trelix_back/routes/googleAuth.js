@@ -15,7 +15,7 @@ router.get('/callback', async (req, res) => {
 
   if (!code) {
     console.error("Code d'authentification manquant dans la requête de callback");
-    return res.redirect('https://trelix-livid.vercel.app/classroom?auth=error&reason=no_code');
+    return res.redirect(`${process.env.BASE_URL_FRONTEND}/classroom?auth=error&reason=no_code`);
   }
 
   try {
@@ -36,10 +36,10 @@ router.get('/callback', async (req, res) => {
     await req.session.save();
     console.log("Session après sauvegarde:", req.session.user);
 
-    res.redirect('https://trelix-livid.vercel.app/classroom?auth=success');
+    res.redirect(`${process.env.BASE_URL_FRONTEND}/classroom?auth=success`);
   } catch (error) {
     console.error('Erreur lors du callback Google:', error.message);
-    res.redirect('https://trelix-livid.vercel.app/classroom?auth=error&reason=token_exchange_failed');
+    res.redirect(`${process.env.BASE_URL_FRONTEND}/classroom?auth=error&reason=token_exchange_failed`);
   }
 });
 
@@ -62,7 +62,12 @@ router.get('/logout', (req, res) => {
       console.error('Erreur lors de la déconnexion:', err);
       return res.status(500).json({ success: false, error: 'Erreur lors de la déconnexion' });
     }
-    res.clearCookie('connect.sid');
+    res.clearCookie('connect.sid', {
+      path: '/',
+      secure: true,
+      httpOnly: true,
+      sameSite: 'none',
+    });
     console.log("Session détruite avec succès");
     res.json({ success: true, message: 'Déconnexion réussie' });
   });
