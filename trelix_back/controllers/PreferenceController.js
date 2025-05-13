@@ -182,6 +182,7 @@ const getRecommendedCourses = async (req, res) => {
       moduleName: moduleExists.name,
       courseSlug: course.slug,
     }));
+    
 
     console.log("Recommended courses:", recommendedCourses);
     res.status(200).json(recommendedCourses);
@@ -191,6 +192,4 @@ const getRecommendedCourses = async (req, res) => {
   }
 };
 
-
 module.exports = { createpreference, updatePreference, getAllPreference, getRecommendedCourses };
-

@@ -46,6 +46,10 @@ import ListBadges from "./components/Admin/ListBadges";
 
 import ModifyPreference from "./components/Student/ModifyPreference.jsx";
 
+
+
+import axios from "axios"; 
+
 import StatPreference from "./components/Student/preference-statistics";
 import Preference from "./components/Student/AddPreference";
 import IntelligentCourses from "./components/Student/IntelligentCourses";
@@ -109,6 +113,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+
           </Route>
           <Route path="/test" element={<MoodleCourses />} />
           <Route path="/test1" element={<Calendar />} />
@@ -150,7 +155,9 @@ function App() {
               element={<EditCourse />}
             />
 
+
             <Route path="/profile/classroom" element={<ClassroomPage />} />
+
             <Route
               path="/profile/classroom/courses/:courseId"
               element={<CourseDetailsPage />}

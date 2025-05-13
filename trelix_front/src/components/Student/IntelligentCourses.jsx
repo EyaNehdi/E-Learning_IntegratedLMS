@@ -172,7 +172,6 @@ function IntelligentCourses() {
                         <p className="mb-1">By: {course.categorie}</p>
                         <p>{course.moduleName}</p>
                       </div>
-
                     </div>
                     <button
                       className="mt-auto bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200"
@@ -192,5 +191,7 @@ function IntelligentCourses() {
     </div>
   );
 }
+
+
 
 export default IntelligentCourses;
