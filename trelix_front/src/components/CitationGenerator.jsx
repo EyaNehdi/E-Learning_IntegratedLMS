@@ -8,18 +8,18 @@ const CitationGenerator = () => {
 
   const fetchCitation = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/citation`);
-
+      const response = await axios.get('https://trelix-xj5h.onrender.com/citation/api/quote');
+      console.log("response citation front", response.data);
       setCitation(response.data.q);
       setAuthor(response.data.a);
-      setVisible(true); // Affiche la citation
+      setVisible(true);
 
-      // Cache la citation après 10 secondes
+      // Hide citation after 10 seconds
       setTimeout(() => {
         setVisible(false);
       }, 10000);
     } catch (error) {
-      console.error('Erreur lors de la récupération de la citation:', error);
+      console.error('Erreur lors de la récupération de la citation:', error.response?.headers || error.message);
       setCitation('Erreur lors de la récupération de la citation');
       setAuthor('');
       setVisible(true);
@@ -30,13 +30,12 @@ const CitationGenerator = () => {
     }
   };
 
-  // Appel toutes les 20 secondes
   useEffect(() => {
-    fetchCitation(); // Premier appel
+    fetchCitation(); // First fetch on mount
 
     const intervalId = setInterval(() => {
       fetchCitation();
-    }, 20000); // Toutes les 20 secondes
+    }, 900000); // 15 minutes = 900,000 ms
 
     return () => clearInterval(intervalId);
   }, []);
@@ -44,8 +43,7 @@ const CitationGenerator = () => {
   return (
     visible && (
       <div className="popup-citation">
-        <h2 className="text-2xl font-bold mb-4">Citation Inspirante 📚</h2>
-
+        <h2 className="text-2xl font-bold mb-4">Inspiring Quote 📚</h2>
         <div className="mt-4 p-3 bg-gray-100 rounded">
           <p className="italic">"{citation}"</p>
           <p className="text-right">- {author}</p>

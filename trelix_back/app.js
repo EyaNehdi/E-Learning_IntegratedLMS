@@ -9,6 +9,7 @@ const cors = require('cors');
 const multer = require('multer');
 const socketIo = require('socket.io');
 const preference = require("./routes/preference");
+const citation = require ('./routes/citationRoutes');
 
 const pdfParse = require('pdf-parse');
 const summarizerRoutes = require('./routes/summarizerRoutes');
@@ -96,6 +97,7 @@ const StripeRaw = require("./routes/stripe.routes");
 const Purchases = require("./routes/coursesPurchasesRoutes");
 const Recommendation = require("./routes/recommendationRoutes");
 
+
 app.use('/stripe/raw', StripeRaw);
 
 
@@ -179,6 +181,7 @@ app.use('/intelligent-recommendation', intelligentRecommendationRoutes);
 app.use('/stripe', Stripe);
 app.use('/purchases', Purchases);
 app.use('/recommendation', Recommendation);
+app.use('/citation',citation);
 
 
 
