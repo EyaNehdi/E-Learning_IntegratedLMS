@@ -150,7 +150,7 @@ function App() {
             <Route path="achievements" element={<Achievements />} />
 
             <Route
-              path="/profile/edit-course/:courseId"
+              path="/edit-course/:courseId"
               element={<EditCourse />}
             />
 
@@ -173,7 +173,7 @@ function App() {
               <Route path="dictionary" element={<Dictionary />} />
               <Route path="chat" element={<ChatComponent />} />
               <Route path="meeting" element={<JoinRoom />} />
-    <Route path="preference" element={<Preference />} />
+              <Route path="preference" element={<Preference />} />
             <Route
               path="modify-preference"
               element={<ModifyPreference />}

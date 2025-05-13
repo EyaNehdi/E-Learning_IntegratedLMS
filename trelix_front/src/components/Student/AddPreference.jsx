@@ -38,12 +38,13 @@ function AddPreference() {
   const user = context.user || {}
   const navigate = useNavigate()
 
-  // Reduced list of resource types (ignored options removed)
+  // Updated typeRessourceOptions with display and value separation
   const typeRessourceOptions = [
-    "video",
-    "pdf",
-    "audio",
-    "other",
+    { display: "video", value: "video" },
+    { display: "pdf", value: "pdf" },
+    { display: "audio", value: "audio" },
+    { display: "text", value: "texte" },
+    { display: "other", value: "other" },
   ]
   
   const momentEtudeOptions = ["day", "evening", "night", "morning", "afternoon", "weekend"]
@@ -135,26 +136,27 @@ function AddPreference() {
     try {
       // Create an array of promises for each module submission
       const submissionPromises = selectedModules.map((module) => {
+        // Map display value "text" to database value "texte"
+        const selectedTypeRessource = typeRessourceOptions.find(
+          (option) => option.display === typeRessource
+        )?.value || typeRessource
+
         const requestData = {
-          typeRessource,
+          typeRessource: selectedTypeRessource,
           momentEtude,
           langue,
           styleContenu,
           objectif,
           methodeEtude,
-
-          module: module.id, // Changé de moduleId à module
-          user: user._id,   // Changé de userId à user
-
+          module: module.id,
+          user: user._id,
         }
         
         if (debugMode) {
           console.log("Sending data for module", module.name, ":", requestData)
         }
         
-
         return axios.post(`${import.meta.env.VITE_API_PROXY}/preference/add`, requestData)
-
       })
 
       // Wait for all submissions to complete
@@ -213,16 +215,12 @@ function AddPreference() {
     }
 
     const handleClick = (option) => {
-      // Play the preloaded sound
-      clickSoundObj.currentTime = 0 // Reset sound for rapid clicks
+      clickSoundObj.currentTime = 0
       clickSoundObj.play().catch((error) => console.error("Audio playback error:", error))
-
-      // Apply visual effect
       setClickEffect("scale-105 shadow-lg")
-      setTimeout(() => setClickEffect(""), 100) // Remove effect after 100ms
-
-      // Always set the value to the clicked option (no toggle behavior)
-      setValue(option)
+      setTimeout(() => setClickEffect(""), 100)
+      // Set the display value for the UI
+      setValue(option.display || option)
     }
 
     return (
@@ -232,20 +230,21 @@ function AddPreference() {
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {options.map((option) => {
-            const isSelected = value === option
+            const optionValue = option.display || option
+            const isSelected = value === optionValue
             return (
-              <div key={option} className="flex items-center">
+              <div key={optionValue} className="flex items-center">
                 <input
                   type="radio"
-                  id={`${name}-${option}`}
+                  id={`${name}-${optionValue}`}
                   name={name}
-                  value={option}
+                  value={optionValue}
                   checked={isSelected}
                   onChange={() => handleClick(option)}
                   className="hidden peer"
                 />
                 <label
-                  htmlFor={`${name}-${option}`}
+                  htmlFor={`${name}-${optionValue}`}
                   className={`w-full text-sm cursor-pointer transition-all duration-300 ease-in-out flex items-center space-x-3 px-4 py-3 rounded-lg border-2 hover:shadow-md ${
                     isSelected
                       ? "bg-blue-100 border-blue-500 text-blue-700 ring-2 ring-blue-300"
@@ -260,7 +259,7 @@ function AddPreference() {
                   >
                     {isSelected && <span className="w-2.5 h-2.5 bg-blue-500 rounded-full"></span>}
                   </span>
-                  <span className="font-medium">{option}</span>
+                  <span className="font-medium">{optionValue}</span>
                 </label>
               </div>
             )
@@ -276,26 +275,20 @@ function AddPreference() {
       name: module.title || module.name || module.moduleName || module.nom || "Unnamed Module",
     }
 
-    // Check if the module is already selected
     const isSelected = selectedModules.some((m) => m.id === moduleInfo.id)
 
     if (isSelected) {
-      // Remove the module if already selected
       setSelectedModules(selectedModules.filter((m) => m.id !== moduleInfo.id))
     } else {
-      // Add the module if not selected
       setSelectedModules([...selectedModules, moduleInfo])
     }
 
-    // Play sound effect
     clickSoundObj.currentTime = 0
     clickSoundObj.play().catch((error) => console.error("Audio playback error:", error))
   }
 
   const removeModule = (moduleId) => {
     setSelectedModules(selectedModules.filter((m) => m.id !== moduleId))
-
-    // Play sound effect
     clickSoundObj.currentTime = 0
     clickSoundObj.play().catch((error) => console.error("Audio playback error:", error))
   }
@@ -309,8 +302,6 @@ function AddPreference() {
           <div className="bg-gradient-to-r from-blue-600 to-purple-700 px-6 py-8">
             <h1 className="text-3xl font-bold text-center text-white mb-2">Learning Preferences</h1>
             <p className="text-center text-blue-100">Customize your learning experience</p>
-            
-
           </div>
 
           <div className="p-6 md:p-8">
@@ -338,7 +329,6 @@ function AddPreference() {
               </div>
             )}
 
-            {/* Display API responses in debug mode */}
             {debugMode && apiResponses.length > 0 && (
               <div className="p-4 mb-6 rounded-md border border-gray-300 bg-gray-50">
                 <h3 className="font-bold mb-2">API Responses:</h3>
@@ -357,7 +347,6 @@ function AddPreference() {
                   Modules <span className="text-red-500">*</span>
                 </label>
 
-                {/* Display selected modules */}
                 {selectedModules.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3">
                     {selectedModules.map((module) => (
@@ -505,7 +494,5 @@ function AddPreference() {
     </div>
   )
 }
-
-
 
 export default AddPreference

@@ -129,10 +129,33 @@ function Sidebar() {
                   <span className="nav-label">Preference</span>
                 </Link>
               </li>
+              
             </ul>
           </nav>
         </div>
       )}
+          {user?.role === "student" && (
+        <div className="widget">
+          <p className="section-title"> Preference Statistique</p>
+          <nav className="dashboard-nav">
+            <ul className="nav-list">
+              <li>
+                <Link
+                  className={`nav-link ${
+                    location.pathname === "/profile/preferencestat" ? "active" : ""
+                  }`}
+                  to="/profile/preferencestat"
+                >
+                  <i className="feather-icon icon-book" />
+                  <span className="nav-label">Statistiques</span>
+                </Link>
+              </li>
+              
+            </ul>
+          </nav>
+        </div>
+      )}
+      
 
       <div className="widget">
         <p className="section-title">Assistance</p>

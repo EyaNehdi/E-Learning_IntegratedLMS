@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -8,71 +9,98 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
-  Legend,
   ResponsiveContainer,
   Tooltip,
 } from "recharts"
 import { Loader2, RefreshCw } from "lucide-react"
+import { useOutletContext } from "react-router-dom"
 
-// Définition des couleurs pour les différents types de ressources
+// Couleurs pour les types de ressources
 const COLORS = {
-  vidéo: "#4f46e5", // indigo
+  video: "#4f46e5", // indigo
   pdf: "#0ea5e9", // sky
   audio: "#10b981", // emerald
-  quiz: "#f59e0b", // amber
-  "exercice interactif": "#ec4899", // pink
-  webinaire: "#8b5cf6", // violet
-  infographie: "#ef4444", // red
-  diapositives: "#06b6d4", // cyan
-  autre: "#6b7280", // gray
+  other: "#6b7280", // gray
 }
 
-// Couleurs pour les autres catégories
+// Couleurs pour les moments d'étude
 const MOMENT_COLORS = {
-  jour: "#4f46e5", // indigo
-  soir: "#f59e0b", // amber
+  day: "#4f46e5", // indigo
+  evening: "#f59e0b", // amber
+  night: "#ec4899", // pink
+  morning: "#10b981", // emerald
+  afternoon: "#0ea5e9", // sky
+  weekend: "#8b5cf6", // violet
 }
 
+// Couleurs pour les langues
 const LANGUE_COLORS = {
-  français: "#4f46e5", // indigo
-  anglais: "#0ea5e9", // sky
-  espagnol: "#10b981", // emerald
+  french: "#4f46e5", // indigo
+  english: "#0ea5e9", // sky
+  spanish: "#10b981", // emerald
+  german: "#f59e0b", // amber
+  chinese: "#ec4899", // pink
+  arabic: "#8b5cf6", // violet
+  russian: "#ef4444", // red
 }
 
+// Couleurs pour les styles de contenu
 const STYLE_COLORS = {
-  théorique: "#4f46e5", // indigo
-  pratique: "#0ea5e9", // sky
-  "exercices interactifs": "#10b981", // emerald
+  theoretical: "#4f46e5", // indigo
+  practical: "#0ea5e9", // sky
+  interactive: "#10b981", // emerald
+  visual: "#f59e0b", // amber
+  textual: "#ec4899", // pink
+  mixed: "#8b5cf6", // violet
 }
 
+// Couleurs pour les objectifs
 const OBJECTIF_COLORS = {
   certification: "#4f46e5", // indigo
-  "compétence métier": "#0ea5e9", // sky
-  "culture générale": "#10b981", // emerald
+  "professional skills": "#0ea5e9", // sky
+  "general knowledge": "#10b981", // emerald
+  "academic success": "#f59e0b", // amber
+  "personal development": "#ec4899", // pink
+  "career change": "#8b5cf6", // violet
 }
 
+// Couleurs pour les méthodes d'étude
 const METHODE_COLORS = {
-  lecture: "#4f46e5", // indigo
+  reading: "#4f46e5", // indigo
   discussion: "#0ea5e9", // sky
-  projet: "#10b981", // emerald
-  "expérience pratique": "#f59e0b", // amber
-  recherche: "#ec4899", // pink
-  tutorat: "#8b5cf6", // violet
-  autre: "#6b7280", // gray
+  project: "#10b981", // emerald
+  "practical experience": "#f59e0b", // amber
+  research: "#ec4899", // pink
+  tutoring: "#8b5cf6", // violet
+  "video learning": "#ef4444", // red
+  "group study": "#06b6d4", // cyan
+  "self-learning": "#4b5563", // gray-600
+  other: "#6b7280", // gray
 }
+
+// Mock data for fallback (if no local or backend data)
+const mockPreferences = [
+  { typeRessource: "video", momentEtude: "morning", langue: "french", styleContenu: "visual", objectif: "academic success", methodeEtude: "video learning", module: "module1" },
+  { typeRessource: "pdf", momentEtude: "afternoon", langue: "english", styleContenu: "theoretical", objectif: "certification", methodeEtude: "reading", module: "module2" },
+  { typeRessource: "video", momentEtude: "evening", langue: "spanish", styleContenu: "interactive", objectif: "personal development", methodeEtude: "discussion", module: "module1" },
+];
 
 export default function PreferenceStatistics() {
-  const [preferences, setPreferences] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [selectedModule, setSelectedModule] = useState("all")
-  const [modules, setModules] = useState([])
-  const [activeTab, setActiveTab] = useState("typeRessource")
+  // Récupérer l'utilisateur depuis useOutletContext ou localStorage
+  const context = useOutletContext() || {};
+  const user = context.user || JSON.parse(localStorage.getItem('user') || '{}');
+  console.log("User object:", user); // Debug: Vérifier l'objet utilisateur
+  const isAuthenticated = !!user?._id;
+
+  const [preferences, setPreferences] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [selectedModule, setSelectedModule] = useState("all");
+  const [modules, setModules] = useState([]);
+  const [activeTab, setActiveTab] = useState("typeRessource");
   const [statsData, setStatsData] = useState({
     typeRessource: [],
     momentEtude: [],
@@ -80,106 +108,133 @@ export default function PreferenceStatistics() {
     styleContenu: [],
     objectif: [],
     methodeEtude: [],
-  })
+  });
 
   // Fonction pour récupérer les préférences
   const fetchPreferences = async () => {
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/preference/get`)
-      setPreferences(response.data)
+      if (!isAuthenticated) {
+        throw new Error("Utilisateur non authentifié. Veuillez vous connecter.");
+      }
+      console.log("Fetching preferences for userId:", user._id); // Debug: Vérifier userId envoyé
+      const queryParams = [
+        `userId=${encodeURIComponent(user._id)}`, // Standard case
+        `UserId=${encodeURIComponent(user._id)}`, // Capitalized case
+        `userid=${encodeURIComponent(user._id)}`, // Lowercase case
+      ];
+      let fetchedData = [];
+      for (const param of queryParams) {
+        const query = `?${param}`;
+        console.log("Trying request URL:", `${import.meta.env.VITE_API_PROXY}/preference/get${query}`); // Debug: Vérifier l'URL testée
+        try {
+          const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/preference/get${query}`, {
+            withCredentials: true, // Inclure les cookies pour l'authentification
+          });
+          console.log("Preferences fetched from backend:", response.data); // Debug: Vérifier les données reçues
+          fetchedData = response.data;
+          break; // Sortir de la boucle si la requête réussit
+        } catch (innerError) {
+          console.error(`Failed with ${param}:`, innerError);
+          if (innerError.response?.status === 400 && innerError.response?.data?.message === "L'identifiant de l'utilisateur est requis.") {
+            continue; // Passer à la prochaine variation si l'erreur persiste
+          } else {
+            throw innerError; // Propager une autre erreur (e.g., 500)
+          }
+        }
+      }
+
+      // Si aucune donnée n'est récupérée, essayer les préférences locales
+      if (fetchedData.length === 0) {
+        const localPrefs = JSON.parse(localStorage.getItem('preferences') || '[]').filter(p => p.user === user._id);
+        console.log("Local preferences found:", localPrefs); // Debug: Vérifier les préférences locales
+        if (localPrefs.length > 0) {
+          fetchedData = localPrefs;
+        } else {
+          console.log("No local preferences, using mock data");
+          fetchedData = mockPreferences.map(p => ({ ...p, user: user._id })); // Ajouter userId au mock
+        }
+      }
+
+      setPreferences(fetchedData);
 
       // Extraire les modules uniques pour le filtre
-      const uniqueModules = [...new Set(response.data.map((pref) => pref.module?._id || pref.module))]
-
-      // Récupérer les détails des modules
-      const moduleResponse = await axios.get(`${import.meta.env.VITE_API_PROXY}/module`)
-      const moduleData = moduleResponse.data
-
-      // Créer la liste des modules pour le filtre
-      const moduleList = uniqueModules.map((moduleId) => {
-        const moduleInfo = Array.isArray(moduleData)
-          ? moduleData.find((m) => m._id === moduleId)
-          : moduleData.modules?.find((m) => m._id === moduleId)
-
-        return {
-          id: moduleId,
-          name: moduleInfo
-            ? moduleInfo.title || moduleInfo.name || moduleInfo.moduleName || moduleInfo.nom || "Module sans nom"
-            : "Module inconnu",
-        }
-      })
-
-      setModules(moduleList)
-
-      // Calculer les statistiques
-      calculateStats(response.data, "all")
+      const uniqueModules = [...new Set(fetchedData.map((pref) => pref.module?._id || pref.module))];
+      setModules(uniqueModules.map(id => ({ id, name: `Module ${id}` }))); // Simplifié pour l'exemple
+      calculateStats(fetchedData, "all");
     } catch (error) {
-      console.error("Erreur lors de la récupération des préférences:", error)
-      setError("Impossible de charger les préférences. Veuillez réessayer plus tard.")
+      console.error("Erreur lors de la récupération des préférences:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Impossible de charger les préférences. Utilisation des données locales ou mock.";
+      setError(errorMessage);
+      console.log("Error response:", error.response?.data); // Debug: Vérifier la réponse d'erreur
+      console.log("Error config:", error.config); // Debug: Vérifier la configuration de la requête
+
+      // Fallback to local or mock data on error
+      const localPrefs = JSON.parse(localStorage.getItem('preferences') || '[]').filter(p => p.user === user._id);
+      if (localPrefs.length > 0) {
+        console.log("Falling back to local preferences:", localPrefs);
+        setPreferences(localPrefs);
+        setModules([...new Set(localPrefs.map(p => p.module))].map(id => ({ id, name: `Module ${id}` })));
+        calculateStats(localPrefs, "all");
+      } else {
+        console.log("Falling back to mock data");
+        const mockWithUser = mockPreferences.map(p => ({ ...p, user: user._id }));
+        setPreferences(mockWithUser);
+        setModules([...new Set(mockWithUser.map(p => p.module))].map(id => ({ id, name: `Module ${id}` })));
+        calculateStats(mockWithUser, "all");
+      }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Calculer les statistiques pour chaque catégorie
   const calculateStats = (data, moduleFilter) => {
-    // Filtrer par module si nécessaire
-    const filteredData =
-      moduleFilter === "all" ? data : data.filter((pref) => (pref.module?._id || pref.module) === moduleFilter)
+    const filteredData = moduleFilter === "all" ? data : data.filter((pref) => (pref.module?._id || pref.module) === moduleFilter);
 
-    // Fonction pour compter les occurrences
     const countOccurrences = (array, property) => {
-      const counts = {}
+      const counts = {};
       array.forEach((item) => {
-        const value = item[property]
-        counts[value] = (counts[value] || 0) + 1
-      })
-      return Object.entries(counts).map(([name, value]) => ({ name, value }))
-    }
-
-    // Calculer les statistiques pour chaque catégorie
-    const typeRessourceStats = countOccurrences(filteredData, "typeRessource")
-    const momentEtudeStats = countOccurrences(filteredData, "momentEtude")
-    const langueStats = countOccurrences(filteredData, "langue")
-    const styleContenuStats = countOccurrences(filteredData, "styleContenu")
-    const objectifStats = countOccurrences(filteredData, "objectif")
-    const methodeEtudeStats = countOccurrences(filteredData, "methodeEtude")
+        const value = item[property];
+        counts[value] = (counts[value] || 0) + 1;
+      });
+      return Object.entries(counts).map(([name, value]) => ({ name, value }));
+    };
 
     setStatsData({
-      typeRessource: typeRessourceStats,
-      momentEtude: momentEtudeStats,
-      langue: langueStats,
-      styleContenu: styleContenuStats,
-      objectif: objectifStats,
-      methodeEtude: methodeEtudeStats,
-    })
-  }
+      typeRessource: countOccurrences(filteredData, "typeRessource"),
+      momentEtude: countOccurrences(filteredData, "momentEtude"),
+      langue: countOccurrences(filteredData, "langue"),
+      styleContenu: countOccurrences(filteredData, "styleContenu"),
+      objectif: countOccurrences(filteredData, "objectif"),
+      methodeEtude: countOccurrences(filteredData, "methodeEtude"),
+    });
+  };
 
   // Charger les données au chargement du composant
   useEffect(() => {
-    fetchPreferences()
-  }, [])
+    fetchPreferences();
+  }, []);
 
-  // Mettre à jour les statistiques lorsque le module sélectionné change
+  // Mettre à jour les statistiques lorsque le module change
   const handleModuleChange = (e) => {
-    const value = e.target.value
-    setSelectedModule(value)
-    calculateStats(preferences, value)
-  }
+    const value = e.target.value;
+    setSelectedModule(value);
+    calculateStats(preferences, value);
+  };
 
-  // Fonction pour formater les pourcentages
+  // Formater les pourcentages pour les tooltips
   const formatPercentage = (value, total) => {
-    return `${Math.round((value / total) * 100)}%`
-  }
+    return `${Math.round((value / total) * 100)}%`;
+  };
 
   // Calculer le total pour les pourcentages
   const getTotalCount = (data) => {
-    return data.reduce((sum, item) => sum + item.value, 0)
-  }
+    return data.reduce((sum, item) => sum + item.value, 0);
+  };
 
-  // Composant personnalisé pour le tooltip des graphiques
+  // Tooltip personnalisé pour les graphiques
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
@@ -192,23 +247,19 @@ export default function PreferenceStatistics() {
             )}`}</p>
           )}
         </div>
-      )
+      );
     }
-    return null
-  }
+    return null;
+  };
 
-  // Rendu du composant
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Preference statistics
-            </h1>
-            <p className="text-gray-600 mt-1">Analysis of Students' Learning Preferences
-</p>
+            <h1 className="text-3xl font-bold text-gray-800">Statistiques des Préférences</h1>
+            <p className="text-gray-600 mt-1">Analyse des préférences d'apprentissage des étudiants</p>
           </div>
-
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <select
               value={selectedModule}
@@ -222,7 +273,6 @@ export default function PreferenceStatistics() {
                 </option>
               ))}
             </select>
-
             <button
               className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
               onClick={fetchPreferences}
@@ -234,7 +284,18 @@ export default function PreferenceStatistics() {
           </div>
         </div>
 
-        {error && <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-md">{error}</div>}
+        {error && (
+          <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-md flex justify-between items-center">
+            <span>{error}</span>
+            <button onClick={fetchPreferences} className="underline">Réessayer</button>
+          </div>
+        )}
+
+        {!isAuthenticated && (
+          <div className="bg-yellow-100 border border-yellow-300 text-yellow-700 px-4 py-3 rounded-md">
+            <span>Vous devez être connecté pour voir vos préférences.</span>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -243,7 +304,6 @@ export default function PreferenceStatistics() {
           </div>
         ) : (
           <div className="w-full">
-            {/* Onglets personnalisés */}
             <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
               {Object.keys(statsData).map((tab) => (
                 <button
@@ -268,81 +328,72 @@ export default function PreferenceStatistics() {
               ))}
             </div>
 
-            {/* Contenu des onglets */}
             <div className="space-y-6">
-              {/* Onglet Type de ressource */}
               {activeTab === "typeRessource" && (
-                <>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                      <h2 className="text-xl font-bold mb-1">Distribution of resource types                      </h2>
-                      <p className="text-gray-600 mb-4 text-sm">Distribution of preferences by resource type                      </p>
-                      <div className="h-[400px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={statsData.typeRessource.map((item) => ({
-                                ...item,
-                                parentData: statsData.typeRessource,
-                              }))}
-                              cx="50%"
-                              cy="50%"
-                              labelLine={false}
-                              outerRadius={150}
-                              fill="#8884d8"
-                              dataKey="value"
-                              nameKey="name"
-                              label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
-                            >
-                              {statsData.typeRessource.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[entry.name] || COLORS.autre} />
-                              ))}
-                            </Pie>
-                            <Tooltip content={<CustomTooltip />} />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                      <h2 className="text-xl font-bold mb-1">Preferred resource types
-                      </h2>
-                      <p className="text-gray-600 mb-4 text-sm">Number of preferences per resource type</p>
-                      <div className="h-[400px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-bold mb-1">Répartition des types de ressources</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Préférences par type de ressource</p>
+                    <div className="h-[400px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
                             data={statsData.typeRessource.map((item) => ({
                               ...item,
                               parentData: statsData.typeRessource,
                             }))}
-                            layout="vertical"
-                            margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            outerRadius={150}
+                            fill="#8884d8"
+                            dataKey="value"
+                            nameKey="name"
+                            label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                           >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis type="number" />
-                            <YAxis dataKey="name" type="category" width={90} tick={{ fontSize: 12 }} />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Bar dataKey="value" nameKey="name" radius={[0, 4, 4, 0]}>
-                              {statsData.typeRessource.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[entry.name] || COLORS.autre} />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
+                            {statsData.typeRessource.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[entry.name] || COLORS.other} />
+                            ))}
+                          </Pie>
+                          <Tooltip content={<CustomTooltip />} />
+                        </PieChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
-
-                
-                </>
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-bold mb-1">Types de ressources préférés</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Nombre de préférences par type</p>
+                    <div className="h-[400px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={statsData.typeRessource.map((item) => ({
+                            ...item,
+                            parentData: statsData.typeRessource,
+                          }))}
+                          layout="vertical"
+                          margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis type="number" />
+                          <YAxis dataKey="name" type="category" width={90} tick={{ fontSize: 12 }} />
+                          <Tooltip content={<CustomTooltip />} />
+                          <Bar dataKey="value" nameKey="name" radius={[0, 4, 4, 0]}>
+                            {statsData.typeRessource.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[entry.name] || COLORS.other} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
               )}
 
-              {/* Onglet Moment d'étude */}
               {activeTab === "momentEtude" && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-1">Distribution of study times                    </h2>
-                    <p className="text-gray-600 mb-4 text-sm">Preference between day and evening</p>
+                    <h2 className="text-xl font-bold mb-1">Répartition des moments d'étude</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Préférences par moment</p>
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -358,7 +409,7 @@ export default function PreferenceStatistics() {
                             label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                           >
                             {statsData.momentEtude.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={MOMENT_COLORS[entry.name] || COLORS.autre} />
+                              <Cell key={`cell-${index}`} fill={MOMENT_COLORS[entry.name] || COLORS.other} />
                             ))}
                           </Pie>
                           <Tooltip content={<CustomTooltip />} />
@@ -366,10 +417,9 @@ export default function PreferenceStatistics() {
                       </ResponsiveContainer>
                     </div>
                   </div>
-
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-1">Favorite study times                    </h2>
-                    <p className="text-gray-600 mb-4 text-sm">Number of preferences per study time                    </p>
+                    <h2 className="text-xl font-bold mb-1">Moments d'étude préférés</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Nombre de préférences par moment</p>
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
@@ -382,7 +432,7 @@ export default function PreferenceStatistics() {
                           <Tooltip content={<CustomTooltip />} />
                           <Bar dataKey="value" nameKey="name" radius={[4, 4, 0, 0]}>
                             {statsData.momentEtude.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={MOMENT_COLORS[entry.name] || COLORS.autre} />
+                              <Cell key={`cell-${index}`} fill={MOMENT_COLORS[entry.name] || COLORS.other} />
                             ))}
                           </Bar>
                         </BarChart>
@@ -392,12 +442,11 @@ export default function PreferenceStatistics() {
                 </div>
               )}
 
-              {/* Onglet Langue */}
               {activeTab === "langue" && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-1">Distribution of languages                    </h2>
-                    <p className="text-gray-600 mb-4 text-sm">Distribution of preferences by language</p>
+                    <h2 className="text-xl font-bold mb-1">Répartition des langues</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Préférences par langue</p>
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -413,7 +462,7 @@ export default function PreferenceStatistics() {
                             label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                           >
                             {statsData.langue.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={LANGUE_COLORS[entry.name] || COLORS.autre} />
+                              <Cell key={`cell-${index}`} fill={LANGUE_COLORS[entry.name] || COLORS.other} />
                             ))}
                           </Pie>
                           <Tooltip content={<CustomTooltip />} />
@@ -421,11 +470,9 @@ export default function PreferenceStatistics() {
                       </ResponsiveContainer>
                     </div>
                   </div>
-
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-1">Preferred languages
-                    </h2>
-                    <p className="text-gray-600 mb-4 text-sm">Number of preferences per language</p>
+                    <h2 className="text-xl font-bold mb-1">Langues préférées</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Nombre de préférences par langue</p>
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
@@ -438,7 +485,7 @@ export default function PreferenceStatistics() {
                           <Tooltip content={<CustomTooltip />} />
                           <Bar dataKey="value" nameKey="name" radius={[4, 4, 0, 0]}>
                             {statsData.langue.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={LANGUE_COLORS[entry.name] || COLORS.autre} />
+                              <Cell key={`cell-${index}`} fill={LANGUE_COLORS[entry.name] || COLORS.other} />
                             ))}
                           </Bar>
                         </BarChart>
@@ -448,12 +495,11 @@ export default function PreferenceStatistics() {
                 </div>
               )}
 
-              {/* Onglet Style de contenu */}
               {activeTab === "styleContenu" && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-1">Distribution of content styles</h2>
-                    <p className="text-gray-600 mb-4 text-sm">Distribution of preferences by content style</p>
+                    <h2 className="text-xl font-bold mb-1">Répartition des styles de contenu</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Préférences par style de contenu</p>
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -472,7 +518,7 @@ export default function PreferenceStatistics() {
                             label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                           >
                             {statsData.styleContenu.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={STYLE_COLORS[entry.name] || COLORS.autre} />
+                              <Cell key={`cell-${index}`} fill={STYLE_COLORS[entry.name] || COLORS.other} />
                             ))}
                           </Pie>
                           <Tooltip content={<CustomTooltip />} />
@@ -480,10 +526,9 @@ export default function PreferenceStatistics() {
                       </ResponsiveContainer>
                     </div>
                   </div>
-
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-1">Preferred Content Styles</h2>
-                    <p className="text-gray-600 mb-4 text-sm">Number of preferences per content style</p>
+                    <h2 className="text-xl font-bold mb-1">Styles de contenu préférés</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Nombre de préférences par style</p>
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
@@ -496,7 +541,7 @@ export default function PreferenceStatistics() {
                           <Tooltip content={<CustomTooltip />} />
                           <Bar dataKey="value" nameKey="name" radius={[4, 4, 0, 0]}>
                             {statsData.styleContenu.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={STYLE_COLORS[entry.name] || COLORS.autre} />
+                              <Cell key={`cell-${index}`} fill={STYLE_COLORS[entry.name] || COLORS.other} />
                             ))}
                           </Bar>
                         </BarChart>
@@ -506,13 +551,11 @@ export default function PreferenceStatistics() {
                 </div>
               )}
 
-              {/* Onglet Objectif */}
               {activeTab === "objectif" && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-1">Distribution of objectives</h2>
-                    <p className="text-gray-600 mb-4 text-sm">Distribution of preferences by objective
-                    </p>
+                    <h2 className="text-xl font-bold mb-1">Répartition des objectifs</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Préférences par objectif</p>
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -528,7 +571,7 @@ export default function PreferenceStatistics() {
                             label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                           >
                             {statsData.objectif.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={OBJECTIF_COLORS[entry.name] || COLORS.autre} />
+                              <Cell key={`cell-${index}`} fill={OBJECTIF_COLORS[entry.name] || COLORS.other} />
                             ))}
                           </Pie>
                           <Tooltip content={<CustomTooltip />} />
@@ -536,11 +579,9 @@ export default function PreferenceStatistics() {
                       </ResponsiveContainer>
                     </div>
                   </div>
-
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-1">Favorite goals
-                    </h2>
-                    <p className="text-gray-600 mb-4 text-sm">Number of preferences per goal</p>
+                    <h2 className="text-xl font-bold mb-1">Objectifs préférés</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Nombre de préférences par objectif</p>
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
@@ -553,7 +594,7 @@ export default function PreferenceStatistics() {
                           <Tooltip content={<CustomTooltip />} />
                           <Bar dataKey="value" nameKey="name" radius={[4, 4, 0, 0]}>
                             {statsData.objectif.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={OBJECTIF_COLORS[entry.name] || COLORS.autre} />
+                              <Cell key={`cell-${index}`} fill={OBJECTIF_COLORS[entry.name] || COLORS.other} />
                             ))}
                           </Bar>
                         </BarChart>
@@ -563,12 +604,11 @@ export default function PreferenceStatistics() {
                 </div>
               )}
 
-              {/* Onglet Méthode d'étude */}
               {activeTab === "methodeEtude" && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-1">Distribution of study methods</h2>
-                    <p className="text-gray-600 mb-4 text-sm">Distribution of preferences by study method</p>
+                    <h2 className="text-xl font-bold mb-1">Répartition des méthodes d'étude</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Préférences par méthode d'étude</p>
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -587,7 +627,7 @@ export default function PreferenceStatistics() {
                             label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                           >
                             {statsData.methodeEtude.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={METHODE_COLORS[entry.name] || COLORS.autre} />
+                              <Cell key={`cell-${index}`} fill={METHODE_COLORS[entry.name] || COLORS.other} />
                             ))}
                           </Pie>
                           <Tooltip content={<CustomTooltip />} />
@@ -595,10 +635,9 @@ export default function PreferenceStatistics() {
                       </ResponsiveContainer>
                     </div>
                   </div>
-
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-1">Preferred study methods</h2>
-                    <p className="text-gray-600 mb-4 text-sm">Number of preferences by study method</p>
+                    <h2 className="text-xl font-bold mb-1">Méthodes d'étude préférées</h2>
+                    <p className="text-gray-600 mb-4 text-sm">Nombre de préférences par méthode</p>
                     <div className="h-[400px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
@@ -611,7 +650,7 @@ export default function PreferenceStatistics() {
                           <Tooltip content={<CustomTooltip />} />
                           <Bar dataKey="value" nameKey="name" radius={[4, 4, 0, 0]}>
                             {statsData.methodeEtude.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={METHODE_COLORS[entry.name] || COLORS.autre} />
+                              <Cell key={`cell-${index}`} fill={METHODE_COLORS[entry.name] || COLORS.other} />
                             ))}
                           </Bar>
                         </BarChart>
@@ -624,43 +663,36 @@ export default function PreferenceStatistics() {
           </div>
         )}
 
-        {/* Résumé des statistiques */}
         {!loading && preferences.length > 0 && (
           <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-            <h2 className="text-xl font-bold mb-1">Summary of statistics
-            </h2>
-            <p className="text-gray-600 mb-4 text-sm">Overview of learning preferences</p>
+            <h2 className="text-xl font-bold mb-1">Résumé des statistiques</h2>
+            <p className="text-gray-600 mb-4 text-sm">Aperçu des préférences d'apprentissage</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-gray-50 p-4 rounded-lg border">
-                <h3 className="text-lg font-medium text-gray-800">Total preferences
-                </h3>
+                <h3 className="text-lg font-medium text-gray-800">Total des préférences</h3>
                 <p className="text-3xl font-bold text-blue-600 mt-2">{preferences.length}</p>
               </div>
-
               <div className="bg-gray-50 p-4 rounded-lg border">
-                <h3 className="text-lg font-medium text-gray-800">Most popular resource type
-                </h3>
+                <h3 className="text-lg font-medium text-gray-800">Type de ressource populaire</h3>
                 {statsData.typeRessource.length > 0 && (
                   <p
                     className="text-2xl font-bold mt-2"
                     style={{
-                      color: COLORS[statsData.typeRessource.sort((a, b) => b.value - a.value)[0].name] || COLORS.autre,
+                      color: COLORS[statsData.typeRessource.sort((a, b) => b.value - a.value)[0].name] || COLORS.other,
                     }}
                   >
                     {statsData.typeRessource.sort((a, b) => b.value - a.value)[0].name}
                   </p>
                 )}
               </div>
-
               <div className="bg-gray-50 p-4 rounded-lg border">
-                <h3 className="text-lg font-medium text-gray-800">Favorite study time
-                </h3>
+                <h3 className="text-lg font-medium text-gray-800">Moment d'étude préféré</h3>
                 {statsData.momentEtude.length > 0 && (
                   <p
                     className="text-2xl font-bold mt-2"
                     style={{
                       color:
-                        MOMENT_COLORS[statsData.momentEtude.sort((a, b) => b.value - a.value)[0].name] || COLORS.autre,
+                        MOMENT_COLORS[statsData.momentEtude.sort((a, b) => b.value - a.value)[0].name] || COLORS.other,
                     }}
                   >
                     {statsData.momentEtude.sort((a, b) => b.value - a.value)[0].name}
@@ -672,5 +704,5 @@ export default function PreferenceStatistics() {
         )}
       </div>
     </div>
-  )
+  );
 }
