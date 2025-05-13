@@ -45,6 +45,7 @@ router.get('/callback', async (req, res) => {
 
 // Route pour vérifier l'authentification
 router.get('/check-auth', (req, res) => {
+  console.log("📦 Session contenu (check-auth):", req.session);
   if (req.session.user && req.session.user.accessToken) {
     console.log("Vérification d'authentification: Utilisateur authentifié");
     res.json({ isAuthenticated: true });

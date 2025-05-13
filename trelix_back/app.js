@@ -27,13 +27,6 @@ const classroomRoutes = require('./routes/classroom');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
-// Avant les routes, après les middlewares comme cors, etc.
-
-
-// Middleware pour déboguer les sessions
-
-const axios = require('axios');
-const fetch = require('node-fetch');
 var app = express();
 
 const allowedOrigins = [
@@ -98,22 +91,6 @@ const Purchases = require("./routes/coursesPurchasesRoutes");
 const Recommendation = require("./routes/recommendationRoutes");
 
 app.use('/stripe/raw', StripeRaw);
-
-
-// Configuration du moteur de vues et des middlewares
-
-console.log("MONGO_URI:", process.env.MONGO_URI);  // Debug
-
-// Vérification des variables d'environnement pour Google Classroom
-console.log("Google Classroom Config:", {
-  clientId: process.env.GOOGLE_CLIENT_ID ? "Défini" : "Non défini",
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET ? "Défini" : "Non défini",
-  redirectUri: process.env.GOOGLE_REDIRECT_URI ? "Défini" : "Non défini",
-  frontendUrl: process.env.FRONTEND_URL ? "Défini" : "Non défini"
-});
-
-// view engine setup
-
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -132,9 +109,9 @@ app.use(session({
     ttl: 14 * 24 * 60 * 60 // 14 jours
   }),
   cookie: {
-    secure: true,
+    secure: process.env.NODE_ENV === 'production', 
     httpOnly: true,
-    sameSite: "none",
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', 
     maxAge: 14 * 24 * 60 * 60 * 1000,
   },
 }));
