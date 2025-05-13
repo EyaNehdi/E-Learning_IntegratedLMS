@@ -556,7 +556,7 @@ const ChapterContent = () => {
                         muted
                         onTimeUpdate={handleVideoTimeUpdate}
                       >
-                        <source src={`${import.meta.env.VITE_API_PROXY}${currentChapter.video}`} type='video/mp4' />
+                        <source src={`${currentChapter.video}`} type='video/mp4' />
                         Your browser does not support the video tag.
                       </video>
                     </div>
@@ -671,7 +671,7 @@ const ChapterContent = () => {
                   {showPDF && currentChapter.pdf && (
                     <div id="pdf-container" className="p-5">
                       <SimplePDFViewer
-                        pdfUrl={`${import.meta.env.VITE_API_PROXY}${currentChapter.pdf}`}
+                        pdfUrl={`${currentChapter.pdf}`}
                         onProgressChange={handlePDFProgressChange}
                         onComplete={handlePDFComplete}
                       />
