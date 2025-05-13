@@ -35,7 +35,7 @@ router.get('/callback', async (req, res) => {
 
     await req.session.save();
     console.log("Session après sauvegarde:", req.session.user);
-
+    res.setHeader('Set-Cookie-Debug', 'Callback reached and session set');
     res.redirect(`${process.env.BASE_URL_FRONTEND}/classroom?auth=success`);
   } catch (error) {
     console.error('Erreur lors du callback Google:', error.message);

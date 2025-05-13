@@ -41,9 +41,9 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: allowedOrigins,
-  credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 }));
 
 app.use(express.json({ limit: '100mb' }));
@@ -109,9 +109,9 @@ app.use(session({
     ttl: 14 * 24 * 60 * 60 // 14 jours
   }),
   cookie: {
-    secure: process.env.NODE_ENV === 'production', 
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', 
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 14 * 24 * 60 * 60 * 1000,
   },
 }));
@@ -121,6 +121,10 @@ app.use((req, res, next) => {
   // console.log('Session ID:', req.sessionID);
   next();
 });
+
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1); // ✅ Allow secure cookies over HTTPS through proxy
+}
 
 
 
@@ -158,7 +162,7 @@ app.use('/intelligent-recommendation', intelligentRecommendationRoutes);
 app.use('/stripe', Stripe);
 app.use('/purchases', Purchases);
 app.use('/recommendation', Recommendation);
-app.use('/citation',citation);
+app.use('/citation', citation);
 
 
 
