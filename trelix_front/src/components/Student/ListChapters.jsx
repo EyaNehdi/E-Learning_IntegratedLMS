@@ -180,7 +180,7 @@ const ListChapters = () => {
       alert("Please complete all chapters before starting the exam.");
       return;
     }
-    navigate(`/exams/${finalCourseId}`);
+    navigate(`/exams/${courseDetails._id}`);
   };
 
   const handleEarnCertificate = async (provider) => {
@@ -190,7 +190,7 @@ const ListChapters = () => {
         `${import.meta.env.VITE_API_PROXY}/certificates/issueCertificate`,
         {
           userId: user._id,
-          courseId: finalCourseId,
+          courseSlug: slugCourse,
           provider,
         }
       );

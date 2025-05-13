@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import {
   Clock,
@@ -22,6 +20,7 @@ import {
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useProfileStore } from "../../store/profileStore";
+import TrelixSpinner from "../../layout/TrelixSpinner";
 
 const ExamStudent = () => {
   // State for exam data
@@ -67,7 +66,9 @@ const ExamStudent = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_PROXY}/exam/check-attempt/${courseid}/${user._id}`
+        `${import.meta.env.VITE_API_PROXY}/exam/check-attempt/${courseid}/${
+          user._id
+        }`
       );
       setCourseSlug(response.data.courseSlug);
 
@@ -331,12 +332,15 @@ const ExamStudent = () => {
         // If the user passed, update the exam status in the backend
         if (results.passed) {
           try {
-            await axios.post(`${import.meta.env.VITE_API_PROXY}/exam/update-status`, {
-              userId: user._id,
-              courseId: courseid,
-              passed: true,
-              score: results.percentageScore,
-            });
+            await axios.post(
+              `${import.meta.env.VITE_API_PROXY}/exam/update-status`,
+              {
+                userId: user._id,
+                courseId: courseid,
+                passed: true,
+                score: results.percentageScore,
+              }
+            );
             console.log("Exam status updated successfully");
           } catch (error) {
             console.error("Error updating exam status:", error);
@@ -399,7 +403,7 @@ const ExamStudent = () => {
         `${import.meta.env.VITE_API_PROXY}/certificates/issueCertificate`,
         {
           userId: user._id,
-          courseId: courseid,
+          courseSlug: courseSlug,
           provider: "Trelix",
         }
       );
@@ -953,8 +957,7 @@ const ExamStudent = () => {
                               >
                                 {isEarningCertificate ? (
                                   <>
-                                    <Spinner className="h-3 w-3 mr-1 animate-spin" />
-                                    Processing...
+                                    <TrelixSpinner />
                                   </>
                                 ) : (
                                   <>

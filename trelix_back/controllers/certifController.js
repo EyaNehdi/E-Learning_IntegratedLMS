@@ -7,6 +7,8 @@ const fontkit = require('fontkit');
 const { PDFDocument, rgb } = require('pdf-lib');
 const path = require('path');
 const QRCode = require('qrcode');
+const { cloudinary } = require('../utils/cloudinary');
+const streamifier = require('streamifier');
 
 async function generateCertificate(user, course) {
     const templatePath = path.join(__dirname, '../templates-cert/certificate_design_trelix.pdf');
@@ -18,18 +20,16 @@ async function generateCertificate(user, course) {
     const greatVibesFontBytes = fs.readFileSync(path.join(__dirname, '../templates-cert/fonts/GreatVibes-Regular.ttf'));
     const caviarBoldFontBytes = fs.readFileSync(path.join(__dirname, '../templates-cert/fonts/CaviarDreams_Bold.ttf'));
     const openSansSemiBoldFontBytes = fs.readFileSync(path.join(__dirname, '../templates-cert/fonts/OpenSans-SemiBold.ttf'));
+
     const greatVibesFont = await pdfDoc.embedFont(greatVibesFontBytes);
     const caviarBoldFont = await pdfDoc.embedFont(caviarBoldFontBytes);
     const openSansFont = await pdfDoc.embedFont(openSansSemiBoldFontBytes);
 
     const pages = pdfDoc.getPages();
     const firstPage = pages[0];
-    const { width, height } = pages[0].getSize();
+    const { width } = firstPage.getSize();
 
-    const Student_Name = [user.firstName, user.lastName]
-        .filter(Boolean)
-        .join('\u00A0')
-        .trim();
+    const Student_Name = [user.firstName, user.lastName].filter(Boolean).join('\u00A0').trim();
     const Student_Name_textWidth = greatVibesFont.widthOfTextAtSize(Student_Name, 64);
 
     firstPage.drawText(Student_Name, {
@@ -51,7 +51,6 @@ async function generateCertificate(user, course) {
         color: rgb(0, 0, 0)
     });
 
-    // Insert Date Acquired
     const acquiredDate = new Date().toLocaleDateString();
     firstPage.drawText(acquiredDate, {
         x: 270,
@@ -60,16 +59,13 @@ async function generateCertificate(user, course) {
         font: openSansFont,
         color: rgb(0, 0, 0)
     });
-    const cleanTitle = course.title.replace(/\s+/g, '');
-    // Generate QR Code for verification
-    const verificationCode = Math.random().toString(36).substring(2, 10).toUpperCase();
-    const qrCodeDir = path.join(__dirname, "../certificates");
-    const qrCodePath = path.join(qrCodeDir, `qrcode-${user._id}-${cleanTitle}.png`);
-    await QRCode.toFile(qrCodePath, `https://trelix-livid.vercel.app/verify/${verificationCode}`);
 
-    // Embed QR Code in the PDF
-    const qrImageBytes = fs.readFileSync(qrCodePath);
+    // Generate QR Code as a buffer instead of saving to file
+    const verificationCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const qrDataUrl = await QRCode.toDataURL(`https://trelix-livid.vercel.app/verify/${verificationCode}`);
+    const qrImageBytes = Buffer.from(qrDataUrl.split(",")[1], "base64");
     const qrImage = await pdfDoc.embedPng(qrImageBytes);
+
     firstPage.drawImage(qrImage, {
         x: 680,
         y: 75,
@@ -77,32 +73,54 @@ async function generateCertificate(user, course) {
         height: 100
     });
 
-    // Save the PDF
+    // Save PDF to buffer
     const pdfBytes = await pdfDoc.save();
+    const sanitizedTitle = course.title.replace(/[^a-zA-Z0-9_-]/g, '');
+    // Upload the in-memory PDF to Cloudinary using streamifier
+    const uploadToCloudinary = () => {
+        return new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'certificates',
+                    resource_type: 'raw',
+                    public_id: `certificate-${user._id}-${sanitizedTitle}`,
+                    format: 'pdf',
+                },
+                (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result);
+                }
+            );
+            streamifier.createReadStream(pdfBytes).pipe(uploadStream);
+        });
+    };
 
-    const certificateDir = path.join(__dirname, `../certificates/certificate-${user._id}-${cleanTitle}.pdf`);
-    fs.writeFileSync(certificateDir, pdfBytes);
-    const certificatePath = `/certificates/certificate-${user._id}-${cleanTitle}.pdf`;
-    // sendCertificateEmail(user.email, certificatePath);
-    return { certificatePath: certificatePath, verificationCode: verificationCode };
+    const result = await uploadToCloudinary();
+
+    return {
+        certificateUrl: result.secure_url,
+        verificationCode,
+        cloudinaryId: result.public_id
+    };
 }
 
 const issueCertificate = async (req, res) => {
     try {
-        const { userId, courseId, provider } = req.body;
-        if (!userId || !courseId || !provider) {
+        const { userId, courseSlug, provider } = req.body;
+        if (!userId || !courseSlug || !provider) {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const course = await Course.findById(courseId);
+        const course = await Course.findOne({ slug: courseSlug });
         if (!course) {
             return res.status(400).json({ error: "Course not found" });
         }
 
         const courseName = course.title;
         const user = await User.findById(userId).populate("certificatesOwned.certificateId");
-
-        if (user.certificatesOwned.some(cert => cert.certificateId && cert.certificateId.courseId.equals(courseId))) {
+        const courseSlugExists = course.slug;
+        const courseId = course._id;
+        if (user.certificatesOwned.some(cert => cert.certificateId && cert.certificateId.courseId.equals(course._id))) {
             return res.status(400).json({ error: "Certificate already earned for this course" });
         }
         let existingCertificate = await Certificate.findOne({ courseId });
@@ -126,7 +144,8 @@ const issueCertificate = async (req, res) => {
             certificateId: existingCertificate._id,
             acquiredOn: new Date(),
             verificationCode: (await certifInfo).verificationCode,
-            pdfUrl: (await certifInfo).certificatePath,
+            pdfUrl: (await certifInfo).certificateUrl,
+            cloudinaryId: (await certifInfo).cloudinaryId,
         });
 
         await user.save();
