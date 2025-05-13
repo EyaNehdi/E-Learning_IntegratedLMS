@@ -3,23 +3,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Moodle-specific colors */
+:root {
+  --moodle-blue: #0f6cbf;
+  --moodle-blue-dark: #0a5699;
+  --moodle-blue-darker: #084a87;
+  --moodle-blue-light: #e9f2fb;
+  --moodle-blue-lighter: #f0f8ff;
+  --moodle-background: #f7f7f7;
+  --moodle-section-header: #f8f9fa;
+}
+
 /* Custom scrollbar for better UX */
 .overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f1f1f1;
   border-radius: 10px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #d1d5db;
   border-radius: 10px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #9ca3af;
 }
 
 /* Smooth transitions */
@@ -39,42 +50,27 @@
 /* Improve focus states for accessibility */
 button:focus,
 a:focus {
-  outline: 2px solid rgba(13, 148, 136, 0.5);
+  outline: 2px solid rgba(15, 108, 191, 0.5);
   outline-offset: 2px;
 }
 
-/* Button hover effects */
-button {
-  position: relative;
-  overflow: hidden;
+/* Moodle-specific button styles */
+.moodle-button {
+  background-color: var(--moodle-blue);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
 }
 
-button::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
-  background-repeat: no-repeat;
-  background-position: 50%;
-  transform: scale(10, 10);
-  opacity: 0;
-  transition: transform 0.3s, opacity 0.5s;
-}
-
-button:active::after {
-  transform: scale(0, 0);
-  opacity: 0.3;
-  transition: 0s;
+.moodle-button:hover {
+  background-color: var(--moodle-blue-dark);
 }
 
 /* Course item hover effect */
-button.course-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+.course-item:hover {
+  background-color: var(--moodle-blue-lighter);
 }
 
 /* Mobile menu animation */
@@ -93,29 +89,22 @@ button.course-item:hover {
   animation: slideIn 0.3s ease-out forwards;
 }
 
-/* Tab hover animation */
-button[class*="border-b-2"]:not(.border-b-2) {
-  position: relative;
+/* Completion indicator styles */
+.completion-indicator {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-button[class*="border-b-2"]:not(.border-b-2)::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: white;
-  transition: all 0.3s ease;
-  transform: translateX(-50%);
+.completion-indicator.complete {
+  background-color: #d1e7dd;
+  color: #0f5132;
 }
 
-button[class*="border-b-2"]:not(.border-b-2):hover::after {
-  width: 80%;
-}
-
-/* Card hover effects */
-.hover\:bg-slate-50:hover {
-  transform: translateZ(0);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+.completion-indicator.incomplete {
+  border: 1px solid #d1d5db;
+  background-color: white;
 }
