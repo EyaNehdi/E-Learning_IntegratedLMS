@@ -42,7 +42,7 @@ const ListChapters = () => {
       if (response) {
         setCertificateEarned(response.data.certificateEarned);
         setCourseDetails(response.data.courseInfo);
-        setFinalCourseId(response.data.courseInfo._id);
+        setFinalCourseId(response.data.courseInfo.slugCourse);
         setChapters(response.data.courseInfo.chapters);
         const chaptersData =
           response.data.chaptersWithCompletion ||
