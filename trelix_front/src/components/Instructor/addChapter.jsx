@@ -485,7 +485,7 @@ function AddChapter() {
                         <div className="flex flex-col space-y-2">
                           {chapter.video ? (
                             <a
-                              href={`${import.meta.env.VITE_API_PROXY}${chapter.video}`}
+                              href={`${chapter.video}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-500 hover:text-blue-700 flex items-center"
@@ -502,7 +502,7 @@ function AddChapter() {
 
                           {chapter.pdf ? (
                             <a
-                              href={`${import.meta.env.VITE_API_PROXY}${chapter.pdf}`}
+                              href={`${chapter.pdf}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-500 hover:text-blue-700 flex items-center"
