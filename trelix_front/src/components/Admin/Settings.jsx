@@ -11,15 +11,15 @@ function Settings(){
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Settings Page</title>
   {/* Favicon */}
-  <link rel="icon" type="image/x-icon" href="assetss/img/favicon.png" />
+  <link rel="icon" type="image/x-icon" href="/assetss/img/favicon.png" />
   {/* Bootstrap CSS */}
-  <link rel="stylesheet" href="assetss/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/assetss/css/bootstrap.min.css" />
   {/* Linearicon Font */}
-  <link rel="stylesheet" href="assetss/css/lnr-icon.css" />
+  <link rel="stylesheet" href="/assetss/css/lnr-icon.css" />
   {/* Fontawesome CSS */}
-  <link rel="stylesheet" href="assetss/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/assetss/css/font-awesome.min.css" />
   {/* Custom CSS */}
-  <link rel="stylesheet" href="assetss/css/style.css" />
+  <link rel="stylesheet" href="/assetss/css/style.css" />
   {/* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries */}
   {/*[if lt IE 9]>
 		

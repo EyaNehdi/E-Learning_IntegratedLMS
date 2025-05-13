@@ -91,7 +91,7 @@ const VerifyEmail = () => {
     setStatus({ type: "info", message: "Verifying your email..." });
     try {
       const responseVerification = await axios.post(
-        "http://localhost:5000/api/auth/verify-email",
+        `${import.meta.env.VITE_API_PROXY}/api/auth/verify-email`,
         {
           email: email,
           verificationCode: code,
@@ -106,7 +106,7 @@ const VerifyEmail = () => {
         });
         try {
           await axios.post(
-            "http://localhost:5000/api/send-verification-confirmation",
+            `${import.meta.env.VITE_API_PROXY}/api/send-verification-confirmation`,
             {
               email: email,
             }
@@ -141,7 +141,7 @@ const VerifyEmail = () => {
     setStatus({ type: "info", message: "Sending a new verification code..." });
 
     try {
-      await axios.post("http://localhost:5000/api/auth/resend-verification", {
+      await axios.post(`${import.meta.env.VITE_API_PROXY}/api/auth/resend-verification`, {
         email: email,
       });
 

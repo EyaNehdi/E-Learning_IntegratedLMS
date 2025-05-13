@@ -23,3 +23,38 @@ function detectOS(ua) {
     if (/iPhone|iPad/.test(ua)) return "iOS";
     return "Unknown";
 }
+
+export default function parseUserAgentAdmin(userAgent) {
+    let browser = "Unknown";
+    let os = "Unknown";
+
+    if (!userAgent) return { browser, os };
+
+    // Browser detection
+    if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
+        browser = "Chrome";
+    } else if (userAgent.includes("Firefox")) {
+        browser = "Firefox";
+    } else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
+        browser = "Safari";
+    } else if (userAgent.includes("Edg")) {
+        browser = "Edge";
+    } else if (userAgent.includes("Opera") || userAgent.includes("OPR")) {
+        browser = "Opera";
+    }
+
+    // OS detection
+    if (userAgent.includes("Win")) {
+        os = "Windows";
+    } else if (userAgent.includes("Mac")) {
+        os = "macOS";
+    } else if (userAgent.includes("Linux")) {
+        os = "Linux";
+    } else if (userAgent.includes("Android")) {
+        os = "Android";
+    } else if (userAgent.includes("iPhone") || userAgent.includes("iPad")) {
+        os = "iOS";
+    }
+
+    return { browser, os };
+}

@@ -21,7 +21,7 @@ const HomeUser = () => {
       useEffect(() => {
         const fetchCategories = async () => {
           try {
-            const res = await axios.get("http://localhost:5000/courses/categories");
+            const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/courses/categories`);
             setCategories(res.data);
           } catch (err) {
             console.error("Erreur lors du fetch des catégories:", err);
@@ -54,7 +54,7 @@ const HomeUser = () => {
       useEffect(() => {
         const fetchStudents = async () =>{
           try {
-            const res = await axios.get('http://localhost:5000/api/admin/count/student') ;// adapt path if needed
+            const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/count/student`) ;// adapt path if needed
             setCountStudent(res.data.count); // assuming the response has a count property
           }
           catch(err){
@@ -63,7 +63,7 @@ const HomeUser = () => {
         };
         const fetchInstructors = async () =>{
           try {
-            const res = await axios.get('http://localhost:5000/api/admin/count/instructor') ;// adapt path if needed
+            const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/count/instructor`) ;// adapt path if needed
             setCountInstructor(res.data.count); // assuming the response has a count property
           }
           catch(err){
@@ -72,7 +72,7 @@ const HomeUser = () => {
         };
         const fetchCoursesNumber = async () =>{
           try {
-            const res = await axios.get('http://localhost:5000/course/count/courses') ;// adapt path if needed
+            const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/count/courses`) ;// adapt path if needed
             setCountCourses(res.data.count); // assuming the response has a count property
           }
           catch(err){
@@ -81,7 +81,7 @@ const HomeUser = () => {
         };
         const MeetOurInstructors = async () =>{
           try {
-            const res = await axios.get('http://localhost:5000/api/admin/instructors'); // adapt if needed
+            const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/instructors`); // adapt if needed
           setInstructorsMeet(res.data);
         } catch (err) {
           console.error("Error fetching instructors:", err);
@@ -96,7 +96,7 @@ const HomeUser = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/courses/categories");
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/courses/categories`);
         setCategories(res.data);
       } catch (err) {
         console.error("Erreur lors du fetch des catégories:", err);
@@ -112,7 +112,7 @@ const HomeUser = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://localhost:5000/course/courses"
+          `${import.meta.env.VITE_API_PROXY}/course/courses`
         );
         setCourses(response.data);
         setLoading(false);
@@ -537,7 +537,13 @@ const HomeUser = () => {
                   <div className="instructor-card position-relative overflow-hidden shadow-sm rounded-3 bg-white">
                     <div className="instructor-image text-center pt-4">
                       <img
-                        src={`http://localhost:5000${instructor?.profilePhoto}`}
+
+                        src={
+                                      instructor?.profilePhoto?.startsWith("http")
+                                        ? instructor.profilePhoto
+                                        : `${import.meta.env.VITE_API_PROXY}${instructor?.profilePhoto}`
+                                    }
+
                         className="rounded-circle shadow-sm border border-white"
                         alt={`${instructor.firstName} ${instructor.lastName}`}
                         style={{

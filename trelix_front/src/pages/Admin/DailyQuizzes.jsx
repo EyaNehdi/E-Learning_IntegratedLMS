@@ -1,13 +1,12 @@
-import Headeradmin from "../../components/Admin/Headeradmin"
-import QuizzAdd from "../../components/Admin/QuizzAdd"
+import { Outlet } from "react-router-dom";
+import PageContainer from "../../layout/PageContainer";
 
 function DailyQuizzes() {
   return (
-   <>
-   <Headeradmin />
-   <QuizzAdd />
-   </>
-  )
+    <PageContainer>
+      <Outlet />
+    </PageContainer>
+  );
 }
 
-export default DailyQuizzes
+export default DailyQuizzes;

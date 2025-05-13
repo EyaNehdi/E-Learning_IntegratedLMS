@@ -18,7 +18,7 @@ const CertificatesPage = () => {
   const fetchCertificates = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/certificates/getCertAll?userId=${user?._id}`
+        `${import.meta.env.VITE_API_PROXY}/certificates/getCertAll?userId=${user?._id}`
       );
       setCertificates(response.data);
     } catch (error) {

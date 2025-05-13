@@ -36,7 +36,7 @@ function ModifyPreference() {
 
   const fetchModules = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/module");
+      const response = await axios.get("https://trelix-xj5h.onrender.com/module");
       if (response.status === 200) {
         setModules(response.data);
       }
@@ -89,7 +89,7 @@ function ModifyPreference() {
 
       // Appeler l'endpoint de mise à jour avec l'ID de la préférence
       const response = await axios.put(
-        `http://localhost:5000/preference/update/${preference._id}`,
+        `https://trelix-xj5h.onrender.com/preference/update/${preference._id}`,
         updatedPreference
       );
 

@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import "./ResponsiveStyle.css";
 
 const ListBadges = () => {
   const navigate = useNavigate();
@@ -33,9 +34,13 @@ const ListBadges = () => {
       text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        confirmButton: "custom-swal-confirm",
+        cancelButton: "custom-swal-cancel",
+      },
     });
 
     if (result.isConfirmed) {
@@ -92,7 +97,7 @@ const ListBadges = () => {
       </div>
     );
   }
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = `${import.meta.env.VITE_API_PROXY}`;
   return (
     <div className="card ctm-border-radius shadow-sm">
       <div className="card-header">
@@ -227,13 +232,13 @@ const ListBadges = () => {
                       <div className="flex gap-2 mt-2">
                         <button
                           onClick={() => handleEdit(badge)}
-                          className="text-xs text-blue-600 hover:text-blue-800"
+                          className="custom-outline-btn edit-btn"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(badge._id)}
-                          className="text-xs text-red-600 hover:text-red-800"
+                          className="custom-outline-btn archive-btn"
                         >
                           Delete
                         </button>

@@ -1,7 +1,7 @@
 // services/googleClassroom.service.js
 import axios from "axios"
 
-const API_URL = "http://localhost:5000/api" // Ajustez selon votre configuration
+const API_URL = `${import.meta.env.VITE_API_PROXY}/api`
 
 // Fonction pour se connecter avec Google
 export const loginWithGoogle = async () => {

@@ -99,7 +99,7 @@ function AddPreference() {
   const fetchModules = async () => {
     setIsLoadingModules(true)
     try {
-      const response = await axios.get("http://localhost:5000/module")
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/module`)
       const data = response.data
       setModules(Array.isArray(data) ? data : [])
     } catch (error) {
@@ -142,15 +142,19 @@ function AddPreference() {
           styleContenu,
           objectif,
           methodeEtude,
+
           module: module.id, // Changé de moduleId à module
           user: user._id,   // Changé de userId à user
+
         }
         
         if (debugMode) {
           console.log("Sending data for module", module.name, ":", requestData)
         }
         
-        return axios.post("http://localhost:5000/preference/add", requestData)
+
+        return axios.post(`${import.meta.env.VITE_API_PROXY}/preference/add`, requestData)
+
       })
 
       // Wait for all submissions to complete
@@ -306,7 +310,7 @@ function AddPreference() {
             <h1 className="text-3xl font-bold text-center text-white mb-2">Learning Preferences</h1>
             <p className="text-center text-blue-100">Customize your learning experience</p>
             
-          
+
           </div>
 
           <div className="p-6 md:p-8">

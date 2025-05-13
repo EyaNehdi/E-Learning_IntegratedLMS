@@ -15,7 +15,7 @@ const styles = {
   container: {
     width: "100vw",
     height: "100vh",
-    backgroundImage: "url('assets/images/404.png')", // chemin vers votre image
+    backgroundImage: "url('/assets/images/404.png')", // chemin vers votre image
     backgroundSize: "cover",    // pour couvrir tout l'écran
     backgroundPosition: "center", // centrer l'image
     backgroundRepeat: "no-repeat",

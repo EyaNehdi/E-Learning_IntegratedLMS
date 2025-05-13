@@ -41,7 +41,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
   };
   const { linkedInLogin } = useLinkedIn({
     clientId: "86un9qr2kersxv",
-    redirectUri: "http://localhost:5173/linkedin/callback",
+    redirectUri: "https://trelix-livid.vercel.app/linkedin/callback",
     scope: "openid profile w_member_social email",
     onSuccess: async (code, state) => {
       console.log("LinkedIn code:", code);
@@ -49,7 +49,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
 
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/auth/register/linkedinStudent",
+          `${import.meta.env.VITE_API_PROXY}/api/auth/register/linkedinStudent`,
           { code }
         );
 
@@ -64,7 +64,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
           "This Linkedin account already exists. Redirecting to login..."
         );
         setTimeout(() => {
-          window.location.href = "http://localhost:5173/login";
+          window.location.href = "https://trelix-livid.vercel.app/login";
         }, 2000);
         console.error("Error:", error);
       } finally {
@@ -103,7 +103,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
       };
       // Send Google user data to the backend for registration
       const res = await axios.post(
-        "http://localhost:5173/api/auth/register/googleStudent",
+        "https://trelix-livid.vercel.app/api/auth/register/googleStudent",
         googleUserData,
         {
           withCredentials: true,
@@ -117,7 +117,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
         "This Google account already exists. Redirecting to login..."
       );
       setTimeout(() => {
-        window.location.href = "http://localhost:5173/login";
+        window.location.href = "https://trelix-livid.vercel.app/login";
       }, 2000);
       console.error(err);
     }
@@ -137,7 +137,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
     try {
       // Send the authorization code to the backend
       const res = await axios.post(
-        "http://localhost:5173/api/auth/register/githubStudent",
+        "https://trelix-livid.vercel.app/api/auth/register/githubStudent",
         {
           code: response.code,
         }
@@ -150,7 +150,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
         "This Github account already exists. Redirecting to login..."
       );
       setTimeout(() => {
-        window.location.href = "http://localhost:5173/login";
+        window.location.href = "https://trelix-livid.vercel.app/login";
       }, 2000);
       console.error(err);
     }
@@ -326,7 +326,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
 
     try {
       const response = await axios.post(
-        "/api/auth/register/student",
+        `${import.meta.env.VITE_API_PROXY}/api/auth/register/student`,
         formData,
         { withCredentials: true }
       );
@@ -490,7 +490,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
             <div className="">
               <MicrosoftLogin
                 clientId="0081ceb9-215c-491a-aaab-e478787be7e8"
-                redirectUri="http://localhost:5173/login/student"
+                redirectUri="https://trelix-livid.vercel.app/login/student"
                 onSuccess={handleMicrosoftLoginSuccess}
                 onFailure={handleMicrosoftLoginError}
               >
@@ -506,7 +506,7 @@ const StudentRegister = ({ setisRegisterSuccess }) => {
             <div className="d-none" ref={githubRef}>
               <GitHubLogin
                 clientId="Ov23liQcQlFtxrCS9Hkz"
-                redirectUri="http://localhost:5173/login/student"
+                redirectUri="https://trelix-livid.vercel.app/login/student"
                 onSuccess={handleGitHubLoginSuccess}
                 onFailure={handleGitHubLoginError}
               />

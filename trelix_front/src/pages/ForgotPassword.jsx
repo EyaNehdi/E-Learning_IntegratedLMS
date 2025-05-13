@@ -35,7 +35,7 @@ const ForgotPassword = () => {
     setStatus({ type: "info", message: "Sending password reset email..." })
 
     try {
-      await axios.post("http://localhost:5000/api/auth/forgot-password", { email })
+      await axios.post(`${import.meta.env.VITE_API_PROXY}/api/auth/forgot-password`, { email })
 
       setStatus({
         type: "success",

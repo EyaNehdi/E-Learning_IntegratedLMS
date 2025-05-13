@@ -1,200 +1,231 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { useOutletContext } from "react-router-dom";
-import {
-  Search,
-  Plus,
-  Trash2,
-  Edit,
-  FileText,
-  Video,
-  Link2,
-  Calendar,
-} from "lucide-react";
+import { useState, useEffect, useRef } from "react"
+import axios from "axios"
+import { useOutletContext } from "react-router-dom"
+import { Search, Plus, Trash2, Edit, FileText, Video, Link2, Calendar } from "lucide-react"
+import NotificationToast from "./NotificationToast"
+import FilePreview from "./FilePreview"
+import UploadProgress from "./UploadProgress"
+import "./animations.css"
 
 function AddChapter() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [pdf, setPdf] = useState(null);
-  const [video, setVideo] = useState(null);
-  const [chapters, setChapters] = useState([]);
-  const { user } = useOutletContext();
-  const [expandedRows, setExpandedRows] = useState({});
-  const maxLength = 100;
-  const [selectedCourse, setSelectedCourse] = useState("");
-  const [selectedChapters, setSelectedChapters] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("add");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [pdfName, setPdfName] = useState("");
-  const [videoName, setVideoName] = useState("");
-
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [pdf, setPdf] = useState(null)
+  const [video, setVideo] = useState(null)
+  const [chapters, setChapters] = useState([])
+  const { user } = useOutletContext()
+  const [expandedRows, setExpandedRows] = useState({})
+  const maxLength = 100
+  const [selectedCourse, setSelectedCourse] = useState("")
+  const [selectedChapters, setSelectedChapters] = useState([])
+  const [courses, setCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("add")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [pdfName, setPdfName] = useState("")
+  const [videoName, setVideoName] = useState("")
+  const [notification, setNotification] = useState({ show: false, message: "", type: "" })
+  const [uploadProgress, setUploadProgress] = useState({ pdf: 0, video: 0 })
+  const fileInputRef = useRef(null)
+  const videoInputRef = useRef(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isAssigning, setIsAssigning] = useState(false)
   // Fetch courses
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        setLoading(true);
-        const response = await axios.get(
-          "http://localhost:5000/course/courses"
-        );
-        setCourses(response.data);
+        setLoading(true)
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/courses`)
+        setCourses(response.data)
 
-        setLoading(false);
+        setLoading(false)
       } catch (error) {
-        console.error("Error fetching courses:", error);
-        setLoading(false);
+        console.error("Error fetching courses:", error)
+        setLoading(false)
       }
-    };
+    }
 
-    fetchCourses();
-  }, []);
+    fetchCourses()
+  }, [])
 
   // Fetch chapters
   useEffect(() => {
     const fetchChapters = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/chapter/get");
-        setChapters(response.data);
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/chapter/get`)
+        setChapters(response.data)
       } catch (error) {
-        console.error("Error fetching chapters:", error);
+        console.error("Error fetching chapters:", error)
       }
-    };
+    }
 
-    fetchChapters();
-  }, []);
+    fetchChapters()
+  }, [])
 
   // Toggle expanded row
   const toggleExpand = (chapterId) => {
     setExpandedRows((prevState) => ({
       ...prevState,
       [chapterId]: !prevState[chapterId],
-    }));
-  };
+    }))
+  }
 
   // Handle course selection
   const handleCourseChange = (e) => {
-    setSelectedCourse(e.target.value);
-  };
+    setSelectedCourse(e.target.value)
+  }
 
   // Handle chapter selection
   const handleChapterChange = (e) => {
-    const selectedOptions = Array.from(
-      e.target.selectedOptions,
-      (option) => option.value
-    );
-    setSelectedChapters(selectedOptions);
-  };
+    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value)
+    setSelectedChapters(selectedOptions)
+  }
+
+  // Show notification
+  const showNotification = (message, type) => {
+    setNotification({ show: true, message, type })
+    // Auto-hide notification after 5 seconds
+    setTimeout(() => {
+      setNotification({ show: false, message: "", type: "" })
+    }, 5000)
+      if (type === "success" && message.includes("added successfully")) {
+        setIsSubmitting(false)
+      }
+  }
+
+  // Dismiss notification
+  const dismissNotification = () => {
+    setNotification({ show: false, message: "", type: "" })
+  }
+
+  // Simulate upload progress
+  const simulateProgress = (fileType) => {
+    let progress = 0
+    const interval = setInterval(() => {
+      progress += Math.floor(Math.random() * 10) + 5
+      if (progress >= 100) {
+        progress = 100
+        clearInterval(interval)
+      }
+      setUploadProgress((prev) => ({ ...prev, [fileType]: progress }))
+    }, 200)
+  }
 
   // Handle file change
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]
     if (file) {
       if (e.target.name === "pdf") {
-        setPdf(file);
-        setPdfName(file.name);
+        setPdf(file)
+        setPdfName(file.name)
+        // Simulate upload progress for better UX
+        simulateProgress("pdf")
       }
       if (e.target.name === "video") {
-        setVideo(file);
-        setVideoName(file.name);
+        setVideo(file)
+        setVideoName(file.name)
+        // Simulate upload progress for better UX
+        simulateProgress("video")
       }
     }
-  };
+  }
 
   // Handle chapter deletion
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/chapter/delete/${id}`
-      );
+      const response = await axios.delete(`${import.meta.env.VITE_API_PROXY}/chapter/delete/${id}`)
       if (response.status === 200) {
-        setChapters((prevChapters) =>
-          prevChapters.filter((chapter) => chapter._id !== id)
-        );
-        alert("Chapter deleted successfully");
+        setChapters((prevChapters) => prevChapters.filter((chapter) => chapter._id !== id))
+        showNotification("Chapter deleted successfully", "success")
       }
     } catch (error) {
-      console.error("Error deleting chapter:", error);
-      alert("Error deleting chapter");
+      console.error("Error deleting chapter:", error)
+      showNotification("Error deleting chapter", "error")
     }
-  };
+  }
 
   // Handle chapter assignment
   const handleAssign = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/chapter/assign-chapters",
-        {
-          slugCourse: selectedCourse,
-          chapters: selectedChapters,
-        }
-      );
-
-      alert("Chapters assigned successfully!");
-      setSelectedCourse("");
-      setSelectedChapters([]);
+       setIsAssigning(true)
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/chapter/assign-chapters`, {
+        slugCourse: selectedCourse,
+        chapters: selectedChapters,
+      })
+   setTimeout(() => {
+        setIsAssigning(false)
+      }, 1000)
+      showNotification("Chapters assigned successfully!", "success")
+      setSelectedCourse("")
+      setSelectedChapters([])
+    
     } catch (error) {
-      console.error(
-        "Error assigning chapters:",
-        error.response?.data || error.message
-      );
-      alert("Error assigning chapters");
+      console.error("Error assigning chapters:", error.response?.data || error.message)
+      showNotification("Error assigning chapters", "error")
+       setIsAssigning(false)
     }
-  };
+  }
 
   // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!title || !description) {
-      alert("Title and description are required.");
-      return;
+      showNotification("Title and description are required.", "error")
+      return
     }
+  setIsSubmitting(true)
+    const formData = new FormData()
+    formData.append("title", title)
+    formData.append("description", description)
+    formData.append("userid", user._id)
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("userid", user._id);
-
-    if (pdf) formData.append("pdf", pdf);
-    if (video) formData.append("video", video);
+    if (pdf) formData.append("pdf", pdf)
+    if (video) formData.append("video", video)
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/chapter/add",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      // Show uploading notification
+      showNotification("Uploading chapter content...", "info")
+
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/chapter/add`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+          console.log(`Upload Progress: ${percentCompleted}%`)
+        },
+      })
 
       if (response.status === 201) {
-        alert("Chapter added successfully!");
+        showNotification("Chapter added successfully!", "success")
         // Refresh chapters list
-        const chaptersResponse = await axios.get(
-          "http://localhost:5000/chapter/get"
-        );
-        setChapters(chaptersResponse.data);
+        const chaptersResponse = await axios.get(`${import.meta.env.VITE_API_PROXY}/chapter/get`)
+        setChapters(chaptersResponse.data)
 
         // Reset form
-        setTitle("");
-        setDescription("");
-        setPdf(null);
-        setVideo(null);
-        setPdfName("");
-        setVideoName("");
+        setTitle("")
+        setDescription("")
+        setPdf(null)
+        setVideo(null)
+        setPdfName("")
+        setVideoName("")
+        setUploadProgress({ pdf: 0, video: 0 })
+        setTimeout(() => {
+          setIsSubmitting(false)
+        }, 1000)
       } else {
-        alert("Failed to add chapter.");
+        showNotification("Failed to add chapter.", "error")
+        setIsSubmitting(false)
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert(error.response?.data?.message || "Failed to add chapter.");
+      console.error("Error:", error)
+      showNotification(error.response?.data?.message || "Failed to add chapter.", "error")
+         setIsSubmitting(false)
     }
-  };
+  }
 
   // Filter chapters based on search term
   const filteredChapters = chapters
@@ -202,23 +233,19 @@ function AddChapter() {
     .filter(
       (chapter) =>
         chapter.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        chapter.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        chapter.description.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 border-b pb-4">
-        Chapter Management
-      </h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-800 border-b pb-4">Chapter Management</h1>
 
       {/* Tabs */}
       <div className="mb-8">
         <div className="flex flex-wrap border-b">
           <button
             className={`px-4 py-2 font-medium text-sm rounded-t-lg ${
-              activeTab === "add"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              activeTab === "add" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
             onClick={() => setActiveTab("add")}
           >
@@ -226,9 +253,7 @@ function AddChapter() {
           </button>
           <button
             className={`px-4 py-2 font-medium text-sm rounded-t-lg ${
-              activeTab === "list"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              activeTab === "list" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
             onClick={() => setActiveTab("list")}
           >
@@ -236,9 +261,7 @@ function AddChapter() {
           </button>
           <button
             className={`px-4 py-2 font-medium text-sm rounded-t-lg ${
-              activeTab === "assign"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              activeTab === "assign" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
             onClick={() => setActiveTab("assign")}
           >
@@ -250,16 +273,11 @@ function AddChapter() {
       {/* Add Chapter Form */}
       {activeTab === "add" && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-6 text-gray-700">
-            Add New Chapter
-          </h2>
+          <h2 className="text-xl font-semibold mb-6 text-gray-700">Add New Chapter</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
                   Chapter Title
                 </label>
                 <input
@@ -274,85 +292,128 @@ function AddChapter() {
               </div>
 
               <div className="space-y-2">
-                <label
-                  htmlFor="pdfInput"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="pdfInput" className="block text-sm font-medium text-gray-700">
                   PDF Document (Optional)
                 </label>
-                <div className="flex items-center">
-                  <label className="flex-1 cursor-pointer px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50">
-                    <span className="flex items-center">
-                      <FileText className="w-5 h-5 mr-2 text-gray-500" />
-                      {pdfName || "Choose PDF file"}
-                    </span>
-                    <input
-                      id="pdfInput"
-                      type="file"
-                      name="pdf"
-                      accept="application/pdf"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </label>
-                  {pdfName && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPdf(null);
-                        setPdfName("");
+                <div className="border border-gray-300 rounded-md overflow-hidden">
+                  <div className="flex items-center">
+                    <label className="flex-1 cursor-pointer px-3 py-2 bg-white text-gray-700 hover:bg-gray-50">
+                      <span className="flex items-center">
+                        <FileText className="w-5 h-5 mr-2 text-gray-500" />
+                        {pdfName || "Choose PDF file"}
+                      </span>
+                      <input
+                        id="pdfInput"
+                        type="file"
+                        name="pdf"
+                        ref={fileInputRef}
+                        accept="application/pdf"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                    </label>
+                    {pdfName ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPdf(null)
+                          setPdfName("")
+                          setUploadProgress((prev) => ({ ...prev, pdf: 0 }))
+                          if (fileInputRef.current) fileInputRef.current.value = ""
+                        }}
+                        className="p-2 text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-2 text-blue-500 hover:text-blue-700 bg-blue-50"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                  {pdf && (
+                    <FilePreview
+                      file={pdf}
+                      type="pdf"
+                      onRemove={() => {
+                        setPdf(null)
+                        setPdfName("")
+                        setUploadProgress((prev) => ({ ...prev, pdf: 0 }))
+                        if (fileInputRef.current) fileInputRef.current.value = ""
                       }}
-                      className="ml-2 p-2 text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                    />
                   )}
+                  {pdfName && uploadProgress.pdf > 0 && <UploadProgress progress={uploadProgress.pdf} />}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label
-                  htmlFor="videoInput"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="videoInput" className="block text-sm font-medium text-gray-700">
                   Video (Optional)
                 </label>
-                <div className="flex items-center">
-                  <label className="flex-1 cursor-pointer px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50">
-                    <span className="flex items-center">
-                      <Video className="w-5 h-5 mr-2 text-gray-500" />
-                      {videoName || "Choose video file"}
-                    </span>
-                    <input
-                      id="videoInput"
-                      type="file"
-                      name="video"
-                      accept="video/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </label>
-                  {videoName && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setVideo(null);
-                        setVideoName("");
+                <div className="border border-gray-300 rounded-md overflow-hidden">
+                  <div className="flex items-center">
+                    <label className="flex-1 cursor-pointer px-3 py-2 bg-white text-gray-700 hover:bg-gray-50">
+                      <span className="flex items-center">
+                        <Video className="w-5 h-5 mr-2 text-gray-500" />
+                        {videoName || "Choose video file"}
+                      </span>
+                      <input
+                        id="videoInput"
+                        type="file"
+                        name="video"
+                        ref={videoInputRef}
+                        accept="video/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                    </label>
+                    {videoName ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVideo(null)
+                          setVideoName("")
+                          setUploadProgress((prev) => ({ ...prev, video: 0 }))
+                          if (videoInputRef.current) videoInputRef.current.value = ""
+                        }}
+                        className="p-2 text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => videoInputRef.current?.click()}
+                        className="p-2 text-blue-500 hover:text-blue-700 bg-blue-50"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                  {video && (
+                    <FilePreview
+                      file={video}
+                      type="video"
+                      onRemove={() => {
+                        setVideo(null)
+                        setVideoName("")
+                        setUploadProgress((prev) => ({ ...prev, video: 0 }))
+                        if (videoInputRef.current) videoInputRef.current.value = ""
                       }}
-                      className="ml-2 p-2 text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                    />
                   )}
+                  {videoName && uploadProgress.video > 0 && <UploadProgress progress={uploadProgress.video} />}
                 </div>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 Description
               </label>
               <textarea
@@ -369,11 +430,41 @@ function AddChapter() {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
+  disabled={isSubmitting}
+                className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+                } text-white focus:ring-blue-500`}              >
                 <span className="flex items-center">
-                  <Plus className="w-5 h-5 mr-2" />
-                  Add Chapter
+                {isSubmitting ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Adding Chapter...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-5 h-5 mr-2" />
+                      Add Chapter
+                    </>
+                  )}
                 </span>
               </button>
             </div>
@@ -385,9 +476,7 @@ function AddChapter() {
       {activeTab === "list" && (
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-700">
-              All Chapters
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-700">All Chapters</h2>
             <div className="relative">
               <input
                 type="text"
@@ -442,21 +531,16 @@ function AddChapter() {
                     <tr key={chapter._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <div className="text-sm font-medium text-gray-900">
-                            {chapter.title}
-                          </div>
+                          <div className="text-sm font-medium text-gray-900">{chapter.title}</div>
                           <div className="text-sm text-gray-500 flex items-center mt-1">
                             <Calendar className="h-4 w-4 mr-1" />
-                            {chapter.createdAt
-                              ? new Date(chapter.createdAt).toLocaleDateString()
-                              : "N/A"}
+                            {chapter.createdAt ? new Date(chapter.createdAt).toLocaleDateString() : "N/A"}
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
-                          {chapter.description.length > maxLength &&
-                          !expandedRows[chapter._id] ? (
+                          {chapter.description.length > maxLength && !expandedRows[chapter._id] ? (
                             <>
                               {chapter.description.substring(0, maxLength)}...
                               <button
@@ -485,7 +569,7 @@ function AddChapter() {
                         <div className="flex flex-col space-y-2">
                           {chapter.video ? (
                             <a
-                              href={`http://localhost:5000${chapter.video}`}
+                              href={`${chapter.video}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-500 hover:text-blue-700 flex items-center"
@@ -502,7 +586,7 @@ function AddChapter() {
 
                           {chapter.pdf ? (
                             <a
-                              href={`http://localhost:5000${chapter.pdf}`}
+                              href={`${chapter.pdf}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-500 hover:text-blue-700 flex items-center"
@@ -528,10 +612,7 @@ function AddChapter() {
                           <button className="text-indigo-600 hover:text-indigo-900">
                             <Edit className="h-5 w-5" />
                           </button>
-                          <button
-                            onClick={() => handleDelete(chapter._id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
+                          <button onClick={() => handleDelete(chapter._id)} className="text-red-600 hover:text-red-900">
                             <Trash2 className="h-5 w-5" />
                           </button>
                         </div>
@@ -540,13 +621,8 @@ function AddChapter() {
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="px-6 py-4 text-center text-sm text-gray-500"
-                    >
-                      {searchTerm
-                        ? "No chapters found matching your search"
-                        : "No chapters available"}
+                    <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
+                      {searchTerm ? "No chapters found matching your search" : "No chapters available"}
                     </td>
                   </tr>
                 )}
@@ -559,15 +635,11 @@ function AddChapter() {
       {/* Assign Chapters to Course */}
       {activeTab === "assign" && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-6 text-gray-700">
-            Assign Chapters to Course
-          </h2>
+          <h2 className="text-xl font-semibold mb-6 text-gray-700">Assign Chapters to Course</h2>
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Select Course
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Select Course</label>
               <select
                 value={selectedCourse}
                 onChange={handleCourseChange}
@@ -614,32 +686,66 @@ function AddChapter() {
                   <option disabled>No chapters available</option>
                 )}
               </select>
-              <p className="text-sm text-gray-500 mt-1">
-                Selected: {selectedChapters.length} chapter(s)
-              </p>
+              <p className="text-sm text-gray-500 mt-1">Selected: {selectedChapters.length} chapter(s)</p>
             </div>
 
             <div className="flex justify-end">
               <button
                 onClick={handleAssign}
-                disabled={!selectedCourse || selectedChapters.length === 0}
+                disabled={!selectedCourse || selectedChapters.length === 0 || isAssigning}
                 className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  !selectedCourse || selectedChapters.length === 0
+                  !selectedCourse || selectedChapters.length === 0 || isAssigning
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500"
                 }`}
               >
                 <span className="flex items-center">
-                  <Link2 className="w-5 h-5 mr-2" />
-                  Assign Chapters to Course
+                     {isAssigning ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Assigning...
+                    </>
+                  ) : (
+                    <>
+                      <Link2 className="w-5 h-5 mr-2" />
+                      Assign Chapters to Course
+                    </>
+                  )}
                 </span>
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Notification Toast */}
+      <NotificationToast
+        show={notification.show}
+        message={notification.message}
+        type={notification.type}
+        onDismiss={dismissNotification}
+      />
     </div>
-  );
+  )
 }
 
-export default AddChapter;
+export default AddChapter

@@ -70,7 +70,7 @@ const sendVerificationConfirmation = async (req, res) => {
 
 const sendPasswordResetEmail = async (email, resetToken) => {
   // Use an environment variable for the base URL in production
-  const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+  const baseUrl = process.env.FRONTEND_URL || "https://trelix-livid.vercel.app"
   const resetLink = `${baseUrl}/reset-password?token=${resetToken}`
 
   const emailContent = `
@@ -99,7 +99,7 @@ const sendPasswordResetEmail = async (email, resetToken) => {
 
 function getEngagementEmailTemplate(user, stage, role) {
   const firstName = user.name || user.email;
-  const siteUrl = 'http://localhost:5173/';
+  const siteUrl = 'https://trelix-livid.vercel.app/';
 
   let subject = '';
   let body = '';

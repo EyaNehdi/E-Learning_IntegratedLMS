@@ -9,22 +9,22 @@ function Manage() {
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <title>Manage Page</title>
       {/* Favicon */}
-      <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
+      <link rel="icon" type="image/x-icon" href="/assets/img/favicon.png" />
 
       <div>
         {/* Bootstrap CSS */}
-        <link rel="stylesheet" href="assetss/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/assetss/css/bootstrap.min.css" />
         {/* Linearicon Font */}
-        <link rel="stylesheet" href="assetss/css/lnr-icon.css" />
+        <link rel="stylesheet" href="/assetss/css/lnr-icon.css" />
         {/* Fontawesome CSS */}
-        <link rel="stylesheet" href="assetss/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/assetss/css/font-awesome.min.css" />
         {/* Custom CSS */}
-        <link rel="stylesheet" href="assetss/css/style.css" />
+        <link rel="stylesheet" href="/assetss/css/style.css" />
         <div>
-          <link rel="stylesheet" href="assetss/css/bootstrap.min.css" />
-          <link rel="stylesheet" href="assetss/css/lnr-icon.css" />
-          <link rel="stylesheet" href="assetss/css/font-awesome.min.css" />
-          <link rel="stylesheet" href="assetss/css/style.css" />
+          <link rel="stylesheet" href="/assetss/css/bootstrap.min.css" />
+          <link rel="stylesheet" href="/assetss/css/lnr-icon.css" />
+          <link rel="stylesheet" href="/assetss/css/font-awesome.min.css" />
+          <link rel="stylesheet" href="/assetss/css/style.css" />
         </div>
       </div>
 
@@ -135,7 +135,7 @@ function Manage() {
                           title="Richard Wilson"
                         >
                           <img
-                            src="assetss/img/profiles/img-10.jpg"
+                            src="/assetss/img/profiles/img-10.jpg"
                             alt="Richard Wilson"
                             className="img-fluid"
                           />
@@ -168,7 +168,7 @@ function Manage() {
                           title="Richard Wilson"
                         >
                           <img
-                            src="assetss/img/profiles/img-10.jpg"
+                            src="/assetss/img/profiles/img-10.jpg"
                             alt="Richard Wilson"
                             className="img-fluid"
                           />
@@ -201,7 +201,7 @@ function Manage() {
                           title="Maria Cotton"
                         >
                           <img
-                            src="assetss/img/profiles/img-6.jpg"
+                            src="/assetss/img/profiles/img-6.jpg"
                             alt="Maria Cotton"
                             className="img-fluid"
                           />
