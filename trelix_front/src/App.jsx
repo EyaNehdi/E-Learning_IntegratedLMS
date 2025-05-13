@@ -162,10 +162,7 @@ function App() {
               path="/profile/classroom/courses/:courseId"
               element={<CourseDetailsPage />}
             />
-             <Route
-              path="/profile/intelligent-courses"
-              element={<IntelligentCourses />}
-            />
+           
         
             <Route path="/store" element={<Store />} />
             <Route path="/profile" element={<ProfilePage />}>
@@ -185,6 +182,10 @@ function App() {
             <Route
               path="preferencestat"
               element={<StatPreference />}
+            />
+              <Route
+              path="intelligent-courses"
+              element={<IntelligentCourses />}
             />
            
               <Route path="CitationGenerator" element={<CitationGenerator />} />
