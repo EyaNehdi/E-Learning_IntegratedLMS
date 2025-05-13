@@ -448,62 +448,82 @@ function Courses() {
 
                   {/* Champ de prix avec symbole de devise */}
                   <div className="relative">
-                    <input
-                      id="price"
-                      type="number"
-                      value={price}
-                      onChange={(e) => handleInputChange("price", e.target.value)}
-                      placeholder="Course price"
-                      className={`w-full p-3 pl-8 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
-                        errors.price ? "border-red-500" : "border-gray-300"
-                      }`}
-                      required
-                      disabled={currency === "free"}
-                    />
-                    <div className="flex gap-4 mb-4">
-                      <div className="flex items-center space-x-1">
-                        <input
-                          type="radio"
-                          id="usd"
-                          name="currency"
-                          value="usd"
-                          checked={currency === "usd"}
-                          onChange={() => handleCurrencyChange("usd")}
-                          className="hidden peer"
-                        />
-                        <label
-                          htmlFor="usd"
-                          className="text-sm text-gray-700 cursor-pointer peer-checked:text-blue-500 peer-checked:bg-blue-100 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-300 transition-all duration-300 ease-in-out flex items-center space-x-2 px-4 py-2 rounded-lg"
-                        >
-                          <span className="h-6 w-6 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:bg-blue-500">
-                            <span className="w-3 h-3 bg-white rounded-full peer-checked:block hidden"></span>
-                          </span>
-                          Trelix Coin (🪙)
-                        </label>
-                      </div>
+  <input
+    id="price"
+    type="number"
+    value={price}
+    onChange={(e) => handleInputChange("price", e.target.value)}
+    placeholder="Course price"
+    className={`w-full p-3 pl-8 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
+      errors.price ? "border-red-500" : "border-gray-300"
+    }`}
+    required
+    disabled={currency === "free"}
+  />
+  <div className="flex gap-4 mb-4">
+    {/* Trelix Coin Radio Button */}
+    <div className="relative flex items-center">
+      <input
+        type="radio"
+        id="usd"
+        name="currency"
+        value="usd"
+        checked={currency === "usd"}
+        onChange={() => handleCurrencyChange("usd")}
+        className="absolute opacity-0 w-full h-full cursor-pointer z-10"
+        style={{ margin: 0 }}
+      />
+      <label
+        htmlFor="usd"
+        className={`text-sm cursor-pointer flex items-center space-x-2 px-4 py-2 rounded-lg ${
+          currency === "usd" 
+            ? "text-blue-500 bg-blue-100 border-blue-500 ring-2 ring-blue-300" 
+            : "text-gray-700"
+        }`}
+      >
+        <span className={`h-6 w-6 border-2 rounded-full flex items-center justify-center ${
+          currency === "usd" ? "border-blue-500 bg-blue-500" : "border-gray-300"
+        }`}>
+          <span className={`w-3 h-3 bg-white rounded-full ${
+            currency === "usd" ? "block" : "hidden"
+          }`}></span>
+        </span>
+        <span>Trelix Coin (🪙)</span>
+      </label>
+    </div>
 
-                      <div className="flex items-center space-x-1">
-                        <input
-                          type="radio"
-                          id="free"
-                          name="currency"
-                          value="free"
-                          checked={currency === "free"}
-                          onChange={() => handleCurrencyChange("free")}
-                          className="hidden peer"
-                        />
-                        <label
-                          htmlFor="free"
-                          className="text-sm text-gray-700 cursor-pointer peer-checked:text-gray-600 peer-checked:bg-gray-100 peer-checked:border-gray-500 peer-checked:ring-2 peer-checked:ring-gray-300 transition-all duration-300 ease-in-out flex items-center space-x-2 px-4 py-2 rounded-lg"
-                        >
-                          <span className="h-6 w-6 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:bg-gray-500">
-                            <span className="w-3 h-3 bg-white rounded-full peer-checked:block hidden"></span>
-                          </span>
-                          Free
-                        </label>
-                      </div>
-                    </div>
-                  </div>
+    {/* Free Radio Button */}
+    <div className="relative flex items-center">
+      <input
+        type="radio"
+        id="free"
+        name="currency"
+        value="free"
+        checked={currency === "free"}
+        onChange={() => handleCurrencyChange("free")}
+        className="absolute opacity-0 w-full h-full cursor-pointer z-10"
+        style={{ margin: 0 }}
+      />
+      <label
+        htmlFor="free"
+        className={`text-sm cursor-pointer flex items-center space-x-2 px-4 py-2 rounded-lg ${
+          currency === "free" 
+            ? "text-gray-600 bg-gray-100 border-gray-500 ring-2 ring-gray-300" 
+            : "text-gray-700"
+        }`}
+      >
+        <span className={`h-6 w-6 border-2 rounded-full flex items-center justify-center ${
+          currency === "free" ? "border-gray-500 bg-gray-500" : "border-gray-300"
+        }`}>
+          <span className={`w-3 h-3 bg-white rounded-full ${
+            currency === "free" ? "block" : "hidden"
+          }`}></span>
+        </span>
+        <span>Free</span>
+      </label>
+    </div>
+  </div>
+</div>
                   {errors.price && (
                     <div className="text-red-500 text-sm mt-1 flex items-center">
                       <Info className="h-4 w-4 mr-1" />
