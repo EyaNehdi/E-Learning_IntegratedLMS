@@ -568,10 +568,10 @@ const ProfileDetails = () => {
               </button>
 
               {/* Header */}
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-800">Upload Your CV</h3>
-                <p className="text-gray-500 mt-2">We'll analyze your CV to extract your skills and experience</p>
-              </div>
+              <div className="mb-6">
+  <h3 className="text-2xl font-bold text-blue-600 text-left">Upload Your CV</h3>
+  <p className="text-gray-500 mt-2">We'll analyze your CV to extract your skills and experience</p>
+</div>
 
               {/* Upload area */}
               <div
@@ -708,68 +708,92 @@ const ProfileDetails = () => {
               )}
 
               {/* Buttons */}
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  onClick={() => setShowPopup(false)}
-                  className="px-5 py-2.5 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={!cvFile || isLoading}
-                  className={`px-5 py-2.5 rounded-lg font-medium flex items-center justify-center min-w-[120px] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500
-                  ${!cvFile || isLoading
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-green-600 text-white hover:bg-green-700 shadow-sm hover:shadow"
-                    }`}
-                >
-                  {isLoading ? (
-                    <>
-                      <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-2"
-                      >
-                        <path d="M2 12h4l3 8 3-16 3 8h7"></path>
-                      </svg>
-                      Analyze CV
-                    </>
-                  )}
-                </button>
-              </div>
-
+             <div className="flex justify-center gap-5 mt-6">
+  <button
+    onClick={() => setShowPopup(false)}
+    className="px-7 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:-translate-y-0.5 active:translate-y-0 min-w-[140px] relative overflow-hidden group"
+    aria-label="Cancel"
+  >
+    <div className="absolute inset-0 w-3 bg-white transition-all duration-300 transform -skew-x-12 -translate-x-full group-hover:translate-x-full opacity-20"></div>
+    <div className="flex items-center justify-center relative z-10">
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="18" 
+        height="18" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        className="mr-2"
+      >
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+      Cancel
+    </div>
+  </button>
+  <button
+    onClick={handleSubmit}
+    disabled={!cvFile || isLoading}
+    className={`px-7 py-3.5 rounded-xl font-semibold flex items-center justify-center min-w-[180px] transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 relative overflow-hidden group
+    ${!cvFile || isLoading
+        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+        : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl"
+      }`}
+    aria-label="Analyze Your CV"
+  >
+    <div className="absolute inset-0 w-3 bg-white transition-all duration-300 transform -skew-x-12 -translate-x-full group-hover:translate-x-full opacity-20"></div>
+    {isLoading ? (
+      <>
+        <svg
+          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        <span className="relative z-10">Analyzing...</span>
+      </>
+    ) : (
+      <div className="flex items-center justify-center relative z-10">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="mr-3"
+        >
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        Analyze Your CV
+      </div>
+    )}
+  </button>
+</div>
               {/* Help text */}
               <p className="text-xs text-gray-500 mt-6 text-center">
                 We'll extract your skills and experience to enhance your profile

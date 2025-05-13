@@ -12,6 +12,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -113,6 +114,7 @@ function Header() {
             </p>
           </div>
         </div>
+          
 
         {/* Search panel offcanvas */}
         <div
