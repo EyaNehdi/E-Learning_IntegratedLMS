@@ -194,7 +194,7 @@ function Header() {
                             <div className="px-2" key={course._id || course.id}>
                               <div className="course-entry-3 card rounded-2 border shadow-1 h-100">
                                 <div className="card-media position-relative">
-                                  <a href={`/chapters/${course._id}`}>
+                                  <a href={`/chapters/${course.slugCourse}`}>
                                     <img
                                       className="card-img-top"
                                       src={course.image || "/assets/images/course1.jpg"}
@@ -209,7 +209,7 @@ function Header() {
                                     </div>
                                   </div>
                                   <h3 className="display-6 mt-1">
-                                    <a href={`/courses/${course._id || course.id}`}>{course.title}</a>
+                                    <a href={`/courses/${course.slugCourse || course.slugCourse}`}>{course.title}</a>
                                   </h3>
                                   <span className="fw-bold">{course.price?.toFixed(2) || "0.00"}🪙</span>
                                 </div>
