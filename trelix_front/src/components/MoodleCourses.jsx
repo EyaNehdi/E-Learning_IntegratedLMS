@@ -22,6 +22,7 @@ import {
   Award,
   Settings,
 } from "lucide-react"
+import "./moodle-courses.css"
 
 function MoodleCourses() {
   const [courses, setCourses] = useState([])
