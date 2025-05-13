@@ -58,7 +58,7 @@ app.use(express.json({ limit: '100mb' }));
 
 
 
-app.use('/summarize-pdf', summarizerRoutes);
+
 
 
 
@@ -182,7 +182,7 @@ app.use('/stripe', Stripe);
 app.use('/purchases', Purchases);
 app.use('/recommendation', Recommendation);
 app.use('/citation',citation);
-
+app.use('/summarize-pdf', summarizerRoutes);
 
 
 
