@@ -420,7 +420,7 @@ function CourseChapter() {
                           courses
                             .filter((course) => course.user === user._id)
                             .map((course) => (
-                              <option key={course._id} value={course._id}>
+                              <option key={course._id} value={course.slug}>
                                 {course.title}
                               </option>
                             ))
