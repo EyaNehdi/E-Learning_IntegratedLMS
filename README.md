@@ -26,7 +26,7 @@ MERN is a full-stack web development framework, composed of four technologies Mo
 - Clone the Main branch
 - Go to trelix_front directory by typing "cd trelix_front" and run "npm run dev"
 - Go to trelix_back directory by typing "cd trelix_back" and run "node app.js"
-- Go to [http://localhost:5173](http://localhost:5173/) and Enjoy 
+- Go to [https://trelix-livid.vercel.app](https://trelix-livid.vercel.app/) and Enjoy 
 
 ## :man_astronaut: Show your support
 

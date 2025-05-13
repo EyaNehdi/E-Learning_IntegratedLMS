@@ -33,7 +33,7 @@ function Calendar() {
     const fetchGoals = async () => {
       try {
         // 1. Try to fetch from backend API
-        const response = await axios.get("http://localhost:5000/api/goals");
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/goals`);
         const apiGoals = response.data.map((goal) => ({
           ...goal,
           date: new Date(goal.date), // ensure date format is correct
@@ -84,9 +84,9 @@ function Calendar() {
       setError(null);
       try {
         // Fetch quizzes and exams from your API
-        const quizResponse = await axios.get("http://localhost:5000/quiz/get");
+        const quizResponse = await axios.get(`${import.meta.env.VITE_API_PROXY}/quiz/get`);
         const examResponse = await axios.get(
-          "http://localhost:5000/Exam/getall"
+          `${import.meta.env.VITE_API_PROXY}/Exam/getall`
         );
 
         // Log the response data to inspect its structure
@@ -243,7 +243,7 @@ function Calendar() {
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/api/goals", goal);
+      const res = await axios.post(`${import.meta.env.VITE_API_PROXY}/api/goals`, goal);
       const savedGoal = res.data;
 
       // Convert the date string back to a Date object
@@ -273,7 +273,7 @@ function Calendar() {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/goals/${editingGoal._id}`,
+        `${import.meta.env.VITE_API_PROXY}/api/goals/${editingGoal._id}`,
         updatedGoal
       );
 
@@ -305,7 +305,7 @@ function Calendar() {
     }
     try {
       console.log(`Deleting goal with ID: ${goalId}`); // Debug line
-      await axios.delete(`http://localhost:5000/api/goals/${goalId}`); // Ensure the correct endpoint
+      await axios.delete(`${import.meta.env.VITE_API_PROXY}/api/goals/${goalId}`); // Ensure the correct endpoint
       setGoals(goals.filter((goal) => goal._id !== goalId)); // Ensure you're using _id
     } catch (error) {
       console.error("Error deleting goal:", error);
@@ -326,7 +326,7 @@ function Calendar() {
     try {
       // Use the goal's _id for the API request
       await axios.put(
-        `http://localhost:5000/api/goals/${goalToUpdate._id}`,
+        `${import.meta.env.VITE_API_PROXY}/api/goals/${goalToUpdate._id}`,
         updatedGoal
       );
 

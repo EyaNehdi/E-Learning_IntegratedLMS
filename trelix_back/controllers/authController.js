@@ -663,10 +663,17 @@ const resetPassword = async (req, res) => {
   }
 }
 
-const signOut = async (req, res) => {
-  res.clearCookie("token");
-  res.status(200).json({ success: true, message: "Logged out successfully" });
+const signOut = (req, res) => {
+  res.clearCookie("token", {
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+
+  return res.status(200).json({ success: true, message: "Logged out successfully" });
 };
+
 
 
 const trackCurrentLocation = async (req, res) => {

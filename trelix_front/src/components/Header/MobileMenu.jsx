@@ -77,7 +77,7 @@ const MobileMenu = ({ isAuthenticated, handleLogout, user, onClose }) => {
                 <Avatar
                   src={
                     user?.profilePhoto
-                      ? `http://localhost:5000${user.profilePhoto}`
+                      ? `${import.meta.env.VITE_API_PROXY}${user.profilePhoto}`
                       : ""
                   }
                   alt={user?.firstName}

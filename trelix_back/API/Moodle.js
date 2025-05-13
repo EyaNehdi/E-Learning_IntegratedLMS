@@ -1,7 +1,7 @@
 const axios = require('axios');
 
-const MOODLE_URL = 'http://localhost/webservice/rest/server.php';
-const MOODLE_TOKEN = '18d62fbe2429478edc4d42c1d35c3e60';  // Replace with your real Moodle token
+const MOODLE_URL = 'https://trelix.moodlecloud.com/webservice/rest/server.php';
+const MOODLE_TOKEN = '39e9016563497ce94abab7b284f66d7c';  // Replace with your real Moodle token
 
 // ✅ Get all courses (as you already had)
 async function getMoodleCourses() {

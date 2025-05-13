@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { format, subDays } from "date-fns";
+import { format } from "date-fns";
 import {
   LineChart,
   Line,
@@ -7,21 +7,23 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 import axios from "axios";
+import "../ResponsiveStyle.css"; // Ensure styles are applied globally
 
 const RegistrationTrendsChart = () => {
   const [registrationData, setRegistrationData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState(30); // Default 30 days
+  const [timeRange, setTimeRange] = useState(30);
 
   useEffect(() => {
     const fetchRegistrationData = async () => {
       try {
         const response = await axios.get(
-          `/api/admin/users/registration-stats?days=${timeRange}`
+          `${
+            import.meta.env.VITE_API_PROXY
+          }/api/admin/users/registration-stats?days=${timeRange}`
         );
         setRegistrationData(response.data);
       } catch (error) {
@@ -34,8 +36,8 @@ const RegistrationTrendsChart = () => {
     fetchRegistrationData();
   }, [timeRange]);
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload?.length) {
       return (
         <div className="bg-white p-3 shadow-md rounded border border-gray-200">
           <p className="font-semibold">
@@ -57,13 +59,13 @@ const RegistrationTrendsChart = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-8">
-      <div className="flex justify-between items-center mb-4">
+    <div className="registration-chart-wrapper">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
         <h2 className="text-xl font-semibold">Registration Trends</h2>
         <select
           value={timeRange}
           onChange={(e) => setTimeRange(Number(e.target.value))}
-          className="border rounded px-3 py-1 text-sm"
+          className="border rounded px-3 py-1 text-sm w-full md:w-auto"
         >
           <option value={7}>Last 7 Days</option>
           <option value={30}>Last 30 Days</option>
@@ -76,7 +78,7 @@ const RegistrationTrendsChart = () => {
           <p>Loading data...</p>
         </div>
       ) : registrationData.length > 0 ? (
-        <div className="h-64">
+        <div className="w-full" style={{ height: 300 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={registrationData}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />

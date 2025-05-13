@@ -44,7 +44,7 @@ const Index = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/courses/categories");
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/courses/categories`);
         setCategories(res.data);
       } catch (err) {
         console.error("Erreur lors du fetch des catégories:", err);
@@ -54,7 +54,7 @@ const Index = () => {
 
     const fetchStudents = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/count/student');
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/count/student`);
         setCountStudent(res.data.count);
       } catch (err) {
         console.error("Error fetching student count:", err);
@@ -63,7 +63,7 @@ const Index = () => {
 
     const fetchInstructors = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/count/instructor');
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/count/instructor`);
         setCountInstructor(res.data.count);
       } catch (err) {
         console.error("Error fetching instructor count:", err);
@@ -72,7 +72,7 @@ const Index = () => {
 
     const fetchCoursesNumber = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/course/count/courses');
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/count/courses`);
         setCountCourses(res.data.count);
       } catch (err) {
         console.error("Error fetching courses count:", err);
@@ -81,7 +81,9 @@ const Index = () => {
 
     const meetOurInstructors = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/instructors');
+
+        const res = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/admin/instructors`);
+
 
         setInstructorsMeet(res.data);
       } catch (err) {
@@ -101,7 +103,7 @@ const Index = () => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:5000/course/courses");
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/courses`);
         console.log("Courses fetched:", response.data);
         setCourses(response.data);
         setLoading(false);
@@ -134,7 +136,7 @@ const Index = () => {
 
     // Nettoyage (optionnel, pour arrêter l'audio si le composant est démonté)
     return () => {
-      document.removeEventListener("click", () => {});
+      document.removeEventListener("click", () => { });
     };
   }, []);
 
@@ -528,8 +530,12 @@ const Index = () => {
                     <div className="instructor-card position-relative overflow-hidden shadow-sm rounded-3 bg-white">
                       <div className="instructor-image text-center pt-4">
                         <img
-                          src={`http://localhost:5000${instructor?.profilePhoto}`}
-                          className="rounded-circle shadow-sm border border-2 border-white"
+                          src={
+                            instructor?.profilePhoto?.startsWith("http")
+                              ? instructor.profilePhoto
+                              : `${import.meta.env.VITE_API_PROXY}${instructor?.profilePhoto}`
+                          }
+                          className="rounded-circle shadow-sm border border-white"
                           alt={`${instructor.firstName} ${instructor.lastName}`}
                           style={{
                             width: "120px",
@@ -540,6 +546,7 @@ const Index = () => {
                           onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
                           onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
                         />
+
                       </div>
 
                       <div className="instructor-info p-4 text-center">
@@ -566,9 +573,8 @@ const Index = () => {
                           </button>
 
                           <ul
-                            className={`social-links list-unstyled d-flex gap-2 position-absolute mb-0 ${
-                              showSocialIndex === index ? "show-social" : ""
-                            }`}
+                            className={`social-links list-unstyled d-flex gap-2 position-absolute mb-0 ${showSocialIndex === index ? "show-social" : ""
+                              }`}
                             style={{
                               left: "50%",
                               transform: `translateX(-50%) translateY(${showSocialIndex === index ? "0" : "10px"})`,

@@ -41,7 +41,7 @@ function CourseChapter() {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `http://localhost:5000/chapter/course/${slugCourse}`
+          `${import.meta.env.VITE_API_PROXY}/chapter/course/${slugCourse}`
         );
         setCourseChapters(response.data.courseInfo.chapters);
 
@@ -61,7 +61,7 @@ function CourseChapter() {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/course/courses"
+          `${import.meta.env.VITE_API_PROXY}/course/courses`
         );
         setCourses(response.data);
       } catch (error) {
@@ -76,7 +76,7 @@ function CourseChapter() {
   useEffect(() => {
     const fetchAllChapters = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/chapter/get");
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/chapter/get`);
         setChapters(response.data);
         console.log("1111 ---", response.data);
       } catch (error) {
@@ -97,7 +97,7 @@ function CourseChapter() {
   const handleDelete = async (id) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/chapter/delete/${id}`
+        `${import.meta.env.VITE_API_PROXY}/chapter/delete/${id}`
       );
       if (response.status === 200) {
         setCourseChapters((prevChapters) =>
@@ -129,7 +129,7 @@ function CourseChapter() {
   const handleAssign = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/chapter/assign-chapters",
+        `${import.meta.env.VITE_API_PROXY}/chapter/assign-chapters`,
         {
           slugCourse: selectedCourse,
           chapters: selectedChapters,
@@ -324,7 +324,7 @@ function CourseChapter() {
                               <div className="d-flex flex-column gap-2">
                                 {chapter.video ? (
                                   <a
-                                    href={`http://localhost:5000${chapter.video}`}
+                                    href={`${import.meta.env.VITE_API_PROXY}${chapter.video}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="btn btn-sm btn-outline-primary"
@@ -341,7 +341,7 @@ function CourseChapter() {
 
                                 {chapter.pdf ? (
                                   <a
-                                    href={`http://localhost:5000${chapter.pdf}`}
+                                    href={`${import.meta.env.VITE_API_PROXY}${chapter.pdf}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="btn btn-sm btn-outline-danger"

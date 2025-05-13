@@ -31,8 +31,10 @@ function IntelligentCourses() {
   const fetchRecommendedCourses = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/intelligent-recommendation/recommended-courses", {
-        params: { module: moduleId, user: userId },
+
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/intelligent-recommendation/recommended-courses`, {
+        params: { moduleId, userId },
+
       });
 
       if (response.status === 200) {
@@ -57,7 +59,7 @@ function IntelligentCourses() {
 
   const fetchUserPreference = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/preference/get?user=${userId}`);
+      const response = await axios.get(`https://trelix-xj5h.onrender.com/preference/get?user=${userId}`);
       if (response.status === 200 && response.data.length > 0) {
         setPreference(response.data[0]);
         console.log("Preference fetched:", response.data[0]);
@@ -171,6 +173,12 @@ function IntelligentCourses() {
                         <p>{course.moduleName}</p>
                       </div>
                     </div>
+                    <button
+                      className="mt-auto bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200"
+                      onClick={() => navigate(`/chapters/${course.courseSlug}`)}
+                    >
+                      Voir le cours
+                    </button>
                   </div>
                 ))}
               </div>

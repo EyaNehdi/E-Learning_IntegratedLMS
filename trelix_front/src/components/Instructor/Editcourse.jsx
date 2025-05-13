@@ -29,13 +29,13 @@ function Editcourse() {
 
     try {
       // Récupérer les modules
-      const modulesResponse = await axios.get("http://localhost:5000/module")
+      const modulesResponse = await axios.get(`${import.meta.env.VITE_API_PROXY}/module`)
       console.log("Modules disponibles:", modulesResponse.data)
       setModules(modulesResponse.data)
 
       // Récupérer les données du cours
       if (courseId) {
-        const courseResponse = await axios.get(`http://localhost:5000/course/${courseId}`)
+        const courseResponse = await axios.get(`${import.meta.env.VITE_API_PROXY}/course/${courseId}`)
         const courseData = courseResponse.data
         console.log("Données du cours récupérées:", courseData)
 
@@ -99,7 +99,7 @@ function Editcourse() {
 
     try {
       // URL correcte basée sur votre définition de route
-      const updateUrl = `http://localhost:5000/course/${courseId}`
+      const updateUrl = `${import.meta.env.VITE_API_PROXY}/course/${courseId}`
 
       console.log("Envoi de la mise à jour à:", updateUrl)
       console.log("Données envoyées:", formData)

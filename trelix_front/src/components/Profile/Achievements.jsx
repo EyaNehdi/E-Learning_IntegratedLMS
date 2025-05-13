@@ -5,7 +5,7 @@ import { Award, Download } from "lucide-react";
 import { Link, useOutletContext } from "react-router-dom";
 import axios from "axios";
 
-const baseUrl = "http://localhost:5000";
+const baseUrl = `${import.meta.env.VITE_API_PROXY}`;
 
 const Achievements = () => {
   const { user } = useOutletContext();
@@ -16,7 +16,7 @@ const Achievements = () => {
   const fetchAchievements = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/certificates/getProgress?userId=${user._id}`
+        `${import.meta.env.VITE_API_PROXY}/certificates/getProgress?userId=${user._id}`
       );
       setAchievements(response.data);
     } catch (error) {
@@ -31,7 +31,7 @@ const Achievements = () => {
       const fetchCertificates = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:5000/certificates/getUserCertificates?userId=${user._id}`
+            `${import.meta.env.VITE_API_PROXY}/certificates/getUserCertificates?userId=${user._id}`
           );
           setCertificates(response.data.certificates);
         } catch (error) {

@@ -37,7 +37,7 @@ const ListChapters = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/chapter/course/${slugCourse}`
+        `${import.meta.env.VITE_API_PROXY}/chapter/course/${slugCourse}`
       );
       if (response) {
         setCertificateEarned(response.data.certificateEarned);
@@ -116,7 +116,7 @@ const ListChapters = () => {
         if (result.isConfirmed && canAfford) {
           try {
             const purchaseResponse = await axios.post(
-              "http://localhost:5000/purchases/purchase",
+              `${import.meta.env.VITE_API_PROXY}/purchases/purchase`,
               { courseId },
               { withCredentials: true }
             );
@@ -153,7 +153,7 @@ const ListChapters = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/chapter/markCompleted",
+        `${import.meta.env.VITE_API_PROXY}/chapter/markCompleted`,
         {},
         {
           params: { userId: user._id, chapterId },
@@ -187,7 +187,7 @@ const ListChapters = () => {
     setLoadingCertificate(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/certificates/issueCertificate",
+        `${import.meta.env.VITE_API_PROXY}/certificates/issueCertificate`,
         {
           userId: user._id,
           courseId: finalCourseId,
