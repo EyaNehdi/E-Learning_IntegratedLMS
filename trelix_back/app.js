@@ -35,7 +35,7 @@ const MongoStore = require('connect-mongo');
 const axios = require('axios');
 const fetch = require('node-fetch');
 var app = express();
-
+app.set('trust proxy', 1); // trust first proxy
 const allowedOrigins = [
   'https://trelix-g9ckx86l8-eyanehdis-projects.vercel.app',
   'https://trelix-xj5h.onrender.com',
@@ -135,6 +135,7 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
+    sameSite: "none",
     maxAge: 14 * 24 * 60 * 60 * 1000 // 14 jours
   }
 }));
