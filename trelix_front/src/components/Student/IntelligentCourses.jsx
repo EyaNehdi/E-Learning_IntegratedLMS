@@ -138,7 +138,7 @@ function IntelligentCourses() {
                   <div
                     key={course.id}
                     className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
-                    onClick={() => navigate(`/course/${course.id}`)}
+                    onClick={() => navigate(`/chapters/${course.courseSlug}`)}
                   >
                     <div className="relative">
                       <img
@@ -173,12 +173,7 @@ function IntelligentCourses() {
                         <p>{course.moduleName}</p>
                       </div>
                     </div>
-                    <button
-                      className="mt-auto bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                      onClick={() => navigate(`/chapters/${course.courseSlug}`)}
-                    >
-                      Voir le cours
-                    </button>
+                   
                   </div>
                 ))}
               </div>
