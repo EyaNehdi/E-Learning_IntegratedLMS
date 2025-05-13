@@ -16,6 +16,7 @@ const summarizerRoutes = require('./routes/summarizerRoutes');
 const intelligentRecommendationRoutes = require("./routes/intelligentRecommendation");
 
 const Goal = require('./models/calanderGoal'); // Assurez-vous que le chemin est correct
+const citation = require('./routes/citationRoutes');
 
 
 
@@ -180,6 +181,7 @@ app.use('/intelligent-recommendation', intelligentRecommendationRoutes);
 app.use('/stripe', Stripe);
 app.use('/purchases', Purchases);
 app.use('/recommendation', Recommendation);
+app.use('/citation',citation);
 
 
 
