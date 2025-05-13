@@ -197,7 +197,7 @@ function Header() {
                                   <a href={`/chapters/${course._id}`}>
                                     <img
                                       className="card-img-top"
-                                      src={course.image || "assets/images/course1.jpg"}
+                                      src={course.image || "/assets/images/course1.jpg"}
                                       alt={course.title}
                                     />
                                   </a>

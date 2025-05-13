@@ -9,7 +9,7 @@ function Admin(){
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard Page</title>
   {/* Favicon */}
-  <link rel="icon" type="image/x-icon" href="assetss/img/logoos.png" />
+  <link rel="icon" type="image/x-icon" href="/assetss/img/logoos.png" />
 
 
 
@@ -48,7 +48,7 @@ function Admin(){
               <div className="user-card card shadow-sm bg-white text-center ctm-border-radius">
                 <div className="user-info card-body">
                   <div className="user-avatar mb-4">
-                    <img src="assetss/img/profiles/img-13.jpg" alt="User Avatar" className="img-fluid rounded-circle" width={100} />
+                    <img src="/assetss/img/profiles/img-13.jpg" alt="User Avatar" className="img-fluid rounded-circle" width={100} />
                   </div>
                   <div className="user-details">
                     <h4><b>Welcome Admin</b>
@@ -222,7 +222,7 @@ function Admin(){
                           </div>
                           <div className="dash-card-avatars">
                             <div className="e-avatar">
-                              <img className="img-fluid" src="assets/img/profiles/img-9.jpg" alt="Avatar" />
+                              <img className="img-fluid" src="/assets/img/profiles/img-9.jpg" alt="Avatar" />
                             </div>
                           </div>
                         </div>
@@ -245,7 +245,7 @@ function Admin(){
                           </div>
                           <div className="dash-card-avatars">
                             <div className="e-avatar">
-                              <img className="img-fluid" src="assetss/img/profiles/img-9.jpg" alt="Avatar" />
+                              <img className="img-fluid" src="/assetss/img/profiles/img-9.jpg" alt="Avatar" />
                             </div>
                           </div>
                         </div>
@@ -267,7 +267,7 @@ function Admin(){
                           </div>
                           <div className="dash-card-avatars">
                             <div className="e-avatar">
-                              <img className="img-fluid" src="assetss/img/profiles/img-5.jpg" alt="Avatar" />
+                              <img className="img-fluid" src="/assetss/img/profiles/img-5.jpg" alt="Avatar" />
                             </div>
                           </div>
                         </div>
@@ -290,7 +290,7 @@ function Admin(){
                           </div>
                           <div className="dash-card-avatars">
                             <div className="e-avatar">
-                              <img className="img-fluid" src="assetss/img/profiles/img-6.jpg" alt="Maria Cotton" />
+                              <img className="img-fluid" src="/assetss/img/profiles/img-6.jpg" alt="Maria Cotton" />
                             </div>
                           </div>
                         </div>
@@ -314,7 +314,7 @@ function Admin(){
                   <div className="card-body">
                     <div className="media mb-3">
                       <div className="e-avatar avatar-online mr-3">
-                        <img src="assetss/img/profiles/img-6.jpg" alt="Maria Cotton" className="img-fluid" />
+                        <img src="/assetss/img/profiles/img-6.jpg" alt="Maria Cotton" className="img-fluid" />
                       </div>
                       <div className="media-body">
                         <h6 className="m-0">
@@ -329,7 +329,7 @@ function Admin(){
                     <hr />
                     <div className="media mb-3">
                       <div className="e-avatar avatar-online mr-3">
-                        <img className="img-fluid" src="assetss/img/profiles/img-5.jpg" alt="Linda Craver" />
+                        <img className="img-fluid" src="/assetss/img/profiles/img-5.jpg" alt="Linda Craver" />
                       </div>
                       <div className="media-body">
                         <h6 className="m-0">
@@ -344,7 +344,7 @@ function Admin(){
                     <hr />
                     <div className="media mb-3">
                       <div className="e-avatar avatar-online mr-3">
-                        <img src="assetss/img/profiles/img-4.jpg" alt="Linda Craver" className="img-fluid" />
+                        <img src="/assetss/img/profiles/img-4.jpg" alt="Linda Craver" className="img-fluid" />
                       </div>
                       <div className="media-body">
                         <h6 className="m-0">
@@ -359,7 +359,7 @@ function Admin(){
                     <hr />
                     <div className="media mb-3">
                       <div className="e-avatar avatar-online mr-3">
-                        <img className="img-fluid" src="assetss/img/profiles/img-3.jpg" alt="Linda Craver" />
+                        <img className="img-fluid" src="/assetss/img/profiles/img-3.jpg" alt="Linda Craver" />
                       </div>
                       <div className="media-body">
                         <h6 className="m-0">
@@ -374,7 +374,7 @@ function Admin(){
                     <hr />
                     <div className="media">
                       <div className="e-avatar avatar-offline mr-3">
-                        <img className="img-fluid" src="assetss/img/profiles/img-2.jpg" alt="Linda Craver" />
+                        <img className="img-fluid" src="/assetss/img/profiles/img-2.jpg" alt="Linda Craver" />
                       </div>
                       <div className="media-body">
                         <h6 className="m-0">
@@ -404,7 +404,7 @@ function Admin(){
                       <div className="notice-board">
                         <div className="table-img">
                           <div className="e-avatar mr-3">
-                            <img className="img-fluid" src="assetss/img/profiles/img-5.jpg" alt="Danny Ward" />
+                            <img className="img-fluid" src="/assetss/img/profiles/img-5.jpg" alt="Danny Ward" />
                           </div>
                         </div>
                         <div className="notice-body">
@@ -427,7 +427,7 @@ function Admin(){
                       <div className="notice-board">
                         <div className="table-img">
                           <div className="e-avatar mr-3">
-                            <img className="img-fluid" src="assetss/img/profiles/img-2.jpg" alt="John Gibbs" />
+                            <img className="img-fluid" src="/assetss/img/profiles/img-2.jpg" alt="John Gibbs" />
                           </div>
                         </div>
                         <div className="notice-body">
@@ -450,7 +450,7 @@ function Admin(){
                       <div className="notice-board">
                         <div className="table-img">
                           <div className="e-avatar mr-3">
-                            <img className="img-fluid" src="assetss/img/profiles/img-6.jpg" alt="Maria Cotton" />
+                            <img className="img-fluid" src="/assetss/img/profiles/img-6.jpg" alt="Maria Cotton" />
                           </div>
                         </div>
                         <div className="notice-body">
@@ -473,7 +473,7 @@ function Admin(){
                       <div className="notice-board">
                         <div className="table-img">
                           <div className="e-avatar mr-3">
-                            <img className="img-fluid" src="assetss/img/profiles/img-4.jpg" alt="Linda Craver" />
+                            <img className="img-fluid" src="/assetss/img/profiles/img-4.jpg" alt="Linda Craver" />
                           </div>
                         </div>
                         <div className="notice-body">
@@ -496,7 +496,7 @@ function Admin(){
                       <div className="notice-board">
                         <div className="table-img">
                           <div className="e-avatar mr-3">
-                            <img className="img-fluid" src="assetss/img/profiles/img-3.jpg" alt="Jenni Sims" />
+                            <img className="img-fluid" src="/assetss/img/profiles/img-3.jpg" alt="Jenni Sims" />
                           </div>
                         </div>
                         <div className="notice-body">

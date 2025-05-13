@@ -150,12 +150,12 @@ const Index = () => {
       <meta name="keywords" content="bootstrap 5, online course, education, creative, gulp, business, minimal, modern, course, one page, responsive, saas, e-Learning, seo, startup, html5, site template" />
       <meta name="author" content="theme-village" />
       <title>Trelix - Smart Learning management system</title>
-      <link rel="apple-touch-icon" href="assets/images/favicon.png" />
-      <link rel="shortcut icon" href="assets/images/favicon.ico" />
-      <link rel="stylesheet" href="assets/css/feather.css" />
-      <link rel="stylesheet" href="assets/css/nice-select2.css" />
-      <link href="assets/css/glightbox.min.css" rel="stylesheet" />
-      <link rel="stylesheet" href="assets/css/swiper-bundle.min.css" />
+      <link rel="apple-touch-icon" href="/assets/images/favicon.png" />
+      <link rel="shortcut icon" href="/assets/images/favicon.ico" />
+      <link rel="stylesheet" href="/assets/css/feather.css" />
+      <link rel="stylesheet" href="/assets/css/nice-select2.css" />
+      <link href="/assets/css/glightbox.min.css" rel="stylesheet" />
+      <link rel="stylesheet" href="/assets/css/swiper-bundle.min.css" />
 
       {/* Header */}
       <Header />
@@ -167,7 +167,7 @@ const Index = () => {
             <div className="col-lg-12">
               <div className="d-md-flex align-items-center banner-content">
                 <div className="img-meta d-none d-md-block position-absolute">
-                  <img src="assets/images/icons/shape1.png" alt />
+                  <img src="/assets/images/icons/shape1.png" alt />
                 </div>
                 <h1 className="display-1 fw-bold">Education is the Way to <span className="color">Success</span></h1>
                 <div className="banner-info">
@@ -180,12 +180,12 @@ const Index = () => {
         </div>
         <div className="banner-bottom d-md-flex position-relative">
           <div className="banner-bg">
-            <img src="assets/images/banner.jpg" alt="Banner" />
+            <img src="/assets/images/banner.jpg" alt="Banner" />
           </div>
           <div className="banner-stat bg-secondary p-4">
             <div className="d-flex single-stat">
               <div className="icon-lg rounded-circle">
-                <img src="assets/images/icons/graduation-cap.png" alt="graduate" />
+                <img src="/assets/images/icons/graduation-cap.png" alt="graduate" />
               </div>
               <div className="stat-info text-info ms-4">
                 <div className="display-3"><span data-purecounter-start={0} data-purecounter-end={8754} className="purecounter">{countStudent}</span>+</div>
@@ -194,7 +194,7 @@ const Index = () => {
             </div>
             <div className="d-flex single-stat">
               <div className="icon-lg rounded-circle">
-                <img src="assets/images/icons/graduate.png" alt />
+                <img src="/assets/images/icons/graduate.png" alt />
               </div>
               <div className="stat-info text-info ms-4">
                 <div className="display-3"><span data-purecounter-start={0} data-purecounter-end={245} className="purecounter">{countInstructor}</span>+</div>
@@ -203,7 +203,7 @@ const Index = () => {
             </div>
             <div className="d-flex single-stat">
               <div className="icon-lg rounded-circle">
-                <img src="assets/images/icons/open-book.png" alt />
+                <img src="/assets/images/icons/open-book.png" alt />
               </div>
               <div className="stat-info text-info ms-4">
                 <div className="display-3"><span data-purecounter-start={0} data-purecounter-end={15} className="purecounter">{countCourses}</span>+</div>
@@ -218,7 +218,7 @@ const Index = () => {
       {/* Categories Section Start */}
       <section className="categories-sec sec-padding position-relative">
         <div className="container">
-          <img src="assets/images/icons/dots1.png" alt="Dot 1" className="anim-img" />
+          <img src="/assets/images/icons/dots1.png" alt="Dot 1" className="anim-img" />
           <div className="text-center sec-intro">
             <h2 className="sec-title">
               Find Your <span className="color">Category</span>
@@ -249,7 +249,7 @@ const Index = () => {
       <section
         className="cta-1 overly"
         style={{
-          background: 'url("assets/images/cta-bg.jpg") no-repeat center center / cover',
+          background: 'url("/assets/images/cta-bg.jpg") no-repeat center center / cover',
         }}
       >
         <div className="container">
@@ -275,7 +275,7 @@ const Index = () => {
                     className="cover-video"
                     href="https://github.com/EyaNehdi/E-Learning_IntegratedLMS"
                   >
-                    <img src="assets/images/icons/play.png" alt="asset_link_alt" />
+                    <img src="/assets/images/icons/play.png" alt="asset_link_alt" />
                   </a>
                 </div>
               </div>
@@ -287,14 +287,14 @@ const Index = () => {
 
       {/* About Section Start */}
       <section className="about-sec sec-padding position-relative overflow-hidden">
-        <div className="anim-img anim-right"><img src="assets/images/icons/shape-plate.png" alt /></div>
+        <div className="anim-img anim-right"><img src="/assets/images/icons/shape-plate.png" alt /></div>
         <div className="container">
           <div className="row">
             <div className="col-xl-6 col-md-8">
               <div className="about-media overly">
                 <div className="category-entry active d-flex p-3 p-xl-4 align-items-center">
                   <span className="icon-lg rounded-circle">
-                    <img src="assets/images/icons/graduate.png" alt />
+                    <img src="/assets/images/icons/graduate.png" alt />
                   </span>
                   <div className="cat-info ms-4">
                     <h3 className="display-3"><span data-purecounter-start={0} data-purecounter-end={8871} className="purecounter">{countStudent}</span>+</h3>
@@ -302,8 +302,8 @@ const Index = () => {
                   </div>
                 </div>
                 <div className="d-flex align-items-baseline justify-content-between">
-                  <img className="img-fluid me-3" src="assets/images/about-lg.jpg" alt="About Image" />
-                  <img className="img-fluid d-none d-sm-block" src="assets/images/about-sm.jpg" alt="About Image" />
+                  <img className="img-fluid me-3" src="/assets/images/about-lg.jpg" alt="About Image" />
+                  <img className="img-fluid d-none d-sm-block" src="/assets/images/about-sm.jpg" alt="About Image" />
                 </div>
               </div>
             </div>
@@ -313,14 +313,14 @@ const Index = () => {
                 <h2 className="sec-title">We Makes a Door to <span className="color">Bright Future</span></h2>
                 <div className="about-lists mt-5">
                   <div className="d-flex about-item">
-                    <span className="icon icon-sm bg-light rounded-circle"><img src="assets/images/icons/pencil.png" alt="pencil" /></span>
+                    <span className="icon icon-sm bg-light rounded-circle"><img src="/assets/images/icons/pencil.png" alt="pencil" /></span>
                     <div className="ms-3">
                       <h3 className="display-5">Education is Power</h3>
                       <p>The cost of ignorance exceed that of education teaches us how to achieve success</p>
                     </div>
                   </div>
                   <div className="d-flex about-item">
-                    <span className="icon icon-sm bg-light rounded-circle"><img src="assets/images/icons/bulb.png" alt="pencil" /></span>
+                    <span className="icon icon-sm bg-light rounded-circle"><img src="/assets/images/icons/bulb.png" alt="pencil" /></span>
                     <div className="ms-3">
                       <h3 className="display-5">Knowledge for Life</h3>
                       <p>Education is smart enough to change the human mind positively your Door to The Future</p>
@@ -378,7 +378,7 @@ const Index = () => {
                     <a href={`/chapters/${course._id}`}>
                       <img
                         className="card-img-top"
-                        src={course.image || "assets/images/crs.png"}
+                        src={course.image || "/assets/images/crs.png"}
                         alt={course.title}
                       />
                     </a>
@@ -386,7 +386,7 @@ const Index = () => {
                   <div className="card-body">
                     <div className="course-meta d-flex justify-content-between align-items-center mb-2">
                       <div className="d-flex align-items-center">
-                        <img src="assets/images/icons/star.png" alt="Rating" />
+                        <img src="/assets/images/icons/star.png" alt="Rating" />
                         <strong>4.7</strong>
                         <span className="rating-count">(2k reviews)</span>
                       </div>
@@ -435,7 +435,7 @@ const Index = () => {
           <div className="row align-items-center">
             <div className="col-xl-6 order-2 order-md-1 col-md-7">
               <div className="swiper review-slider">
-                <div className="quote-icon icon-lg bg-secondary rounded-circle mb-md-4 mb-3"><img src="assets/images/icons/left-quote.png" alt="Quote" /></div>
+                <div className="quote-icon icon-lg bg-secondary rounded-circle mb-md-4 mb-3"><img src="/assets/images/icons/left-quote.png" alt="Quote" /></div>
                 <div className="swiper-wrapper">
                   <div className="swiper-slide">
                     <div className="review-entry">
@@ -454,18 +454,18 @@ const Index = () => {
                       </p>
                       <div className="d-sm-flex align-items-center justify-content-between">
                         <div className="d-flex align-items-center">
-                          <img className="rounded-circle" width={56} src="assets/images/avatar2.png" alt="Avater" />
+                          <img className="rounded-circle" width={56} src="/assets/images/avatar2.png" alt="Avater" />
                           <div className="avatar-txt ms-3">
                             <h5 className="display-5 m-0">Robert Mugabe</h5>
                             <small className="text-mute">Technology Facilitator</small>
                           </div>
                         </div>
                         <div className="ratings">
-                          <img src="assets/images/icons/star.png" alt />
-                          <img src="assets/images/icons/star.png" alt />
-                          <img src="assets/images/icons/star.png" alt />
-                          <img src="assets/images/icons/star.png" alt />
-                          <img src="assets/images/icons/star-half.png" alt />
+                          <img src="/assets/images/icons/star.png" alt />
+                          <img src="/assets/images/icons/star.png" alt />
+                          <img src="/assets/images/icons/star.png" alt />
+                          <img src="/assets/images/icons/star.png" alt />
+                          <img src="/assets/images/icons/star-half.png" alt />
                         </div>
                       </div>
                     </div>
@@ -478,18 +478,18 @@ const Index = () => {
                       </p>
                       <div className="d-flex align-items-center justify-content-between">
                         <div className="d-flex align-items-center">
-                          <img className="rounded-circle" width={56} src="assets/images/avatar3.png" alt="Avater" />
+                          <img className="rounded-circle" width={56} src="/assets/images/avatar3.png" alt="Avater" />
                           <div className="avatar-txt ms-3">
                             <h5 className="display-5 m-0">Tariqul Islam</h5>
                             <small className="text-mute">Technology Facilitator</small>
                           </div>
                         </div>
                         <div className="ratings">
-                          <img src="assets/images/icons/star.png" alt />
-                          <img src="assets/images/icons/star.png" alt />
-                          <img src="assets/images/icons/star.png" alt />
-                          <img src="assets/images/icons/star.png" alt />
-                          <img src="assets/images/icons/star-half.png" alt />
+                          <img src="/assets/images/icons/star.png" alt />
+                          <img src="/assets/images/icons/star.png" alt />
+                          <img src="/assets/images/icons/star.png" alt />
+                          <img src="/assets/images/icons/star.png" alt />
+                          <img src="/assets/images/icons/star-half.png" alt />
                         </div>
                       </div>
                     </div>
@@ -499,7 +499,7 @@ const Index = () => {
             </div>
             <div className="col-xl-6 order-l order-md-2 col-md-5">
               <figure className="review-img">
-                <img className="img-fluid" src="assets/bb.png" alt="Review Banner" />
+                <img className="img-fluid" src="/assets/bb.png" alt="Review Banner" />
               </figure>
             </div>
           </div>
@@ -510,7 +510,7 @@ const Index = () => {
       {/* Meet our Instructors */}
       <section className="team-sec bg-shade sec-padding position-relative">
         <span className="anim-img anim-right">
-          <img src="assets/images/icons/instructor-shape.png" alt="Instructor" />
+          <img src="/assets/images/icons/instructor-shape.png" alt="Instructor" />
         </span>
         <div className="container">
           <div className="text-center sec-intro">
@@ -712,22 +712,22 @@ const Index = () => {
               <ul className="nav nav-tabs ct-tab" id="myTab" role="tablist">
                 <li className="nav-item" role="presentation">
                   <button className="nav-link" id="instructor-tab" data-bs-toggle="tab" data-bs-target="#instructor" type="button" role="tab" aria-controls="instructor" aria-selected="true">
-                    <img src="assets/images/icons/instructor.png" alt />Educational supervision
+                    <img src="/assets/images/icons/instructor.png" alt />Educational supervision
                   </button>
                 </li>
                 <li className="nav-item" role="presentation">
                   <button className="nav-link active" id="cost-tab" data-bs-toggle="tab" data-bs-target="#cost" type="button" role="tab" aria-controls="cost" aria-selected="false">
-                    <img src="assets/images/icons/wallet.png" alt />Cost Effectiveness
+                    <img src="/assets/images/icons/wallet.png" alt />Cost Effectiveness
                   </button>
                 </li>
                 <li className="nav-item" role="presentation">
                   <button className="nav-link" id="learning-tab" data-bs-toggle="tab" data-bs-target="#learning" type="button" role="tab" aria-controls="learning" aria-selected="false">
-                    <img src="assets/images/icons/book.png" alt />Flexible Learning
+                    <img src="/assets/images/icons/book.png" alt />Flexible Learning
                   </button>
                 </li>
                 <li className="nav-item" role="presentation">
                   <button className="nav-link" id="support-tab" data-bs-toggle="tab" data-bs-target="#support" type="button" role="tab" aria-controls="support" aria-selected="false">
-                    <img src="assets/images/icons/headphone.png" alt />24/7 Strong Support
+                    <img src="/assets/images/icons/headphone.png" alt />24/7 Strong Support
                   </button>
                 </li>
               </ul>
@@ -736,8 +736,8 @@ const Index = () => {
                   <div className="row">
                     <div className="col-lg-7">
                       <div className="choose-media position-relative">
-                        <img src="assets/images/blog2.jpg" alt="About" className="img-fluid" />
-                        <img className="choose-abs img-fluid" src="assets/images/about-xs.png" alt="About" />
+                        <img src="/assets/images/blog2.jpg" alt="About" className="img-fluid" />
+                        <img className="choose-abs img-fluid" src="/assets/images/about-xs.png" alt="About" />
                       </div>
                     </div>
                     <div className="col-lg-5">
@@ -760,8 +760,8 @@ const Index = () => {
                   <div className="row">
                     <div className="col-lg-7">
                       <div className="choose-media position-relative">
-                        <img src="assets/images/about-md.png" alt="About" className="img-fluid" />
-                        <img className="choose-abs img-fluid" src="assets/images/about-xs.png" alt="About" />
+                        <img src="/assets/images/about-md.png" alt="About" className="img-fluid" />
+                        <img className="choose-abs img-fluid" src="/assets/images/about-xs.png" alt="About" />
                       </div>
                     </div>
                     <div className="col-lg-5">
@@ -784,8 +784,8 @@ const Index = () => {
                   <div className="row">
                     <div className="col-lg-7">
                       <div className="choose-media position-relative">
-                        <img src="assets/images/blog1.png" alt="About" className="img-fluid" />
-                        <img className="choose-abs img-fluid" src="assets/images/about-xs.png" alt="About" />
+                        <img src="/assets/images/blog1.png" alt="About" className="img-fluid" />
+                        <img className="choose-abs img-fluid" src="/assets/images/about-xs.png" alt="About" />
                       </div>
                     </div>
                     <div className="col-lg-5">
@@ -808,8 +808,8 @@ const Index = () => {
                   <div className="row">
                     <div className="col-lg-7">
                       <div className="choose-media position-relative">
-                        <img src="assets/images/blog1.png" alt="About" className="img-fluid" />
-                        <img className="choose-abs img-fluid" src="assets/images/about-xs.png" alt="About" />
+                        <img src="/assets/images/blog1.png" alt="About" className="img-fluid" />
+                        <img className="choose-abs img-fluid" src="/assets/images/about-xs.png" alt="About" />
                       </div>
                     </div>
                     <div className="col-lg-5">

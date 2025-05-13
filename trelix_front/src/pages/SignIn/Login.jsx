@@ -192,7 +192,7 @@ function Login() {
                   <div className="signup-thumb">
                     <img
                       className="img-fluid"
-                      src="assets/images/shape-bg.png"
+                      src="/assets/images/shape-bg.png"
                       alt="Sign Up"
                     />
                   </div>

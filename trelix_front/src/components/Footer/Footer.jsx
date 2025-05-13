@@ -121,7 +121,7 @@ function Footer() {
                 <img src="/assets/images/icons/linkedin-w.png" alt="socialMedia_icon"/>
               </a>
               <a href="https://github.com/EyaNehdi/E-Learning_IntegratedLMS">
-                <img src="assets/images/icons/github-mark-white.png" alt="socialMedia_icon"/>
+                <img src="/assets/images/icons/github-mark-white.png" alt="socialMedia_icon"/>
               </a>
             </div>
           </div>

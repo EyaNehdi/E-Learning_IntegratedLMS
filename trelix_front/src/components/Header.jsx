@@ -283,7 +283,7 @@ function Header() {
                           <div className="d-flex avatar border-bottom pb-3">
                             <img
                               className="img-fluid border rounded-circle"
-                              src="assets/images/ava-sm1.jpg"
+                              src="/assets/images/ava-sm1.jpg"
                               width={50}
                               alt="avatar"
                             />

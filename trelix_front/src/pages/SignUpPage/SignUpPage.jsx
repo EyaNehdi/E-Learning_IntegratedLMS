@@ -34,7 +34,7 @@ function SignUpPage() {
           <div className="w-100 h-100 d-flex justify-content-center align-items-center">
             <div style={{ textAlign: "center" }}>
               <img
-                src="assets/images/signup-2.png"
+                src="/assets/images/signup-2.png"
                 alt="Sign Up"
                 className="img-fluid"
               />

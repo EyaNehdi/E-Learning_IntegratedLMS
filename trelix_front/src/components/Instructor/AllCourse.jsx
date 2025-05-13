@@ -1080,10 +1080,10 @@ function Allcourse() {
                               className="card-img-top"
                               src={
                                 course.categorie === "OpenClassrooms"
-                                  ? "assets/images/openclassrooms.jpg"
+                                  ? "/assets/images/openclassrooms.jpg"
                                   : course.categorie === "OpenLearn"
-                                    ? "assets/images/openlearn.png"
-                                    : "assets/images/crs.png"
+                                    ? "/assets/images/openlearn.png"
+                                    : "/assets/images/crs.png"
                               }
                               alt={course.title}
                             />
@@ -1107,7 +1107,7 @@ function Allcourse() {
                             style={{ cursor: "pointer" }}
                           >
                             <img
-                              src="assets/images/icons/heart-fill.svg"
+                              src="/assets/images/icons/heart-fill.svg"
                               alt="Wishlist"
                               style={{ marginTop: "10px", marginLeft: "9px" }}
                               className={animatingHearts[course._id] ? "heart-pulse" : ""}
@@ -1126,7 +1126,7 @@ function Allcourse() {
                         <div className="card-body">
                           <div className="course-meta d-flex justify-content-between align-items-center mb-2">
                             <div className="d-flex align-items-center">
-                              <img src="assets/images/icons/star.png" alt="Rating" />
+                              <img src="/assets/images/icons/star.png" alt="Rating" />
                               <strong className={animatingHearts[course._id] ? "like-count-animation" : ""}>
                                 {likedCourses[course._id] ?? course.likes ?? 0}
                               </strong>
