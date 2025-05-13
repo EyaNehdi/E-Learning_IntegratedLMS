@@ -162,19 +162,11 @@ function App() {
               path="/profile/classroom/courses/:courseId"
               element={<CourseDetailsPage />}
             />
-            <Route path="/profile/preference" element={<Preference />} />
-            <Route
-              path="/profile/modify-preference"
-              element={<ModifyPreference />}
-            />
-            <Route
-              path="/profile/preferencestat"
-              element={<StatPreference />}
-            />
-            <Route
+             <Route
               path="/profile/intelligent-courses"
               element={<IntelligentCourses />}
             />
+        
             <Route path="/store" element={<Store />} />
             <Route path="/profile" element={<ProfilePage />}>
               <Route index element={<ProfileDetails />} />
@@ -185,7 +177,16 @@ function App() {
               <Route path="dictionary" element={<Dictionary />} />
               <Route path="chat" element={<ChatComponent />} />
               <Route path="meeting" element={<JoinRoom />} />
-
+    <Route path="preference" element={<Preference />} />
+            <Route
+              path="modify-preference"
+              element={<ModifyPreference />}
+            />
+            <Route
+              path="preferencestat"
+              element={<StatPreference />}
+            />
+           
               <Route path="CitationGenerator" element={<CitationGenerator />} />
 
               <Route path="addchapter" element={<AddChapter />} />
