@@ -184,7 +184,7 @@ function App() {
               element={<StatPreference />}
             />
               <Route
-              path="intelligent-courses/:moduleId/:userId"
+              path="intelligent-courses"
               element={<IntelligentCourses />}
             />
            

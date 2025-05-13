@@ -33,7 +33,7 @@ function IntelligentCourses() {
     try {
 
       const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/intelligent-recommendation/recommended-courses`, {
-        params: { moduleId, userId },
+        params: {  module: moduleId, user:userId },
 
       });
 
