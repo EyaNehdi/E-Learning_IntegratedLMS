@@ -22,6 +22,8 @@ function Courses() {
   const [message, setMessage] = useState({ text: "", type: "" }) // Pour les messages de succès/erreur
   const [showGiftModal, setShowGiftModal] = useState(false)
   const [giftType, setGiftType] = useState("")
+  const [editorLoaded, setEditorLoaded] = useState(false)
+  const [editorError, setEditorError] = useState(false)
 
   // Nouvel état pour la devise
   const [currency, setCurrency] = useState("eur")
@@ -52,40 +54,9 @@ function Courses() {
 
   const editorRef = useRef(null)
 
-  // CKEditor configuration to match the image
+  // CKEditor configuration with only basic features that are guaranteed to be available
   const editorConfig = {
-    toolbar: [
-      "heading",
-      "|",
-      "bold",
-      "italic",
-      "underline",
-      "strikethrough",
-      "|",
-      "link",
-      "insertTable",
-      "|",
-      "bulletedList",
-      "numberedList",
-      "indent",
-      "outdent",
-      "|",
-      "alignment",
-      "|",
-      "undo",
-      "redo",
-      "|",
-      "blockQuote",
-    ],
-    // Custom styling to match the image
-    styles: {
-      editable: {
-        border: "1px solid #ccc",
-        borderRadius: "4px",
-        padding: "10px",
-        minHeight: "200px",
-      },
-    },
+    toolbar: ["heading", "|", "bold", "italic", "|", "link", "bulletedList", "numberedList", "|", "undo", "redo"],
   }
 
   // Fonction pour récupérer les modules
@@ -129,6 +100,35 @@ function Courses() {
       return () => clearTimeout(timer)
     }
   }, [message])
+
+  // Add cleanup effect for CKEditor
+  useEffect(() => {
+    // Cleanup function to properly destroy the editor
+    return () => {
+      if (editorRef.current) {
+        try {
+          // Check if destroy method exists and is a function
+          if (typeof editorRef.current.destroy === "function") {
+            editorRef.current
+              .destroy()
+              .then(() => {
+                editorRef.current = null
+              })
+              .catch((error) => {
+                console.error("Error destroying CKEditor:", error)
+                editorRef.current = null
+              })
+          } else {
+            // If destroy is not a function, just set ref to null
+            editorRef.current = null
+          }
+        } catch (error) {
+          console.error("Error in CKEditor cleanup:", error)
+          editorRef.current = null
+        }
+      }
+    }
+  }, [])
 
   // Function to strip HTML tags for validation
   const stripHtml = (html) => {
@@ -380,28 +380,10 @@ function Courses() {
   // Classe CSS pour les champs en erreur
   const errorInputClass = "border-red-500 focus:ring-red-500 focus:border-red-500"
 
-  // Add cleanup effect for CKEditor
-  useEffect(() => {
-    // Cleanup function to properly destroy the editor
-    return () => {
-      if (editorRef.current) {
-        try {
-          editorRef.current
-            .destroy()
-            .then(() => {
-              editorRef.current = null
-            })
-            .catch((error) => {
-              console.error("Error destroying CKEditor:", error)
-              editorRef.current = null
-            })
-        } catch (error) {
-          console.error("Error in CKEditor cleanup:", error)
-          editorRef.current = null
-        }
-      }
-    }
-  }, [])
+  // Handle textarea change as fallback
+  const handleTextareaChange = (e) => {
+    handleInputChange("description", e.target.value, validateMinAlphaChars)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 py-12">
@@ -536,7 +518,8 @@ function Courses() {
                   Description <span className="text-red-500">*</span>
                 </label>
                 <div className="border rounded-md overflow-hidden">
-                  {!editorRef.current && (
+                  {/* Try to load CKEditor first */}
+                  <div className={editorError ? "hidden" : ""}>
                     <CKEditor
                       editor={ClassicEditor}
                       data={description}
@@ -545,13 +528,16 @@ function Courses() {
                         try {
                           const data = editor.getData()
                           handleInputChange("description", data, validateMinAlphaChars)
+                          setEditorLoaded(true)
                         } catch (error) {
                           console.error("CKEditor onChange error:", error)
+                          setEditorError(true)
                         }
                       }}
                       onReady={(editor) => {
                         try {
                           editorRef.current = editor
+                          setEditorLoaded(true)
                           if (editor && editor.ui) {
                             const editorElement = editor.ui.getEditableElement()
                             if (editorElement) {
@@ -562,14 +548,27 @@ function Courses() {
                           }
                         } catch (error) {
                           console.error("CKEditor onReady error:", error)
+                          setEditorError(true)
                         }
                       }}
-                      onError={(error, { willEditorRestart }) => {
+                      onError={(error) => {
                         console.error("CKEditor error:", error)
-                        if (willEditorRestart) {
-                          editorRef.current = null
-                        }
+                        setEditorError(true)
                       }}
+                    />
+                  </div>
+
+                  {/* Fallback textarea if CKEditor fails to load */}
+                  {editorError && (
+                    <textarea
+                      id="description"
+                      value={description}
+                      onChange={handleTextareaChange}
+                      placeholder="Enter course description"
+                      className={`w-full p-3 border-0 min-h-[200px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
+                        errors.description ? "border-red-500" : "border-gray-300"
+                      }`}
+                      required
                     />
                   )}
                 </div>
@@ -647,7 +646,7 @@ function Courses() {
               {/* Type Ressource */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2 relative">
-                  <label htmlFor="level" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="typeRessource" className="block text-sm font-medium text-gray-700">
                     Ressource Type <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -751,7 +750,7 @@ function Courses() {
                   className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition-colors text-lg font-medium shadow-md"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Ajout en cours..." : "Add coursee"}
+                  {isSubmitting ? "Ajout en cours..." : "Add course"}
                 </button>
               </div>
 
