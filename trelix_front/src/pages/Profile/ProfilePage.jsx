@@ -130,28 +130,39 @@ const ProfilePage = () => {
   };
 
   const awardBadge = async () => {
-    const description = "Earned for completing profile";
-    const hasBadge = user.badges?.some(
-      (badge) => badge.description === description
+  const description = "Earned for completing profile";
+  const hasBadge = user.badges?.some(
+    (badge) => badge.description === description
+  );
+
+  if (hasBadge) {
+    return;
+  }
+
+  const badgeImageUrl = "/assets/Badges/WelcomeBadge.png";
+
+  try {
+    const response = await axios.post(
+      "https://trelix-xj5h.onrender.com/api/info/profile/badge",
+      {
+        badge: "Welcome to Trelix Badge 🏅",
+        email: user.email,
+        badgeImage: badgeImageUrl,
+      }
     );
-    if (hasBadge) {
-      return;
-    }
-    const badgeImageUrl = "/assets/Badges/WelcomeBadge.png";
-    try {
-      const response = await axios.post(
-        "https://trelix-xj5h.onrender.com/api/info/profile/badge",
-        {
-          badge: " Welcome to Trelix Badge 🏅",
-          email: user.email, // Send the user's email
-          badgeImage: badgeImageUrl, // Send the badge image URL
-        }
-      );
-      console.log("Badge awarded:", response.data);
-    } catch (error) {
-      console.error("Error awarding badge:", error);
-    }
-  };
+
+    console.log("Badge awarded:", response.data);
+
+    // Show success alert
+    alert("🎉 Congratulations! You've earned a new badge!");
+
+    // Refresh the page
+    window.location.reload();
+  } catch (error) {
+    console.error("Error awarding badge:", error);
+  }
+};
+
   return (
     <>
       <ToastContainer position="top-right" autoClose={2000} />
