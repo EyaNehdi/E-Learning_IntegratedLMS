@@ -763,6 +763,7 @@ const HomeUser = () => {
       <li>Apprenez aujourd’hui, transformez votre avenir dès demain</li>
     </ul>
   </div>
+  
 
 
                 </div>
@@ -858,6 +859,8 @@ Education transforms closed minds into open ones. It requires effort, but its fr
   {/*Javascript
 ========================================================*/}
   {/* Mirrored from html.theme-village.com/eduxo/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 20:26:01 GMT */}
+
+  
 </div>
                       );
 };

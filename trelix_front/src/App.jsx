@@ -75,7 +75,6 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 import Dictionary from "./components/Dictionary";
 import { ExamStatusProvider } from "./components/Exam/ExamStatusContext.jsx";
 import Summarizer from "./components/Summarizer";
-import CitationGenerator from "./components/CitationGenerator";
 import AuditPage from "./pages/Admin/AuditPage.jsx";
 import WordleGame from "./components/Leaderboard/WordleGame.jsx";
 import AuthDashboard from "./components/Admin/activitytrack/AuthDashboard.jsx";
