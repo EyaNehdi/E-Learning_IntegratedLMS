@@ -57,11 +57,6 @@ function Courses() {
     toolbar: [
       "heading",
       "|",
-      "fontFamily",
-      "fontSize",
-      "fontColor",
-      "fontBackgroundColor",
-      "|",
       "bold",
       "italic",
       "underline",
@@ -80,10 +75,7 @@ function Courses() {
       "undo",
       "redo",
       "|",
-      "imageUpload",
       "blockQuote",
-      "insertImage",
-      "mediaEmbed",
     ],
     // Custom styling to match the image
     styles: {
@@ -203,8 +195,8 @@ function Courses() {
       newErrors.categorie = "La catégorie est requise"
       isValid = false
     }
-     // Vérifier la catégorie
-     if (!typeRessource) {
+    // Vérifier la catégorie
+    if (!typeRessource) {
       newErrors.typeRessource = "Le type du cours est requis"
       isValid = false
     }
@@ -257,7 +249,7 @@ function Courses() {
       case "categorie":
         setCategorie(value)
         break
-        case "typeRessource":
+      case "typeRessource":
         setTypeRessource(value)
         break
       default:
@@ -388,6 +380,29 @@ function Courses() {
   // Classe CSS pour les champs en erreur
   const errorInputClass = "border-red-500 focus:ring-red-500 focus:border-red-500"
 
+  // Add cleanup effect for CKEditor
+  useEffect(() => {
+    // Cleanup function to properly destroy the editor
+    return () => {
+      if (editorRef.current) {
+        try {
+          editorRef.current
+            .destroy()
+            .then(() => {
+              editorRef.current = null
+            })
+            .catch((error) => {
+              console.error("Error destroying CKEditor:", error)
+              editorRef.current = null
+            })
+        } catch (error) {
+          console.error("Error in CKEditor cleanup:", error)
+          editorRef.current = null
+        }
+      }
+    }
+  }, [])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 py-12">
       <div className="container mx-auto px-4">
@@ -420,8 +435,8 @@ function Courses() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                  Course title
-                  <span className="text-red-500">*</span>
+                    Course title
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="title"
@@ -444,7 +459,7 @@ function Courses() {
 
                 <div className="space-y-2">
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                  Price <span className="text-red-500">*</span>
+                    Price <span className="text-red-500">*</span>
                   </label>
 
                   {/* Boutons radio pour la sélection de devise */}
@@ -518,7 +533,7 @@ function Courses() {
 
               <div className="space-y-2">
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Description <span className="text-red-500">*</span>
+                  Description <span className="text-red-500">*</span>
                 </label>
                 <div className="border rounded-md overflow-hidden">
                   {!editorRef.current && (
@@ -527,16 +542,32 @@ function Courses() {
                       data={description}
                       config={editorConfig}
                       onChange={(event, editor) => {
-                        const data = editor.getData()
-                        handleInputChange("description", data, validateMinAlphaChars)
+                        try {
+                          const data = editor.getData()
+                          handleInputChange("description", data, validateMinAlphaChars)
+                        } catch (error) {
+                          console.error("CKEditor onChange error:", error)
+                        }
                       }}
                       onReady={(editor) => {
-                        editorRef.current = editor
-                        const editorElement = editor.ui.getEditableElement()
-                        if (editorElement) {
-                          editorElement.style.minHeight = "200px"
-                          editorElement.style.border = "1px solid #ccc"
-                          editorElement.style.padding = "10px"
+                        try {
+                          editorRef.current = editor
+                          if (editor && editor.ui) {
+                            const editorElement = editor.ui.getEditableElement()
+                            if (editorElement) {
+                              editorElement.style.minHeight = "200px"
+                              editorElement.style.border = "1px solid #ccc"
+                              editorElement.style.padding = "10px"
+                            }
+                          }
+                        } catch (error) {
+                          console.error("CKEditor onReady error:", error)
+                        }
+                      }}
+                      onError={(error, { willEditorRestart }) => {
+                        console.error("CKEditor error:", error)
+                        if (willEditorRestart) {
+                          editorRef.current = null
                         }
                       }}
                     />
@@ -553,7 +584,7 @@ function Courses() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2 relative">
                   <label htmlFor="level" className="block text-sm font-medium text-gray-700">
-                  Level <span className="text-red-500">*</span>
+                    Level <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <select
@@ -570,8 +601,7 @@ function Courses() {
                       }}
                     >
                       <option value="" disabled>
-                      Select a level
-
+                        Select a level
                       </option>
                       <option value="Débutant">Débutant</option>
                       <option value="Intermédiaire">Intermédiaire</option>
@@ -593,7 +623,7 @@ function Courses() {
 
                 <div className="space-y-2">
                   <label htmlFor="categorie" className="block text-sm font-medium text-gray-700">
-                  Category <span className="text-red-500">*</span>
+                    Category <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="categorie"
@@ -614,11 +644,11 @@ function Courses() {
                   )}
                 </div>
               </div>
-{/* Type Ressource */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Type Ressource */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2 relative">
                   <label htmlFor="level" className="block text-sm font-medium text-gray-700">
-                  Ressource Type <span className="text-red-500">*</span>
+                    Ressource Type <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <select
@@ -635,8 +665,7 @@ function Courses() {
                       }}
                     >
                       <option value="" disabled>
-                      Select a Ressource Type
-
+                        Select a Ressource Type
                       </option>
                       <option value="pdf">Pdf</option>
                       <option value="video">Video</option>
@@ -658,10 +687,8 @@ function Courses() {
                     </div>
                   )}
                 </div>
-
-               
               </div>
-{/* Fin Type Ressource */}
+              {/* Fin Type Ressource */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label htmlFor="modules" className="block text-sm font-medium text-gray-700">
