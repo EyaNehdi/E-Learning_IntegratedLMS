@@ -16,7 +16,7 @@ const ListBadges = () => {
     const fetchBadges = async () => {
       try {
         const response = await axios.get(`/api/badges-r/get-badges`);
-        setBadges(response.data);
+        setBadges(Array.isArray(response.data) ? response.data : []);
         console.log(response.data);
       } catch (err) {
         console.error("Error fetching badges:", err);
@@ -138,41 +138,42 @@ const ListBadges = () => {
           </div>
         ) : viewMode === "grid" ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
-            {badges.map((badge) => (
-              <div
-                key={badge.id}
-                className="relative group rounded-lg overflow-hidden hover:shadow-md transition-all"
-              >
-                {/* Badge Image */}
-                <img
-                  src={`${baseUrl}${badge.image.replace(/\\/g, "/")}`}
-                  alt={badge.name}
-                  className="w-full h-auto aspect-square object-contain bg-gray-100 p-2"
-                />
-
-                {/* Edit Icon (appears on hover) */}
+            {Array.isArray(badges) &&
+              badges.map((badge) => (
                 <div
-                  onClick={() => handleEdit(badge)}
-                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
-                  title="Edit badge"
+                  key={badge.id}
+                  className="relative group rounded-lg overflow-hidden hover:shadow-md transition-all"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  {/* Badge Image */}
+                  <img
+                    src={`${baseUrl}${badge.image.replace(/\\/g, "/")}`}
+                    alt={badge.name}
+                    className="w-full h-auto aspect-square object-contain bg-gray-100 p-2"
+                  />
+
+                  {/* Edit Icon (appears on hover) */}
+                  <div
+                    onClick={() => handleEdit(badge)}
+                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
+                    title="Edit badge"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         ) : (
           <div className="overflow-x-auto p-4">
@@ -200,52 +201,53 @@ const ListBadges = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {badges.map((badge) => (
-                  <tr key={badge.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <img
-                        src={`${baseUrl}${badge.image.replace(/\\/g, "/")}`}
-                        alt={badge.name}
-                        className="h-10 w-10"
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {badge.name}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-500 max-w-xs truncate">
-                        {badge.description}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {badge.triggerType} {badge.triggerCondition}{" "}
-                        {badge.conditionValue}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(badge.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex gap-2 mt-2">
-                        <button
-                          onClick={() => handleEdit(badge)}
-                          className="custom-outline-btn edit-btn"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(badge._id)}
-                          className="custom-outline-btn archive-btn"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {Array.isArray(badges) &&
+                  badges.map((badge) => (
+                    <tr key={badge.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <img
+                          src={`${baseUrl}${badge.image.replace(/\\/g, "/")}`}
+                          alt={badge.name}
+                          className="h-10 w-10"
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {badge.name}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-500 max-w-xs truncate">
+                          {badge.description}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {badge.triggerType} {badge.triggerCondition}{" "}
+                          {badge.conditionValue}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(badge.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => handleEdit(badge)}
+                            className="custom-outline-btn edit-btn"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(badge._id)}
+                            className="custom-outline-btn archive-btn"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

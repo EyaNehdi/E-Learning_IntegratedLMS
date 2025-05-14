@@ -48,9 +48,8 @@ const sidebarConfig = [
   {
     label: "Business Metrics",
     icon: <HeartPulse size={16} />,
-    path: "/business-metrics",
+    path: "/business-metrics/user-transactions",
     children: [
-      { label: "Overview", path: "/business-metrics" },
       {
         label: "User Transactions",
         path: "/business-metrics/user-transactions",
