@@ -295,11 +295,6 @@ const ProfileDetails = () => {
                     name: "location",
                   },
                   {
-                    label: "Last Logged In At",
-                    value: `${lastLoggedInAt}`,
-                    name: "loggedInAt",
-                  },
-                  {
                     label: "UserName",
                     value: `${user?.firstName} ${user?.lastName}`,
                     name: "userName",
@@ -420,10 +415,6 @@ const ProfileDetails = () => {
                   </div>
                 </li>
 
-                {/* Registration Date */}
-                <li>
-                  <span className="font-semibold">Registration Date:</span> September 29, 2024, 8:30 AM
-                </li>
               </ul>
 
               {/* Profile Completion & Badge */}
