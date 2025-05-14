@@ -108,7 +108,7 @@ const ManageBadges = () => {
           text: "Badge updated successfully!",
         });
       } else {
-        await axios.post("${import.meta.env.VITE_API_PROXY}/api/badges-r/createBadge", formData, {
+        await axios.post(`${import.meta.env.VITE_API_PROXY}/api/badges-r/createBadge`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setSubmitMessage({

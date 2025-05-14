@@ -29,7 +29,7 @@ const StoreManagement = () => {
     if (isEditing) {
       setIsLoading(true);
       axios
-        .get(`/api/admin/pack/${id}`)
+        .get(`${import.meta.env.VITE_API_PROXY}/api/admin/pack/${id}`)
         .then((res) => {
           const data = res.data;
           setPack({
@@ -93,9 +93,9 @@ const StoreManagement = () => {
         price: Math.round(parseFloat(pack.price) * 100),
       };
       if (isEditing) {
-        await axios.put(`/api/admin/update-pack/${id}`, payload);
+        await axios.put(`${import.meta.env.VITE_API_PROXY}/api/admin/update-pack/${id}`, payload);
       } else {
-        await axios.post("/api/admin/addPack", payload);
+        await axios.post(`${import.meta.env.VITE_API_PROXY}/api/admin/addPack`, payload);
         setPack({ name: "", description: "", price: "0", coinAmount: 0 });
       }
       navigate("/storeAdmin", { state: { refresh: true } });
