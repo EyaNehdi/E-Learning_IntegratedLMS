@@ -48,7 +48,7 @@ pipeline {
                 dir('trelix_back') {
                     script {
                         // Publish to Nexus
-                        sh 'npm publish --registry http://192.168.33.10:8081/repository/npm-group/'
+                        sh 'npm publish --registry http://192.168.33.10:8081/repository/npm-private/'
                     }
                 }
             }
