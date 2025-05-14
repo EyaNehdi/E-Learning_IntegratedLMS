@@ -1,18 +1,33 @@
 const Chapter = require("../models/chapterModels");
 const Course = require("../models/course");
-const multer = require("multer");
-const path = require("path");
 const User = require("../models/userModel");
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { cloudinary } = require("../utils/cloudinary");
 
-// Configure multer storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../uploads'));
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    let resourceType = "raw"; // default fallback
+
+    if (file.mimetype.startsWith("image/")) {
+      resourceType = "image";
+    } else if (file.mimetype.startsWith("video/")) {
+      resourceType = "video";
+    } else if (file.mimetype === "application/pdf") {
+      resourceType = "raw"; // PDFs are not images or videos
     }
+
+    return {
+      folder: "uploads",
+      format: file.mimetype.split("/")[1],
+      public_id: Date.now() + "-" + file.originalname,
+      resource_type: resourceType,
+    };
+  },
 });
+
+
 
 const upload = multer({ storage });
 
@@ -35,7 +50,7 @@ const getChapters = async (req, res) => {
 // Create a new chapter
 const createChapter = async (req, res) => {
     try {
-        console.log("Received files:", req.files); // Debugging purpose
+        console.log("Received files:", req.files); // Check structure
 
         const { title, description, courseId, userid } = req.body;
 
@@ -43,16 +58,15 @@ const createChapter = async (req, res) => {
             return res.status(400).json({ message: "Title and userId are required" });
         }
 
-        const pdfPath = req.files?.pdf ? `/uploads/${req.files.pdf[0].filename}` : null;
-        const videoPath = req.files?.video ? `/uploads/${req.files.video[0].filename}` : null;
-
+        const pdfUrl = req.files?.pdf ? req.files.pdf[0].path : null;
+        const videoUrl = req.files?.video ? req.files.video[0].path : null;
 
         const chapter = new Chapter({
             title,
             description,
             courseId,
-            pdf: pdfPath,
-            video: videoPath,
+            pdf: pdfUrl,
+            video: videoUrl,
             userid,
         });
 
@@ -63,6 +77,7 @@ const createChapter = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
 
 // Update a chapter
 const updateChapter = async (req, res) => {

@@ -22,6 +22,8 @@ function Courses() {
   const [message, setMessage] = useState({ text: "", type: "" }) // Pour les messages de succès/erreur
   const [showGiftModal, setShowGiftModal] = useState(false)
   const [giftType, setGiftType] = useState("")
+  const [editorLoaded, setEditorLoaded] = useState(false)
+  const [editorError, setEditorError] = useState(false)
 
   // Nouvel état pour la devise
   const [currency, setCurrency] = useState("eur")
@@ -52,54 +54,15 @@ function Courses() {
 
   const editorRef = useRef(null)
 
-  // CKEditor configuration to match the image
+  // CKEditor configuration with only basic features that are guaranteed to be available
   const editorConfig = {
-    toolbar: [
-      "heading",
-      "|",
-      "fontFamily",
-      "fontSize",
-      "fontColor",
-      "fontBackgroundColor",
-      "|",
-      "bold",
-      "italic",
-      "underline",
-      "strikethrough",
-      "|",
-      "link",
-      "insertTable",
-      "|",
-      "bulletedList",
-      "numberedList",
-      "indent",
-      "outdent",
-      "|",
-      "alignment",
-      "|",
-      "undo",
-      "redo",
-      "|",
-      "imageUpload",
-      "blockQuote",
-      "insertImage",
-      "mediaEmbed",
-    ],
-    // Custom styling to match the image
-    styles: {
-      editable: {
-        border: "1px solid #ccc",
-        borderRadius: "4px",
-        padding: "10px",
-        minHeight: "200px",
-      },
-    },
+    toolbar: ["heading", "|", "bold", "italic", "|", "link", "bulletedList", "numberedList", "|", "undo", "redo"],
   }
 
   // Fonction pour récupérer les modules
   const fetchModules = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/module")
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/module`)
       console.log("Modules récupérés:", response.data)
 
       if (response.data.length > 0) {
@@ -137,6 +100,35 @@ function Courses() {
       return () => clearTimeout(timer)
     }
   }, [message])
+
+  // Add cleanup effect for CKEditor
+  useEffect(() => {
+    // Cleanup function to properly destroy the editor
+    return () => {
+      if (editorRef.current) {
+        try {
+          // Check if destroy method exists and is a function
+          if (typeof editorRef.current.destroy === "function") {
+            editorRef.current
+              .destroy()
+              .then(() => {
+                editorRef.current = null
+              })
+              .catch((error) => {
+                console.error("Error destroying CKEditor:", error)
+                editorRef.current = null
+              })
+          } else {
+            // If destroy is not a function, just set ref to null
+            editorRef.current = null
+          }
+        } catch (error) {
+          console.error("Error in CKEditor cleanup:", error)
+          editorRef.current = null
+        }
+      }
+    }
+  }, [])
 
   // Function to strip HTML tags for validation
   const stripHtml = (html) => {
@@ -203,8 +195,8 @@ function Courses() {
       newErrors.categorie = "La catégorie est requise"
       isValid = false
     }
-     // Vérifier la catégorie
-     if (!typeRessource) {
+    // Vérifier la catégorie
+    if (!typeRessource) {
       newErrors.typeRessource = "Le type du cours est requis"
       isValid = false
     }
@@ -257,7 +249,7 @@ function Courses() {
       case "categorie":
         setCategorie(value)
         break
-        case "typeRessource":
+      case "typeRessource":
         setTypeRessource(value)
         break
       default:
@@ -305,7 +297,7 @@ function Courses() {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/course/addcourse", {
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/course/addcourse`, {
         title,
         description,
         price,
@@ -388,6 +380,11 @@ function Courses() {
   // Classe CSS pour les champs en erreur
   const errorInputClass = "border-red-500 focus:ring-red-500 focus:border-red-500"
 
+  // Handle textarea change as fallback
+  const handleTextareaChange = (e) => {
+    handleInputChange("description", e.target.value, validateMinAlphaChars)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 py-12">
       <div className="container mx-auto px-4">
@@ -420,8 +417,8 @@ function Courses() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                  Course title
-                  <span className="text-red-500">*</span>
+                    Course title
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="title"
@@ -444,69 +441,89 @@ function Courses() {
 
                 <div className="space-y-2">
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                  Price <span className="text-red-500">*</span>
+                    Price <span className="text-red-500">*</span>
                   </label>
 
                   {/* Boutons radio pour la sélection de devise */}
 
                   {/* Champ de prix avec symbole de devise */}
                   <div className="relative">
-                    <input
-                      id="price"
-                      type="number"
-                      value={price}
-                      onChange={(e) => handleInputChange("price", e.target.value)}
-                      placeholder="Course price"
-                      className={`w-full p-3 pl-8 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
-                        errors.price ? "border-red-500" : "border-gray-300"
-                      }`}
-                      required
-                      disabled={currency === "free"}
-                    />
-                    <div className="flex gap-4 mb-4">
-                      <div className="flex items-center space-x-1">
-                        <input
-                          type="radio"
-                          id="usd"
-                          name="currency"
-                          value="usd"
-                          checked={currency === "usd"}
-                          onChange={() => handleCurrencyChange("usd")}
-                          className="hidden peer"
-                        />
-                        <label
-                          htmlFor="usd"
-                          className="text-sm text-gray-700 cursor-pointer peer-checked:text-blue-500 peer-checked:bg-blue-100 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-300 transition-all duration-300 ease-in-out flex items-center space-x-2 px-4 py-2 rounded-lg"
-                        >
-                          <span className="h-6 w-6 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:bg-blue-500">
-                            <span className="w-3 h-3 bg-white rounded-full peer-checked:block hidden"></span>
-                          </span>
-                          Trelix Coin (🪙)
-                        </label>
-                      </div>
+  <input
+    id="price"
+    type="number"
+    value={price}
+    onChange={(e) => handleInputChange("price", e.target.value)}
+    placeholder="Course price"
+    className={`w-full p-3 pl-8 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
+      errors.price ? "border-red-500" : "border-gray-300"
+    }`}
+    required
+    disabled={currency === "free"}
+  />
+  <div className="flex gap-4 mb-4">
+    {/* Trelix Coin Radio Button */}
+    <div className="relative flex items-center">
+      <input
+        type="radio"
+        id="usd"
+        name="currency"
+        value="usd"
+        checked={currency === "usd"}
+        onChange={() => handleCurrencyChange("usd")}
+        className="absolute opacity-0 w-full h-full cursor-pointer z-10"
+        style={{ margin: 0 }}
+      />
+      <label
+        htmlFor="usd"
+        className={`text-sm cursor-pointer flex items-center space-x-2 px-4 py-2 rounded-lg ${
+          currency === "usd" 
+            ? "text-blue-500 bg-blue-100 border-blue-500 ring-2 ring-blue-300" 
+            : "text-gray-700"
+        }`}
+      >
+        <span className={`h-6 w-6 border-2 rounded-full flex items-center justify-center ${
+          currency === "usd" ? "border-blue-500 bg-blue-500" : "border-gray-300"
+        }`}>
+          <span className={`w-3 h-3 bg-white rounded-full ${
+            currency === "usd" ? "block" : "hidden"
+          }`}></span>
+        </span>
+        <span>Trelix Coin (🪙)</span>
+      </label>
+    </div>
 
-                      <div className="flex items-center space-x-1">
-                        <input
-                          type="radio"
-                          id="free"
-                          name="currency"
-                          value="free"
-                          checked={currency === "free"}
-                          onChange={() => handleCurrencyChange("free")}
-                          className="hidden peer"
-                        />
-                        <label
-                          htmlFor="free"
-                          className="text-sm text-gray-700 cursor-pointer peer-checked:text-gray-600 peer-checked:bg-gray-100 peer-checked:border-gray-500 peer-checked:ring-2 peer-checked:ring-gray-300 transition-all duration-300 ease-in-out flex items-center space-x-2 px-4 py-2 rounded-lg"
-                        >
-                          <span className="h-6 w-6 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:bg-gray-500">
-                            <span className="w-3 h-3 bg-white rounded-full peer-checked:block hidden"></span>
-                          </span>
-                          Free
-                        </label>
-                      </div>
-                    </div>
-                  </div>
+    {/* Free Radio Button */}
+    <div className="relative flex items-center">
+      <input
+        type="radio"
+        id="free"
+        name="currency"
+        value="free"
+        checked={currency === "free"}
+        onChange={() => handleCurrencyChange("free")}
+        className="absolute opacity-0 w-full h-full cursor-pointer z-10"
+        style={{ margin: 0 }}
+      />
+      <label
+        htmlFor="free"
+        className={`text-sm cursor-pointer flex items-center space-x-2 px-4 py-2 rounded-lg ${
+          currency === "free" 
+            ? "text-gray-600 bg-gray-100 border-gray-500 ring-2 ring-gray-300" 
+            : "text-gray-700"
+        }`}
+      >
+        <span className={`h-6 w-6 border-2 rounded-full flex items-center justify-center ${
+          currency === "free" ? "border-gray-500 bg-gray-500" : "border-gray-300"
+        }`}>
+          <span className={`w-3 h-3 bg-white rounded-full ${
+            currency === "free" ? "block" : "hidden"
+          }`}></span>
+        </span>
+        <span>Free</span>
+      </label>
+    </div>
+  </div>
+</div>
                   {errors.price && (
                     <div className="text-red-500 text-sm mt-1 flex items-center">
                       <Info className="h-4 w-4 mr-1" />
@@ -518,27 +535,60 @@ function Courses() {
 
               <div className="space-y-2">
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Description <span className="text-red-500">*</span>
+                  Description <span className="text-red-500">*</span>
                 </label>
                 <div className="border rounded-md overflow-hidden">
-                  {!editorRef.current && (
+                  {/* Try to load CKEditor first */}
+                  <div className={editorError ? "hidden" : ""}>
                     <CKEditor
                       editor={ClassicEditor}
                       data={description}
                       config={editorConfig}
                       onChange={(event, editor) => {
-                        const data = editor.getData()
-                        handleInputChange("description", data, validateMinAlphaChars)
-                      }}
-                      onReady={(editor) => {
-                        editorRef.current = editor
-                        const editorElement = editor.ui.getEditableElement()
-                        if (editorElement) {
-                          editorElement.style.minHeight = "200px"
-                          editorElement.style.border = "1px solid #ccc"
-                          editorElement.style.padding = "10px"
+                        try {
+                          const data = editor.getData()
+                          handleInputChange("description", data, validateMinAlphaChars)
+                          setEditorLoaded(true)
+                        } catch (error) {
+                          console.error("CKEditor onChange error:", error)
+                          setEditorError(true)
                         }
                       }}
+                      onReady={(editor) => {
+                        try {
+                          editorRef.current = editor
+                          setEditorLoaded(true)
+                          if (editor && editor.ui) {
+                            const editorElement = editor.ui.getEditableElement()
+                            if (editorElement) {
+                              editorElement.style.minHeight = "200px"
+                              editorElement.style.border = "1px solid #ccc"
+                              editorElement.style.padding = "10px"
+                            }
+                          }
+                        } catch (error) {
+                          console.error("CKEditor onReady error:", error)
+                          setEditorError(true)
+                        }
+                      }}
+                      onError={(error) => {
+                        console.error("CKEditor error:", error)
+                        setEditorError(true)
+                      }}
+                    />
+                  </div>
+
+                  {/* Fallback textarea if CKEditor fails to load */}
+                  {editorError && (
+                    <textarea
+                      id="description"
+                      value={description}
+                      onChange={handleTextareaChange}
+                      placeholder="Enter course description"
+                      className={`w-full p-3 border-0 min-h-[200px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
+                        errors.description ? "border-red-500" : "border-gray-300"
+                      }`}
+                      required
                     />
                   )}
                 </div>
@@ -553,7 +603,7 @@ function Courses() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2 relative">
                   <label htmlFor="level" className="block text-sm font-medium text-gray-700">
-                  Level <span className="text-red-500">*</span>
+                    Level <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <select
@@ -570,8 +620,7 @@ function Courses() {
                       }}
                     >
                       <option value="" disabled>
-                      Select a level
-
+                        Select a level
                       </option>
                       <option value="Débutant">Débutant</option>
                       <option value="Intermédiaire">Intermédiaire</option>
@@ -593,7 +642,7 @@ function Courses() {
 
                 <div className="space-y-2">
                   <label htmlFor="categorie" className="block text-sm font-medium text-gray-700">
-                  Category <span className="text-red-500">*</span>
+                    Category <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="categorie"
@@ -614,11 +663,11 @@ function Courses() {
                   )}
                 </div>
               </div>
-{/* Type Ressource */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Type Ressource */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2 relative">
-                  <label htmlFor="level" className="block text-sm font-medium text-gray-700">
-                  Ressource Type <span className="text-red-500">*</span>
+                  <label htmlFor="typeRessource" className="block text-sm font-medium text-gray-700">
+                    Ressource Type <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <select
@@ -635,8 +684,7 @@ function Courses() {
                       }}
                     >
                       <option value="" disabled>
-                      Select a Ressource Type
-
+                        Select a Ressource Type
                       </option>
                       <option value="pdf">Pdf</option>
                       <option value="video">Video</option>
@@ -658,10 +706,8 @@ function Courses() {
                     </div>
                   )}
                 </div>
-
-               
               </div>
-{/* Fin Type Ressource */}
+              {/* Fin Type Ressource */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label htmlFor="modules" className="block text-sm font-medium text-gray-700">
@@ -724,7 +770,7 @@ function Courses() {
                   className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition-colors text-lg font-medium shadow-md"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Ajout en cours..." : "Add coursee"}
+                  {isSubmitting ? "Ajout en cours..." : "Add course"}
                 </button>
               </div>
 

@@ -23,6 +23,7 @@ const User = new Schema({
       acquiredOn: Date,
       verificationCode: String,
       pdfUrl: { type: String, default: null },
+      cloudinaryId: { type: String, default: null },
     }
   ],
   skils: { type: [String], default: [] },

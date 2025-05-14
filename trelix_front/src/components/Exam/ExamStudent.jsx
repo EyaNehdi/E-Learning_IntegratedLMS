@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import {
   Clock,
@@ -22,6 +20,7 @@ import {
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useProfileStore } from "../../store/profileStore";
+import TrelixSpinner from "../../layout/TrelixSpinner";
 
 const ExamStudent = () => {
   // State for exam data
@@ -67,7 +66,9 @@ const ExamStudent = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:5000/exam/check-attempt/${courseid}/${user._id}`
+        `${import.meta.env.VITE_API_PROXY}/exam/check-attempt/${courseid}/${
+          user._id
+        }`
       );
       setCourseSlug(response.data.courseSlug);
 
@@ -95,7 +96,7 @@ const ExamStudent = () => {
       setLoading(true);
       // Make the request to get a random exam from the course
       const response = await axios.get(
-        `http://localhost:5000/Exam/random/${courseid}`
+        `${import.meta.env.VITE_API_PROXY}/Exam/random/${courseid}`
       );
 
       console.log("Random Exam API response:", response.data); // Debugging
@@ -209,7 +210,7 @@ const ExamStudent = () => {
   const saveProgress = async () => {
     try {
       // In a real app, you would save to the server here
-      // await axios.post(`http://localhost:5000/Exam/progress/${exam._id}`, { answers });
+      // await axios.post(`${import.meta.env.VITE_API_PROXY}/Exam/progress/${exam._id}`, { answers });
 
       // For demo, just show a success message
       alert("Progress saved successfully!");
@@ -318,7 +319,7 @@ const ExamStudent = () => {
 
         // Submit answers to the backend
         const response = await axios.post(
-          `http://localhost:5000/exam/submit/${exam._id}`,
+          `${import.meta.env.VITE_API_PROXY}/exam/submit/${exam._id}`,
           {
             userId: user._id,
             answers: answersArray,
@@ -331,12 +332,15 @@ const ExamStudent = () => {
         // If the user passed, update the exam status in the backend
         if (results.passed) {
           try {
-            await axios.post(`http://localhost:5000/exam/update-status`, {
-              userId: user._id,
-              courseId: courseid,
-              passed: true,
-              score: results.percentageScore,
-            });
+            await axios.post(
+              `${import.meta.env.VITE_API_PROXY}/exam/update-status`,
+              {
+                userId: user._id,
+                courseId: courseid,
+                passed: true,
+                score: results.percentageScore,
+              }
+            );
             console.log("Exam status updated successfully");
           } catch (error) {
             console.error("Error updating exam status:", error);
@@ -396,10 +400,10 @@ const ExamStudent = () => {
     setIsEarningCertificate(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/certificates/issueCertificate",
+        `${import.meta.env.VITE_API_PROXY}/certificates/issueCertificate`,
         {
           userId: user._id,
-          courseId: courseid,
+          courseSlug: courseSlug,
           provider: "Trelix",
         }
       );
@@ -953,8 +957,7 @@ const ExamStudent = () => {
                               >
                                 {isEarningCertificate ? (
                                   <>
-                                    <Spinner className="h-3 w-3 mr-1 animate-spin" />
-                                    Processing...
+                                    <TrelixSpinner />
                                   </>
                                 ) : (
                                   <>

@@ -39,7 +39,7 @@ const QuizEdit = () => {
 
       setLoading(true)
       try {
-        const response = await axios.get(`http://localhost:5000/quiz/get/${id}`)
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/quiz/get/${id}`)
         setQuiz(response.data)
       } catch (err) {
         console.error("Error fetching quiz:", err)
@@ -174,10 +174,10 @@ const QuizEdit = () => {
       let response
       if (id && id !== "new") {
         // Update existing quiz
-        response = await axios.put(`http://localhost:5000/quiz/update/${id}`, quiz)
+        response = await axios.put(`${import.meta.env.VITE_API_PROXY}/quiz/update/${id}`, quiz)
       } else {
         // Create new quiz
-        response = await axios.post("http://localhost:5000/quiz/create", quiz)
+        response = await axios.post(`${import.meta.env.VITE_API_PROXY}/quiz/create`, quiz)
       }
 
       setSuccess(true)

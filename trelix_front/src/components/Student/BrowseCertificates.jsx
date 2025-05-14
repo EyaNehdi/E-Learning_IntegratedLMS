@@ -13,7 +13,7 @@ const BrowseCertificates = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentCertificates = certificates.slice(indexOfFirstItem, indexOfLastItem);
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = `${import.meta.env.VITE_API_PROXY}`;
 
   return (
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
@@ -139,7 +139,7 @@ const BrowseCertificates = () => {
                           }}
                           onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#c7d2fe'}
                           onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#e0e7ff'}
-                          onClick={() => setSelectedPdf(`${baseUrl}${cert.pdfUrl.replace(/\\/g, "/")}`)}
+                          onClick={() => setSelectedPdf(`${cert.pdfUrl.replace(/\\/g, "/")}`)}
                         >
                           <Eye style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
                           Preview
@@ -161,7 +161,7 @@ const BrowseCertificates = () => {
                           }}
                           onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
                           onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
-                          onClick={() => window.open(`${baseUrl}${cert.pdfUrl.replace(/\\/g, "/")}`, '_blank')}
+                          onClick={() => window.open(`${cert.pdfUrl.replace(/\\/g, "/")}`, '_blank')}
                         >
                           <Download style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
                           Download

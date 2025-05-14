@@ -32,7 +32,7 @@ function Login() {
     setLoading(true);
     try {
       const responseLogin = await axios.post(
-        `/api/auth/login`,
+        `${import.meta.env.VITE_API_PROXY}/api/auth/login`,
         { email, password, stayLoggedIn },
         { withCredentials: true }
       );
@@ -64,14 +64,14 @@ function Login() {
   };
   const { linkedInLogin } = useLinkedIn({
     clientId: "86un9qr2kersxv",
-    redirectUri: "http://localhost:5173/linkedin/callback",
+    redirectUri: "https://trelix-livid.vercel.app/linkedin/callback",
     scope: "openid profile w_member_social email",
     onSuccess: async (code, state) => {
       console.log("LinkedIn code:", code);
 
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/auth/loginLinkedIn",
+          `${import.meta.env.VITE_API_PROXY}/api/auth/loginLinkedIn`,
           { code }
         );
 
@@ -86,7 +86,7 @@ function Login() {
           "This Linkedin account dosn't exists. Redirecting to signup..."
         );
         setTimeout(() => {
-          window.location.href = "http://localhost:5173/signup";
+          window.location.href = "https://trelix-livid.vercel.app/signup";
         }, 2000);
         console.error("Error:", error);
       } finally {
@@ -117,7 +117,7 @@ function Login() {
           "This Google account dosn't exists. Redirecting to signup..."
         );
         setTimeout(() => {
-          window.location.href = "http://localhost:5173/signup";
+          window.location.href = "https://trelix-livid.vercel.app/signup";
         }, 2000);
         setErrorMessage("Account does not exist");
       } else {
@@ -136,7 +136,7 @@ function Login() {
 
   const handleGitHubLoginSuccess = async (response) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/loginGit", {
+      const res = await axios.post(`${import.meta.env.VITE_API_PROXY}/api/auth/loginGit`, {
         code: response.code,
       });
 
@@ -151,7 +151,7 @@ function Login() {
         "This Github account dosn't exists. Redirecting to signup..."
       );
       setTimeout(() => {
-        window.location.href = "http://localhost:5173/signup";
+        window.location.href = "https://trelix-livid.vercel.app/signup";
       }, 2000);
       console.error(err);
     }
@@ -192,7 +192,7 @@ function Login() {
                   <div className="signup-thumb">
                     <img
                       className="img-fluid"
-                      src="assets/images/shape-bg.png"
+                      src="/assets/images/shape-bg.png"
                       alt="Sign Up"
                     />
                   </div>
@@ -315,7 +315,7 @@ function Login() {
                           <div className="d-none" ref={githubRef}>
                             <GitHubLogin
                               clientId="Ov23liQcQlFtxrCS9Hkz"
-                              redirectUri="http://localhost:5173/login/student"
+                              redirectUri="https://trelix-livid.vercel.app/login/student"
                               onSuccess={handleGitHubLoginSuccess}
                               onFailure={handleGitHubLoginError}
                             />

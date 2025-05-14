@@ -37,7 +37,7 @@ export default function MeetingRoom() {
         return
       }
       
-      const response = await axios.get("http://127.0.0.1:8001/api/emotion")
+      const response = await axios.get("https://facerecognition-qoya.onrender.com/api/emotion")
       console.log("API Response:", response.data)
       
       // Check if the API returned an errorcd
