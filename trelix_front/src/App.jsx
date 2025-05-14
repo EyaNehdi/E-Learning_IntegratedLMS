@@ -97,7 +97,7 @@ function App() {
   return (
     <Router>
       <div>
-        <ChatComponent />
+       
 
         <Routes>
           {/* **************** */}
