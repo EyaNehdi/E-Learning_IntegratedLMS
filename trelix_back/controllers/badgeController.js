@@ -7,12 +7,12 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { cloudinary } = require('../utils/cloudinary');
 
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: async (req, file) => ({
-    folder: "badges", 
-    format: file.mimetype.split("/")[1], 
-    public_id: Date.now() + "-" + file.originalname,
-  }),
+    cloudinary: cloudinary,
+    params: async (req, file) => ({
+        folder: "badges",
+        format: file.mimetype.split("/")[1],
+        public_id: Date.now() + "-" + file.originalname,
+    }),
 });
 
 const uploadBadges = multer({ storage });
@@ -23,7 +23,7 @@ const createBadge = async (req, res) => {
 
         let imagePath = null;
         if (req.file) {
-            imagePath = req.file.filename;
+            imagePath = req.file.path;
         }
 
         const badge = new Badge({
@@ -61,15 +61,7 @@ const updateBadge = async (req, res) => {
         let imagePath = null;
 
         if (req.file) {
-            const badge = await Badge.findById(id);
-            if (badge.image) {
-                const oldImagePath = path.join(__dirname, '..', badge.image);
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                }
-            }
-            imagePath = `/uploads/badges/${req.file.filename}`;
-            updates.image = imagePath;
+            updates.image = req.file.path;
         }
 
         const updatedBadge = await Badge.findByIdAndUpdate(
