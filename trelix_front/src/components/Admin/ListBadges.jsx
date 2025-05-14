@@ -15,7 +15,7 @@ const ListBadges = () => {
   useEffect(() => {
     const fetchBadges = async () => {
       try {
-        const response = await axios.get(`/api/badges-r/get-badges`);
+        const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/api/badges-r/get-badges`);
         setBadges(Array.isArray(response.data) ? response.data : []);
         console.log(response.data);
       } catch (err) {
@@ -45,7 +45,7 @@ const ListBadges = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/api/badges-r/deleteBadge/${badgeId}`, {
+        await axios.delete(`${import.meta.env.VITE_API_PROXY}/api/badges-r/deleteBadge/${badgeId}`, {
           withCredentials: true,
         }),
           setBadges(badges.filter((badge) => badge._id !== badgeId));
