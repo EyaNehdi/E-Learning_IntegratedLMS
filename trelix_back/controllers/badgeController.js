@@ -2,13 +2,28 @@ const Badge = require('../models/Badge');
 const fs = require('fs');
 const path = require('path');
 
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { cloudinary } = require('../utils/cloudinary');
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => ({
+    folder: "badges", 
+    format: file.mimetype.split("/")[1], 
+    public_id: Date.now() + "-" + file.originalname,
+  }),
+});
+
+const uploadBadges = multer({ storage });
+
 const createBadge = async (req, res) => {
     try {
         const { name, description, triggerType, triggerCondition, conditionValue } = req.body;
 
         let imagePath = null;
         if (req.file) {
-            imagePath = `/uploads/badges/${req.file.filename}`;
+            imagePath = req.file.filename;
         }
 
         const badge = new Badge({
@@ -98,4 +113,4 @@ const deleteBadge = async (req, res) => {
     }
 };
 
-module.exports = { createBadge, getAllBadges, updateBadge, deleteBadge }
+module.exports = { createBadge, getAllBadges, updateBadge, deleteBadge, uploadBadges }

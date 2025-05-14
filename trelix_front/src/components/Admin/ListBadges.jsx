@@ -146,7 +146,7 @@ const ListBadges = () => {
                 >
                   {/* Badge Image */}
                   <img
-                    src={`${baseUrl}${badge.image.replace(/\\/g, "/")}`}
+                    src={`${badge.image.replace(/\\/g, "/")}`}
                     alt={badge.name}
                     className="w-full h-auto aspect-square object-contain bg-gray-100 p-2"
                   />
@@ -206,7 +206,7 @@ const ListBadges = () => {
                     <tr key={badge.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <img
-                          src={`${baseUrl}${badge.image.replace(/\\/g, "/")}`}
+                          src={`${badge.image.replace(/\\/g, "/")}`}
                           alt={badge.name}
                           className="h-10 w-10"
                         />
