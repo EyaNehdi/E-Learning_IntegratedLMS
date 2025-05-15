@@ -859,20 +859,31 @@ function Allcourse() {
         <div className="container">
           <div className="row">
             <div className="col-lg-4">
-              <div className="widget">
-                <h3 className="widget-title">Statistics</h3>
-                <div className="widget-inner text-center">
-                  <a
-                    href="/chart"
-                    className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
-                  >
-                    <i className="feather-icon icon-bar-chart" />
-                    <span>Voir les statistiques</span>
-                  </a>
-                </div>
-              </div>
+
 
               <aside className="sidebar sidebar-spacing">
+                              <div className="widget">
+                <h3 className="widget-title">Statistics</h3>
+                <div className="widget-inner text-center">
+  <a
+    href="/chart"
+    className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+    style={{ 
+      fontSize: "18px", 
+      padding: "6px 6px", 
+      minHeight: "60px",
+      minWidth: "12px",
+      transform: "scale(0.95)"
+    }}
+  >
+    <i 
+      className="feather-icon icon-bar-chart" 
+      style={{ fontSize: "14px" }}
+    />
+    <span>Explore Statistics</span>
+  </a>
+</div>
+              </div>
                 <div className="widget">
                   <h3 className="widget-title">Filter by Popularity</h3>
                   <div className="widget-inner">
