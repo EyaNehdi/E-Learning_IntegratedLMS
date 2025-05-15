@@ -504,6 +504,7 @@ function Allcourse() {
   };
 
   const fetchRecommendations = useCallback(async () => {
+    setShowingRecommendations((prev) => !prev);
     setRecommendationsLoading(true);
     setError(null);
     setButtonClicked(true);
@@ -645,6 +646,14 @@ function Allcourse() {
     userId,
     navigate,
   ]);
+  useEffect(() => {
+  if (userId && showingRecommendations && recommendations.length === 0) {
+    fetchRecommendations().catch((err) => {
+      console.error("Error fetching recommendations on mount:", err);
+      useMockRecommendations();
+    });
+  }
+}, [userId, showingRecommendations, recommendations.length, fetchRecommendations, useMockRecommendations]);
 
   useEffect(() => {
     // Inject custom SweetAlert2 styles
@@ -851,7 +860,7 @@ function Allcourse() {
           <div className="row">
             <div className="col-lg-4">
               <div className="widget">
-                <h3 className="widget-title">Statistiques</h3>
+                <h3 className="widget-title">Statistics</h3>
                 <div className="widget-inner text-center">
                   <a
                     href="/chart"
@@ -1058,8 +1067,8 @@ function Allcourse() {
                         <Sparkles className="sparkle-icon" size={20} />
                         <span>
                           {showingRecommendations
-                            ? "Show All Courses"
-                            : "Show Recommended Courses"}
+                            ? "Show Recommended Courses"
+                            : "Show All Courses"}
                         </span>
                       </>
                     )}
