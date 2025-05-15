@@ -1067,8 +1067,8 @@ function Allcourse() {
                         <Sparkles className="sparkle-icon" size={20} />
                         <span>
                           {showingRecommendations
-                            ? "Show Recommended Courses"
-                            : "Show All Courses"}
+                            ? "Show All Courses"
+                            : "Show Recommended Courses"}
                         </span>
                       </>
                     )}
