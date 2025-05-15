@@ -31,7 +31,7 @@ function Allcourse() {
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [error, setError] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
-  const [showingRecommendations, setShowingRecommendations] = useState(false);
+  const [showingRecommendations, setShowingRecommendations] = useState(true);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [filters, setFilters] = useState({
     frontendDev: false,
@@ -110,25 +110,32 @@ function Allcourse() {
 
   useEffect(() => {
     const checkCoursesAccess = async () => {
-      if (!courses.length) return;
-      const access = {};
-      for (const course of courses) {
-        try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_API_PROXY}/purchases/access/${course._id}`,
-            {
-              withCredentials: true,
-            }
-          );
-          access[course._id] = response.data.hasAccess;
-        } catch (err) {
-          console.error(`Error checking access for course ${course._id}:`, err);
-          access[course._id] = false;
-        }
-      }
-      setCourseAccess(access);
-      setIsLoading(false);
-    };
+  if (!courses.length) return;
+
+  const accessResults = await Promise.allSettled(
+    courses.map(course =>
+      axios.get(
+        `${import.meta.env.VITE_API_PROXY}/purchases/access/${course._id}`,
+        { withCredentials: true }
+      )
+    )
+  );
+
+  const access = {};
+  accessResults.forEach((result, index) => {
+    const courseId = courses[index]._id;
+    if (result.status === 'fulfilled') {
+      access[courseId] = result.value.data.hasAccess;
+    } else {
+      console.error(`Error checking access for course ${courseId}:`, result.reason);
+      access[courseId] = false;
+    }
+  });
+
+  setCourseAccess(access);
+  setIsLoading(false);
+};
+
 
     checkCoursesAccess();
   }, [courses]);
