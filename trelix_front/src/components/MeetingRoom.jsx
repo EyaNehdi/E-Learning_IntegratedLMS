@@ -21,11 +21,11 @@ export default function MeetingRoom() {
   const retryTimeoutRef = useRef(null)
   const jitsiApiRef = useRef(null)
 
-  // New state for participants and their emotions
-  const [participants, setParticipants] = useState({})
-  const [isInstructor, setIsInstructor] = useState(false)
-  const [instructorId, setInstructorId] = useState(null)
-  const [userId, setUserId] = useState(null)
+  // New state for participants and roles
+  const [isHost, setIsHost] = useState(false)
+  const [participantEmotions, setParticipantEmotions] = useState({})
+  const [myId, setMyId] = useState(null)
+  const [displayName, setDisplayName] = useState(localStorage.getItem("displayName") || "Participant")
 
   // Function to fetch emotion from the API
   const fetchEmotion = async (retryCount = 0) => {
@@ -72,7 +72,36 @@ export default function MeetingRoom() {
 
       // If we have an emotion property, use it
       if (response.data.emotion) {
-        handleEmotionDetected(response.data.emotion)
+        const detectedEmotion = response.data.emotion
+        setEmotion(detectedEmotion)
+
+        // Update emotion statistics
+        setEmotionStats((prevStats) => {
+          const newStats = { ...prevStats }
+          newStats[detectedEmotion] = (newStats[detectedEmotion] || 0) + 1
+          return newStats
+        })
+
+        // If we're not the host, broadcast our emotion to everyone
+        if (!isHost && jitsiApiRef.current && myId) {
+          // Use Jitsi's sendEndpointMessage to broadcast to all participants
+          try {
+            // Format the message with our ID, name, and emotion
+            const message = {
+              type: "emotion_update",
+              senderId: myId,
+              senderName: displayName,
+              emotion: detectedEmotion,
+              timestamp: new Date().toISOString(),
+            }
+
+            // Send the message to all participants using executeCommand
+            jitsiApiRef.current.executeCommand("sendEndpointMessage", "", message)
+            console.log("Sent emotion update to all participants:", message)
+          } catch (err) {
+            console.error("Error sending emotion update:", err)
+          }
+        }
       } else {
         setError("No emotion detected in API response")
       }
@@ -82,96 +111,6 @@ export default function MeetingRoom() {
     } finally {
       setLoading(false)
     }
-  }
-
-  // Helper function to handle detected emotions
-  const handleEmotionDetected = (detectedEmotion) => {
-    setEmotion(detectedEmotion)
-
-    // Update emotion statistics
-    setEmotionStats((prevStats) => {
-      const newStats = { ...prevStats }
-      newStats[detectedEmotion] = (newStats[detectedEmotion] || 0) + 1
-      return newStats
-    })
-
-    // Update this participant's emotion in the participants state
-    if (userId) {
-      const updatedParticipants = { ...participants }
-
-      if (!updatedParticipants[userId]) {
-        updatedParticipants[userId] = {
-          id: userId,
-          displayName: jitsiApiRef.current?.getDisplayName(userId) || "Unknown",
-          emotion: detectedEmotion,
-          timestamp: new Date().toISOString(),
-        }
-      } else {
-        updatedParticipants[userId] = {
-          ...updatedParticipants[userId],
-          emotion: detectedEmotion,
-          timestamp: new Date().toISOString(),
-        }
-      }
-
-      setParticipants(updatedParticipants)
-
-      // If this user is not the instructor, send the emotion data to the instructor
-      if (!isInstructor && instructorId) {
-        sendEmotionToInstructor(userId, detectedEmotion)
-      }
-    }
-
-    setLoading(false)
-  }
-
-  // Function to send emotion data to the instructor
-  const sendEmotionToInstructor = (participantId, emotion) => {
-    if (!jitsiApiRef.current || !instructorId) return
-
-    try {
-      // Use Jitsi's sendEndpointMessage to send data to a specific participant
-      jitsiApiRef.current.executeCommand("sendEndpointMessage", instructorId, {
-        type: "emotion_update",
-        senderId: participantId,
-        senderName: jitsiApiRef.current.getDisplayName(participantId),
-        emotion: emotion,
-        timestamp: new Date().toISOString(),
-      })
-
-      console.log(`Sent emotion ${emotion} to instructor (${instructorId})`)
-    } catch (err) {
-      console.error("Error sending emotion to instructor:", err)
-    }
-  }
-
-  // Function to handle receiving emotion data from students (for instructor)
-  const handleReceivedEmotionData = (participant, data) => {
-    if (!isInstructor || !data || data.type !== "emotion_update") return
-
-    console.log(`Received emotion data from ${data.senderName}:`, data)
-
-    // Update the participants state with the received emotion data
-    setParticipants((prevParticipants) => {
-      const updatedParticipants = { ...prevParticipants }
-
-      if (!updatedParticipants[data.senderId]) {
-        updatedParticipants[data.senderId] = {
-          id: data.senderId,
-          displayName: data.senderName || "Unknown",
-          emotion: data.emotion,
-          timestamp: data.timestamp,
-        }
-      } else {
-        updatedParticipants[data.senderId] = {
-          ...updatedParticipants[data.senderId],
-          emotion: data.emotion,
-          timestamp: data.timestamp,
-        }
-      }
-
-      return updatedParticipants
-    })
   }
 
   // Start automatic emotion detection
@@ -193,7 +132,7 @@ export default function MeetingRoom() {
         clearTimeout(retryTimeoutRef.current)
       }
     }
-  }, [autoDetectActive, mockMode, detectionInterval])
+  }, [autoDetectActive, mockMode, detectionInterval, isHost, myId, displayName])
 
   // Update interval when detection interval changes
   const updateDetectionInterval = (seconds) => {
@@ -238,7 +177,19 @@ export default function MeetingRoom() {
   useEffect(() => {
     const script = document.createElement("script")
     script.src = "https://meet.jit.si/external_api.js" // Jitsi Meet API
+    script.async = true
+
     script.onload = () => {
+      // Check if the user is the host (you can implement your own logic here)
+      // For simplicity, we'll use a URL parameter or localStorage
+      const isUserHost =
+        localStorage.getItem("isHost") === "true" || new URLSearchParams(window.location.search).get("host") === "true"
+      setIsHost(isUserHost)
+
+      // Get the display name from localStorage or use a default
+      const userDisplayName = localStorage.getItem("displayName") || "Participant"
+      setDisplayName(userDisplayName)
+
       const domain = "meet.jit.si"
       const options = {
         roomName: roomId,
@@ -246,8 +197,9 @@ export default function MeetingRoom() {
         height: "100%",
         parentNode: videoContainerRef.current,
         configOverwrite: {
-          startWithAudioMuted: true,
-          // Enable endpoint messaging for participant communication
+          startWithAudioMuted: false,
+          startWithVideoMuted: false,
+          // Enable endpoint messaging
           enableEndpointMessageTransport: true,
         },
         interfaceConfigOverwrite: {
@@ -283,7 +235,9 @@ export default function MeetingRoom() {
           ],
         },
         userInfo: {
-          displayName: localStorage.getItem("displayName") || "Participant",
+          displayName: userDisplayName,
+          // Add a role indicator in the display name
+          email: isUserHost ? "host@example.com" : "student@example.com",
         },
       }
 
@@ -291,80 +245,58 @@ export default function MeetingRoom() {
       const api = new window.JitsiMeetExternalAPI(domain, options)
       jitsiApiRef.current = api
 
-      // Set up event listeners for Jitsi Meet
+      // Set up event listeners
       api.addEventListeners({
-        // Handle participant join events
-        participantJoined: (participant) => {
-          console.log("Participant joined:", participant)
+        // Get our participant ID when we join
+        videoConferenceJoined: (event) => {
+          console.log("I joined the conference!", event)
+          setMyId(event.id)
 
-          // Check if this is the local participant (current user)
-          if (participant.local) {
-            setUserId(participant.id)
-
-            // For demo purposes, you can set the first participant as the instructor
-            // In a real app, you would determine this based on user roles
-            if (Object.keys(participants).length === 0) {
-              setIsInstructor(true)
-              setInstructorId(participant.id)
-              console.log("Setting current user as instructor:", participant.id)
-            }
-          } else {
-            // Add the new participant to our state
-            setParticipants((prevParticipants) => ({
-              ...prevParticipants,
-              [participant.id]: {
-                id: participant.id,
-                displayName: participant.displayName || "Unknown",
-                emotion: "unknown",
-                timestamp: new Date().toISOString(),
-              },
-            }))
-
-            // If we're the instructor, notify the new participant
-            if (isInstructor) {
-              setTimeout(() => {
-                api.executeCommand("sendEndpointMessage", participant.id, {
-                  type: "instructor_notification",
-                  instructorId: userId,
-                })
-              }, 2000)
-            }
+          // If we're the host, set a special display name to identify us
+          if (isUserHost) {
+            api.executeCommand("displayName", `${userDisplayName} (Instructor)`)
           }
         },
 
-        // Handle participant leave events
-        participantLeft: (participant) => {
-          console.log("Participant left:", participant)
+        // Track participants joining
+        participantJoined: (event) => {
+          console.log("Participant joined:", event)
+        },
 
-          // Remove the participant from our state
-          setParticipants((prevParticipants) => {
-            const updatedParticipants = { ...prevParticipants }
-            delete updatedParticipants[participant.id]
-            return updatedParticipants
+        // Track participants leaving
+        participantLeft: (event) => {
+          console.log("Participant left:", event)
+
+          // Remove their emotion data when they leave
+          setParticipantEmotions((prev) => {
+            const updated = { ...prev }
+            delete updated[event.id]
+            return updated
           })
-
-          // If the instructor left, we need to assign a new one
-          if (participant.id === instructorId) {
-            // For simplicity, assign the first remaining participant as instructor
-            // In a real app, you would have a more sophisticated approach
-            const remainingParticipantIds = Object.keys(participants).filter((id) => id !== participant.id)
-            if (remainingParticipantIds.length > 0 && remainingParticipantIds[0] === userId) {
-              setIsInstructor(true)
-              setInstructorId(userId)
-              console.log("Current user is now the instructor")
-            }
-          }
         },
 
-        // Handle endpoint messages (for emotion data exchange)
+        // Handle incoming messages (for emotion updates)
         endpointTextMessageReceived: (event) => {
-          console.log("Endpoint message received:", event)
+          console.log("Received message:", event)
 
+          // Check if this is an emotion update message
           if (event.data && event.data.type === "emotion_update") {
-            handleReceivedEmotionData(event.participant, event.data)
-          } else if (event.data && event.data.type === "instructor_notification") {
-            // If we receive a notification about who the instructor is
-            setInstructorId(event.data.instructorId)
+            const { senderId, senderName, emotion, timestamp } = event.data
+
+            // If we're the host, update our participant emotions state
+            if (isHost) {
+              setParticipantEmotions((prev) => ({
+                ...prev,
+                [senderId]: {
+                  id: senderId,
+                  name: senderName,
+                  emotion: emotion,
+                  timestamp: timestamp,
+                },
+              }))
+
+              console.log(`Host received emotion update from ${senderName}: ${emotion}`)
+            }
           }
         },
 
@@ -372,16 +304,24 @@ export default function MeetingRoom() {
         displayNameChange: (event) => {
           console.log("Display name changed:", event)
 
-          // Update the participant's display name in our state
-          if (event.id && participants[event.id]) {
-            setParticipants((prevParticipants) => ({
-              ...prevParticipants,
-              [event.id]: {
-                ...prevParticipants[event.id],
-                displayName: event.displayname,
-              },
-            }))
+          // Update our local state if it's our display name
+          if (event.id === myId) {
+            setDisplayName(event.displayname)
           }
+
+          // Update participant name in our emotions tracking
+          setParticipantEmotions((prev) => {
+            if (prev[event.id]) {
+              return {
+                ...prev,
+                [event.id]: {
+                  ...prev[event.id],
+                  name: event.displayname,
+                },
+              }
+            }
+            return prev
+          })
         },
       })
     }
@@ -398,6 +338,9 @@ export default function MeetingRoom() {
       }
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current)
+      }
+      if (jitsiApiRef.current) {
+        jitsiApiRef.current.dispose()
       }
     }
   }, [roomId])
@@ -449,13 +392,13 @@ export default function MeetingRoom() {
           borderRadius: "10px",
           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
           zIndex: 1000,
-          maxWidth: isInstructor ? "400px" : "350px",
+          maxWidth: isHost ? "400px" : "350px",
           maxHeight: "80vh",
           overflowY: "auto",
         }}
       >
         <h3 style={{ margin: "0 0 10px 0", fontSize: "16px", fontWeight: "600" }}>
-          {isInstructor ? "Instructor Dashboard" : "Emotion Detection"} {autoDetectActive ? "(Auto)" : "(Stopped)"}
+          {isHost ? "Instructor Dashboard" : "Emotion Detection"} {autoDetectActive ? "(Auto)" : "(Stopped)"}
         </h3>
 
         <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
@@ -558,7 +501,8 @@ export default function MeetingRoom() {
           </div>
         )}
 
-        {!isInstructor && emotion && (
+        {/* Current Emotion (for students) */}
+        {!isHost && emotion && (
           <div
             style={{
               backgroundColor: "#e7f5ff",
@@ -570,69 +514,206 @@ export default function MeetingRoom() {
             <p style={{ margin: "0", fontSize: "14px" }}>
               <strong>Your Emotion:</strong> {emotion} {mockMode && "(Mock)"}
             </p>
+            <p style={{ margin: "5px 0 0 0", fontSize: "12px", fontStyle: "italic", color: "#495057" }}>
+              Your emotion is being shared with the instructor.
+            </p>
           </div>
         )}
 
         {/* Instructor View - Participants Emotions */}
-        {isInstructor && Object.keys(participants).length > 0 && (
+        {isHost && (
           <div style={{ marginTop: "15px" }}>
-            <h4 style={{ fontSize: "14px", margin: "0 0 8px 0" }}>Student Emotions:</h4>
-            <div
+            <h4
               style={{
-                maxHeight: "300px",
-                overflowY: "auto",
-                backgroundColor: "#f8f9fa",
-                borderRadius: "6px",
-                padding: "8px",
+                fontSize: "16px",
+                margin: "0 0 12px 0",
+                fontWeight: "600",
+                borderBottom: "2px solid #e9ecef",
+                paddingBottom: "8px",
               }}
             >
-              {Object.values(participants)
-                .filter((p) => p.id !== userId) // Don't show the instructor
-                .map((participant) => (
-                  <div
-                    key={participant.id}
-                    style={{
-                      marginBottom: "12px",
-                      padding: "10px",
-                      borderRadius: "6px",
-                      backgroundColor: getEmotionBackgroundColor(participant.emotion),
-                    }}
-                  >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontWeight: "500", fontSize: "14px" }}>{participant.displayName}</span>
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          padding: "3px 8px",
-                          borderRadius: "12px",
-                          backgroundColor: getEmotionColor(participant.emotion),
-                          color: "white",
-                        }}
-                      >
-                        {participant.emotion || "unknown"}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: "12px", color: "#666", marginTop: "4px" }}>
-                      {participant.timestamp ? new Date(participant.timestamp).toLocaleTimeString() : "No data yet"}
-                    </div>
-                    {getEmotionFeedback(participant.emotion)}
-                  </div>
-                ))}
-            </div>
+              Student Emotions Dashboard
+            </h4>
 
-            {/* Class Engagement Summary */}
-            <div style={{ marginTop: "15px" }}>
-              <h4 style={{ fontSize: "14px", margin: "0 0 8px 0" }}>Class Engagement Summary:</h4>
+            {Object.keys(participantEmotions).length === 0 ? (
+              <div
+                style={{
+                  padding: "20px",
+                  textAlign: "center",
+                  backgroundColor: "#f8f9fa",
+                  borderRadius: "6px",
+                  color: "#495057",
+                }}
+              >
+                <p style={{ margin: "0", fontSize: "14px" }}>
+                  No students have joined yet or no emotion data available.
+                </p>
+                <p style={{ margin: "8px 0 0 0", fontSize: "13px" }}>
+                  Students' emotions will appear here once they join and their emotions are detected.
+                </p>
+              </div>
+            ) : (
               <div
                 style={{
                   backgroundColor: "#f8f9fa",
                   borderRadius: "6px",
-                  padding: "10px",
+                  padding: "12px",
+                  marginBottom: "15px",
                 }}
               >
-                {getClassEngagementSummary(participants, userId)}
+                <div
+                  style={{
+                    marginBottom: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <span style={{ fontWeight: "500", fontSize: "14px" }}>
+                    Total Students: {Object.keys(participantEmotions).length}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      padding: "3px 8px",
+                      borderRadius: "12px",
+                      backgroundColor: "#4dabf7",
+                      color: "white",
+                    }}
+                  >
+                    Live Updates
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                    gap: "10px",
+                    maxHeight: "300px",
+                    overflowY: "auto",
+                    padding: "5px",
+                  }}
+                >
+                  {Object.values(participantEmotions).map((participant) => (
+                    <div
+                      key={participant.id}
+                      style={{
+                        padding: "12px",
+                        borderRadius: "8px",
+                        backgroundColor: "white",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                        border: `1px solid ${getEmotionBorderColor(participant.emotion)}`,
+                        transition: "all 0.3s ease",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginBottom: "8px",
+                          gap: "8px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "50%",
+                            backgroundColor: getEmotionColor(participant.emotion),
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "white",
+                            fontWeight: "bold",
+                            fontSize: "16px",
+                          }}
+                        >
+                          {participant.name ? participant.name.charAt(0).toUpperCase() : "?"}
+                        </div>
+                        <div style={{ overflow: "hidden" }}>
+                          <div
+                            style={{
+                              fontWeight: "600",
+                              fontSize: "14px",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {participant.name || "Unknown Student"}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              color: "#666",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            Last update:{" "}
+                            {participant.timestamp
+                              ? new Date(participant.timestamp).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : "N/A"}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        style={{
+                          backgroundColor: getEmotionBackgroundColor(participant.emotion),
+                          padding: "8px",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontWeight: "500",
+                            fontSize: "15px",
+                            color: getEmotionTextColor(participant.emotion),
+                          }}
+                        >
+                          {participant.emotion ? participant.emotion.toUpperCase() : "UNKNOWN"}
+                        </div>
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          marginTop: "8px",
+                          fontStyle: "italic",
+                          color: "#495057",
+                          lineHeight: "1.3",
+                        }}
+                      >
+                        {getEmotionFeedback(participant.emotion)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Class Engagement Summary */}
+            {Object.keys(participantEmotions).length > 0 && (
+              <div style={{ marginTop: "15px" }}>
+                <h4 style={{ fontSize: "14px", margin: "0 0 8px 0", fontWeight: "600" }}>Class Engagement Summary:</h4>
+                <div
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "6px",
+                    padding: "10px",
+                  }}
+                >
+                  {getClassEngagementSummary(participantEmotions)}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -783,6 +864,38 @@ function getEmotionBackgroundColor(emotion) {
   return colors[emotion?.toLowerCase()] || "#f8f9fa" // Default to light gray if emotion not found
 }
 
+// Helper function to get text color for emotion cards
+function getEmotionTextColor(emotion) {
+  const colors = {
+    happy: "#2b8a3e",
+    sad: "#0878b4",
+    angry: "#c92a2a",
+    surprised: "#e67700",
+    neutral: "#343a40",
+    fearful: "#7950f2",
+    disgusted: "#d9480f",
+    unknown: "#343a40",
+  }
+
+  return colors[emotion?.toLowerCase()] || "#343a40"
+}
+
+// Helper function to get border color for emotion cards
+function getEmotionBorderColor(emotion) {
+  const colors = {
+    happy: "#94d8a2",
+    sad: "#a5d8ff",
+    angry: "#ffc9c9",
+    surprised: "#ffe08a",
+    neutral: "#ced4da",
+    fearful: "#d0bfff",
+    disgusted: "#ffbb91",
+    unknown: "#ced4da",
+  }
+
+  return colors[emotion?.toLowerCase()] || "#ced4da"
+}
+
 // Helper function to get feedback based on emotion
 function getEmotionFeedback(emotion) {
   if (!emotion) return null
@@ -813,9 +926,8 @@ function getEmotionFeedback(emotion) {
 }
 
 // Helper function to generate class engagement summary
-function getClassEngagementSummary(participants, currentUserId) {
-  // Filter out the current user (instructor)
-  const students = Object.values(participants).filter((p) => p.id !== currentUserId)
+function getClassEngagementSummary(participants) {
+  const students = Object.values(participants)
 
   if (students.length === 0) {
     return <p style={{ fontSize: "13px" }}>No students have joined yet.</p>
@@ -914,3 +1026,5 @@ function getClassEngagementSummary(participants, currentUserId) {
     </div>
   )
 }
+
+

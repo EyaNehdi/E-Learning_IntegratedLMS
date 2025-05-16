@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { db } from "./FirebaseConfig"
 import { ref, set, onValue, remove, update } from "firebase/database"
-import "../App.css"
+import "./chat.css"
 import { censorBadWords } from "../utils/content-filter"
 
 function ChatComponent() {

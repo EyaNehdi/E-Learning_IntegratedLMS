@@ -93,6 +93,7 @@ import ViewPack from "./components/Admin/ViewPack.jsx";
 import ViewUser from "./components/Admin/ViewUser.jsx";
 import QuizzAdd from "./components/Admin/QuizzAdd.jsx";
 import CoursesWizard from "./components/Instructor/CoursesWizard.jsx";
+import HostSetup from "./components/HostSetup.jsx";
 
 function App() {
   return (
@@ -118,8 +119,9 @@ function App() {
           <Route path="/test" element={<MoodleCourses />} />
           <Route path="/test1" element={<Calendar />} />
           <Route path="/meeting" element={<JoinRoom />} />
+          <Route path="/host" element={<HostSetup />} />
           <Route path="/chat" element={<ChatComponent />} />
-          <Route path="/meeting/:roomId" element={<MeetingRoom />} />
+          <Route path="/room/:roomId" element={<MeetingRoom />} />
           {/* **************** */}
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>

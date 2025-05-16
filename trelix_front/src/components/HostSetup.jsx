@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-export default function JoinRoom() {
+export default function HostSetup() {
   const [roomId, setRoomId] = useState("")
   const [displayName, setDisplayName] = useState("")
   const navigate = useNavigate()
@@ -11,20 +11,20 @@ export default function JoinRoom() {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    // Save the display name to localStorage (not as host)
-    localStorage.setItem("isHost", "false")
+    // Save the host status and display name to localStorage
+    localStorage.setItem("isHost", "true")
     localStorage.setItem("displayName", displayName)
 
-    // Navigate to the meeting room
-    navigate(`/room/${roomId}`)
+    // Navigate to the meeting room with the host parameter
+    navigate(`/room/${roomId}?host=true`)
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-lg">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Join Meeting Room</h1>
-          <p className="mt-2 text-gray-600">Enter the room ID provided by your instructor</p>
+          <h1 className="text-3xl font-bold text-gray-900">Create Meeting Room</h1>
+          <p className="mt-2 text-gray-600">Set up a new meeting room as an instructor</p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -41,8 +41,9 @@ export default function JoinRoom() {
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter the room ID"
+                placeholder="Enter a unique room ID"
               />
+              <p className="mt-1 text-xs text-gray-500">Choose a unique name for your meeting room</p>
             </div>
 
             <div>
@@ -65,16 +66,16 @@ export default function JoinRoom() {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
-              Join Meeting
+              Create Room as Instructor
             </button>
           </div>
         </form>
 
         <div className="mt-6">
           <p className="text-center text-sm text-gray-600">
-            Your emotions will be shared with the instructor to help improve the learning experience
+            Students will be able to join using the Room ID you create
           </p>
         </div>
       </div>
