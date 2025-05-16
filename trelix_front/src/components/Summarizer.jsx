@@ -43,13 +43,16 @@ const Summarizer = () => {
 
   return (
     <div className="p-4 bg-white rounded shadow max-w-xl mx-auto mt-8">
+
       <h2 className="text-2xl font-bold mb-4">Summarizer of PDF files 📚</h2>
+
       <input 
         type="file" 
         accept="application/pdf"
         onChange={handleFileChange}
         className="w-full p-2 border rounded mb-2"
       />
+
  <button
   onClick={summarizePdf}
   className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -57,6 +60,7 @@ const Summarizer = () => {
 >
   Summarize Your PDF
 </button>
+
 
       {loading && <p className="mt-2">loading...</p>}
       {summary && (
