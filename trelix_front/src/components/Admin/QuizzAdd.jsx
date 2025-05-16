@@ -35,7 +35,10 @@ function QuizzAdd() {
     setLoading(true);
     setError(null);
     try {
-      await axios.post("/api/quiz/addQuiz", { title, questions });
+      await axios.post(`${import.meta.env.VITE_API_PROXY}/api/quiz/addQuiz`, {
+        title,
+        questions,
+      });
       alert("Quiz added successfully!");
       setTitle("");
       setQuestions([

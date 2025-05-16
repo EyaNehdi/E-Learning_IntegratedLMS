@@ -136,7 +136,7 @@ function Sidebar() {
       )}
           {user?.role === "student" && (
         <div className="widget">
-          <p className="section-title"> Preference Statistique</p>
+          <p className="section-title"> Preference Statistics</p>
           <nav className="dashboard-nav">
             <ul className="nav-list">
               <li>
@@ -147,7 +147,7 @@ function Sidebar() {
                   to="/profile/preferencestat"
                 >
                   <i className="feather-icon icon-book" />
-                  <span className="nav-label">Statistiques</span>
+                  <span className="nav-label">Statistics</span>
                 </Link>
               </li>
               

@@ -69,7 +69,7 @@ function Listcourse() {
           </li>
           <li>
             <a
-              href="/profile/course"
+              href="/profile/wizard"
               className="custom-btn"
               style={{
                 backgroundColor: "#17a2b8", // Bleu clair (équivalent à btn-info)

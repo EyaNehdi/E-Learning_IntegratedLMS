@@ -35,7 +35,7 @@ router.get('/callback', async (req, res) => {
 
     await req.session.save();
     console.log("Session après sauvegarde:", req.session.user);
-
+    res.setHeader('Set-Cookie-Debug', 'Callback reached and session set');
     res.redirect(`${process.env.BASE_URL_FRONTEND}/classroom?auth=success`);
   } catch (error) {
     console.error('Erreur lors du callback Google:', error.message);
@@ -45,6 +45,7 @@ router.get('/callback', async (req, res) => {
 
 // Route pour vérifier l'authentification
 router.get('/check-auth', (req, res) => {
+  console.log("📦 Session contenu (check-auth):", req.session);
   if (req.session.user && req.session.user.accessToken) {
     console.log("Vérification d'authentification: Utilisateur authentifié");
     res.json({ isAuthenticated: true });

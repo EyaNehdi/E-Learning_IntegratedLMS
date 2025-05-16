@@ -31,7 +31,7 @@ function Allcourse() {
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [error, setError] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
-  const [showingRecommendations, setShowingRecommendations] = useState(false);
+  const [showingRecommendations, setShowingRecommendations] = useState(true);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [filters, setFilters] = useState({
     frontendDev: false,
@@ -110,25 +110,32 @@ function Allcourse() {
 
   useEffect(() => {
     const checkCoursesAccess = async () => {
-      if (!courses.length) return;
-      const access = {};
-      for (const course of courses) {
-        try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_API_PROXY}/purchases/access/${course._id}`,
-            {
-              withCredentials: true,
-            }
-          );
-          access[course._id] = response.data.hasAccess;
-        } catch (err) {
-          console.error(`Error checking access for course ${course._id}:`, err);
-          access[course._id] = false;
-        }
-      }
-      setCourseAccess(access);
-      setIsLoading(false);
-    };
+  if (!courses.length) return;
+
+  const accessResults = await Promise.allSettled(
+    courses.map(course =>
+      axios.get(
+        `${import.meta.env.VITE_API_PROXY}/purchases/access/${course._id}`,
+        { withCredentials: true }
+      )
+    )
+  );
+
+  const access = {};
+  accessResults.forEach((result, index) => {
+    const courseId = courses[index]._id;
+    if (result.status === 'fulfilled') {
+      access[courseId] = result.value.data.hasAccess;
+    } else {
+      console.error(`Error checking access for course ${courseId}:`, result.reason);
+      access[courseId] = false;
+    }
+  });
+
+  setCourseAccess(access);
+  setIsLoading(false);
+};
+
 
     checkCoursesAccess();
   }, [courses]);
@@ -497,6 +504,7 @@ function Allcourse() {
   };
 
   const fetchRecommendations = useCallback(async () => {
+    setShowingRecommendations((prev) => !prev);
     setRecommendationsLoading(true);
     setError(null);
     setButtonClicked(true);
@@ -638,6 +646,14 @@ function Allcourse() {
     userId,
     navigate,
   ]);
+  useEffect(() => {
+  if (userId && showingRecommendations && recommendations.length === 0) {
+    fetchRecommendations().catch((err) => {
+      console.error("Error fetching recommendations on mount:", err);
+      useMockRecommendations();
+    });
+  }
+}, [userId, showingRecommendations, recommendations.length, fetchRecommendations, useMockRecommendations]);
 
   useEffect(() => {
     // Inject custom SweetAlert2 styles
@@ -843,20 +859,31 @@ function Allcourse() {
         <div className="container">
           <div className="row">
             <div className="col-lg-4">
-              <div className="widget">
-                <h3 className="widget-title">Statistiques</h3>
-                <div className="widget-inner text-center">
-                  <a
-                    href="/chart"
-                    className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
-                  >
-                    <i className="feather-icon icon-bar-chart" />
-                    <span>Voir les statistiques</span>
-                  </a>
-                </div>
-              </div>
+
 
               <aside className="sidebar sidebar-spacing">
+                              <div className="widget">
+                <h3 className="widget-title">Statistics</h3>
+                <div className="widget-inner text-center">
+  <a
+    href="/chart"
+    className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+    style={{ 
+      fontSize: "18px", 
+      padding: "6px 6px", 
+      minHeight: "60px",
+      minWidth: "12px",
+      transform: "scale(0.95)"
+    }}
+  >
+    <i 
+      className="feather-icon icon-bar-chart" 
+      style={{ fontSize: "14px" }}
+    />
+    <span>Explore Statistics</span>
+  </a>
+</div>
+              </div>
                 <div className="widget">
                   <h3 className="widget-title">Filter by Popularity</h3>
                   <div className="widget-inner">

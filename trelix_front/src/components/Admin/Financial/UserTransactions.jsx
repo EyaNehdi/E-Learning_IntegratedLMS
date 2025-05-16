@@ -44,6 +44,8 @@ const UserTransactions = () => {
       const response = await axios.get(
         `${import.meta.env.VITE_API_PROXY}/api/finance/transactions`
       );
+      console.log("transactions fetched :", response.data);
+
       setTransactions(response.data);
     } catch (error) {
       console.error("Error fetching transactions:", error);
@@ -99,6 +101,7 @@ const UserTransactions = () => {
   const filtered = transactions
     .filter((t) => (typeFilter === "all" ? true : t.type === typeFilter))
     .filter((t) => {
+      if (!t.user) return false;
       const userName = `${t.user.firstName} ${t.user.lastName}`.toLowerCase();
       return userName.includes(search.toLowerCase());
     });
@@ -335,7 +338,9 @@ const UserTransactions = () => {
                     <td>
                       <div className="flex items-center justify-between gap-2">
                         <span>
-                          {t.user.firstName} {t.user.lastName}
+                          {t.user
+                            ? `${t.user.firstName} ${t.user.lastName}`
+                            : "Unknown User"}
                         </span>
                       </div>
                     </td>
@@ -378,6 +383,7 @@ const UserTransactions = () => {
                             <button
                               className="custom-outline-btn view-btn"
                               onClick={() =>
+                                t.user &&
                                 navigate(`/admin/details/${t.user._id}`)
                               }
                             >
