@@ -41,6 +41,28 @@ function Sidebar() {
             </li>
           </ul>
         </nav>
+        
+            {user?.role === "instructor" && (
+        <div className="widget">
+          <p className="section-title"> Course statistics </p>
+          <nav className="dashboard-nav">
+            <ul className="nav-list">
+              <li>
+                <Link
+                  className={`nav-link ${
+                    location.pathname === "/chart" ? "active" : ""
+                  }`}
+                  to="/chart"
+                >
+                  <i className="feather-icon icon-plus" />
+                  <span className="nav-label">statistics</span>
+                </Link>
+              </li>
+             
+            </ul>
+          </nav>
+        </div>
+      )}
         {user?.role === "instructor" && (
           <div className="widget">
             <p className="section-title">Learning Resources</p>
@@ -72,8 +94,12 @@ function Sidebar() {
               </ul>
             </nav>
           </div>
+          
+          
         )}
       </div>
+
+      
 
       {user?.role === "instructor" && (
         <div className="widget">
