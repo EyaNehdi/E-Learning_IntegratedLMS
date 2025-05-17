@@ -247,7 +247,7 @@ You don't have any courses in Google Classroom yet, or you don't have the necess
                         View course
                       </a>
                       <a
-                        href="#"
+                         href={`/classroom/courses/${course.id}`}
                         className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg text-sm transition-colors duration-200"
                       >
                        View more.

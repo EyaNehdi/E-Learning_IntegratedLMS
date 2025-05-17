@@ -142,6 +142,10 @@ function App() {
             <Route path="/quiz" element={<QuizzLeaderboard />} />
             <Route path="/Classroom" element={<ClassroomPage />} />
             <Route
+              path="/classroom/courses/:courseId"
+              element={<CourseDetailsPage />}
+            />
+            <Route
               path="course-chapter/:slugCourse"
               element={<CourseChapter />}
             />
@@ -159,10 +163,7 @@ function App() {
 
             <Route path="/profile/classroom" element={<ClassroomPage />} />
 
-            <Route
-              path="/profile/classroom/courses/:courseId"
-              element={<CourseDetailsPage />}
-            />
+            
 
 
             <Route path="/store" element={<Store />} />
