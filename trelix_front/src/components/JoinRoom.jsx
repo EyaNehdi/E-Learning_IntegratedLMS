@@ -1,19 +1,81 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+
+// Shared database for room management
+const ROOM_DB = {
+  // Check if a room exists
+  roomExists: (roomId) => {
+    try {
+      return localStorage.getItem(`room_${roomId}_info`) !== null
+    } catch (e) {
+      console.error("Error checking room:", e)
+      return false
+    }
+  },
+
+  // Get room info
+  getRoomInfo: (roomId) => {
+    try {
+      const roomInfo = localStorage.getItem(`room_${roomId}_info`)
+      return roomInfo ? JSON.parse(roomInfo) : null
+    } catch (e) {
+      console.error("Error getting room info:", e)
+      return null
+    }
+  },
+}
 
 export default function JoinRoom() {
   const [roomId, setRoomId] = useState("")
   const [displayName, setDisplayName] = useState("")
+  const [userId, setUserId] = useState("")
+  const [error, setError] = useState("")
   const navigate = useNavigate()
+
+  // Generate or retrieve user ID on component mount
+  useEffect(() => {
+    // Check if we already have a user ID
+    const storedId = localStorage.getItem("userId")
+    if (storedId) {
+      setUserId(storedId)
+    } else {
+      // Generate a new unique ID
+      const newId = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      localStorage.setItem("userId", newId)
+      setUserId(newId)
+    }
+  }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    // Save the display name to localStorage (not as host)
+    // Validate room ID
+    if (!roomId.trim()) {
+      setError("Please enter a valid room ID")
+      return
+    }
+
+    // Check if room exists
+    if (!ROOM_DB.roomExists(roomId)) {
+      setError("This room doesn't exist. Please check the room ID.")
+      return
+    }
+
+    // Get room info to verify instructor
+    const roomInfo = ROOM_DB.getRoomInfo(roomId)
+    if (!roomInfo || !roomInfo.instructorId) {
+      setError("Invalid room information. Please try again.")
+      return
+    }
+
+    // Save the display name and room info to localStorage
     localStorage.setItem("isHost", "false")
     localStorage.setItem("displayName", displayName)
+    localStorage.setItem("currentRoomId", roomId)
+    localStorage.setItem("instructorId", roomInfo.instructorId)
+    localStorage.setItem("instructorName", roomInfo.instructorName || "Instructor")
 
     // Navigate to the meeting room
     navigate(`/room/${roomId}`)
@@ -25,6 +87,7 @@ export default function JoinRoom() {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">Join Meeting Room</h1>
           <p className="mt-2 text-gray-600">Enter the room ID provided by your instructor</p>
+          {userId && <p className="mt-2 text-xs text-gray-500">Student ID: {userId.substring(0, 8)}...</p>}
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -61,6 +124,8 @@ export default function JoinRoom() {
               />
             </div>
           </div>
+
+          {error && <div className="text-red-500 text-sm p-2 bg-red-50 rounded-md">{error}</div>}
 
           <div>
             <button

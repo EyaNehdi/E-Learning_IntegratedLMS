@@ -167,12 +167,14 @@ function Sidebar() {
                 <span className="nav-label">Chatbot</span>
               </Link>
             </li>
+            {user?.role === "instructor" && (
             <li>
-              <Link className="nav-link" to="/profile/meeting">
+              <Link className="nav-link" to="/profile/host">
                 <i className="feather-icon icon-video" />
                 <span className="nav-label">Meet</span>
               </Link>
             </li>
+            )}
             {user?.role === "student" && (
               <>
                 <li>
@@ -181,12 +183,12 @@ function Sidebar() {
                     <span className="nav-label">Dictionary</span>
                   </Link>
                 </li>
-                <li>
-                  <Link className="nav-link" to="/profile/CitationGenerator">
-                    <i className="feather-icon icon-plus" />
-                    <span className="nav-label">Citation Generator</span>
-                  </Link>
-                </li>
+                 <li>
+              <Link className="nav-link" to="/profile/meeting">
+                <i className="feather-icon icon-video" />
+                <span className="nav-label">Meet</span>
+              </Link>
+            </li>
               </>
             )}
           </ul>

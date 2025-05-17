@@ -4,6 +4,76 @@ import { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { useParams, useNavigate } from "react-router-dom"
 
+// Direct communication system between students and instructors
+const EMOTION_MESSENGER = {
+  // Send emotion from student to instructor
+  sendEmotion: (roomId, studentId, studentName, instructorId, emotion) => {
+    try {
+      // Get existing emotions for this room
+      let roomEmotions = {}
+      try {
+        const storedEmotions = localStorage.getItem(`room_${roomId}_emotions`)
+        if (storedEmotions) {
+          roomEmotions = JSON.parse(storedEmotions)
+        }
+      } catch (e) {
+        console.error("Error loading emotions:", e)
+      }
+
+      // Add/update this student's emotion
+      roomEmotions[studentId] = {
+        id: studentId,
+        name: studentName,
+        emotion: emotion,
+        timestamp: new Date().toISOString(),
+        instructorId: instructorId, // Track which instructor this is for
+      }
+
+      // Store back in localStorage
+      localStorage.setItem(`room_${roomId}_emotions`, JSON.stringify(roomEmotions))
+      console.log(`Student ${studentName} (${studentId}) sent emotion ${emotion} to instructor ${instructorId}`)
+      return true
+    } catch (e) {
+      console.error("Error sending emotion:", e)
+      return false
+    }
+  },
+
+  // Get all student emotions for a specific instructor
+  getStudentEmotions: (roomId, instructorId) => {
+    try {
+      // Get all emotions for this room
+      const storedEmotions = localStorage.getItem(`room_${roomId}_emotions`)
+      if (!storedEmotions) return {}
+
+      const allEmotions = JSON.parse(storedEmotions)
+
+      // Filter to only include emotions for this instructor
+      const instructorEmotions = {}
+      Object.keys(allEmotions).forEach((studentId) => {
+        const emotion = allEmotions[studentId]
+        if (emotion.instructorId === instructorId) {
+          instructorEmotions[studentId] = emotion
+        }
+      })
+
+      return instructorEmotions
+    } catch (e) {
+      console.error("Error getting emotions:", e)
+      return {}
+    }
+  },
+
+  // Clear emotions for a room
+  clearRoomEmotions: (roomId) => {
+    try {
+      localStorage.removeItem(`room_${roomId}_emotions`)
+    } catch (e) {
+      console.error("Error clearing emotions:", e)
+    }
+  },
+}
+
 export default function MeetingRoom() {
   const { roomId } = useParams()
   const navigate = useNavigate()
@@ -20,12 +90,102 @@ export default function MeetingRoom() {
   const intervalRef = useRef(null)
   const retryTimeoutRef = useRef(null)
   const jitsiApiRef = useRef(null)
+  const pollingRef = useRef(null)
 
-  // New state for participants and roles
+  // User identification - now loaded from localStorage
   const [isHost, setIsHost] = useState(false)
+  const [userId, setUserId] = useState("")
+  const [displayName, setDisplayName] = useState("")
+  const [instructorId, setInstructorId] = useState("")
   const [participantEmotions, setParticipantEmotions] = useState({})
-  const [myId, setMyId] = useState(null)
-  const [displayName, setDisplayName] = useState(localStorage.getItem("displayName") || "Participant")
+
+  // For debugging - to see if messages are being sent/received
+  const [debugMessages, setDebugMessages] = useState([])
+  const [showDebug, setShowDebug] = useState(false)
+
+  // Load user data from localStorage
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId")
+    const storedDisplayName = localStorage.getItem("displayName") || "Participant"
+    const storedIsHost = localStorage.getItem("isHost") === "true"
+    const storedInstructorId = localStorage.getItem("instructorId")
+
+    setUserId(storedUserId || "")
+    setDisplayName(storedDisplayName)
+    setIsHost(storedIsHost)
+
+    if (storedIsHost) {
+      // If we're the host, our ID is the instructor ID
+      setInstructorId(storedUserId)
+    } else {
+      // If we're a student, use the stored instructor ID
+      setInstructorId(storedInstructorId || "")
+    }
+
+    addDebugMessage(
+      `Loaded user data - ID: ${storedUserId?.substring(0, 8)}..., Role: ${storedIsHost ? "Instructor" : "Student"}`,
+    )
+    if (!storedIsHost && storedInstructorId) {
+      addDebugMessage(`Instructor ID: ${storedInstructorId.substring(0, 8)}...`)
+    }
+  }, [])
+
+  // Function to add debug message
+  const addDebugMessage = (message) => {
+    console.log(`[DEBUG] ${message}`)
+    setDebugMessages((prev) => {
+      const newMessages = [
+        ...prev,
+        {
+          time: new Date().toLocaleTimeString(),
+          message,
+        },
+      ]
+      // Keep only the last 20 messages
+      if (newMessages.length > 20) {
+        return newMessages.slice(newMessages.length - 20)
+      }
+      return newMessages
+    })
+  }
+
+  // Mock data for testing when no students are connected
+  const useMockData = () => {
+    if (isHost && mockMode) {
+      const mockStudents = {
+        student1: {
+          id: "student1",
+          name: "John Smith",
+          emotion: "happy",
+          timestamp: new Date().toISOString(),
+          instructorId: userId,
+        },
+        student2: {
+          id: "student2",
+          name: "Maria Garcia",
+          emotion: "neutral",
+          timestamp: new Date().toISOString(),
+          instructorId: userId,
+        },
+        student3: {
+          id: "student3",
+          name: "Alex Johnson",
+          emotion: "sad",
+          timestamp: new Date().toISOString(),
+          instructorId: userId,
+        },
+        student4: {
+          id: "student4",
+          name: "Sarah Williams",
+          emotion: "surprised",
+          timestamp: new Date().toISOString(),
+          instructorId: userId,
+        },
+      }
+      setParticipantEmotions(mockStudents)
+      addDebugMessage("Added mock student data for testing")
+    }
+  }
 
   // Function to fetch emotion from the API
   const fetchEmotion = async (retryCount = 0) => {
@@ -35,14 +195,29 @@ export default function MeetingRoom() {
     setError(null)
 
     try {
+      // If in mock mode, generate random emotions
+      if (mockMode) {
+        const emotions = ["happy", "sad", "angry", "surprised", "neutral", "fearful", "disgusted"]
+        const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)]
+
+        // Simulate API response
+        setTimeout(() => {
+          handleEmotionDetected(randomEmotion)
+          addDebugMessage(`Mock emotion detected: ${randomEmotion}`)
+        }, 500)
+        return
+      }
+
       const response = await axios.get("https://facerecognition-qoya.onrender.com/api/emotion")
       console.log("API Response:", response.data)
+      addDebugMessage(`API Response: ${JSON.stringify(response.data)}`)
 
       // Check if the API returned an error
       if (response.data.error) {
         if (response.data.error === "Failed to access webcam") {
           setWebcamError(true)
           setError("Failed to access webcam. Please check your camera permissions.")
+          addDebugMessage("Webcam access error")
 
           // If we have fewer than 3 retries, try again after a delay
           if (retryCount < 3) {
@@ -61,6 +236,7 @@ export default function MeetingRoom() {
           }
         } else {
           setError(`API Error: ${response.data.error}`)
+          addDebugMessage(`API Error: ${response.data.error}`)
         }
         return
       }
@@ -73,45 +249,69 @@ export default function MeetingRoom() {
       // If we have an emotion property, use it
       if (response.data.emotion) {
         const detectedEmotion = response.data.emotion
-        setEmotion(detectedEmotion)
-
-        // Update emotion statistics
-        setEmotionStats((prevStats) => {
-          const newStats = { ...prevStats }
-          newStats[detectedEmotion] = (newStats[detectedEmotion] || 0) + 1
-          return newStats
-        })
-
-        // If we're not the host, broadcast our emotion to everyone
-        if (!isHost && jitsiApiRef.current && myId) {
-          // Use Jitsi's sendEndpointMessage to broadcast to all participants
-          try {
-            // Format the message with our ID, name, and emotion
-            const message = {
-              type: "emotion_update",
-              senderId: myId,
-              senderName: displayName,
-              emotion: detectedEmotion,
-              timestamp: new Date().toISOString(),
-            }
-
-            // Send the message to all participants using executeCommand
-            jitsiApiRef.current.executeCommand("sendEndpointMessage", "", message)
-            console.log("Sent emotion update to all participants:", message)
-          } catch (err) {
-            console.error("Error sending emotion update:", err)
-          }
-        }
+        handleEmotionDetected(detectedEmotion)
       } else {
         setError("No emotion detected in API response")
+        addDebugMessage("No emotion detected in API response")
       }
     } catch (err) {
       setError(`Error fetching emotion data: ${err.message}`)
       console.error("Emotion detection error:", err)
+      addDebugMessage(`Error fetching emotion: ${err.message}`)
     } finally {
       setLoading(false)
     }
   }
+
+  // Handle detected emotion
+  const handleEmotionDetected = (detectedEmotion) => {
+    setEmotion(detectedEmotion)
+
+    // Update emotion statistics
+    setEmotionStats((prevStats) => {
+      const newStats = { ...prevStats }
+      newStats[detectedEmotion] = (newStats[detectedEmotion] || 0) + 1
+      return newStats
+    })
+
+    // If we're a student, send our emotion to the instructor
+    if (!isHost && userId && displayName && instructorId) {
+      // Send emotion directly to the instructor using our messenger system
+      EMOTION_MESSENGER.sendEmotion(roomId, userId, displayName, instructorId, detectedEmotion)
+      addDebugMessage(`Sent emotion to instructor ${instructorId.substring(0, 8)}...: ${detectedEmotion}`)
+    }
+  }
+
+  // Poll for student emotions (for instructors)
+  useEffect(() => {
+    if (!isHost || !roomId || !userId) return
+
+    addDebugMessage(`Starting to poll for student emotions as instructor ${userId.substring(0, 8)}...`)
+
+    const pollEmotions = () => {
+      try {
+        const studentEmotions = EMOTION_MESSENGER.getStudentEmotions(roomId, userId)
+
+        // Update our state with the student emotions
+        if (Object.keys(studentEmotions).length > 0) {
+          setParticipantEmotions(studentEmotions)
+          addDebugMessage(`Retrieved ${Object.keys(studentEmotions).length} student emotions`)
+        }
+      } catch (err) {
+        console.error("Error polling student emotions:", err)
+      }
+    }
+
+    // Poll every 2 seconds
+    pollEmotions() // Initial poll
+    pollingRef.current = setInterval(pollEmotions, 2000)
+
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current)
+      }
+    }
+  }, [isHost, roomId, userId])
 
   // Start automatic emotion detection
   useEffect(() => {
@@ -132,7 +332,7 @@ export default function MeetingRoom() {
         clearTimeout(retryTimeoutRef.current)
       }
     }
-  }, [autoDetectActive, mockMode, detectionInterval, isHost, myId, displayName])
+  }, [autoDetectActive, mockMode, detectionInterval])
 
   // Update interval when detection interval changes
   const updateDetectionInterval = (seconds) => {
@@ -157,6 +357,9 @@ export default function MeetingRoom() {
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current)
     }
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current)
+    }
 
     // Show statistics before navigating
     setShowStats(true)
@@ -180,16 +383,6 @@ export default function MeetingRoom() {
     script.async = true
 
     script.onload = () => {
-      // Check if the user is the host (you can implement your own logic here)
-      // For simplicity, we'll use a URL parameter or localStorage
-      const isUserHost =
-        localStorage.getItem("isHost") === "true" || new URLSearchParams(window.location.search).get("host") === "true"
-      setIsHost(isUserHost)
-
-      // Get the display name from localStorage or use a default
-      const userDisplayName = localStorage.getItem("displayName") || "Participant"
-      setDisplayName(userDisplayName)
-
       const domain = "meet.jit.si"
       const options = {
         roomName: roomId,
@@ -199,8 +392,6 @@ export default function MeetingRoom() {
         configOverwrite: {
           startWithAudioMuted: false,
           startWithVideoMuted: false,
-          // Enable endpoint messaging
-          enableEndpointMessageTransport: true,
         },
         interfaceConfigOverwrite: {
           filmStripOnly: false,
@@ -235,9 +426,8 @@ export default function MeetingRoom() {
           ],
         },
         userInfo: {
-          displayName: userDisplayName,
-          // Add a role indicator in the display name
-          email: isUserHost ? "host@example.com" : "student@example.com",
+          displayName: displayName,
+          email: isHost ? "host@example.com" : "student@example.com",
         },
       }
 
@@ -247,81 +437,24 @@ export default function MeetingRoom() {
 
       // Set up event listeners
       api.addEventListeners({
-        // Get our participant ID when we join
+        // When we join the conference
         videoConferenceJoined: (event) => {
           console.log("I joined the conference!", event)
-          setMyId(event.id)
+          addDebugMessage(`Joined conference with ID: ${event.id}`)
 
           // If we're the host, set a special display name to identify us
-          if (isUserHost) {
-            api.executeCommand("displayName", `${userDisplayName} (Instructor)`)
-          }
-        },
-
-        // Track participants joining
-        participantJoined: (event) => {
-          console.log("Participant joined:", event)
-        },
-
-        // Track participants leaving
-        participantLeft: (event) => {
-          console.log("Participant left:", event)
-
-          // Remove their emotion data when they leave
-          setParticipantEmotions((prev) => {
-            const updated = { ...prev }
-            delete updated[event.id]
-            return updated
-          })
-        },
-
-        // Handle incoming messages (for emotion updates)
-        endpointTextMessageReceived: (event) => {
-          console.log("Received message:", event)
-
-          // Check if this is an emotion update message
-          if (event.data && event.data.type === "emotion_update") {
-            const { senderId, senderName, emotion, timestamp } = event.data
-
-            // If we're the host, update our participant emotions state
-            if (isHost) {
-              setParticipantEmotions((prev) => ({
-                ...prev,
-                [senderId]: {
-                  id: senderId,
-                  name: senderName,
-                  emotion: emotion,
-                  timestamp: timestamp,
-                },
-              }))
-
-              console.log(`Host received emotion update from ${senderName}: ${emotion}`)
-            }
+          if (isHost) {
+            api.executeCommand("displayName", `${displayName} (Instructor)`)
           }
         },
 
         // Handle display name changes
         displayNameChange: (event) => {
           console.log("Display name changed:", event)
+          addDebugMessage(`Display name changed to: ${event.displayname}`)
 
-          // Update our local state if it's our display name
-          if (event.id === myId) {
-            setDisplayName(event.displayname)
-          }
-
-          // Update participant name in our emotions tracking
-          setParticipantEmotions((prev) => {
-            if (prev[event.id]) {
-              return {
-                ...prev,
-                [event.id]: {
-                  ...prev[event.id],
-                  name: event.displayname,
-                },
-              }
-            }
-            return prev
-          })
+          // Update our local state
+          setDisplayName(event.displayname)
         },
       })
     }
@@ -339,11 +472,14 @@ export default function MeetingRoom() {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current)
       }
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current)
+      }
       if (jitsiApiRef.current) {
         jitsiApiRef.current.dispose()
       }
     }
-  }, [roomId])
+  }, [roomId, displayName, isHost])
 
   return (
     <div style={{ position: "relative", height: "100vh" }}>
@@ -381,6 +517,26 @@ export default function MeetingRoom() {
         </button>
       </div>
 
+      {/* User ID Display (for debugging) */}
+      {showDebug && (
+        <div
+          style={{
+            position: "absolute",
+            top: "80px",
+            left: "20px",
+            zIndex: 1000,
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            color: "white",
+            padding: "5px 10px",
+            borderRadius: "4px",
+            fontSize: "12px",
+          }}
+        >
+          {isHost ? "Instructor" : "Student"} ID: {userId.substring(0, 8)}...
+          {!isHost && instructorId && <div>Instructor ID: {instructorId.substring(0, 8)}...</div>}
+        </div>
+      )}
+
       {/* Emotion Detection UI */}
       <div
         style={{
@@ -392,7 +548,7 @@ export default function MeetingRoom() {
           borderRadius: "10px",
           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
           zIndex: 1000,
-          maxWidth: isHost ? "400px" : "350px",
+          maxWidth: isHost ? "450px" : "350px",
           maxHeight: "80vh",
           overflowY: "auto",
         }}
@@ -418,24 +574,72 @@ export default function MeetingRoom() {
             {autoDetectActive ? "Stop Auto Detection" : "Start Auto Detection"}
           </button>
 
-          {webcamError && (
-            <button
-              onClick={() => setMockMode(!mockMode)}
-              style={{
-                backgroundColor: mockMode ? "#2b8a3e" : "#868e96",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                padding: "8px 12px",
-                fontSize: "14px",
-                cursor: "pointer",
-                flex: "1",
-              }}
-            >
-              {mockMode ? "Mock Mode: ON" : "Use Mock Data"}
-            </button>
-          )}
+          <button
+            onClick={() => {
+              setMockMode(!mockMode)
+              if (!mockMode && isHost) {
+                // Add mock data when enabling mock mode as host
+                setTimeout(useMockData, 500)
+              }
+            }}
+            style={{
+              backgroundColor: mockMode ? "#2b8a3e" : "#868e96",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              padding: "8px 12px",
+              fontSize: "14px",
+              cursor: "pointer",
+              flex: "1",
+            }}
+          >
+            {mockMode ? "Mock Mode: ON" : "Use Mock Data"}
+          </button>
         </div>
+
+        {/* Debug Toggle */}
+        <div style={{ marginBottom: "10px", textAlign: "right" }}>
+          <button
+            onClick={() => setShowDebug(!showDebug)}
+            style={{
+              backgroundColor: "transparent",
+              color: "#666",
+              border: "none",
+              fontSize: "12px",
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >
+            {showDebug ? "Hide Debug" : "Show Debug"}
+          </button>
+        </div>
+
+        {/* Debug Messages */}
+        {showDebug && (
+          <div
+            style={{
+              marginBottom: "15px",
+              backgroundColor: "#f8f9fa",
+              border: "1px solid #dee2e6",
+              borderRadius: "4px",
+              padding: "8px",
+              maxHeight: "150px",
+              overflowY: "auto",
+              fontSize: "12px",
+              fontFamily: "monospace",
+            }}
+          >
+            {debugMessages.length === 0 ? (
+              <div style={{ color: "#666" }}>No debug messages yet</div>
+            ) : (
+              debugMessages.map((msg, i) => (
+                <div key={i} style={{ marginBottom: "4px" }}>
+                  <span style={{ color: "#666" }}>[{msg.time}]</span> {msg.message}
+                </div>
+              ))
+            )}
+          </div>
+        )}
 
         {/* Detection Interval Settings */}
         <div style={{ marginBottom: "15px" }}>
@@ -551,6 +755,21 @@ export default function MeetingRoom() {
                 <p style={{ margin: "8px 0 0 0", fontSize: "13px" }}>
                   Students' emotions will appear here once they join and their emotions are detected.
                 </p>
+                <button
+                  onClick={useMockData}
+                  style={{
+                    marginTop: "10px",
+                    backgroundColor: "#4dabf7",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    padding: "6px 12px",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Load Sample Data
+                </button>
               </div>
             ) : (
               <div
@@ -581,7 +800,7 @@ export default function MeetingRoom() {
                       color: "white",
                     }}
                   >
-                    Live Updates
+                    {mockMode ? "Mock Data" : "Live Updates"}
                   </span>
                 </div>
 
@@ -911,18 +1130,7 @@ function getEmotionFeedback(emotion) {
     unknown: "No emotion data available.",
   }
 
-  return (
-    <div
-      style={{
-        fontSize: "12px",
-        marginTop: "6px",
-        fontStyle: "italic",
-        color: "#495057",
-      }}
-    >
-      {feedback[emotion.toLowerCase()] || "No feedback available."}
-    </div>
-  )
+  return feedback[emotion.toLowerCase()] || "No feedback available."
 }
 
 // Helper function to generate class engagement summary
@@ -1026,5 +1234,3 @@ function getClassEngagementSummary(participants) {
     </div>
   )
 }
-
-

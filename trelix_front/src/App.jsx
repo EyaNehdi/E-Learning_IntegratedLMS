@@ -118,10 +118,9 @@ function App() {
           </Route>
           <Route path="/test" element={<MoodleCourses />} />
           <Route path="/test1" element={<Calendar />} />
-          <Route path="/meeting" element={<JoinRoom />} />
-          <Route path="/host" element={<HostSetup />} />
+       
           <Route path="/chat" element={<ChatComponent />} />
-          <Route path="/room/:roomId" element={<MeetingRoom />} />
+         
           {/* **************** */}
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
@@ -156,7 +155,7 @@ function App() {
               path="/edit-course/:courseId"
               element={<EditCourse />}
             />
-
+<Route path="/room/:roomId" element={<MeetingRoom />} />
 
             <Route path="/profile/classroom" element={<ClassroomPage />} />
 
@@ -171,7 +170,9 @@ function App() {
               <Route index element={<ProfileDetails />} />
               <Route path="details" element={<ProfileDetails />} />
               <Route path="test" element={<WordleGame />} />
-
+   <Route path="meeting" element={<JoinRoom />} />
+          <Route path="host" element={<HostSetup />} />
+           
               <Route path="geminichat" element={<GeminiChatbot />} />
               <Route path="dictionary" element={<Dictionary />} />
               <Route path="chat" element={<ChatComponent />} />

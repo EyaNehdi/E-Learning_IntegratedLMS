@@ -1,19 +1,84 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+
+// Shared database for room management
+const ROOM_DB = {
+  // Register a new room with instructor info
+  createRoom: (roomId, instructorId, instructorName) => {
+    try {
+      // Store room info in localStorage
+      localStorage.setItem(
+        `room_${roomId}_info`,
+        JSON.stringify({
+          instructorId: instructorId,
+          instructorName: instructorName,
+          createdAt: new Date().toISOString(),
+        }),
+      )
+      console.log(`Room ${roomId} created by instructor ${instructorName} (${instructorId})`)
+      return true
+    } catch (e) {
+      console.error("Error creating room:", e)
+      return false
+    }
+  },
+
+  // Check if a room exists
+  roomExists: (roomId) => {
+    try {
+      return localStorage.getItem(`room_${roomId}_info`) !== null
+    } catch (e) {
+      console.error("Error checking room:", e)
+      return false
+    }
+  },
+}
 
 export default function HostSetup() {
   const [roomId, setRoomId] = useState("")
   const [displayName, setDisplayName] = useState("")
+  const [userId, setUserId] = useState("")
+  const [error, setError] = useState("")
   const navigate = useNavigate()
+
+  // Generate or retrieve user ID on component mount
+  useEffect(() => {
+    // Check if we already have a user ID
+    const storedId = localStorage.getItem("userId")
+    if (storedId) {
+      setUserId(storedId)
+    } else {
+      // Generate a new unique ID
+      const newId = `instructor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      localStorage.setItem("userId", newId)
+      setUserId(newId)
+    }
+  }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
+    // Validate room ID
+    if (!roomId.trim()) {
+      setError("Please enter a valid room ID")
+      return
+    }
+
+    // Check if room already exists
+    if (ROOM_DB.roomExists(roomId)) {
+      setError("This room ID already exists. Please choose a different one.")
+      return
+    }
+
+    // Create the room with instructor info
+    ROOM_DB.createRoom(roomId, userId, displayName)
+
     // Save the host status and display name to localStorage
     localStorage.setItem("isHost", "true")
     localStorage.setItem("displayName", displayName)
+    localStorage.setItem("currentRoomId", roomId)
 
     // Navigate to the meeting room with the host parameter
     navigate(`/room/${roomId}?host=true`)
@@ -25,6 +90,7 @@ export default function HostSetup() {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">Create Meeting Room</h1>
           <p className="mt-2 text-gray-600">Set up a new meeting room as an instructor</p>
+          {userId && <p className="mt-2 text-xs text-gray-500">Instructor ID: {userId.substring(0, 8)}...</p>}
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -62,6 +128,8 @@ export default function HostSetup() {
               />
             </div>
           </div>
+
+          {error && <div className="text-red-500 text-sm p-2 bg-red-50 rounded-md">{error}</div>}
 
           <div>
             <button
