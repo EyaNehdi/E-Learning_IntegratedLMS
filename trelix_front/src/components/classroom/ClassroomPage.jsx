@@ -240,17 +240,12 @@ You don't have any courses in Google Classroom yet, or you don't have the necess
                     </div>
 
                     <div className="flex justify-between items-center mt-4 space-x-2">
-                      <a
-                        href="#"
-                        className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm transition-colors duration-200"
-                      >
-                        View course
-                      </a>
+                     
                       <a
                          href={`/classroom/courses/${course.id}`}
                         className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg text-sm transition-colors duration-200"
                       >
-                       View more.
+                       View more
                       </a>
                     </div>
                   </div>
@@ -284,17 +279,12 @@ You don't have any courses in Google Classroom yet, or you don't have the necess
                     </div>
 
                     <div className="flex justify-between items-center mt-4 space-x-2">
+                      
                       <a
-                        href="#"
-                        className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm transition-colors duration-200"
-                      >
-                        Voir le cours
-                      </a>
-                      <a
-                        href="#"
+                         href={`/classroom/courses/${course.id}`}
                         className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg text-sm transition-colors duration-200"
                       >
-                        Voir plus
+                       View more
                       </a>
                     </div>
                   </div>
