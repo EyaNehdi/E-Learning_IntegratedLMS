@@ -2,30 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-
-// Shared database for room management
-const ROOM_DB = {
-  // Check if a room exists
-  roomExists: (roomId) => {
-    try {
-      return localStorage.getItem(`room_${roomId}_info`) !== null
-    } catch (e) {
-      console.error("Error checking room:", e)
-      return false
-    }
-  },
-
-  // Get room info
-  getRoomInfo: (roomId) => {
-    try {
-      const roomInfo = localStorage.getItem(`room_${roomId}_info`)
-      return roomInfo ? JSON.parse(roomInfo) : null
-    } catch (e) {
-      console.error("Error getting room info:", e)
-      return null
-    }
-  },
-}
+import RoomService from "./room-service"
 
 export default function JoinRoom() {
   const [roomId, setRoomId] = useState("")
@@ -36,49 +13,58 @@ export default function JoinRoom() {
 
   // Generate or retrieve user ID on component mount
   useEffect(() => {
-    // Check if we already have a user ID
-    const storedId = localStorage.getItem("userId")
-    if (storedId) {
-      setUserId(storedId)
-    } else {
-      // Generate a new unique ID
-      const newId = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      localStorage.setItem("userId", newId)
-      setUserId(newId)
+    try {
+      // Check if we already have a user ID
+      const storedId = localStorage.getItem("userId")
+      if (storedId) {
+        setUserId(storedId)
+      } else {
+        // Generate a new unique ID
+        const newId = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        localStorage.setItem("userId", newId)
+        setUserId(newId)
+      }
+    } catch (err) {
+      console.error("Error generating user ID:", err)
     }
   }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    // Validate room ID
-    if (!roomId.trim()) {
-      setError("Please enter a valid room ID")
-      return
+    try {
+      // Validate room ID
+      if (!roomId.trim()) {
+        setError("Please enter a valid room ID")
+        return
+      }
+
+      // Check if room exists
+      if (!RoomService.roomExists(roomId)) {
+        setError("This room doesn't exist. Please check the room ID.")
+        return
+      }
+
+      // Get room info to verify instructor
+      const roomInfo = RoomService.getRoomInfo(roomId)
+      if (!roomInfo || !roomInfo.instructorId) {
+        setError("Invalid room information. Please try again.")
+        return
+      }
+
+      // Save the display name and room info to localStorage
+      localStorage.setItem("isHost", "false")
+      localStorage.setItem("displayName", displayName)
+      localStorage.setItem("currentRoomId", roomId)
+      localStorage.setItem("instructorId", roomInfo.instructorId)
+      localStorage.setItem("instructorName", roomInfo.instructorName || "Instructor")
+
+      // Navigate to the meeting room
+      navigate(`/room/${roomId}`)
+    } catch (err) {
+      console.error("Error joining room:", err)
+      setError("An unexpected error occurred. Please try again.")
     }
-
-    // Check if room exists
-    if (!ROOM_DB.roomExists(roomId)) {
-      setError("This room doesn't exist. Please check the room ID.")
-      return
-    }
-
-    // Get room info to verify instructor
-    const roomInfo = ROOM_DB.getRoomInfo(roomId)
-    if (!roomInfo || !roomInfo.instructorId) {
-      setError("Invalid room information. Please try again.")
-      return
-    }
-
-    // Save the display name and room info to localStorage
-    localStorage.setItem("isHost", "false")
-    localStorage.setItem("displayName", displayName)
-    localStorage.setItem("currentRoomId", roomId)
-    localStorage.setItem("instructorId", roomInfo.instructorId)
-    localStorage.setItem("instructorName", roomInfo.instructorName || "Instructor")
-
-    // Navigate to the meeting room
-    navigate(`/room/${roomId}`)
   }
 
   return (

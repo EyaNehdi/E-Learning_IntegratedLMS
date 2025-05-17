@@ -2,39 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-
-// Shared database for room management
-const ROOM_DB = {
-  // Register a new room with instructor info
-  createRoom: (roomId, instructorId, instructorName) => {
-    try {
-      // Store room info in localStorage
-      localStorage.setItem(
-        `room_${roomId}_info`,
-        JSON.stringify({
-          instructorId: instructorId,
-          instructorName: instructorName,
-          createdAt: new Date().toISOString(),
-        }),
-      )
-      console.log(`Room ${roomId} created by instructor ${instructorName} (${instructorId})`)
-      return true
-    } catch (e) {
-      console.error("Error creating room:", e)
-      return false
-    }
-  },
-
-  // Check if a room exists
-  roomExists: (roomId) => {
-    try {
-      return localStorage.getItem(`room_${roomId}_info`) !== null
-    } catch (e) {
-      console.error("Error checking room:", e)
-      return false
-    }
-  },
-}
+import RoomService from "./room-service"
 
 export default function HostSetup() {
   const [roomId, setRoomId] = useState("")
@@ -45,43 +13,57 @@ export default function HostSetup() {
 
   // Generate or retrieve user ID on component mount
   useEffect(() => {
-    // Check if we already have a user ID
-    const storedId = localStorage.getItem("userId")
-    if (storedId) {
-      setUserId(storedId)
-    } else {
-      // Generate a new unique ID
-      const newId = `instructor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      localStorage.setItem("userId", newId)
-      setUserId(newId)
+    try {
+      // Check if we already have a user ID
+      const storedId = localStorage.getItem("userId")
+      if (storedId) {
+        setUserId(storedId)
+      } else {
+        // Generate a new unique ID
+        const newId = `instructor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        localStorage.setItem("userId", newId)
+        setUserId(newId)
+      }
+    } catch (err) {
+      console.error("Error generating user ID:", err)
     }
   }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    // Validate room ID
-    if (!roomId.trim()) {
-      setError("Please enter a valid room ID")
-      return
+    try {
+      // Validate room ID
+      if (!roomId.trim()) {
+        setError("Please enter a valid room ID")
+        return
+      }
+
+      // Check if room already exists
+      if (RoomService.roomExists(roomId)) {
+        setError("This room ID already exists. Please choose a different one.")
+        return
+      }
+
+      // Create the room with instructor info
+      const result = RoomService.createRoom(roomId, userId, displayName)
+
+      if (!result.success) {
+        setError(result.error || "Failed to create room")
+        return
+      }
+
+      // Save the host status and display name to localStorage
+      localStorage.setItem("isHost", "true")
+      localStorage.setItem("displayName", displayName)
+      localStorage.setItem("currentRoomId", roomId)
+
+      // Navigate to the meeting room
+      navigate(`/room/${roomId}`)
+    } catch (err) {
+      console.error("Error creating room:", err)
+      setError("An unexpected error occurred. Please try again.")
     }
-
-    // Check if room already exists
-    if (ROOM_DB.roomExists(roomId)) {
-      setError("This room ID already exists. Please choose a different one.")
-      return
-    }
-
-    // Create the room with instructor info
-    ROOM_DB.createRoom(roomId, userId, displayName)
-
-    // Save the host status and display name to localStorage
-    localStorage.setItem("isHost", "true")
-    localStorage.setItem("displayName", displayName)
-    localStorage.setItem("currentRoomId", roomId)
-
-    // Navigate to the meeting room with the host parameter
-    navigate(`/room/${roomId}?host=true`)
   }
 
   return (
