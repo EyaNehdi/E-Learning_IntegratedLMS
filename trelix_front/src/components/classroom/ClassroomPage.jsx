@@ -129,9 +129,9 @@ const ClassroomPage = () => {
   if (!isAuthenticated) {
     return (
       <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-4">Accéder à vos cours Google Classroom</h1>
+        <h1 className="text-2xl font-bold mb-4">Access your Google Classroom courses</h1>
         <p className="mb-6 text-gray-600">
-          Connectez-vous avec votre compte Google pour voir vos cours Google Classroom.
+          Sign in with your Google account to view your Google Classroom courses
         </p>
         {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>}
         <button
@@ -144,7 +144,7 @@ const ClassroomPage = () => {
               d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
             />
           </svg>
-          <span>Se connecter avec Google</span>
+          <span>Log in with Google</span>
         </button>
       </div>
     );
@@ -153,7 +153,7 @@ const ClassroomPage = () => {
   return (
     <div className="container mx-auto p-6">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-gray-200 pb-4">
-        <h1 className="text-2xl font-bold">Mes cours Google Classroom</h1>
+        <h1 className="text-2xl font-bold">My Google Classroom courses.</h1>
         <div className="flex gap-3 items-center">
           <button
             onClick={toggleViewMode}
@@ -165,7 +165,7 @@ const ClassroomPage = () => {
             onClick={handleLogout}
             className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 min-w-[128px]"
           >
-            Se déconnecter
+            Log out
           </button>
         </div>
       </div>
@@ -180,14 +180,14 @@ const ClassroomPage = () => {
               rel="noopener noreferrer"
               className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg text-sm transition-colors duration-200"
             >
-              Configurer les testeurs ou vérifier
+              Configure testers or check
             </a>
           ) : (
             <button
               onClick={fetchCourses}
               className="bg-red-200 hover:bg-red-300 text-red-800 py-1 px-3 rounded-lg text-sm transition-colors duration-200"
             >
-              Réessayer
+              Try again.
             </button>
           )}
         </div>
@@ -195,23 +195,22 @@ const ClassroomPage = () => {
 
       {courses.length === 0 && !error ? (
         <div className="bg-gray-100 p-8 rounded-lg text-center">
-          <h2 className="text-xl font-semibold mb-2">Aucun cours trouvé</h2>
+          <h2 className="text-xl font-semibold mb-2">No courses found</h2>
           <p className="text-gray-600 mb-4">
-            Vous n'avez pas encore de cours dans Google Classroom ou vous n'avez pas les permissions nécessaires.
-          </p>
+You don't have any courses in Google Classroom yet, or you don't have the necessary permissions          </p>
           <a
             href="https://classroom.google.com"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg inline-block transition-colors duration-200"
           >
-            Créer un cours dans Google Classroom
+           Create a course in Google Classroom.
           </a>
         </div>
       ) : (
         <>
           <p className="text-gray-600 mb-4">
-            {courses.length} cours trouvés. Cliquez sur "Voir le cours" pour accéder aux détails.
+            {courses.length} courses found. Click 'View course' to access the details
           </p>
 
           {viewMode === "grid" ? (
@@ -228,7 +227,7 @@ const ClassroomPage = () => {
                         {course.section && <p className="text-gray-600">{course.section}</p>}
                       </div>
                       {course.courseState === "ARCHIVED" && (
-                        <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">Archivé</span>
+                        <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">Archived</span>
                       )}
                     </div>
 
@@ -236,7 +235,7 @@ const ClassroomPage = () => {
                       {course.description ? (
                         <p className="text-gray-700">{course.description}</p>
                       ) : (
-                        <p className="text-gray-500 italic">Aucune description disponible</p>
+                        <p className="text-gray-500 italic">No description available</p>
                       )}
                     </div>
 
@@ -245,13 +244,13 @@ const ClassroomPage = () => {
                         href="#"
                         className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm transition-colors duration-200"
                       >
-                        Voir le cours
+                        View course
                       </a>
                       <a
                         href="#"
                         className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg text-sm transition-colors duration-200"
                       >
-                        Voir plus
+                       View more.
                       </a>
                     </div>
                   </div>
