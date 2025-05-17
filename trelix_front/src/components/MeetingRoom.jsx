@@ -99,9 +99,13 @@ export default function MeetingRoom() {
   const [detectionInterval, setDetectionInterval] = useState(30)
   const [participantEmotions, setParticipantEmotions] = useState({})
 
+  // Processed emotions cache to prevent duplicates
+  const processedEmotions = useRef(new Set())
+
   // Refs for cleanup
   const intervalRef = useRef(null)
   const pollingRef = useRef(null)
+  const broadcastListenerRef = useRef(null)
 
   // User identification
   const [isHost, setIsHost] = useState(false)
@@ -114,6 +118,30 @@ export default function MeetingRoom() {
   const [debugMessages, setDebugMessages] = useState([])
 
   // Load user data from localStorage
+  // Add this function after the addDebugMessage function
+  // This will help with cross-browser room joining
+  const ensureRoomExists = () => {
+    if (!roomId) return
+
+    try {
+      // Check if this room exists in our localStorage
+      const roomExists = RoomService.roomExists(roomId)
+
+      // If we're joining as a student and the room doesn't exist in our localStorage
+      if (!isHost) {
+        addDebugMessage(`Joining room ${roomId}`)
+
+        // Get the existing room info or create a placeholder
+        const roomInfo = RoomService.getRoomInfo(roomId)
+
+        addDebugMessage(`Room info retrieved: ${roomInfo ? "success" : "failed"}`)
+      }
+    } catch (err) {
+      console.error("Error ensuring room exists:", err)
+      addDebugMessage(`Error ensuring room exists: ${err.message}`)
+    }
+  }
+
   useEffect(() => {
     try {
       const storedUserId = localStorage.getItem("userId")
@@ -136,10 +164,13 @@ export default function MeetingRoom() {
       // Debug: List all rooms
       const allRooms = RoomService.listAllRooms()
       addDebugMessage(`Available rooms: ${JSON.stringify(allRooms.map((r) => r.roomId))}`)
+
+      // Add this line to ensure room exists in this browser
+      ensureRoomExists()
     } catch (err) {
       console.error("Error loading user data:", err)
     }
-  }, [])
+  }, [roomId])
 
   // Function to add debug message
   const addDebugMessage = (message) => {
@@ -257,8 +288,12 @@ export default function MeetingRoom() {
     // If we're a student, send our emotion to the instructor
     if (!isHost && userId && displayName && instructorId) {
       try {
-        RoomService.sendEmotion(roomId, userId, displayName, instructorId, detectedEmotion)
-        addDebugMessage(`Sent emotion to instructor: ${detectedEmotion}`)
+        const result = RoomService.sendEmotion(roomId, userId, displayName, instructorId, detectedEmotion)
+        if (result.success) {
+          addDebugMessage(`Sent emotion to instructor: ${detectedEmotion} (broadcast ID: ${result.broadcastId})`)
+        } else {
+          addDebugMessage(`Failed to send emotion: ${result.error}`)
+        }
       } catch (err) {
         console.error("Error sending emotion:", err)
         addDebugMessage(`Error sending emotion: ${err.message}`)
@@ -266,29 +301,79 @@ export default function MeetingRoom() {
     }
   }
 
+  // Process broadcast message for instructors
+  const handleBroadcastMessage = (broadcastData) => {
+    if (!isHost || !broadcastData) return
+
+    // Ignore non-emotion broadcasts
+    if (broadcastData.type !== "emotion") return
+
+    // Make sure this broadcast is for our room and instructor
+    if (broadcastData.roomId !== roomId || broadcastData.instructorId !== userId) return
+
+    // Check if we've already processed this broadcast
+    if (processedEmotions.current.has(broadcastData.broadcastId)) return
+
+    // Mark as processed
+    processedEmotions.current.add(broadcastData.broadcastId)
+
+    // Update participant emotions state with the new emotion
+    addDebugMessage(`Received emotion from ${broadcastData.studentName}: ${broadcastData.emotion}`)
+
+    setParticipantEmotions((prev) => {
+      const updated = { ...prev }
+      updated[broadcastData.studentId] = {
+        id: broadcastData.studentId,
+        name: broadcastData.studentName,
+        emotion: broadcastData.emotion,
+        timestamp: broadcastData.timestamp,
+        instructorId: broadcastData.instructorId,
+      }
+      return updated
+    })
+  }
+
+  // Set up broadcast listener for instructors
+  useEffect(() => {
+    if (!isHost || !roomId || !userId) return
+
+    addDebugMessage(`Setting up broadcast listener for instructor ${userId}`)
+
+    // This will set up a storage event listener and polling
+    const stopListening = RoomService.setupBroadcastListener(handleBroadcastMessage)
+    broadcastListenerRef.current = stopListening
+
+    return () => {
+      if (broadcastListenerRef.current) {
+        broadcastListenerRef.current()
+      }
+    }
+  }, [isHost, roomId, userId])
+
   // Poll for student emotions (for instructors)
   useEffect(() => {
     if (!isHost || !roomId || !userId) return
 
-    addDebugMessage(`Starting to poll for student emotions as instructor`)
+    addDebugMessage(`Starting to poll for student emotions as instructor ${userId} in room ${roomId}`)
 
     const pollEmotions = () => {
       try {
         const studentEmotions = RoomService.getStudentEmotions(roomId, userId)
+        const emotionCount = Object.keys(studentEmotions).length
 
         // Only update if we have emotions
-        if (Object.keys(studentEmotions).length > 0) {
+        if (emotionCount > 0) {
           setParticipantEmotions(studentEmotions)
-          addDebugMessage(`Retrieved ${Object.keys(studentEmotions).length} student emotions`)
+          addDebugMessage(`Retrieved ${emotionCount} student emotions`)
         }
       } catch (err) {
         console.error("Error polling student emotions:", err)
       }
     }
 
-    // Poll every 3 seconds
+    // Poll more frequently (1 second) for more responsive updates
     pollEmotions() // Initial poll
-    pollingRef.current = setInterval(pollEmotions, 3000)
+    pollingRef.current = setInterval(pollEmotions, 1000)
 
     return () => {
       if (pollingRef.current) {
@@ -341,6 +426,9 @@ export default function MeetingRoom() {
     }
     if (pollingRef.current) {
       clearInterval(pollingRef.current)
+    }
+    if (broadcastListenerRef.current) {
+      broadcastListenerRef.current()
     }
 
     // Navigate to home

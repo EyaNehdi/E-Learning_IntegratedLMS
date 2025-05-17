@@ -9,6 +9,7 @@ export default function HostSetup() {
   const [displayName, setDisplayName] = useState("")
   const [userId, setUserId] = useState("")
   const [error, setError] = useState("")
+  const [isClearing, setIsClearing] = useState(false)
   const navigate = useNavigate()
 
   // Generate or retrieve user ID on component mount
@@ -39,12 +40,6 @@ export default function HostSetup() {
         return
       }
 
-      // Check if room already exists
-      if (RoomService.roomExists(roomId)) {
-        setError("This room ID already exists. Please choose a different one.")
-        return
-      }
-
       // Create the room with instructor info
       const result = RoomService.createRoom(roomId, userId, displayName)
 
@@ -63,6 +58,22 @@ export default function HostSetup() {
     } catch (err) {
       console.error("Error creating room:", err)
       setError("An unexpected error occurred. Please try again.")
+    }
+  }
+
+  const clearAllRoomData = () => {
+    setIsClearing(true)
+    try {
+      const result = RoomService.clearAllRoomData()
+      if (result.success) {
+        setError(`Successfully cleared ${result.count} room items. You can now create a new room.`)
+      } else {
+        setError(`Failed to clear room data: ${result.error}`)
+      }
+    } catch (err) {
+      setError(`Error clearing room data: ${err.message}`)
+    } finally {
+      setIsClearing(false)
     }
   }
 
@@ -122,6 +133,18 @@ export default function HostSetup() {
             </button>
           </div>
         </form>
+
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <p className="text-sm text-gray-600 mb-2">Having trouble creating a room?</p>
+          <button
+            onClick={clearAllRoomData}
+            disabled={isClearing}
+            className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            {isClearing ? "Clearing..." : "Clear All Room Data"}
+          </button>
+          <p className="mt-1 text-xs text-gray-500">This will remove all stored room data from this browser.</p>
+        </div>
 
         <div className="mt-6">
           <p className="text-center text-sm text-gray-600">

@@ -29,6 +29,7 @@ export default function JoinRoom() {
     }
   }, [])
 
+  // Modify the handleSubmit function to be more permissive with room checking
   const handleSubmit = (e) => {
     e.preventDefault()
 
@@ -39,15 +40,13 @@ export default function JoinRoom() {
         return
       }
 
-      // Check if room exists
-      if (!RoomService.roomExists(roomId)) {
-        setError("This room doesn't exist. Please check the room ID.")
-        return
-      }
+      // Check if room exists - but we'll be more permissive now
+      // We'll attempt to join even if the room isn't found in localStorage
+      const roomExists = RoomService.roomExists(roomId)
 
       // Get room info to verify instructor
       const roomInfo = RoomService.getRoomInfo(roomId)
-      if (!roomInfo || !roomInfo.instructorId) {
+      if (!roomInfo) {
         setError("Invalid room information. Please try again.")
         return
       }
@@ -56,7 +55,7 @@ export default function JoinRoom() {
       localStorage.setItem("isHost", "false")
       localStorage.setItem("displayName", displayName)
       localStorage.setItem("currentRoomId", roomId)
-      localStorage.setItem("instructorId", roomInfo.instructorId)
+      localStorage.setItem("instructorId", roomInfo.instructorId || "unknown_instructor")
       localStorage.setItem("instructorName", roomInfo.instructorName || "Instructor")
 
       // Navigate to the meeting room
