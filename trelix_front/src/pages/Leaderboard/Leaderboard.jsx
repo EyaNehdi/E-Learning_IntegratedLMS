@@ -29,6 +29,8 @@ function Leaderboard() {
           const timeLeft = Math.max((nextReset - now) / 1000, 0);
           setCountdown(timeLeft);
         }
+      
+      
       }
       setLoading(false);
     } catch (error) {
