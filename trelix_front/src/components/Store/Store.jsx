@@ -1,10 +1,9 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Coins } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
+import { getRedirectSlug } from "../../utils/redirectSlug";
 
 function Store() {
   const navigate = useNavigate();
@@ -16,13 +15,22 @@ function Store() {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
   const [redirecting, setRedirecting] = useState(false);
+  const [postPaymentLoading, setPostPaymentLoading] = useState(false);
+  const [purchaseType, setPurchaseType] = useState("topup"); // default is topup
 
-  // Verify session after redirect
+  useEffect(() => {
+    const slug = getRedirectSlug();
+    if (slug && typeof slug === "string" && slug.trim() !== "") {
+      setPurchaseType("course");
+    } else {
+      setPurchaseType("topup");
+    }
+  }, []);
+
   useEffect(() => {
     const sessionId = new URLSearchParams(location.search).get("session_id");
     if (sessionId) {
-      console.log("Verifying session:", sessionId);
-      console.log("user:", user);
+      setPostPaymentLoading(true);
       const verifySession = async () => {
         try {
           const response = await axios.get(
@@ -33,11 +41,20 @@ function Store() {
               withCredentials: true,
             }
           );
-          console.log("Session verification response:", response.data);
           setMessage(response.data.message || "Payment successful!");
-          navigate("/store", { replace: true }); // Clear session_id from URL
-          await checkAuth(); // Refresh user data to update balance
-          console.log("User balance updated:", user.balance);
+          await checkAuth();
+          const waitForUser = () =>
+            new Promise((resolve) => {
+              const interval = setInterval(() => {
+                const user = useAuthStore.getState().user;
+                if (user) {
+                  clearInterval(interval);
+                  resolve(user);
+                }
+              }, 100);
+            });
+          await waitForUser();
+          navigate("/store", { replace: true });
         } catch (err) {
           console.error("Session verification failed:", err);
           setMessage(
@@ -52,7 +69,6 @@ function Store() {
 
   // Fetch packs
   useEffect(() => {
-    console.log("fetchPacks useEffect triggered");
     const fetchPacks = async () => {
       try {
         setLoading(true);
@@ -62,9 +78,7 @@ function Store() {
             withCredentials: true,
           }
         );
-        console.log("Fetched packs:", response.data);
         const activePacks = response.data.filter((pack) => pack.isActive);
-        console.log("Active packs:", activePacks);
         setPacks(activePacks);
         setError(null);
       } catch (err) {
@@ -80,13 +94,11 @@ function Store() {
 
   const handlePackClick = async (pack) => {
     if (!isAuthenticated) {
-      console.log("User not authenticated, redirecting to login");
       setMessage("Please log in to proceed with the purchase.");
       navigate("/login");
       return;
     }
     if (pack.isActive && !redirecting) {
-      console.log("Initiating checkout for pack:", pack);
       setRedirecting(true);
       setMessage("");
       try {
@@ -95,16 +107,14 @@ function Store() {
           {
             packId: pack._id,
             userId: user._id,
+            type: purchaseType,
           },
           {
             withCredentials: true,
             headers: { "Content-Type": "application/json" },
           }
         );
-        console.log("Checkout session response:", response.data);
         if (response.data.url) {
-          console.log(response.data.url);
-
           window.location.href = response.data.url;
         } else {
           throw new Error("No checkout URL returned");
@@ -120,15 +130,18 @@ function Store() {
     }
   };
 
-  console.log("Store component rendered, state:", {
-    loading,
-    error,
-    packs: packs.length,
-    message,
-    redirecting,
-    isAuthenticated,
-    userBalance: user?.balance,
-  });
+  if (postPaymentLoading) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-700 dark:text-gray-300 text-lg font-medium">
+            Updating your balance and redirecting...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

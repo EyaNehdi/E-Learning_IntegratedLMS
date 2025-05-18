@@ -46,8 +46,6 @@ import ListBadges from "./components/Admin/ListBadges";
 
 import ModifyPreference from "./components/Student/ModifyPreference.jsx";
 
-
-
 import axios from "axios";
 
 import StatPreference from "./components/Student/preference-statistics";
@@ -94,13 +92,12 @@ import ViewUser from "./components/Admin/ViewUser.jsx";
 import QuizzAdd from "./components/Admin/QuizzAdd.jsx";
 import CoursesWizard from "./components/Instructor/CoursesWizard.jsx";
 import HostSetup from "./components/HostSetup.jsx";
+import PostPayment from "./pages/PostPayment.jsx";
 
 function App() {
   return (
     <Router>
       <div>
-
-
         <Routes>
           {/* **************** */}
           {/* Public routes */}
@@ -114,7 +111,6 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-
           </Route>
           <Route path="/test" element={<MoodleCourses />} />
           <Route path="/test1" element={<Calendar />} />
@@ -152,11 +148,7 @@ function App() {
             <Route path="module" element={<Module />} />
             <Route path="achievements" element={<Achievements />} />
 
-            <Route
-              path="/edit-course/:courseId"
-              element={<EditCourse />}
-            />
-
+            <Route path="/edit-course/:courseId" element={<EditCourse />} />
 
             <Route path="/profile/classroom" element={<ClassroomPage />} />
 
@@ -165,8 +157,8 @@ function App() {
               element={<CourseDetailsPage />}
             />
 
-
             <Route path="/store" element={<Store />} />
+            <Route path="/payment/success" element={<PostPayment />} />
             <Route path="/profile" element={<ProfilePage />}>
               <Route index element={<ProfileDetails />} />
               <Route path="details" element={<ProfileDetails />} />
@@ -177,14 +169,8 @@ function App() {
               <Route path="chat" element={<ChatComponent />} />
               <Route path="meeting" element={<JoinRoom />} />
               <Route path="preference" element={<Preference />} />
-              <Route
-                path="modify-preference"
-                element={<ModifyPreference />}
-              />
-              <Route
-                path="preferencestat"
-                element={<StatPreference />}
-              />
+              <Route path="modify-preference" element={<ModifyPreference />} />
+              <Route path="preferencestat" element={<StatPreference />} />
               <Route
                 path="intelligent-courses"
                 element={<IntelligentCourses />}

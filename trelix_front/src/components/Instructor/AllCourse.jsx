@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
@@ -15,6 +13,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import "./stylecontent.css";
+import toast from "react-hot-toast";
+import { setRedirectSlug } from "../../utils/redirectSlug";
 
 const MAX = 2000;
 const MIN = 0;
@@ -60,9 +60,9 @@ function Allcourse() {
   const navigate = useNavigate();
   const { checkAuth, user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
-
   // Get userId from auth store
   const userId = user && user._id ? user._id : null;
+  const checkedAccessRef = useRef(new Set());
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -71,7 +71,6 @@ function Allcourse() {
         const response = await axios.get(
           `${import.meta.env.VITE_API_PROXY}/course/courses`
         );
-        console.log("✅ [AllCourse Init] Fetched courses:", response.data);
         setCourses(response.data);
         setFilteredCourses(response.data);
 
@@ -109,55 +108,45 @@ function Allcourse() {
   }, []);
 
   useEffect(() => {
-    const checkCoursesAccess = async () => {
-  if (!courses.length) return;
+    const checkAccessForPaginatedCourses = async () => {
+      if (!paginatedCourses.length) return;
+      const courseIdsToCheck = paginatedCourses
+        .map((c) => c._id)
+        .filter((id) => !checkedAccessRef.current.has(id));
 
-  const accessResults = await Promise.allSettled(
-    courses.map(course =>
-      axios.get(
-        `${import.meta.env.VITE_API_PROXY}/purchases/access/${course._id}`,
-        { withCredentials: true }
-      )
-    )
-  );
+      if (courseIdsToCheck.length === 0) return;
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_PROXY}/purchases/access/bulk`,
+          { courseIds: paginatedCourses.map((c) => c._id), userId: userId },
+          { withCredentials: true }
+        );
+        courseIdsToCheck.forEach((id) => checkedAccessRef.current.add(id));
+        setCourseAccess((prev) => ({
+          ...prev,
+          ...response.data.access,
+        }));
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const access = {};
-  accessResults.forEach((result, index) => {
-    const courseId = courses[index]._id;
-    if (result.status === 'fulfilled') {
-      access[courseId] = result.value.data.hasAccess;
-    } else {
-      console.error(`Error checking access for course ${courseId}:`, result.reason);
-      access[courseId] = false;
-    }
-  });
-
-  setCourseAccess(access);
-  setIsLoading(false);
-};
-
-
-    checkCoursesAccess();
-  }, [courses]);
+    checkAccessForPaginatedCourses();
+  }, [paginatedCourses]);
 
   useEffect(() => {
     let filtered = courses;
 
     if (showingRecommendations && recommendations.length > 0) {
-      console.log("📦 Filtered by recommendations:", filtered); // ✅
-
-      // Assume recommendations contain courseId
       const recommendationIds = recommendations.map((rec) => rec.title);
-      console.log("Recommendation titles:", recommendationIds);
 
       filtered = filtered.filter((course) =>
         recommendationIds.includes(course.title)
       );
-      console.log("Filtered courses by recommendations:", filtered);
 
-      // If no courses match recommendations, show a message and revert to all courses
       if (filtered.length === 0) {
-        console.log("No matching courses found for recommendations");
         Swal.fire({
           icon: "info",
           title: "No Matching Courses",
@@ -205,7 +194,6 @@ function Allcourse() {
           (a, b) => (a.likes || 0) - (b.likes || 0)
         );
       }
-      console.log("📦 Filtered by UI filters:", filtered); // ✅
     }
 
     setFilteredCourses(filtered);
@@ -219,8 +207,8 @@ function Allcourse() {
     popularityFilter,
     showingRecommendations,
     recommendations,
-    accessFilter, // Add accessFilter to dependency array
-    courseAccess, // Add courseAccess to dependency array
+    accessFilter,
+    courseAccess,
   ]);
 
   useEffect(() => {
@@ -229,7 +217,6 @@ function Allcourse() {
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    console.log(`📃 Paginated (Page ${currentPage}/${totalPages}):`);
     setPaginatedCourses(filteredCourses.slice(startIndex, endIndex));
   }, [filteredCourses, currentPage, itemsPerPage]);
 
@@ -424,7 +411,12 @@ function Allcourse() {
           cancelButton: "swal-custom-cancel-button",
         },
       }).then((result) => {
-        if (result.isConfirmed) navigate("/store");
+        if (result.isConfirmed) {
+          setRedirectSlug(course.slug);
+          sessionStorage.setItem("showRedirectToast", "true");
+          toast.success("Redirecting to the store...");
+          navigate("/store");
+        }
       });
       return;
     }
@@ -471,7 +463,6 @@ function Allcourse() {
                 },
                 { withCredentials: true }
               );
-              console.log("Badge awarded:", badgeResponse.data);
               Swal.fire({
                 icon: "success",
                 title: "Achievement Unlocked!",
@@ -521,15 +512,12 @@ function Allcourse() {
         }
       );
 
-      console.log("Recommendations response:", response.data);
-
       if (
         response.data &&
         response.data.recommendations &&
         Array.isArray(response.data.recommendations)
       ) {
         setRecommendations(response.data.recommendations);
-        console.log("Set recommendations:", response.data.recommendations);
 
         if (response.data.recommendations.length === 0) {
           Swal.fire({
@@ -585,7 +573,6 @@ function Allcourse() {
           courseId: course._id,
           score: 0.95 - Math.random() * 0.2,
         }));
-      console.log("Using mock recommendations:", mockRecommendations);
       setRecommendations(mockRecommendations);
       setShowingRecommendations(true);
       setRecommendationsLoading(false);
@@ -647,13 +634,19 @@ function Allcourse() {
     navigate,
   ]);
   useEffect(() => {
-  if (userId && showingRecommendations && recommendations.length === 0) {
-    fetchRecommendations().catch((err) => {
-      console.error("Error fetching recommendations on mount:", err);
-      useMockRecommendations();
-    });
-  }
-}, [userId, showingRecommendations, recommendations.length, fetchRecommendations, useMockRecommendations]);
+    if (userId && showingRecommendations && recommendations.length === 0) {
+      fetchRecommendations().catch((err) => {
+        console.error("Error fetching recommendations on mount:", err);
+        useMockRecommendations();
+      });
+    }
+  }, [
+    userId,
+    showingRecommendations,
+    recommendations.length,
+    fetchRecommendations,
+    useMockRecommendations,
+  ]);
 
   useEffect(() => {
     // Inject custom SweetAlert2 styles
@@ -859,31 +852,29 @@ function Allcourse() {
         <div className="container">
           <div className="row">
             <div className="col-lg-4">
-
-
               <aside className="sidebar sidebar-spacing">
-                              <div className="widget">
-                <h3 className="widget-title">Statistics</h3>
-                <div className="widget-inner text-center">
-  <a
-    href="/chart"
-    className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
-    style={{ 
-      fontSize: "18px", 
-      padding: "6px 6px", 
-      minHeight: "60px",
-      minWidth: "12px",
-      transform: "scale(0.95)"
-    }}
-  >
-    <i 
-      className="feather-icon icon-bar-chart" 
-      style={{ fontSize: "14px" }}
-    />
-    <span>Explore Statistics</span>
-  </a>
-</div>
-              </div>
+                <div className="widget">
+                  <h3 className="widget-title">Statistics</h3>
+                  <div className="widget-inner text-center">
+                    <a
+                      href="/chart"
+                      className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+                      style={{
+                        fontSize: "18px",
+                        padding: "6px 6px",
+                        minHeight: "60px",
+                        minWidth: "12px",
+                        transform: "scale(0.95)",
+                      }}
+                    >
+                      <i
+                        className="feather-icon icon-bar-chart"
+                        style={{ fontSize: "14px" }}
+                      />
+                      <span>Explore Statistics</span>
+                    </a>
+                  </div>
+                </div>
                 <div className="widget">
                   <h3 className="widget-title">Filter by Popularity</h3>
                   <div className="widget-inner">
