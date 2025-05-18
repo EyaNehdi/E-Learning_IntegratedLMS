@@ -6,25 +6,25 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { cloudinary } = require("../utils/cloudinary");
 
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: async (req, file) => {
-    let resourceType = "raw"; // default fallback
+    cloudinary: cloudinary,
+    params: async (req, file) => {
+        let resourceType = "raw"; // default fallback
 
-    if (file.mimetype.startsWith("image/")) {
-      resourceType = "image";
-    } else if (file.mimetype.startsWith("video/")) {
-      resourceType = "video";
-    } else if (file.mimetype === "application/pdf") {
-      resourceType = "raw"; // PDFs are not images or videos
-    }
+        if (file.mimetype.startsWith("image/")) {
+            resourceType = "image";
+        } else if (file.mimetype.startsWith("video/")) {
+            resourceType = "video";
+        } else if (file.mimetype === "application/pdf") {
+            resourceType = "raw"; // PDFs are not images or videos
+        }
 
-    return {
-      folder: "uploads",
-      format: file.mimetype.split("/")[1],
-      public_id: Date.now() + "-" + file.originalname,
-      resource_type: resourceType,
-    };
-  },
+        return {
+            folder: "uploads",
+            format: file.mimetype.split("/")[1],
+            public_id: Date.now() + "-" + file.originalname,
+            resource_type: resourceType,
+        };
+    },
 });
 
 
@@ -166,12 +166,16 @@ const getChaptersByCourse = async (req, res) => {
             cert.certificateId && cert.certificateId.courseId.equals(course._id)
         );
 
-        const chaptersWithCompletion = course.chapters?.map(chapter => ({
-            ...chapter,
-            isCompleted: user.completedChapters?.some(completedId =>
-                completedId?.equals(chapter._id)
-            ) ?? false
-        })) ?? [];
+        const chapters = course.chapters || [];
+
+        const chaptersWithCompletion = (course.chapters || [])
+            .filter(chapter => chapter && chapter._id)
+            .map(chapter => ({
+                ...chapter,
+                isCompleted: user.completedChapters?.some(completedId =>
+                    completedId?.equals(chapter._id)
+                ) ?? false
+            }));
 
         if (course.price > 0) {
 
@@ -190,7 +194,14 @@ const getChaptersByCourse = async (req, res) => {
                 });
             }
         }
-
+        if (!chapters.length) {
+            return res.status(200).json({
+                courseInfo: course,
+                chaptersWithCompletion: [],
+                certificateEarned: !!certificateForCourse,
+                warning: 'No chapters are currently available for this course.',
+            });
+        }
         res.status(200).json({
             courseInfo: course,
             chaptersWithCompletion,

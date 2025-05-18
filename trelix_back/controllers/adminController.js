@@ -256,7 +256,7 @@ const getProductById = async (req, res) => {
 // Admin adding a product to store with stripe
 const createProductWithStripe = async (req, res) => {
     const { name, description, price, coinAmount } = req.body;
-
+    console.log("Creating price with unit_amount:", price);
     try {
         // 1. Create Product on Stripe
         const stripeProduct = await stripe.products.create({
@@ -267,7 +267,7 @@ const createProductWithStripe = async (req, res) => {
 
         // 2. Create Price for that product on Stripe
         const stripePrice = await stripe.prices.create({
-            unit_amount: price * 100, // convert euros to cents
+            unit_amount: price,
             currency: 'eur',
             product: stripeProduct.id,
         });
@@ -300,7 +300,7 @@ const createProductWithStripe = async (req, res) => {
 const updateProductAndPrice = async (req, res) => {
     const { id } = req.params; // MongoDB product ID
 
-    const { name, description, price, coinAmoint } = req.body; // Price in cents from frontend
+    const { name, description, price, coinAmount } = req.body; // Price in cents from frontend
 
 
     try {

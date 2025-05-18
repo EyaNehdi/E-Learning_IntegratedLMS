@@ -1,11 +1,17 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import axios from "axios"
-import { useProfileStore } from "../../store/profileStore"
-import { Link, Outlet, useParams, useNavigate, useLocation } from "react-router-dom"
-import Swal from "sweetalert2"
-import "../Instructor/stylecontent.css"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useProfileStore } from "../../store/profileStore";
+import {
+  Link,
+  Outlet,
+  useParams,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+import Swal from "sweetalert2";
+import "../Instructor/stylecontent.css";
+import { setRedirectSlug } from "../../utils/redirectSlug";
+import toast from "react-hot-toast";
 
 const ListChapters = () => {
   const { slugCourse } = useParams()
@@ -64,7 +70,7 @@ const ListChapters = () => {
           title: "Access Denied",
           html: `
             <p>You need to purchase <b>${courseTitle}</b> to view its chapters.</p>
-            <p>Price: $${coursePrice} | Your balance: $${userBalance}</p>
+            <p>Price: &nbsp; 🪙${coursePrice} | Your balance: &nbsp; 🪙${userBalance}</p>
             ${
               canAfford
                 ? "<p>You have enough balance to purchase this course.</p>"
@@ -123,7 +129,10 @@ const ListChapters = () => {
             Swal.fire("Operation failed", "Please try again later.", "error")
           }
         } else if (result.isDenied) {
-          navigate("/store")
+          setRedirectSlug(slugCourse);
+          sessionStorage.setItem("showRedirectToast", "true");
+          toast.success("Redirecting to the store...");
+          navigate("/store");
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           navigate("/allcours")
         }
@@ -440,7 +449,9 @@ const ListChapters = () => {
       {/* Main content area with sidebar and content */}
 
       {!hasAccess ? (
-        <></>
+        <div className="flex justify-center items-center min-h-screen bg-white">
+          <div className="text-gray-600 text-lg">Checking access...</div>
+        </div>
       ) : (
         <div className="flex flex-1 overflow-hidden">
           {/* Sidebar - Chapter List */}
@@ -637,7 +648,9 @@ const ListChapters = () => {
                           <p className="text-lg mb-4">Select a chapter from the menu to start learning</p>
                           {chapters.length > 0 && (
                             <Link
+
                                to={`/chapters/${slugCourse}/content/${chapters[0]._id}`}
+
                               className="inline-flex items-center py-3.5 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-md hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm"
                             >
                               <svg
