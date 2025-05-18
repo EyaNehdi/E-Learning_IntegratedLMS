@@ -412,7 +412,40 @@ function Header() {
                   >
                     <i className="feather-icon icon-search" />
                   </a>
-
+                      <div>
+                        {user ? (
+                          <div className="d-none d-sm-flex flex-nowrap align-items-center">
+                            
+                            Welcome,{" "}
+                            <Tooltip
+                              title={
+                                <div>
+                                  <div>Trelix account ({user.role})</div>
+                                  <div>Email: {user?.email}</div>
+                                  <div>
+                                    Name: {user?.firstName} {user?.lastName}
+                                  </div>
+                                </div>
+                              }
+                              arrow
+                              placement="bottom"
+                            >
+                              <span
+                                className="text-nowrap"
+                                style={{
+                                  cursor: "pointer",
+                                  marginLeft: "4px",
+                                }}
+                              >
+                                {user?.firstName} {user?.lastName}{" "}
+                              </span>
+                            </Tooltip>
+                            
+                          </div>
+                        ) : (
+                          <></>
+                        )}
+                      </div>
                   {/* authenticated layout */}
                   {isAuthenticated ? (
                     <div className="d-flex justify-content-center align-items-center user-dropdown">
@@ -582,35 +615,15 @@ function Header() {
                               </ul>
                             </nav>
                           </div>
+
                         )}
+                         
                       </div>
-                      <div>
+
+                     <div>
                         {user ? (
                           <div className="d-none d-sm-flex flex-nowrap align-items-center">
-                            Welcome,{" "}
-                            <Tooltip
-                              title={
-                                <div>
-                                  <div>Trelix account ({user.role})</div>
-                                  <div>Email: {user?.email}</div>
-                                  <div>
-                                    Name: {user?.firstName} {user?.lastName}
-                                  </div>
-                                </div>
-                              }
-                              arrow
-                              placement="bottom"
-                            >
-                              <span
-                                className="text-nowrap"
-                                style={{
-                                  cursor: "pointer",
-                                  marginLeft: "4px",
-                                }}
-                              >
-                                {user?.firstName} {user?.lastName}{" "}
-                              </span>
-                            </Tooltip>
+                            
                             <span>&nbsp; 🪙 {user?.balance}</span>
                           </div>
                         ) : (

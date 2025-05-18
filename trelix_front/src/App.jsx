@@ -114,10 +114,9 @@ function App() {
           </Route>
           <Route path="/test" element={<MoodleCourses />} />
           <Route path="/test1" element={<Calendar />} />
-          <Route path="/meeting" element={<JoinRoom />} />
-          <Route path="/host" element={<HostSetup />} />
+       
           <Route path="/chat" element={<ChatComponent />} />
-          <Route path="/room/:roomId" element={<MeetingRoom />} />
+         
           {/* **************** */}
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
@@ -139,6 +138,10 @@ function App() {
             <Route path="/quiz" element={<QuizzLeaderboard />} />
             <Route path="/Classroom" element={<ClassroomPage />} />
             <Route
+              path="/classroom/courses/:courseId"
+              element={<CourseDetailsPage />}
+            />
+            <Route
               path="course-chapter/:slugCourse"
               element={<CourseChapter />}
             />
@@ -148,14 +151,16 @@ function App() {
             <Route path="module" element={<Module />} />
             <Route path="achievements" element={<Achievements />} />
 
-            <Route path="/edit-course/:courseId" element={<EditCourse />} />
+            <Route
+              path="/edit-course/:courseId"
+              element={<EditCourse />}
+            />
+            <Route path="/room/:roomId" element={<MeetingRoom />} />
+
 
             <Route path="/profile/classroom" element={<ClassroomPage />} />
 
-            <Route
-              path="/profile/classroom/courses/:courseId"
-              element={<CourseDetailsPage />}
-            />
+            
 
             <Route path="/store" element={<Store />} />
             <Route path="/payment/success" element={<PostPayment />} />
@@ -163,7 +168,9 @@ function App() {
               <Route index element={<ProfileDetails />} />
               <Route path="details" element={<ProfileDetails />} />
               <Route path="test" element={<WordleGame />} />
-
+   <Route path="meeting" element={<JoinRoom />} />
+          <Route path="host" element={<HostSetup />} />
+           
               <Route path="geminichat" element={<GeminiChatbot />} />
               <Route path="dictionary" element={<Dictionary />} />
               <Route path="chat" element={<ChatComponent />} />

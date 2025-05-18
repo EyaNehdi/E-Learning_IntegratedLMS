@@ -1,4 +1,4 @@
-
+"use client"
 
 import axios from "axios"
 import { useState, useEffect, useRef } from "react"
@@ -18,9 +18,229 @@ import {
   BookOpen,
   Calendar,
   Clock,
+  X,
 } from "lucide-react"
 import { CKEditor } from "@ckeditor/ckeditor5-react"
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
+
+// Button style component for consistent styling
+const ButtonStyle = {
+  primary: {
+    backgroundColor: "#0066ff",
+    color: "white",
+    borderRadius: "6px",
+    padding: "8px 16px",
+    fontWeight: "500",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "auto",
+    minWidth: "140px",
+    border: "none",
+    cursor: "pointer",
+    transition: "background-color 0.2s",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+  },
+  secondary: {
+    backgroundColor: "white",
+    color: "#333",
+    borderRadius: "6px",
+    padding: "8px 16px",
+    fontWeight: "500",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "auto",
+    minWidth: "140px",
+    border: "1px solid #ddd",
+    cursor: "pointer",
+    transition: "background-color 0.2s",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+  },
+  danger: {
+    backgroundColor: "#ff3b30",
+    color: "white",
+    borderRadius: "6px",
+    padding: "8px 16px",
+    fontWeight: "500",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "auto",
+    minWidth: "140px",
+    border: "none",
+    cursor: "pointer",
+    transition: "background-color 0.2s",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+  },
+  success: {
+    backgroundColor: "#34c759",
+    color: "white",
+    borderRadius: "6px",
+    padding: "8px 16px",
+    fontWeight: "500",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "auto",
+    minWidth: "140px",
+    border: "none",
+    cursor: "pointer",
+    transition: "background-color 0.2s",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+  },
+  small: {
+    padding: "6px 12px",
+    minWidth: "auto",
+    fontSize: "0.875rem",
+  },
+  disabled: {
+    opacity: 0.6,
+    cursor: "not-allowed",
+  },
+  iconButton: {
+    backgroundColor: "transparent",
+    color: "#0066ff",
+    borderRadius: "6px",
+    padding: "6px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "none",
+    cursor: "pointer",
+    transition: "background-color 0.2s",
+  },
+}
+
+// Module Modal Component
+function ModuleModal({ isOpen, onClose, onModuleAdded }) {
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
+  const [startDate, setStartDate] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const addModule = async (e) => {
+    e.preventDefault()
+
+    if (!name || !description || !startDate) {
+      alert("All fields are required.")
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/module/addmodule`, {
+        name, // Assurez-vous que ce champ correspond au schéma (name)
+        description, // Ce champ est correct
+        StartDate: startDate, // Modifié pour correspondre au schéma (StartDate au lieu de startDate)
+      })
+
+      if (response.status === 201) {
+        alert("Module added successfully!")
+        setName("")
+        setDescription("")
+        setStartDate("")
+        onModuleAdded() // Refresh the modules list
+        onClose() // Close the modal
+      } else {
+        alert("Failed to add module.")
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      alert(error.response?.data?.message || "Failed to add module.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white shadow-2xl rounded-3xl p-8 w-full max-w-lg relative">
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+          <X className="w-6 h-6" />
+        </button>
+
+        <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-8">
+          <h1 className="text-3xl font-bold text-center text-white mb-2">Add Module</h1>
+        </div>
+
+        <form onSubmit={addModule} className="space-y-6">
+          {/* Module Name */}
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">Module Name</label>
+            <input
+              onChange={(e) => setName(e.target.value)}
+              type="text"
+              name="name"
+              placeholder="Enter module name"
+              value={name}
+              className="w-full p-4 border border-gray-300 rounded-xl bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">Description</label>
+            <textarea
+              onChange={(e) => setDescription(e.target.value)}
+              name="description"
+              placeholder="Enter description"
+              value={description}
+              rows={4}
+              className="w-full p-4 border border-gray-300 rounded-xl bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            ></textarea>
+          </div>
+
+          {/* Creation Date */}
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">Creation Date</label>
+            <input
+              onChange={(e) => setStartDate(e.target.value)}
+              type="date"
+              name="startDate"
+              value={startDate}
+              className="w-full p-4 border border-gray-300 rounded-xl bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-start mt-4">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                backgroundColor: "#0066ff",
+                color: "white",
+                borderRadius: "6px",
+                padding: "8px 16px",
+                fontWeight: "500",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "auto",
+                minWidth: "140px",
+                opacity: isSubmitting ? 0.7 : 1,
+                cursor: isSubmitting ? "not-allowed" : "pointer",
+              }}
+            >
+              {isSubmitting ? (
+                "Adding..."
+              ) : (
+                <>
+                  <span style={{ marginRight: "4px", fontSize: "18px" }}>+</span>
+                  <span>Add Module</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
 
 function CoursesWizard() {
   // Navigation
@@ -34,6 +254,7 @@ function CoursesWizard() {
   const [courseSlug, setCourseSlug] = useState("")
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showModuleModal, setShowModuleModal] = useState(false)
 
   // Course form state
   const [title, setTitle] = useState("")
@@ -112,9 +333,6 @@ function CoursesWizard() {
     fetchModules()
   }, [])
 
-  // Add default dates when the exam step is loaded
-  // Add this inside the useEffect section, after the fetchModules useEffect
-
   // Set default dates when moving to exam step
   useEffect(() => {
     if (currentStep === 3 && !startDate && !endDate) {
@@ -171,7 +389,7 @@ function CoursesWizard() {
   const fetchModules = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/module`)
-      console.log("Modules récupérés:", response.data)
+      console.log("Modules retrieved:", response.data)
 
       if (response.data.length > 0) {
         const firstModule = response.data[0]
@@ -182,9 +400,9 @@ function CoursesWizard() {
 
       setModules(response.data)
     } catch (error) {
-      console.error("Erreur lors de la récupération des modules:", error)
+      console.error("Error retrieving modules:", error)
       setMessage({
-        text: "Erreur lors de la récupération des modules",
+        text: "Error retrieving modules",
         type: "error",
       })
     }
@@ -220,49 +438,49 @@ function CoursesWizard() {
 
     // Check title
     if (!title) {
-      newErrors.title = "Le titre est requis"
+      newErrors.title = "Title is required"
       isValid = false
     } else if (!validateMinAlphaChars(title)) {
-      newErrors.title = "Le titre doit contenir au moins 5 caractères alphabétiques"
+      newErrors.title = "Title must contain at least 5 alphabetic characters"
       isValid = false
     }
 
     // Check description
     if (!description) {
-      newErrors.description = "La description est requise"
+      newErrors.description = "Description is required"
       isValid = false
     } else if (!validateMinAlphaChars(description)) {
-      newErrors.description = "La description doit contenir au moins 10 caractères alphabétiques"
+      newErrors.description = "Description must contain at least 10 alphabetic characters"
       isValid = false
     }
 
     // Check price
     if (!price) {
-      newErrors.price = "Le prix est requis"
+      newErrors.price = "Price is required"
       isValid = false
     }
 
     // Check level
     if (!level) {
-      newErrors.level = "Le niveau est requis"
+      newErrors.level = "Level is required"
       isValid = false
     }
 
     // Check category
     if (!categorie) {
-      newErrors.categorie = "La catégorie est requise"
+      newErrors.categorie = "Category is required"
       isValid = false
     }
 
     // Check resource type
     if (!typeRessource) {
-      newErrors.typeRessource = "Le type du cours est requis"
+      newErrors.typeRessource = "Course type is required"
       isValid = false
     }
 
     // Check modules
     if (selectedModules.length === 0) {
-      newErrors.modules = "Veuillez sélectionner au moins un module"
+      newErrors.modules = "Please select at least one module"
       isValid = false
     }
 
@@ -345,7 +563,7 @@ function CoursesWizard() {
 
     if (!validateForm()) {
       setMessage({
-        text: "Veuillez corriger les erreurs dans le formulaire",
+        text: "Please correct the errors in the form",
         type: "error",
       })
       setIsSubmitting(false)
@@ -365,11 +583,11 @@ function CoursesWizard() {
         userId: user._id,
       })
 
-      console.log("Réponse du serveur:", response.data)
+      console.log("Server response:", response.data)
 
       if (response.status === 201 || response.status === 200) {
         setMessage({
-          text: "Cours ajouté avec succès ! Maintenant, ajoutez des chapitres.",
+          text: "Course added successfully! Now, add chapters.",
           type: "success",
         })
 
@@ -382,9 +600,9 @@ function CoursesWizard() {
         setCurrentStep(2)
       }
     } catch (error) {
-      console.error("Erreur:", error)
+      console.error("Error:", error)
       setMessage({
-        text: error.response?.data?.message || "Erreur lors de l'ajout du cours.",
+        text: error.response?.data?.message || "Error adding course.",
         type: "error",
       })
     } finally {
@@ -464,14 +682,14 @@ function CoursesWizard() {
     const invalidChapters = chapters.filter((chapter) => !chapter.title || !chapter.description)
     if (invalidChapters.length > 0) {
       setMessage({
-        text: "Tous les chapitres doivent avoir un titre et une description",
+        text: "All chapters must have a title and description",
         type: "error",
       })
       return
     }
 
     setChapterSubmitting(true)
-    setMessage({ text: "Ajout des chapitres en cours...", type: "info" })
+    setMessage({ text: "Adding chapters...", type: "info" })
 
     try {
       // Submit each chapter
@@ -500,16 +718,16 @@ function CoursesWizard() {
       }
 
       setMessage({
-        text: "Chapitres ajoutés avec succès ! Maintenant, créez un examen pour ce cours.",
+        text: "Chapters added successfully! Now, create an exam for this course.",
         type: "success",
       })
 
       // Move to the next step
       setCurrentStep(3)
     } catch (error) {
-      console.error("Erreur lors de l'ajout des chapitres:", error)
+      console.error("Error adding chapters:", error)
       setMessage({
-        text: error.response?.data?.message || "Erreur lors de l'ajout des chapitres.",
+        text: error.response?.data?.message || "Error adding chapters.",
         type: "error",
       })
     } finally {
@@ -568,7 +786,7 @@ function CoursesWizard() {
     // Validate exam
     if (!examTitle) {
       setMessage({
-        text: "Le titre de l'examen est requis",
+        text: "Exam title is required",
         type: "error",
       })
       return
@@ -576,7 +794,7 @@ function CoursesWizard() {
 
     if (questions.length === 0) {
       setMessage({
-        text: "Veuillez ajouter au moins une question à l'examen",
+        text: "Please add at least one question to the exam",
         type: "error",
       })
       return
@@ -586,7 +804,7 @@ function CoursesWizard() {
     const incompleteQuestion = questions.find((q) => !q.question)
     if (incompleteQuestion) {
       setMessage({
-        text: "Veuillez compléter toutes les questions",
+        text: "Please complete all questions",
         type: "error",
       })
       return
@@ -595,7 +813,7 @@ function CoursesWizard() {
     // Validate required dates
     if (!startDate) {
       setMessage({
-        text: "La date de début est requise",
+        text: "Start date is required",
         type: "error",
       })
       return
@@ -603,20 +821,20 @@ function CoursesWizard() {
 
     if (!endDate) {
       setMessage({
-        text: "La date de fin est requise",
+        text: "End date is required",
         type: "error",
       })
       return
     }
 
     setExamSubmitting(true)
-    setMessage({ text: "Ajout de l'examen en cours...", type: "info" })
+    setMessage({ text: "Adding exam...", type: "info" })
 
     try {
       // Prepare exam data
       const examData = {
         title: examTitle,
-        description: examDescription || "Examen pour le cours " + title, // Provide default description if empty
+        description: examDescription || "Exam for course " + title, // Provide default description if empty
         duration,
         passingScore,
         startDate,
@@ -641,7 +859,7 @@ function CoursesWizard() {
         })
 
         setMessage({
-          text: "Examen ajouté avec succès ! Le processus de création du cours est terminé.",
+          text: "Exam added successfully! The course creation process is complete.",
           type: "success",
         })
 
@@ -652,11 +870,9 @@ function CoursesWizard() {
         }, 3000)
       }
     } catch (error) {
-      console.error("Erreur lors de l'ajout de l'examen:", error)
+      console.error("Error adding exam:", error)
       setMessage({
-        text:
-          error.response?.data?.message ||
-          "Erreur lors de l'ajout de l'examen. Assurez-vous que tous les champs requis sont remplis.",
+        text: error.response?.data?.message || "Error adding exam. Make sure all required fields are filled.",
         type: "error",
       })
     } finally {
@@ -681,6 +897,21 @@ function CoursesWizard() {
     }, 2500)
   }
 
+  // Handle opening the module modal
+  const handleOpenModuleModal = () => {
+    setShowModuleModal(true)
+  }
+
+  // Handle closing the module modal
+  const handleCloseModuleModal = () => {
+    setShowModuleModal(false)
+  }
+
+  // Handle module added
+  const handleModuleAdded = () => {
+    fetchModules() // Refresh the modules list
+  }
+
   // Render step indicators
   const renderStepIndicators = () => {
     return (
@@ -691,7 +922,7 @@ function CoursesWizard() {
           >
             {currentStep > 1 ? <CheckCircle2 className="h-5 w-5" /> : 1}
           </div>
-          <span className="ml-2 font-medium">Cours</span>
+          <span className="ml-2 font-medium">Course</span>
         </div>
 
         <div className={`w-12 h-1 mx-2 ${currentStep > 1 ? "bg-green-600" : "bg-gray-300"}`}></div>
@@ -710,7 +941,7 @@ function CoursesWizard() {
           >
             {currentStep > 2 ? <CheckCircle2 className="h-5 w-5" /> : 2}
           </div>
-          <span className="ml-2 font-medium">Chapitres</span>
+          <span className="ml-2 font-medium">Chapters</span>
         </div>
 
         <div className={`w-12 h-1 mx-2 ${currentStep > 2 ? "bg-green-600" : "bg-gray-300"}`}></div>
@@ -723,7 +954,7 @@ function CoursesWizard() {
           >
             3
           </div>
-          <span className="ml-2 font-medium">Examen</span>
+          <span className="ml-2 font-medium">Exam</span>
         </div>
       </div>
     )
@@ -794,7 +1025,7 @@ function CoursesWizard() {
                       type="text"
                       value={title}
                       onChange={(e) => handleInputChange("title", e.target.value, validateMinAlphaChars)}
-                      placeholder="Course title"
+                      placeholder="Enter course title"
                       className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
                         errors.title ? "border-red-500" : "border-gray-300"
                       }`}
@@ -813,19 +1044,7 @@ function CoursesWizard() {
                       Price <span className="text-red-500">*</span>
                     </label>
 
-                    <div className="relative">
-                      <input
-                        id="price"
-                        type="number"
-                        value={price}
-                        onChange={(e) => handleInputChange("price", e.target.value)}
-                        placeholder="Course price"
-                        className={`w-full p-3 pl-8 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
-                          errors.price ? "border-red-500" : "border-gray-300"
-                        }`}
-                        required
-                        disabled={currency === "free"}
-                      />
+                    <div className="space-y-4">
                       <div className="flex gap-4 mb-4">
                         <div className="relative flex items-center">
                           <input
@@ -843,7 +1062,7 @@ function CoursesWizard() {
                             className={`text-sm cursor-pointer flex items-center space-x-2 px-4 py-2 rounded-lg ${
                               currency === "usd"
                                 ? "text-blue-500 bg-blue-100 border-blue-500 ring-2 ring-blue-300"
-                                : "text-gray-700"
+                                : "text-gray-700 border border-gray-300"
                             }`}
                           >
                             <span
@@ -855,7 +1074,7 @@ function CoursesWizard() {
                                 className={`w-3 h-3 bg-white rounded-full ${currency === "usd" ? "block" : "hidden"}`}
                               ></span>
                             </span>
-                            <span>Trelix Coin (🪙)</span>
+                            <span>Trelixcoin</span>
                           </label>
                         </div>
 
@@ -875,7 +1094,7 @@ function CoursesWizard() {
                             className={`text-sm cursor-pointer flex items-center space-x-2 px-4 py-2 rounded-lg ${
                               currency === "free"
                                 ? "text-gray-600 bg-gray-100 border-gray-500 ring-2 ring-gray-300"
-                                : "text-gray-700"
+                                : "text-gray-700 border border-gray-300"
                             }`}
                           >
                             <span
@@ -891,6 +1110,20 @@ function CoursesWizard() {
                           </label>
                         </div>
                       </div>
+
+                      {currency === "usd" && (
+                        <input
+                          id="price"
+                          type="number"
+                          value={price}
+                          onChange={(e) => handleInputChange("price", e.target.value)}
+                          placeholder="Enter course price"
+                          className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
+                            errors.price ? "border-red-500" : "border-gray-300"
+                          }`}
+                          required
+                        />
+                      )}
                     </div>
                     {errors.price && (
                       <div className="text-red-500 text-sm mt-1 flex items-center">
@@ -988,9 +1221,9 @@ function CoursesWizard() {
                         <option value="" disabled>
                           Select a level
                         </option>
-                        <option value="Débutant">Débutant</option>
-                        <option value="Intermédiaire">Intermédiaire</option>
-                        <option value="Avancé">Avancé</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -1006,21 +1239,49 @@ function CoursesWizard() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 relative">
                     <label htmlFor="categorie" className="block text-sm font-medium text-gray-700">
                       Category <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      id="categorie"
-                      type="text"
-                      value={categorie}
-                      onChange={(e) => handleInputChange("categorie", e.target.value)}
-                      placeholder="Course category"
-                      className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
-                        errors.categorie ? "border-red-500" : "border-gray-300"
-                      }`}
-                      required
-                    />
+                    <div className="relative">
+                      <select
+                        id="categorie"
+                        value={categorie}
+                        onChange={(e) => handleInputChange("categorie", e.target.value)}
+                        className={`w-full p-3 border rounded-md appearance-none bg-gray-50 ${
+                          errors.categorie ? "border-red-500" : "border-gray-300"
+                        }`}
+                        style={{
+                          display: "block",
+                          position: "relative",
+                          zIndex: 10,
+                        }}
+                      >
+                        <option value="" disabled>
+                          Select a category
+                        </option>
+                        <option value="Computer Science & Programming">Computer Science & Programming</option>
+                        <option value="Marketing & Communications">Marketing & Communications</option>
+                        <option value="Design & Multimedia">Design & Multimedia</option>
+                        <option value="Personal Development">Personal Development</option>
+                        <option value="Foreign Languages">Foreign Languages</option>
+                        <option value="Science & Mathematics">Science & Mathematics</option>
+                        <option value="Business & Entrepreneurship">Business & Entrepreneurship</option>
+                        <option value="Health & Wellness">Health & Wellness</option>
+                        <option value="Arts & Culture">Arts & Culture</option>
+                        <option value="Engineering & Technology">Engineering & Technology</option>
+                        <option value="Education & Training">Education & Training</option>
+                        <option value="Law & Political Science">Law & Political Science</option>
+                        <option value="Environment & Sustainability">Environment & Sustainability</option>
+                        <option value="Tourism & Hospitality">Tourism & Hospitality</option>
+                        <option value="Trades & Crafts">Trades & Crafts</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                        </svg>
+                      </div>
+                    </div>
                     {errors.categorie && (
                       <div className="text-red-500 text-sm mt-1 flex items-center">
                         <Info className="h-4 w-4 mr-1" />
@@ -1033,7 +1294,7 @@ function CoursesWizard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2 relative">
                     <label htmlFor="typeRessource" className="block text-sm font-medium text-gray-700">
-                      Ressource Type <span className="text-red-500">*</span>
+                      Resource Type <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <select
@@ -1050,13 +1311,13 @@ function CoursesWizard() {
                         }}
                       >
                         <option value="" disabled>
-                          Select a Ressource Type
+                          Select a Resource Type
                         </option>
-                        <option value="pdf">Pdf</option>
+                        <option value="pdf">PDF</option>
                         <option value="video">Video</option>
                         <option value="audio">Audio</option>
                         <option value="image">Image</option>
-                        <option value="texte">Text</option>
+                        <option value="text">Text</option>
                         <option value="other">Other</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
@@ -1079,21 +1340,10 @@ function CoursesWizard() {
                     <label htmlFor="modules" className="block text-sm font-medium text-gray-700">
                       Modules ({modules.length} available) <span className="text-red-500">*</span>
                     </label>
-                    <a
-                      href="/profile/module"
-                      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      Add Module
-                    </a>
+                    <button type="button" onClick={handleOpenModuleModal} style={ButtonStyle.primary}>
+                      <span style={{ marginRight: "4px", fontSize: "18px" }}>+</span>
+                      <span>Add Module</span>
+                    </button>
                   </div>
                   <div className="relative">
                     <select
@@ -1114,11 +1364,11 @@ function CoursesWizard() {
                               module.title ||
                               module.name ||
                               module.moduleName ||
-                              "Module sans nom"}
+                              "Unnamed module"}
                           </option>
                         ))
                       ) : (
-                        <option disabled>Aucun module disponible</option>
+                        <option disabled>No modules available</option>
                       )}
                     </select>
                   </div>
@@ -1133,7 +1383,14 @@ function CoursesWizard() {
                 <div className="pt-4">
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition-colors text-lg font-medium shadow-md flex items-center justify-center"
+                    style={{
+                      ...ButtonStyle.primary,
+                      width: "100%",
+                      minWidth: "100%",
+                      padding: "12px 16px",
+                      fontSize: "1.125rem",
+                      ...(isSubmitting ? ButtonStyle.disabled : {}),
+                    }}
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -1158,11 +1415,11 @@ function CoursesWizard() {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           ></path>
                         </svg>
-                        Création du cours...
+                        Creating course...
                       </>
                     ) : (
                       <>
-                        Créer le cours et continuer
+                        Create course and continue
                         <ChevronRight className="ml-2 h-5 w-5" />
                       </>
                     )}
@@ -1184,7 +1441,7 @@ function CoursesWizard() {
             {currentStep === 2 && (
               <div className="space-y-6">
                 <div className="bg-blue-50 p-4 rounded-md">
-                  <h3 className="text-lg font-medium text-blue-800 mb-2">Add a chapter for "{title}"</h3>
+                  <h3 className="text-lg font-medium text-blue-800 mb-2">Add chapters for "{title}"</h3>
                   <p className="text-blue-700">
                     Add one or more chapters to your course. Each chapter can contain text, PDFs, and videos.
                   </p>
@@ -1193,13 +1450,10 @@ function CoursesWizard() {
                 {chapters.map((chapter, index) => (
                   <div key={chapter.id} className="border rounded-lg shadow-sm p-6 bg-white">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-medium">Chapitre {index + 1}</h3>
+                      <h3 className="text-lg font-medium">Chapter {index + 1}</h3>
                       {chapters.length > 1 && (
-                        <button
-                          onClick={() => removeChapterForm(chapter.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <Trash2 className="h-5 w-5" />
+                        <button onClick={() => removeChapterForm(chapter.id)} style={ButtonStyle.iconButton}>
+                          <Trash2 className="h-5 w-5 text-red-500" />
                         </button>
                       )}
                     </div>
@@ -1207,26 +1461,26 @@ function CoursesWizard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                       <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">
-                          Titre du chapitre <span className="text-red-500">*</span>
+                          Chapter title <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           value={chapter.title}
                           onChange={(e) => updateChapterField(chapter.id, "title", e.target.value)}
-                          placeholder="Titre du chapitre"
+                          placeholder="Enter chapter title"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           required
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">PDF Document (Optionnel)</label>
+                        <label className="block text-sm font-medium text-gray-700">PDF Document (Optional)</label>
                         <div className="border border-gray-300 rounded-md overflow-hidden">
                           <div className="flex items-center">
                             <label className="flex-1 cursor-pointer px-3 py-2 bg-white text-gray-700 hover:bg-gray-50">
                               <span className="flex items-center">
                                 <FileText className="w-5 h-5 mr-2 text-gray-500" />
-                                {chapter.pdfName || "Choisir un fichier PDF"}
+                                {chapter.pdfName || "Choose a PDF file"}
                               </span>
                               <input
                                 type="file"
@@ -1249,15 +1503,15 @@ function CoursesWizard() {
                                   if (fileInputRefs.current[`${chapter.id}-pdf`])
                                     fileInputRefs.current[`${chapter.id}-pdf`].value = ""
                                 }}
-                                className="p-2 text-red-500 hover:text-red-700"
+                                style={ButtonStyle.iconButton}
                               >
-                                <Trash2 className="w-5 h-5" />
+                                <Trash2 className="w-5 h-5 text-red-500" />
                               </button>
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => fileInputRefs.current[`${chapter.id}-pdf`]?.click()}
-                                className="p-2 text-blue-500 hover:text-blue-700 bg-blue-50"
+                                style={{ ...ButtonStyle.iconButton, backgroundColor: "#f0f9ff" }}
                               >
                                 <Plus className="w-5 h-5" />
                               </button>
@@ -1283,7 +1537,7 @@ function CoursesWizard() {
                         <textarea
                           value={chapter.description}
                           onChange={(e) => updateChapterField(chapter.id, "description", e.target.value)}
-                          placeholder="Description du chapitre"
+                          placeholder="Enter chapter description"
                           rows={4}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           required
@@ -1291,13 +1545,13 @@ function CoursesWizard() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">Vidéo (Optionnel)</label>
+                        <label className="block text-sm font-medium text-gray-700">Video (Optional)</label>
                         <div className="border border-gray-300 rounded-md overflow-hidden">
                           <div className="flex items-center">
                             <label className="flex-1 cursor-pointer px-3 py-2 bg-white text-gray-700 hover:bg-gray-50">
                               <span className="flex items-center">
                                 <Video className="w-5 h-5 mr-2 text-gray-500" />
-                                {chapter.videoName || "Choisir une vidéo"}
+                                {chapter.videoName || "Choose a video"}
                               </span>
                               <input
                                 type="file"
@@ -1320,15 +1574,15 @@ function CoursesWizard() {
                                   if (videoInputRefs.current[`${chapter.id}-video`])
                                     videoInputRefs.current[`${chapter.id}-video`].value = ""
                                 }}
-                                className="p-2 text-red-500 hover:text-red-700"
+                                style={ButtonStyle.iconButton}
                               >
-                                <Trash2 className="w-5 h-5" />
+                                <Trash2 className="w-5 h-5 text-red-500" />
                               </button>
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => videoInputRefs.current[`${chapter.id}-video`]?.click()}
-                                className="p-2 text-blue-500 hover:text-blue-700 bg-blue-50"
+                                style={{ ...ButtonStyle.iconButton, backgroundColor: "#f0f9ff" }}
                               >
                                 <Plus className="w-5 h-5" />
                               </button>
@@ -1352,10 +1606,14 @@ function CoursesWizard() {
                   <button
                     type="button"
                     onClick={addChapterForm}
-                    className="px-4 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors flex items-center"
+                    style={{
+                      ...ButtonStyle.secondary,
+                      backgroundColor: "#f0f9ff",
+                      color: "#0066ff",
+                    }}
                   >
                     <Plus className="h-5 w-5 mr-2" />
-                    Ajouter un autre chapitre
+                    Add another chapter
                   </button>
                 </div>
 
@@ -1363,16 +1621,22 @@ function CoursesWizard() {
                   <button
                     type="button"
                     onClick={() => setCurrentStep(1)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center"
+                    style={{
+                      ...ButtonStyle.secondary,
+                      ...(chapterSubmitting ? ButtonStyle.disabled : {}),
+                    }}
                     disabled={chapterSubmitting}
                   >
                     <ChevronLeft className="h-5 w-5 mr-2" />
-                    Retour
+                    Back
                   </button>
                   <button
                     type="button"
                     onClick={submitChapters}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+                    style={{
+                      ...ButtonStyle.primary,
+                      ...(chapterSubmitting ? ButtonStyle.disabled : {}),
+                    }}
                     disabled={chapterSubmitting}
                   >
                     {chapterSubmitting ? (
@@ -1397,11 +1661,11 @@ function CoursesWizard() {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           ></path>
                         </svg>
-                        Enregistrement...
+                        Saving...
                       </>
                     ) : (
                       <>
-                        Enregistrer et continuer
+                        Save and continue
                         <ChevronRight className="h-5 w-5 ml-2" />
                       </>
                     )}
@@ -1414,32 +1678,32 @@ function CoursesWizard() {
             {currentStep === 3 && (
               <div className="space-y-6">
                 <div className="bg-blue-50 p-4 rounded-md">
-                  <h3 className="text-lg font-medium text-blue-800 mb-2">Create a exam for "{title}"</h3>
+                  <h3 className="text-lg font-medium text-blue-800 mb-2">Create an exam for "{title}"</h3>
                   <p className="text-blue-700">
                     Create an exam to assess the students' knowledge. You can add different types of questions.
                   </p>
                 </div>
 
                 <div className="border rounded-lg shadow-sm p-6 bg-white">
-                  <h3 className="text-lg font-medium mb-4">Détails of examen</h3>
+                  <h3 className="text-lg font-medium mb-4">Exam Details</h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700">
-                        Titre de l'examen <span className="text-red-500">*</span>
+                        Exam title <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         value={examTitle}
                         onChange={(e) => setExamTitle(e.target.value)}
-                        placeholder="Titre de l'examen"
+                        placeholder="Enter exam title"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         required
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">Durée (minutes)</label>
+                      <label className="block text-sm font-medium text-gray-700">Duration (minutes)</label>
                       <div className="flex items-center">
                         <Clock className="h-5 w-5 text-gray-400 mr-2" />
                         <input
@@ -1458,7 +1722,7 @@ function CoursesWizard() {
                     <textarea
                       value={examDescription}
                       onChange={(e) => setExamDescription(e.target.value)}
-                      placeholder="Description de l'examen"
+                      placeholder="Enter exam description"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -1466,7 +1730,7 @@ function CoursesWizard() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">rate of passing (%)</label>
+                      <label className="block text-sm font-medium text-gray-700">Passing score (%)</label>
                       <input
                         type="number"
                         min="0"
@@ -1479,7 +1743,7 @@ function CoursesWizard() {
 
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700">
-                        Date de début <span className="text-red-500">*</span>
+                        Start date <span className="text-red-500">*</span>
                       </label>
                       <div className="flex items-center">
                         <Calendar className="h-5 w-5 text-gray-400 mr-2" />
@@ -1496,7 +1760,7 @@ function CoursesWizard() {
 
                   <div className="space-y-2 mb-6">
                     <label className="block text-sm font-medium text-gray-700">
-                      Date de fin <span className="text-red-500">*</span>
+                      End date <span className="text-red-500">*</span>
                     </label>
                     <div className="flex items-center">
                       <Calendar className="h-5 w-5 text-gray-400 mr-2" />
@@ -1518,24 +1782,33 @@ function CoursesWizard() {
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => addQuestion("multiple_choice")}
-                        className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center text-sm"
+                        style={{
+                          ...ButtonStyle.primary,
+                          ...ButtonStyle.small,
+                        }}
                       >
                         <Plus className="h-4 w-4 mr-1" />
-                        Choix multiple
+                        Multiple Choice
                       </button>
                       <button
                         onClick={() => addQuestion("true_false")}
-                        className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center text-sm"
+                        style={{
+                          ...ButtonStyle.primary,
+                          ...ButtonStyle.small,
+                        }}
                       >
                         <Plus className="h-4 w-4 mr-1" />
-                        Vrai/Faux
+                        True/False
                       </button>
                       <button
                         onClick={() => addQuestion("short_answer")}
-                        className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center text-sm"
+                        style={{
+                          ...ButtonStyle.primary,
+                          ...ButtonStyle.small,
+                        }}
                       >
                         <Plus className="h-4 w-4 mr-1" />
-                        Réponse courte
+                        Short Answer
                       </button>
                     </div>
                   </div>
@@ -1543,7 +1816,7 @@ function CoursesWizard() {
                   {questions.length === 0 ? (
                     <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
                       <BookOpen className="h-12 w-12 mx-auto text-gray-400" />
-                      <h3 className="mt-2 text-lg font-medium text-gray-900">No questions for the moment</h3>
+                      <h3 className="mt-2 text-lg font-medium text-gray-900">No questions yet</h3>
                       <p className="mt-1 text-sm text-gray-500">Start by adding a question using the buttons above.</p>
                     </div>
                   ) : (
@@ -1555,11 +1828,8 @@ function CoursesWizard() {
                               <span className="font-medium text-gray-700">Question {index + 1}</span>
                               <span className="ml-2 text-sm text-gray-500">({question.type.replace("_", " ")})</span>
                             </div>
-                            <button
-                              onClick={() => deleteQuestion(question.id)}
-                              className="p-1 text-red-500 hover:bg-red-50 rounded-md"
-                            >
-                              <Trash2 className="h-5 w-5" />
+                            <button onClick={() => deleteQuestion(question.id)} style={ButtonStyle.iconButton}>
+                              <Trash2 className="h-5 w-5 text-red-500" />
                             </button>
                           </div>
 
@@ -1569,7 +1839,7 @@ function CoursesWizard() {
                               <textarea
                                 value={question.question}
                                 onChange={(e) => updateQuestion(question.id, "question", e.target.value)}
-                                placeholder="Entrez votre question"
+                                placeholder="Enter your question"
                                 rows={2}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               />
@@ -1601,9 +1871,9 @@ function CoursesWizard() {
                                           newOptions.splice(optIndex, 1)
                                           updateQuestion(question.id, "options", newOptions)
                                         }}
-                                        className="p-1 text-red-500 hover:bg-red-50 rounded-md"
+                                        style={ButtonStyle.iconButton}
                                       >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash2 className="h-4 w-4 text-red-500" />
                                       </button>
                                     )}
                                   </div>
@@ -1617,7 +1887,7 @@ function CoursesWizard() {
                                     className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
                                   >
                                     <Plus className="h-4 w-4 mr-1" />
-                                    add Option
+                                    Add Option
                                   </button>
                                 )}
                               </div>
@@ -1625,7 +1895,7 @@ function CoursesWizard() {
 
                             {question.type === "true_false" && (
                               <div className="space-y-3">
-                                <label className="block text-sm font-medium text-gray-700">correctAnswer</label>
+                                <label className="block text-sm font-medium text-gray-700">Correct Answer</label>
                                 <div className="flex space-x-4">
                                   <div className="flex items-center">
                                     <input
@@ -1638,7 +1908,7 @@ function CoursesWizard() {
                                       className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                                     />
                                     <label htmlFor={`true-${question.id}`} className="ml-2 text-gray-700">
-                                      Vrai
+                                      True
                                     </label>
                                   </div>
                                   <div className="flex items-center">
@@ -1652,7 +1922,7 @@ function CoursesWizard() {
                                       className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                                     />
                                     <label htmlFor={`false-${question.id}`} className="ml-2 text-gray-700">
-                                      Faux
+                                      False
                                     </label>
                                   </div>
                                 </div>
@@ -1661,12 +1931,12 @@ function CoursesWizard() {
 
                             {question.type === "short_answer" && (
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">correct Answer</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Correct Answer</label>
                                 <input
                                   type="text"
                                   value={question.correctAnswer}
                                   onChange={(e) => setCorrectAnswer(question.id, e.target.value)}
-                                  placeholder="Entrez la réponse correcte"
+                                  placeholder="Enter the correct answer"
                                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                               </div>
@@ -1700,25 +1970,34 @@ function CoursesWizard() {
                   <button
                     type="button"
                     onClick={() => setCurrentStep(2)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center"
+                    style={{
+                      ...ButtonStyle.secondary,
+                      ...(examSubmitting ? ButtonStyle.disabled : {}),
+                    }}
                     disabled={examSubmitting}
                   >
                     <ChevronLeft className="h-5 w-5 mr-2" />
-                    Retour
+                    Back
                   </button>
                   <div className="space-x-3">
                     <button
                       type="button"
                       onClick={skipExam}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                      style={{
+                        ...ButtonStyle.secondary,
+                        ...(examSubmitting ? ButtonStyle.disabled : {}),
+                      }}
                       disabled={examSubmitting}
                     >
-                      ignore this step
+                      Skip this step
                     </button>
                     <button
                       type="button"
                       onClick={submitExam}
-                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+                      style={{
+                        ...ButtonStyle.success,
+                        ...(examSubmitting ? ButtonStyle.disabled : {}),
+                      }}
                       disabled={examSubmitting}
                     >
                       {examSubmitting ? (
@@ -1743,12 +2022,12 @@ function CoursesWizard() {
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             ></path>
                           </svg>
-                          Saving
+                          Saving...
                         </>
                       ) : (
                         <>
                           <Save className="h-5 w-5 mr-2" />
-                          course add seccessfully
+                          Complete Course
                         </>
                       )}
                     </button>
@@ -1759,6 +2038,9 @@ function CoursesWizard() {
           </div>
         </div>
       </div>
+
+      {/* Module Modal */}
+      <ModuleModal isOpen={showModuleModal} onClose={handleCloseModuleModal} onModuleAdded={handleModuleAdded} />
 
       {/* Gift Modal */}
       {showGiftModal && (

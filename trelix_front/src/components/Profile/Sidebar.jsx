@@ -41,6 +41,28 @@ function Sidebar() {
             </li>
           </ul>
         </nav>
+        
+            {user?.role === "instructor" && (
+        <div className="widget">
+          <p className="section-title"> Course statistics </p>
+          <nav className="dashboard-nav">
+            <ul className="nav-list">
+              <li>
+                <Link
+                  className={`nav-link ${
+                    location.pathname === "/chart" ? "active" : ""
+                  }`}
+                  to="/chart"
+                >
+                  <i className="feather-icon icon-plus" />
+                  <span className="nav-label">statistics</span>
+                </Link>
+              </li>
+             
+            </ul>
+          </nav>
+        </div>
+      )}
         {user?.role === "instructor" && (
           <div className="widget">
             <p className="section-title">Learning Resources</p>
@@ -72,8 +94,12 @@ function Sidebar() {
               </ul>
             </nav>
           </div>
+          
+          
         )}
       </div>
+
+      
 
       {user?.role === "instructor" && (
         <div className="widget">
@@ -167,12 +193,14 @@ function Sidebar() {
                 <span className="nav-label">Chatbot</span>
               </Link>
             </li>
+            {user?.role === "instructor" && (
             <li>
-              <Link className="nav-link" to="/profile/meeting">
+              <Link className="nav-link" to="/profile/host">
                 <i className="feather-icon icon-video" />
                 <span className="nav-label">Meet</span>
               </Link>
             </li>
+            )}
             {user?.role === "student" && (
               <>
                 <li>
@@ -181,12 +209,12 @@ function Sidebar() {
                     <span className="nav-label">Dictionary</span>
                   </Link>
                 </li>
-                <li>
-                  <Link className="nav-link" to="/profile/CitationGenerator">
-                    <i className="feather-icon icon-plus" />
-                    <span className="nav-label">Citation Generator</span>
-                  </Link>
-                </li>
+                 <li>
+              <Link className="nav-link" to="/profile/meeting">
+                <i className="feather-icon icon-video" />
+                <span className="nav-label">Meet</span>
+              </Link>
+            </li>
               </>
             )}
           </ul>
