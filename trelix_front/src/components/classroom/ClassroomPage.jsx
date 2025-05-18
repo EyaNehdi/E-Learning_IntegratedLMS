@@ -266,7 +266,7 @@ You don't have any courses in Google Classroom yet, or you don't have the necess
                         {course.section && <p className="text-gray-600">{course.section}</p>}
                       </div>
                       {course.courseState === "ARCHIVED" && (
-                        <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">Archivé</span>
+                        <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">Archived</span>
                       )}
                     </div>
 
@@ -274,7 +274,7 @@ You don't have any courses in Google Classroom yet, or you don't have the necess
                       {course.description ? (
                         <p className="text-gray-700">{course.description}</p>
                       ) : (
-                        <p className="text-gray-500 italic">Aucune description disponible</p>
+                        <p className="text-gray-500 italic">No description available</p>
                       )}
                     </div>
 

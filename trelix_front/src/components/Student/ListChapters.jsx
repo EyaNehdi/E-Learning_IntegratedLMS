@@ -637,7 +637,7 @@ const ListChapters = () => {
                           <p className="text-lg mb-4">Select a chapter from the menu to start learning</p>
                           {chapters.length > 0 && (
                             <Link
-                              to={`/chapters/${finalCourseId}/content/${chapters[0]._id}`}
+                               to={`/chapters/${slugCourse}/content/${chapters[0]._id}`}
                               className="inline-flex items-center py-3.5 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-md hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm"
                             >
                               <svg
