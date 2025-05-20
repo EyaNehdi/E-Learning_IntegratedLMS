@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { useParams, useNavigate } from "react-router-dom"
-import RoomService from "./room-service"
+import RoomServiceSupabase from "./room-service.js"
 
 // Helper functions for emotion colors
 const getEmotionColor = (emotion) => {
@@ -104,8 +104,8 @@ export default function MeetingRoom() {
 
   // Refs for cleanup
   const intervalRef = useRef(null)
-  const pollingRef = useRef(null)
-  const broadcastListenerRef = useRef(null)
+  const subscriptionRef = useRef(null)
+  const pollIntervalRef = useRef(null)
 
   // User identification
   const [isHost, setIsHost] = useState(false)
@@ -117,22 +117,39 @@ export default function MeetingRoom() {
   const [showDebug, setShowDebug] = useState(false)
   const [debugMessages, setDebugMessages] = useState([])
 
+  // Function to add debug message
+  const addDebugMessage = (message) => {
+    console.log(`[DEBUG] ${message}`)
+    setDebugMessages((prev) => {
+      const newMessages = [
+        ...prev,
+        {
+          time: new Date().toLocaleTimeString(),
+          message,
+        },
+      ]
+      // Keep only the last 10 messages to prevent memory issues
+      if (newMessages.length > 10) {
+        return newMessages.slice(newMessages.length - 10)
+      }
+      return newMessages
+    })
+  }
+
   // Load user data from localStorage
-  // Add this function after the addDebugMessage function
-  // This will help with cross-browser room joining
-  const ensureRoomExists = () => {
+  const ensureRoomExists = async () => {
     if (!roomId) return
 
     try {
-      // Check if this room exists in our localStorage
-      const roomExists = RoomService.roomExists(roomId)
+      // Check if this room exists in our database
+      const roomExists = await RoomServiceSupabase.roomExists(roomId)
 
-      // If we're joining as a student and the room doesn't exist in our localStorage
+      // If we're joining as a student and the room doesn't exist in our database
       if (!isHost) {
         addDebugMessage(`Joining room ${roomId}`)
 
         // Get the existing room info or create a placeholder
-        const roomInfo = RoomService.getRoomInfo(roomId)
+        const roomInfo = await RoomServiceSupabase.getRoomInfo(roomId)
 
         addDebugMessage(`Room info retrieved: ${roomInfo ? "success" : "failed"}`)
       }
@@ -162,34 +179,51 @@ export default function MeetingRoom() {
       addDebugMessage(`Loaded user data - Role: ${storedIsHost ? "Instructor" : "Student"}, Name: ${storedDisplayName}`)
 
       // Debug: List all rooms
-      const allRooms = RoomService.listAllRooms()
-      addDebugMessage(`Available rooms: ${JSON.stringify(allRooms.map((r) => r.roomId))}`)
+      RoomServiceSupabase.listAllRooms().then((allRooms) => {
+        addDebugMessage(`Available rooms: ${JSON.stringify(allRooms.map((r) => r.room_id))}`)
+      })
 
-      // Add this line to ensure room exists in this browser
+      // Add this line to ensure room exists in the database
       ensureRoomExists()
     } catch (err) {
       console.error("Error loading user data:", err)
     }
   }, [roomId])
 
-  // Function to add debug message
-  const addDebugMessage = (message) => {
-    console.log(`[DEBUG] ${message}`)
-    setDebugMessages((prev) => {
-      const newMessages = [
-        ...prev,
-        {
-          time: new Date().toLocaleTimeString(),
-          message,
-        },
-      ]
-      // Keep only the last 10 messages to prevent memory issues
-      if (newMessages.length > 10) {
-        return newMessages.slice(newMessages.length - 10)
+  // Manual poll for emotions (for instructors)
+  const manualPollEmotions = async () => {
+    if (!isHost || !roomId || !userId) return
+
+    addDebugMessage("Manually polling for emotions...")
+
+    try {
+      const emotions = await RoomServiceSupabase.getStudentEmotions(roomId, userId)
+      const emotionCount = Object.keys(emotions).length
+
+      addDebugMessage(`Manual poll retrieved ${emotionCount} emotions`)
+
+      if (emotionCount > 0) {
+        setParticipantEmotions(emotions)
       }
-      return newMessages
-    })
+    } catch (err) {
+      console.error("Error in manual emotion poll:", err)
+      addDebugMessage(`Error polling emotions: ${err.message}`)
+    }
   }
+
+  // Set up polling for instructors as a fallback
+  useEffect(() => {
+    if (!isHost || !roomId || !userId) return
+
+    // Set up a polling interval as a fallback
+    pollIntervalRef.current = setInterval(manualPollEmotions, 10000) // Poll every 10 seconds
+
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+      }
+    }
+  }, [isHost, roomId, userId])
 
   // Mock data for testing
   const useMockData = () => {
@@ -288,12 +322,13 @@ export default function MeetingRoom() {
     // If we're a student, send our emotion to the instructor
     if (!isHost && userId && displayName && instructorId) {
       try {
-        const result = RoomService.sendEmotion(roomId, userId, displayName, instructorId, detectedEmotion)
-        if (result.success) {
-          addDebugMessage(`Sent emotion to instructor: ${detectedEmotion} (broadcast ID: ${result.broadcastId})`)
-        } else {
-          addDebugMessage(`Failed to send emotion: ${result.error}`)
-        }
+        RoomServiceSupabase.sendEmotion(roomId, userId, displayName, instructorId, detectedEmotion).then((result) => {
+          if (result.success) {
+            addDebugMessage(`Sent emotion to instructor: ${detectedEmotion} (broadcast ID: ${result.broadcastId})`)
+          } else {
+            addDebugMessage(`Failed to send emotion: ${result.error}`)
+          }
+        })
       } catch (err) {
         console.error("Error sending emotion:", err)
         addDebugMessage(`Error sending emotion: ${err.message}`)
@@ -301,85 +336,51 @@ export default function MeetingRoom() {
     }
   }
 
-  // Process broadcast message for instructors
-  const handleBroadcastMessage = (broadcastData) => {
-    if (!isHost || !broadcastData) return
-
-    // Ignore non-emotion broadcasts
-    if (broadcastData.type !== "emotion") return
-
-    // Make sure this broadcast is for our room and instructor
-    if (broadcastData.roomId !== roomId || broadcastData.instructorId !== userId) return
-
-    // Check if we've already processed this broadcast
-    if (processedEmotions.current.has(broadcastData.broadcastId)) return
-
-    // Mark as processed
-    processedEmotions.current.add(broadcastData.broadcastId)
-
-    // Update participant emotions state with the new emotion
-    addDebugMessage(`Received emotion from ${broadcastData.studentName}: ${broadcastData.emotion}`)
-
-    setParticipantEmotions((prev) => {
-      const updated = { ...prev }
-      updated[broadcastData.studentId] = {
-        id: broadcastData.studentId,
-        name: broadcastData.studentName,
-        emotion: broadcastData.emotion,
-        timestamp: broadcastData.timestamp,
-        instructorId: broadcastData.instructorId,
-      }
-      return updated
-    })
-  }
-
-  // Set up broadcast listener for instructors
+  // Set up real-time subscription for instructors
   useEffect(() => {
     if (!isHost || !roomId || !userId) return
 
-    addDebugMessage(`Setting up broadcast listener for instructor ${userId}`)
+    addDebugMessage(`Setting up real-time subscription for instructor ${userId}`)
 
-    // This will set up a storage event listener and polling
-    const stopListening = RoomService.setupBroadcastListener(handleBroadcastMessage)
-    broadcastListenerRef.current = stopListening
+    // This will set up a Supabase real-time subscription
+    const unsubscribe = RoomServiceSupabase.setupEmotionSubscription(roomId, userId, (emotions) => {
+      addDebugMessage(`Received updated emotions, count: ${Object.keys(emotions).length}`)
+      setParticipantEmotions(emotions)
+    })
+
+    subscriptionRef.current = unsubscribe
 
     return () => {
-      if (broadcastListenerRef.current) {
-        broadcastListenerRef.current()
+      if (subscriptionRef.current) {
+        subscriptionRef.current()
       }
     }
   }, [isHost, roomId, userId])
 
-  // Poll for student emotions (for instructors)
+  // Initial fetch of student emotions for instructors
   useEffect(() => {
     if (!isHost || !roomId || !userId) return
 
-    addDebugMessage(`Starting to poll for student emotions as instructor ${userId} in room ${roomId}`)
+    addDebugMessage(`Fetching initial student emotions as instructor ${userId} in room ${roomId}`)
 
-    const pollEmotions = () => {
+    const fetchEmotions = async () => {
       try {
-        const studentEmotions = RoomService.getStudentEmotions(roomId, userId)
+        const studentEmotions = await RoomServiceSupabase.getStudentEmotions(roomId, userId)
         const emotionCount = Object.keys(studentEmotions).length
+
+        addDebugMessage(`Retrieved ${emotionCount} student emotions`)
 
         // Only update if we have emotions
         if (emotionCount > 0) {
           setParticipantEmotions(studentEmotions)
-          addDebugMessage(`Retrieved ${emotionCount} student emotions`)
         }
       } catch (err) {
-        console.error("Error polling student emotions:", err)
+        console.error("Error fetching student emotions:", err)
+        addDebugMessage(`Error fetching emotions: ${err.message}`)
       }
     }
 
-    // Poll more frequently (1 second) for more responsive updates
-    pollEmotions() // Initial poll
-    pollingRef.current = setInterval(pollEmotions, 1000)
-
-    return () => {
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current)
-      }
-    }
+    fetchEmotions()
   }, [isHost, roomId, userId])
 
   // Start automatic emotion detection
@@ -424,11 +425,11 @@ export default function MeetingRoom() {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
     }
-    if (pollingRef.current) {
-      clearInterval(pollingRef.current)
+    if (subscriptionRef.current) {
+      subscriptionRef.current()
     }
-    if (broadcastListenerRef.current) {
-      broadcastListenerRef.current()
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current)
     }
 
     // Navigate to home
@@ -654,7 +655,7 @@ export default function MeetingRoom() {
   }
 
   return (
-    <div style={{ position: "relative", height: "100vh", width: "100%" }}>
+    <div style={{ position: "relative", height: "calc(100vh - 200px)", width: "100%", margin: "20px 0" }}>
       {/* Video container */}
       <div
         ref={videoContainerRef}
@@ -662,6 +663,9 @@ export default function MeetingRoom() {
           height: "100%",
           width: "100%",
           backgroundColor: "#f0f0f0",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          overflow: "hidden",
         }}
       />
 
@@ -754,6 +758,35 @@ export default function MeetingRoom() {
           Return to Home
         </button>
       </div>
+
+      {/* Manual Refresh Button for Instructors */}
+      {isHost && (
+        <div
+          style={{
+            position: "absolute",
+            top: "20px",
+            left: "180px",
+            zIndex: 1000,
+          }}
+        >
+          <button
+            onClick={manualPollEmotions}
+            style={{
+              backgroundColor: "#4dabf7",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              padding: "10px 16px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+            }}
+          >
+            Refresh Emotions
+          </button>
+        </div>
+      )}
 
       {/* Emotion Detection UI */}
       <div

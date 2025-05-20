@@ -1,56 +1,56 @@
-/**
- * Room service using localStorage and sessionStorage for cross-browser communication
- */
+import { supabase } from "./utils/supabase-client"
 
-const RoomService = {
+/**
+ * Room service using Supabase for cross-browser communication
+ */
+const RoomServiceSupabase = {
   // Helper function to generate a unique ID
   generateUniqueId() {
     return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   },
 
   // Create a new room
-  createRoom: (roomId, instructorId, instructorName) => {
+  createRoom: async (roomId, instructorId, instructorName) => {
     try {
-      // Create a unique room key that will be used by all browsers
-      const globalRoomKey = `global_room_${roomId}`
-
-      // Check if room already exists in this browser's localStorage
-      const existingRoom = localStorage.getItem(globalRoomKey)
+      // Check if room already exists
+      const { data: existingRoom } = await supabase.from("rooms").select("*").eq("room_id", roomId).single()
 
       if (existingRoom) {
-        // Check if this is a placeholder room
-        const roomData = JSON.parse(existingRoom)
-
-        if (roomData.isPlaceholder) {
+        if (existingRoom.is_placeholder) {
           console.log(`Found placeholder room ${roomId}, replacing with real room data`)
-          // This is a placeholder, so we can replace it with real data
+          // This is a placeholder, so we can update it with real data
+          const { error } = await supabase
+            .from("rooms")
+            .update({
+              instructor_id: instructorId,
+              instructor_name: instructorName,
+              is_placeholder: false,
+              last_updated: new Date().toISOString(),
+            })
+            .eq("room_id", roomId)
+
+          if (error) throw error
         } else {
           console.log(`Room ${roomId} already exists`)
           return { success: false, error: "Room already exists" }
         }
+      } else {
+        // Create the room
+        const { error } = await supabase.from("rooms").insert({
+          room_id: roomId,
+          instructor_id: instructorId,
+          instructor_name: instructorName,
+          is_placeholder: false,
+          last_updated: new Date().toISOString(),
+        })
+
+        if (error) throw error
       }
-
-      // Create the room
-      const roomData = {
-        roomId,
-        instructorId,
-        instructorName,
-        createdAt: new Date().toISOString(),
-        isPlaceholder: false,
-        emotions: {},
-        lastUpdated: Date.now(),
-      }
-
-      // Store in localStorage using the global key
-      localStorage.setItem(globalRoomKey, JSON.stringify(roomData))
-
-      // Also store in regular key for backward compatibility
-      localStorage.setItem(`room_${roomId}`, JSON.stringify(roomData))
 
       console.log(`Room ${roomId} created by instructor ${instructorName}`)
 
       // Also create a heartbeat entry for this room
-      RoomService.updateRoomHeartbeat(roomId)
+      await RoomServiceSupabase.updateRoomHeartbeat(roomId)
 
       return { success: true }
     } catch (e) {
@@ -60,25 +60,17 @@ const RoomService = {
   },
 
   // Check if a room exists
-  roomExists: (roomId) => {
+  roomExists: async (roomId) => {
     try {
-      // First check with the global key
-      const globalRoomKey = `global_room_${roomId}`
-      const globalRoom = localStorage.getItem(globalRoomKey)
+      const { data, error } = await supabase.from("rooms").select("room_id").eq("room_id", roomId).single()
 
-      if (globalRoom !== null) {
+      if (error) {
+        // If not found in database, we'll still try to join
+        console.log(`Room ${roomId} not found in database, but will attempt to join anyway`)
         return true
       }
 
-      // Then check with the regular key for backward compatibility
-      const localRoom = localStorage.getItem(`room_${roomId}`)
-      if (localRoom !== null) {
-        return true
-      }
-
-      // If not found in local storage, we'll still try to join
-      console.log(`Room ${roomId} not found in local storage, but will attempt to join anyway`)
-      return true
+      return !!data
     } catch (e) {
       console.error("Error checking room existence:", e)
       return false
@@ -86,42 +78,29 @@ const RoomService = {
   },
 
   // Get room info
-  getRoomInfo: (roomId) => {
+  getRoomInfo: async (roomId) => {
     try {
-      const globalRoomKey = `global_room_${roomId}`
-      const globalRoomData = localStorage.getItem(globalRoomKey)
+      const { data, error } = await supabase.from("rooms").select("*").eq("room_id", roomId).single()
 
-      if (globalRoomData) {
-        return JSON.parse(globalRoomData)
-      }
-
-      // Check regular key for backward compatibility
-      const roomData = localStorage.getItem(`room_${roomId}`)
-
-      if (roomData) {
-        // If found in regular key but not global, upgrade it to global
-        const parsedData = JSON.parse(roomData)
-        localStorage.setItem(globalRoomKey, roomData)
-        return parsedData
-      } else {
+      if (error || !data) {
         // If room data isn't found, create a placeholder with minimal required info
         console.log(`Creating placeholder room info for ${roomId}`)
         const placeholderRoom = {
-          roomId,
-          instructorId: "unknown_instructor",
-          instructorName: "Instructor",
-          createdAt: new Date().toISOString(),
-          isPlaceholder: true,
-          emotions: {},
-          lastUpdated: Date.now(),
+          room_id: roomId,
+          instructor_id: "unknown_instructor",
+          instructor_name: "Instructor",
+          created_at: new Date().toISOString(),
+          is_placeholder: true,
+          last_updated: new Date().toISOString(),
         }
 
-        // Save the placeholder to both keys
-        localStorage.setItem(globalRoomKey, JSON.stringify(placeholderRoom))
-        localStorage.setItem(`room_${roomId}`, JSON.stringify(placeholderRoom))
+        // Save the placeholder
+        await supabase.from("rooms").insert(placeholderRoom)
 
         return placeholderRoom
       }
+
+      return data
     } catch (e) {
       console.error("Error getting room info:", e)
       return null
@@ -129,78 +108,71 @@ const RoomService = {
   },
 
   // Update the room heartbeat
-  updateRoomHeartbeat: (roomId) => {
+  updateRoomHeartbeat: async (roomId) => {
     try {
-      const heartbeatKey = `heartbeat_room_${roomId}`
-      localStorage.setItem(heartbeatKey, Date.now().toString())
+      const { error } = await supabase
+        .from("rooms")
+        .update({ last_updated: new Date().toISOString() })
+        .eq("room_id", roomId)
+
+      if (error) throw error
     } catch (e) {
       console.error("Error updating room heartbeat:", e)
     }
   },
 
   // Send emotion from student to instructor
-  sendEmotion: (roomId, studentId, studentName, instructorId, emotion) => {
+  sendEmotion: async (roomId, studentId, studentName, instructorId, emotion) => {
     try {
       // Generate a unique broadcast ID for this emotion
-      const broadcastId = RoomService.generateUniqueId()
+      const broadcastId = RoomServiceSupabase.generateUniqueId()
       const timestamp = new Date().toISOString()
 
       // Create the emotion data
       const emotionData = {
-        id: studentId,
-        name: studentName,
+        room_id: roomId,
+        student_id: studentId,
+        student_name: studentName,
         emotion: emotion,
+        instructor_id: instructorId,
+        broadcast_id: broadcastId,
         timestamp: timestamp,
-        instructorId: instructorId,
-        broadcastId: broadcastId,
       }
 
-      // Store in a global emotion key that all browsers can access
-      const globalEmotionKey = `global_emotion_${roomId}_${studentId}`
-      localStorage.setItem(globalEmotionKey, JSON.stringify(emotionData))
+      console.log("Sending emotion data:", emotionData)
 
-      // Create a broadcast message
-      const broadcastKey = `broadcast_${broadcastId}`
-      const broadcastData = {
-        type: "emotion",
-        roomId: roomId,
-        studentId: studentId,
-        studentName: studentName,
-        emotion: emotion,
-        instructorId: instructorId,
-        timestamp: timestamp,
-        broadcastId: broadcastId,
-        expires: Date.now() + 60000, // Expire after 1 minute
+      // Check if an emotion already exists for this student in this room
+      const { data: existingEmotion } = await supabase
+        .from("emotions")
+        .select("*")
+        .eq("room_id", roomId)
+        .eq("student_id", studentId)
+        .single()
+
+      if (existingEmotion) {
+        // Update the existing emotion
+        const { error } = await supabase
+          .from("emotions")
+          .update({
+            emotion: emotion,
+            broadcast_id: broadcastId,
+            timestamp: timestamp,
+          })
+          .eq("room_id", roomId)
+          .eq("student_id", studentId)
+
+        if (error) throw error
+      } else {
+        // Insert a new emotion
+        const { error } = await supabase.from("emotions").insert(emotionData)
+
+        if (error) throw error
       }
-
-      // Store the broadcast
-      localStorage.setItem(broadcastKey, JSON.stringify(broadcastData))
 
       console.log(`Student ${studentName} sent emotion ${emotion} to instructor (broadcast ID: ${broadcastId})`)
 
-      // Update the global room data too
-      const globalRoomKey = `global_room_${roomId}`
-      const roomDataStr = localStorage.getItem(globalRoomKey)
-
-      if (roomDataStr) {
-        try {
-          const roomData = JSON.parse(roomDataStr)
-
-          if (!roomData.emotions) {
-            roomData.emotions = {}
-          }
-
-          roomData.emotions[studentId] = emotionData
-          roomData.lastUpdated = Date.now()
-
-          localStorage.setItem(globalRoomKey, JSON.stringify(roomData))
-        } catch (e) {
-          console.error("Error updating room data with emotion:", e)
-        }
-      }
-
-      // Clean up old broadcasts (those older than 1 minute)
-      RoomService.cleanupOldBroadcasts()
+      // Update the room's last_updated timestamp
+      await RoomServiceSupabase.updateRoomHeartbeat(roomId)
 
       return { success: true, broadcastId: broadcastId }
     } catch (e) {
@@ -209,99 +181,34 @@ const RoomService = {
     }
   },
 
-  // Clean up old broadcast messages
-  cleanupOldBroadcasts: () => {
-    try {
-      const now = Date.now()
-      const keysToRemove = []
-
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.startsWith("broadcast_")) {
-          try {
-            const data = JSON.parse(localStorage.getItem(key))
-            if (data.expires && data.expires < now) {
-              keysToRemove.push(key)
-            }
-          } catch (e) {
-            // If we can't parse it, it's probably corrupted, so remove it
-            keysToRemove.push(key)
-          }
-        }
-      }
-
-      keysToRemove.forEach((key) => localStorage.removeItem(key))
-    } catch (e) {
-      console.error("Error cleaning up old broadcasts:", e)
-    }
-  },
-
   // Get all student emotions for a specific instructor
-  getStudentEmotions: (roomId, instructorId) => {
+  getStudentEmotions: async (roomId, instructorId) => {
     try {
+      console.log(`Fetching emotions for room ${roomId} and instructor ${instructorId}`)
+
+      const { data, error } = await supabase
+        .from("emotions")
+        .select("*")
+        .eq("room_id", roomId)
+        .eq("instructor_id", instructorId)
+
+      if (error) throw error
+
+      console.log(`Retrieved ${data?.length || 0} emotions from database:`, data)
+
+      // Format the data to match the expected structure
       const emotions = {}
-
-      // First, check the global room data
-      const globalRoomKey = `global_room_${roomId}`
-      const roomDataStr = localStorage.getItem(globalRoomKey)
-
-      if (roomDataStr) {
-        try {
-          const roomData = JSON.parse(roomDataStr)
-          if (roomData.emotions) {
-            // Filter emotions for this instructor
-            Object.keys(roomData.emotions).forEach((studentId) => {
-              const emotion = roomData.emotions[studentId]
-              if (emotion.instructorId === instructorId) {
-                emotions[studentId] = emotion
-              }
-            })
+      if (data) {
+        data.forEach((emotion) => {
+          emotions[emotion.student_id] = {
+            id: emotion.student_id,
+            name: emotion.student_name,
+            emotion: emotion.emotion,
+            timestamp: emotion.timestamp,
+            instructorId: emotion.instructor_id,
+            broadcastId: emotion.broadcast_id,
           }
-        } catch (e) {
-          console.error("Error parsing room data for emotions:", e)
-        }
-      }
-
-      // Then check for any direct emotion entries
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.startsWith(`global_emotion_${roomId}_`)) {
-          try {
-            const emotionData = JSON.parse(localStorage.getItem(key))
-            if (emotionData && emotionData.instructorId === instructorId) {
-              emotions[emotionData.id] = emotionData
-            }
-          } catch (e) {
-            console.warn("Error parsing emotion data:", e)
-          }
-        }
-      }
-
-      // Finally, check for any recent broadcasts
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.startsWith("broadcast_")) {
-          try {
-            const broadcastData = JSON.parse(localStorage.getItem(key))
-            if (
-              broadcastData &&
-              broadcastData.type === "emotion" &&
-              broadcastData.roomId === roomId &&
-              broadcastData.instructorId === instructorId
-            ) {
-              emotions[broadcastData.studentId] = {
-                id: broadcastData.studentId,
-                name: broadcastData.studentName,
-                emotion: broadcastData.emotion,
-                timestamp: broadcastData.timestamp,
-                instructorId: broadcastData.instructorId,
-                broadcastId: broadcastData.broadcastId,
-              }
-            }
-          } catch (e) {
-            console.warn("Error parsing broadcast data:", e)
-          }
-        }
+        })
       }
 
       return emotions
@@ -311,101 +218,78 @@ const RoomService = {
     }
   },
 
-  // Set up a broadcast listener
-  setupBroadcastListener: (callback) => {
-    const handleStorageChange = (event) => {
-      // This will only fire for changes in other tabs of the same browser
-      // but we'll keep it for tab-to-tab communication
-      if (event.key && event.key.startsWith("broadcast_") && event.newValue) {
-        try {
-          const broadcastData = JSON.parse(event.newValue)
-          if (callback && broadcastData) {
-            callback(broadcastData)
-          }
-        } catch (e) {
-          console.warn("Error handling storage event:", e)
-        }
+  // Set up a real-time subscription for emotion updates
+  setupEmotionSubscription: (roomId, instructorId, callback) => {
+    console.log(`Setting up real-time subscription for room ${roomId} and instructor ${instructorId}`)
+
+    // First, fetch current emotions
+    RoomServiceSupabase.getStudentEmotions(roomId, instructorId).then((emotions) => {
+      if (callback && Object.keys(emotions).length > 0) {
+        console.log(`Initial emotions loaded: ${Object.keys(emotions).length}`)
+        callback(emotions)
       }
-    }
+    })
 
-    // Add storage event listener
-    window.addEventListener("storage", handleStorageChange)
+    // Subscribe to changes in the emotions table for this room
+    const channel = supabase
+      .channel(`room-${roomId}-emotions`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "emotions",
+          filter: `room_id=eq.${roomId}`,
+        },
+        (payload) => {
+          console.log("Received real-time update:", payload)
 
-    // Set up polling for broadcast messages
-    const pollInterval = 2000 // Poll every 2 seconds
-    const intervalId = setInterval(() => {
-      RoomService.pollForBroadcasts(callback)
-    }, pollInterval)
+          // When an emotion is updated, fetch all emotions for this instructor
+          RoomServiceSupabase.getStudentEmotions(roomId, instructorId).then((emotions) => {
+            console.log(`Fetched updated emotions: ${Object.keys(emotions).length}`)
+            if (callback) {
+              callback(emotions)
+            }
+          })
+        },
+      )
+      .subscribe((status) => {
+        console.log(`Subscription status for room ${roomId}:`, status)
+      })
 
-    // Return cleanup function
+    // Set up a polling fallback in case real-time doesn't work
+    const pollInterval = setInterval(() => {
+      RoomServiceSupabase.getStudentEmotions(roomId, instructorId).then((emotions) => {
+        if (callback && Object.keys(emotions).length > 0) {
+          console.log(`Polled emotions: ${Object.keys(emotions).length}`)
+          callback(emotions)
+        }
+      })
+    }, 5000) // Poll every 5 seconds
+
+    // Return a function to unsubscribe
     return () => {
-      window.removeEventListener("storage", handleStorageChange)
-      clearInterval(intervalId)
-    }
-  },
-
-  // Poll for broadcast messages
-  pollForBroadcasts: (callback) => {
-    try {
-      // This is needed for cross-browser communication
-      const processed = new Set()
-
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.startsWith("broadcast_")) {
-          try {
-            const broadcastData = JSON.parse(localStorage.getItem(key))
-
-            // Skip already processed broadcasts using an in-memory set
-            if (processed.has(broadcastData.broadcastId)) {
-              continue
-            }
-
-            // Mark as processed
-            processed.add(broadcastData.broadcastId)
-
-            // Call the callback
-            if (callback && broadcastData) {
-              callback(broadcastData)
-            }
-          } catch (e) {
-            console.warn("Error processing broadcast while polling:", e)
-          }
-        }
-      }
-
-      // Clean up old broadcasts
-      RoomService.cleanupOldBroadcasts()
-    } catch (e) {
-      console.error("Error polling for broadcasts:", e)
+      console.log(`Unsubscribing from room ${roomId} emotions`)
+      channel.unsubscribe()
+      clearInterval(pollInterval)
     }
   },
 
   // Clear all room data (useful for debugging and resetting)
-  clearAllRoomData: () => {
+  clearAllRoomData: async () => {
     try {
-      // Find all keys that might be related to rooms
-      const keysToRemove = []
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (
-          key &&
-          (key.startsWith("room_") ||
-            key.startsWith("global_room_") ||
-            key.startsWith("emotion_") ||
-            key.startsWith("global_emotion_") ||
-            key.startsWith("broadcast_") ||
-            key.startsWith("heartbeat_"))
-        ) {
-          keysToRemove.push(key)
-        }
-      }
+      // Delete all emotions first (due to foreign key constraint)
+      const { error: emotionsError } = await supabase.from("emotions").delete().neq("room_id", "dummy_value") // Delete all rows
 
-      // Remove all found keys
-      keysToRemove.forEach((key) => localStorage.removeItem(key))
+      if (emotionsError) throw emotionsError
 
-      console.log(`Cleared ${keysToRemove.length} room-related items from storage`)
-      return { success: true, count: keysToRemove.length }
+      // Then delete all rooms
+      const { error: roomsError } = await supabase.from("rooms").delete().neq("room_id", "dummy_value") // Delete all rows
+
+      if (roomsError) throw roomsError
+
+      console.log("Cleared all room-related data from database")
+      return { success: true, count: "all" }
     } catch (e) {
       console.error("Error clearing room data:", e)
       return { success: false, error: e.message }
@@ -413,53 +297,13 @@ const RoomService = {
   },
 
   // For debugging - list all rooms
-  listAllRooms: () => {
+  listAllRooms: async () => {
     try {
-      const rooms = []
+      const { data, error } = await supabase.from("rooms").select("*")
 
-      // Check for global room keys first
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.startsWith("global_room_")) {
-          const roomId = key.replace("global_room_", "")
-          try {
-            const roomData = JSON.parse(localStorage.getItem(key))
-            rooms.push({
-              roomId,
-              ...roomData,
-              keyType: "global",
-            })
-          } catch (e) {
-            console.warn(`Error parsing room data for key ${key}:`, e)
-          }
-        }
-      }
+      if (error) throw error
 
-      // Then check legacy room keys
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.startsWith("room_")) {
-          const roomId = key.replace("room_", "")
-
-          // Skip if we already found this room in the global keys
-          if (rooms.some((r) => r.roomId === roomId && r.keyType === "global")) {
-            continue
-          }
-
-          try {
-            const roomData = JSON.parse(localStorage.getItem(key))
-            rooms.push({
-              roomId,
-              ...roomData,
-              keyType: "legacy",
-            })
-          } catch (e) {
-            console.warn(`Error parsing room data for key ${key}:`, e)
-          }
-        }
-      }
-
-      return rooms
+      return data || []
     } catch (e) {
       console.error("Error listing rooms:", e)
       return []
@@ -467,4 +311,4 @@ const RoomService = {
   },
 }
 
-export default RoomService
+export default RoomServiceSupabase

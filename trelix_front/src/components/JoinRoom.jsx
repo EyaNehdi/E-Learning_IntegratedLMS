@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import RoomService from "./room-service"
+import RoomServiceSupabase from "./room-service.js"
 
 export default function JoinRoom() {
   const [roomId, setRoomId] = useState("")
@@ -30,7 +30,7 @@ export default function JoinRoom() {
   }, [])
 
   // Modify the handleSubmit function to be more permissive with room checking
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     try {
@@ -41,11 +41,11 @@ export default function JoinRoom() {
       }
 
       // Check if room exists - but we'll be more permissive now
-      // We'll attempt to join even if the room isn't found in localStorage
-      const roomExists = RoomService.roomExists(roomId)
+      // We'll attempt to join even if the room isn't found in the database
+      const roomExists = await RoomServiceSupabase.roomExists(roomId)
 
       // Get room info to verify instructor
-      const roomInfo = RoomService.getRoomInfo(roomId)
+      const roomInfo = await RoomServiceSupabase.getRoomInfo(roomId)
       if (!roomInfo) {
         setError("Invalid room information. Please try again.")
         return
@@ -55,8 +55,8 @@ export default function JoinRoom() {
       localStorage.setItem("isHost", "false")
       localStorage.setItem("displayName", displayName)
       localStorage.setItem("currentRoomId", roomId)
-      localStorage.setItem("instructorId", roomInfo.instructorId || "unknown_instructor")
-      localStorage.setItem("instructorName", roomInfo.instructorName || "Instructor")
+      localStorage.setItem("instructorId", roomInfo.instructor_id || "unknown_instructor")
+      localStorage.setItem("instructorName", roomInfo.instructor_name || "Instructor")
 
       // Navigate to the meeting room
       navigate(`/room/${roomId}`)
