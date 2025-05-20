@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import RoomService from "./room-service"
+import RoomServiceSupabase from "./room-service.js"
 
 export default function HostSetup() {
   const [roomId, setRoomId] = useState("")
@@ -30,7 +30,7 @@ export default function HostSetup() {
     }
   }, [])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     try {
@@ -41,7 +41,7 @@ export default function HostSetup() {
       }
 
       // Create the room with instructor info
-      const result = RoomService.createRoom(roomId, userId, displayName)
+      const result = await RoomServiceSupabase.createRoom(roomId, userId, displayName)
 
       if (!result.success) {
         setError(result.error || "Failed to create room")
@@ -61,12 +61,12 @@ export default function HostSetup() {
     }
   }
 
-  const clearAllRoomData = () => {
+  const clearAllRoomData = async () => {
     setIsClearing(true)
     try {
-      const result = RoomService.clearAllRoomData()
+      const result = await RoomServiceSupabase.clearAllRoomData()
       if (result.success) {
-        setError(`Successfully cleared ${result.count} room items. You can now create a new room.`)
+        setError(`Successfully cleared all room data. You can now create a new room.`)
       } else {
         setError(`Failed to clear room data: ${result.error}`)
       }
@@ -143,7 +143,7 @@ export default function HostSetup() {
           >
             {isClearing ? "Clearing..." : "Clear All Room Data"}
           </button>
-          <p className="mt-1 text-xs text-gray-500">This will remove all stored room data from this browser.</p>
+          <p className="mt-1 text-xs text-gray-500">This will remove all stored room data from the database.</p>
         </div>
 
         <div className="mt-6">
