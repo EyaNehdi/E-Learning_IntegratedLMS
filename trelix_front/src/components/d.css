@@ -1,0 +1,47 @@
+/* Dashboard transitions */
+.dashboard {
+  transition: all 0.3s ease;
+}
+
+.dashboard-minimized {
+  transform: scale(0.1);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dashboard-expanded {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Smooth size transitions */
+.dashboard-content {
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+/* Draggable cursor styles */
+.dashboard-header {
+  cursor: grab;
+}
+
+.dashboard-header:active {
+  cursor: grabbing;
+}
+
+/* Tab transitions */
+.dashboard-tab {
+  transition: background-color 0.2s ease, color 0.2s ease, border-bottom 0.2s ease;
+}
+
+/* Button hover effects */
+.dashboard-button {
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.dashboard-button:hover {
+  transform: translateY(-1px);
+}
+
+.dashboard-button:active {
+  transform: translateY(1px);
+}

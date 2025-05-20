@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import RoomServiceSupabase from "./room-service.js"
+import "./d.css"
 
 export default function JoinRoom() {
   const [roomId, setRoomId] = useState("")
