@@ -82,6 +82,7 @@ export default function MeetingRoom() {
   const { roomId } = useParams()
   const navigate = useNavigate()
   const videoContainerRef = useRef(null)
+  const dashboardRef = useRef(null)
 
   // Jitsi state
   const [jitsiLoaded, setJitsiLoaded] = useState(false)
@@ -98,6 +99,14 @@ export default function MeetingRoom() {
   const [mockMode, setMockMode] = useState(false)
   const [detectionInterval, setDetectionInterval] = useState(30)
   const [participantEmotions, setParticipantEmotions] = useState({})
+
+  // Dashboard UI state
+  const [dashboardPosition, setDashboardPosition] = useState({ x: 20, y: 20 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [dashboardMinimized, setDashboardMinimized] = useState(false)
+  const [dashboardView, setDashboardView] = useState("emotions") // "emotions" or "stats"
+  const [dashboardSize, setDashboardSize] = useState("medium") // "small", "medium", "large"
 
   // Processed emotions cache to prevent duplicates
   const processedEmotions = useRef(new Set())
@@ -135,6 +144,113 @@ export default function MeetingRoom() {
       return newMessages
     })
   }
+
+  // Load dashboard position from localStorage
+  useEffect(() => {
+    try {
+      const savedPosition = localStorage.getItem("dashboardPosition")
+      if (savedPosition) {
+        setDashboardPosition(JSON.parse(savedPosition))
+      }
+
+      const savedMinimized = localStorage.getItem("dashboardMinimized")
+      if (savedMinimized !== null) {
+        setDashboardMinimized(savedMinimized === "true")
+      }
+
+      const savedSize = localStorage.getItem("dashboardSize")
+      if (savedSize) {
+        setDashboardSize(savedSize)
+      }
+
+      const savedView = localStorage.getItem("dashboardView")
+      if (savedView) {
+        setDashboardView(savedView)
+      }
+    } catch (err) {
+      console.error("Error loading dashboard settings:", err)
+    }
+  }, [])
+
+  // Save dashboard position to localStorage when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("dashboardPosition", JSON.stringify(dashboardPosition))
+    } catch (err) {
+      console.error("Error saving dashboard position:", err)
+    }
+  }, [dashboardPosition])
+
+  // Save dashboard minimized state to localStorage when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("dashboardMinimized", dashboardMinimized.toString())
+    } catch (err) {
+      console.error("Error saving dashboard minimized state:", err)
+    }
+  }, [dashboardMinimized])
+
+  // Save dashboard size to localStorage when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("dashboardSize", dashboardSize)
+    } catch (err) {
+      console.error("Error saving dashboard size:", err)
+    }
+  }, [dashboardSize])
+
+  // Save dashboard view to localStorage when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("dashboardView", dashboardView)
+    } catch (err) {
+      console.error("Error saving dashboard view:", err)
+    }
+  }, [dashboardView])
+
+  // Handle mouse down for dragging
+  const handleMouseDown = (e) => {
+    if (dashboardRef.current && e.target.closest(".dashboard-header")) {
+      setIsDragging(true)
+      const rect = dashboardRef.current.getBoundingClientRect()
+      setDragOffset({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      })
+    }
+  }
+
+  // Handle mouse move for dragging
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      const newX = e.clientX - dragOffset.x
+      const newY = e.clientY - dragOffset.y
+
+      // Ensure dashboard stays within viewport
+      const maxX = window.innerWidth - (dashboardRef.current?.offsetWidth || 300)
+      const maxY = window.innerHeight - (dashboardRef.current?.offsetHeight || 200)
+
+      setDashboardPosition({
+        x: Math.max(0, Math.min(newX, maxX)),
+        y: Math.max(0, Math.min(newY, maxY)),
+      })
+    }
+  }
+
+  // Handle mouse up for dragging
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  // Add event listeners for dragging
+  useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mouseup", handleMouseUp)
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("mouseup", handleMouseUp)
+    }
+  }, [isDragging, dragOffset])
 
   // Load user data from localStorage
   const ensureRoomExists = async () => {
@@ -654,6 +770,32 @@ export default function MeetingRoom() {
     )
   }
 
+  // Get dashboard width based on size
+  const getDashboardWidth = () => {
+    switch (dashboardSize) {
+      case "small":
+        return "280px"
+      case "large":
+        return "450px"
+      case "medium":
+      default:
+        return "350px"
+    }
+  }
+
+  // Get dashboard max height based on size
+  const getDashboardMaxHeight = () => {
+    switch (dashboardSize) {
+      case "small":
+        return "400px"
+      case "large":
+        return "700px"
+      case "medium":
+      default:
+        return "550px"
+    }
+  }
+
   return (
     <div style={{ position: "relative", height: "calc(100vh - 200px)", width: "100%", margin: "20px 0" }}>
       {/* Video container */}
@@ -759,395 +901,675 @@ export default function MeetingRoom() {
         </button>
       </div>
 
-      {/* Manual Refresh Button for Instructors */}
-      {isHost && (
+      {/* Student Emotion UI */}
+      {!isHost && (
         <div
           style={{
             position: "absolute",
             top: "20px",
-            left: "180px",
+            right: "20px",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            padding: "15px",
+            borderRadius: "10px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
             zIndex: 1000,
+            maxWidth: "300px",
           }}
         >
-          <button
-            onClick={manualPollEmotions}
-            style={{
-              backgroundColor: "#4dabf7",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              padding: "10px 16px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: "pointer",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-            }}
-          >
-            Refresh Emotions
-          </button>
+          <h3 style={{ margin: "0 0 10px 0", fontSize: "16px", fontWeight: "600" }}>
+            Emotion Detection {autoDetectActive ? "(Auto)" : "(Stopped)"}
+          </h3>
+
+          <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
+            <button
+              onClick={() => setAutoDetectActive(!autoDetectActive)}
+              style={{
+                backgroundColor: autoDetectActive ? "#e03131" : "#4dabf7",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                padding: "8px 12px",
+                fontSize: "14px",
+                cursor: "pointer",
+                flex: "1",
+              }}
+            >
+              {autoDetectActive ? "Stop Detection" : "Start Detection"}
+            </button>
+
+           
+          </div>
+
+          {loading && <p style={{ fontSize: "14px", margin: "5px 0" }}>Analyzing...</p>}
+
+          {webcamError && !mockMode && (
+            <div
+              style={{
+                backgroundColor: "#fff5f5",
+                padding: "10px",
+                borderRadius: "6px",
+                marginBottom: "10px",
+                border: "1px solid #ffc9c9",
+              }}
+            >
+              <p style={{ margin: "0 0 8px 0", fontSize: "14px", fontWeight: "500", color: "#e03131" }}>
+                Webcam Access Error
+              </p>
+              <p style={{ margin: "0", fontSize: "13px" }}>Enable mock mode to test with simulated emotions.</p>
+            </div>
+          )}
+
+          {error && !webcamError && (
+            <div
+              style={{
+                fontSize: "14px",
+                color: "#e03131",
+                margin: "5px 0",
+                padding: "8px",
+                backgroundColor: "#fff5f5",
+                borderRadius: "4px",
+              }}
+            >
+              <p style={{ margin: "0" }}>{error}</p>
+            </div>
+          )}
+
+          {/* Current Emotion (for students) */}
+          {emotion && (
+            <div
+              style={{
+                backgroundColor: "#e7f5ff",
+                padding: "10px",
+                borderRadius: "6px",
+                marginTop: "5px",
+              }}
+            >
+              <p style={{ margin: "0", fontSize: "14px" }}>
+                <strong>Your Emotion:</strong> {emotion} {mockMode && "(Mock)"}
+              </p>
+              <p style={{ margin: "5px 0 0 0", fontSize: "12px", fontStyle: "italic", color: "#495057" }}>
+                Your emotion is being shared with the instructor.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Emotion Detection UI */}
-      <div
-        style={{
-          position: "absolute",
-          top: "20px",
-          right: "20px",
-          backgroundColor: "rgba(255, 255, 255, 0.9)",
-          padding: "15px",
-          borderRadius: "10px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-          zIndex: 1000,
-          maxWidth: isHost ? "400px" : "300px",
-          maxHeight: "80vh",
-          overflowY: "auto",
-        }}
-      >
-        <h3 style={{ margin: "0 0 10px 0", fontSize: "16px", fontWeight: "600" }}>
-          {isHost ? "Instructor Dashboard" : "Emotion Detection"} {autoDetectActive ? "(Auto)" : "(Stopped)"}
-        </h3>
+      {/* Instructor Dashboard */}
+      {isHost && (
+        <>
+          {/* Minimized Dashboard Button */}
+          {dashboardMinimized && (
+            <div
+              style={{
+                position: "absolute",
+                top: dashboardPosition.y,
+                left: dashboardPosition.x,
+                zIndex: 1000,
+                backgroundColor: "#4dabf7",
+                borderRadius: "50%",
+                width: "50px",
+                height: "50px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+              }}
+              onClick={() => setDashboardMinimized(false)}
+            >
+              <span style={{ color: "white", fontSize: "24px" }}>👁️</span>
+            </div>
+          )}
 
-        <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
-          <button
-            onClick={() => setAutoDetectActive(!autoDetectActive)}
-            style={{
-              backgroundColor: autoDetectActive ? "#e03131" : "#4dabf7",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              padding: "8px 12px",
-              fontSize: "14px",
-              cursor: "pointer",
-              flex: "1",
-            }}
-          >
-            {autoDetectActive ? "Stop Detection" : "Start Detection"}
-          </button>
-
-          <button
-            onClick={() => {
-              setMockMode(!mockMode)
-              if (!mockMode && isHost) {
-                setTimeout(useMockData, 500)
-              }
-            }}
-            style={{
-              backgroundColor: mockMode ? "#2b8a3e" : "#868e96",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              padding: "8px 12px",
-              fontSize: "14px",
-              cursor: "pointer",
-              flex: "1",
-            }}
-          >
-            {mockMode ? "Mock: ON" : "Use Mock"}
-          </button>
-        </div>
-
-        {/* Debug Toggle */}
-        <div style={{ marginBottom: "10px", textAlign: "right" }}>
-          <button
-            onClick={() => setShowDebug(!showDebug)}
-            style={{
-              backgroundColor: "transparent",
-              color: "#666",
-              border: "none",
-              fontSize: "12px",
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}
-          >
-            {showDebug ? "Hide Debug" : "Show Debug"}
-          </button>
-        </div>
-
-        {/* Debug Messages */}
-        {showDebug && (
-          <div
-            style={{
-              marginBottom: "15px",
-              backgroundColor: "#f8f9fa",
-              border: "1px solid #dee2e6",
-              borderRadius: "4px",
-              padding: "8px",
-              maxHeight: "150px",
-              overflowY: "auto",
-              fontSize: "12px",
-              fontFamily: "monospace",
-            }}
-          >
-            {debugMessages.length === 0 ? (
-              <div style={{ color: "#666" }}>No debug messages yet</div>
-            ) : (
-              debugMessages.map((msg, i) => (
-                <div key={i} style={{ marginBottom: "4px" }}>
-                  <span style={{ color: "#666" }}>[{msg.time}]</span> {msg.message}
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* Detection Interval Settings */}
-        <div style={{ marginBottom: "15px" }}>
-          <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>
-            Detection Interval: {detectionInterval} seconds
-          </label>
-          <div style={{ display: "flex", gap: "8px" }}>
-            {[15, 30, 60].map((seconds) => (
-              <button
-                key={seconds}
-                onClick={() => updateDetectionInterval(seconds)}
+          {/* Full Dashboard */}
+          {!dashboardMinimized && (
+            <div
+              ref={dashboardRef}
+              style={{
+                position: "absolute",
+                top: dashboardPosition.y,
+                left: dashboardPosition.x,
+                backgroundColor: "rgba(255, 255, 255, 0.95)",
+                borderRadius: "10px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                zIndex: 1000,
+                width: getDashboardWidth(),
+                maxHeight: getDashboardMaxHeight(),
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                cursor: isDragging ? "grabbing" : "auto",
+              }}
+              onMouseDown={handleMouseDown}
+            >
+              {/* Dashboard Header */}
+              <div
+                className="dashboard-header"
                 style={{
-                  backgroundColor: detectionInterval === seconds ? "#4dabf7" : "#e9ecef",
-                  color: detectionInterval === seconds ? "white" : "#495057",
-                  border: "none",
-                  borderRadius: "4px",
-                  padding: "4px 8px",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  flex: "1",
+                  padding: "10px 15px",
+                  backgroundColor: "#4dabf7",
+                  color: "white",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "grab",
+                  userSelect: "none",
                 }}
               >
-                {seconds}s
-              </button>
-            ))}
-          </div>
-        </div>
+                <div style={{ fontWeight: "600", fontSize: "16px" }}>Instructor Dashboard</div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  {/* Size Toggle */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const sizes = ["small", "medium", "large"]
+                      const currentIndex = sizes.indexOf(dashboardSize)
+                      const nextIndex = (currentIndex + 1) % sizes.length
+                      setDashboardSize(sizes[nextIndex])
+                    }}
+                    style={{
+                      backgroundColor: "transparent",
+                      border: "none",
+                      color: "white",
+                      cursor: "pointer",
+                      fontSize: "16px",
+                      padding: "0",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "24px",
+                      height: "24px",
+                    }}
+                  >
+                    {dashboardSize === "small" ? "🔍" : dashboardSize === "medium" ? "📊" : "📋"}
+                  </button>
 
-        {loading && <p style={{ fontSize: "14px", margin: "5px 0" }}>Analyzing...</p>}
+                  {/* Minimize Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setDashboardMinimized(true)
+                    }}
+                    style={{
+                      backgroundColor: "transparent",
+                      border: "none",
+                      color: "white",
+                      cursor: "pointer",
+                      fontSize: "16px",
+                      padding: "0",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "24px",
+                      height: "24px",
+                    }}
+                  >
+                    —
+                  </button>
+                </div>
+              </div>
 
-        {webcamError && !mockMode && (
-          <div
-            style={{
-              backgroundColor: "#fff5f5",
-              padding: "10px",
-              borderRadius: "6px",
-              marginBottom: "10px",
-              border: "1px solid #ffc9c9",
-            }}
-          >
-            <p style={{ margin: "0 0 8px 0", fontSize: "14px", fontWeight: "500", color: "#e03131" }}>
-              Webcam Access Error
-            </p>
-            <p style={{ margin: "0", fontSize: "13px" }}>Enable mock mode to test with simulated emotions.</p>
-          </div>
-        )}
+              {/* Dashboard Tabs */}
+              <div
+                style={{
+                  display: "flex",
+                  borderBottom: "1px solid #e9ecef",
+                }}
+              >
+                <button
+                  onClick={() => setDashboardView("emotions")}
+                  style={{
+                    flex: 1,
+                    padding: "8px 12px",
+                    backgroundColor: dashboardView === "emotions" ? "#e7f5ff" : "transparent",
+                    border: "none",
+                    borderBottom: dashboardView === "emotions" ? "2px solid #4dabf7" : "none",
+                    cursor: "pointer",
+                    fontWeight: dashboardView === "emotions" ? "600" : "normal",
+                    color: dashboardView === "emotions" ? "#4dabf7" : "#495057",
+                  }}
+                >
+                  Student Emotions
+                </button>
+                <button
+                  onClick={() => setDashboardView("stats")}
+                  style={{
+                    flex: 1,
+                    padding: "8px 12px",
+                    backgroundColor: dashboardView === "stats" ? "#e7f5ff" : "transparent",
+                    border: "none",
+                    borderBottom: dashboardView === "stats" ? "2px solid #4dabf7" : "none",
+                    cursor: "pointer",
+                    fontWeight: dashboardView === "stats" ? "600" : "normal",
+                    color: dashboardView === "stats" ? "#4dabf7" : "#495057",
+                  }}
+                >
+                  Class Stats
+                </button>
+              </div>
 
-        {error && !webcamError && (
-          <div
-            style={{
-              fontSize: "14px",
-              color: "#e03131",
-              margin: "5px 0",
-              padding: "8px",
-              backgroundColor: "#fff5f5",
-              borderRadius: "4px",
-            }}
-          >
-            <p style={{ margin: "0" }}>{error}</p>
-          </div>
-        )}
-
-        {/* Current Emotion (for students) */}
-        {!isHost && emotion && (
-          <div
-            style={{
-              backgroundColor: "#e7f5ff",
-              padding: "10px",
-              borderRadius: "6px",
-              marginTop: "5px",
-            }}
-          >
-            <p style={{ margin: "0", fontSize: "14px" }}>
-              <strong>Your Emotion:</strong> {emotion} {mockMode && "(Mock)"}
-            </p>
-            <p style={{ margin: "5px 0 0 0", fontSize: "12px", fontStyle: "italic", color: "#495057" }}>
-              Your emotion is being shared with the instructor.
-            </p>
-          </div>
-        )}
-
-        {/* Instructor View - Participants Emotions */}
-        {isHost && (
-          <div style={{ marginTop: "15px" }}>
-            <h4
-              style={{
-                fontSize: "16px",
-                margin: "0 0 12px 0",
-                fontWeight: "600",
-                borderBottom: "2px solid #e9ecef",
-                paddingBottom: "8px",
-              }}
-            >
-              Student Emotions
-            </h4>
-
-            {Object.keys(participantEmotions).length === 0 ? (
+              {/* Dashboard Content */}
               <div
                 style={{
                   padding: "15px",
-                  textAlign: "center",
-                  backgroundColor: "#f8f9fa",
-                  borderRadius: "6px",
-                  color: "#495057",
+                  overflowY: "auto",
+                  maxHeight: "calc(100% - 100px)",
                 }}
               >
-                <p style={{ margin: "0", fontSize: "14px" }}>No students have joined yet.</p>
-                <button
-                  onClick={useMockData}
-                  style={{
-                    marginTop: "10px",
-                    backgroundColor: "#4dabf7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    padding: "6px 12px",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Load Sample Data
-                </button>
-              </div>
-            ) : (
-              <div
-                style={{
-                  backgroundColor: "#f8f9fa",
-                  borderRadius: "6px",
-                  padding: "12px",
-                  marginBottom: "15px",
-                }}
-              >
-                <div
-                  style={{
-                    marginBottom: "10px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <span style={{ fontWeight: "500", fontSize: "14px" }}>
-                    Total Students: {Object.keys(participantEmotions).length}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "12px",
-                      padding: "3px 8px",
-                      borderRadius: "12px",
-                      backgroundColor: "#4dabf7",
-                      color: "white",
-                    }}
-                  >
-                    {mockMode ? "Mock Data" : "Live Updates"}
-                  </span>
-                </div>
-
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-                    gap: "10px",
-                    maxHeight: "300px",
-                    overflowY: "auto",
-                    padding: "5px",
-                  }}
-                >
-                  {Object.values(participantEmotions).map((participant) => (
-                    <div
-                      key={participant.id}
+                {/* Controls */}
+                <div style={{ marginBottom: "15px" }}>
+                  <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
+                    <button
+                      onClick={() => setAutoDetectActive(!autoDetectActive)}
                       style={{
-                        padding: "12px",
-                        borderRadius: "8px",
-                        backgroundColor: "white",
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-                        border: `1px solid ${getEmotionBorderColor(participant.emotion)}`,
+                        backgroundColor: autoDetectActive ? "#e03131" : "#4dabf7",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "8px 12px",
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        flex: "1",
                       }}
                     >
+                      {autoDetectActive ? "Stop Detection" : "Start Detection"}
+                    </button>
+
+                    <button
+                      onClick={manualPollEmotions}
+                      style={{
+                        backgroundColor: "#4dabf7",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "8px 12px",
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        flex: "1",
+                      }}
+                    >
+                      Refresh Data
+                    </button>
+                  </div>
+
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    
+
+                    <button
+                      onClick={() => setShowDebug(!showDebug)}
+                      style={{
+                        backgroundColor: showDebug ? "#fd7e14" : "#adb5bd",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "8px 12px",
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        flex: "1",
+                      }}
+                    >
+                      {showDebug ? "Hide Debug" : "Show Debug"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Debug Messages */}
+                {showDebug && (
+                  <div
+                    style={{
+                      marginBottom: "15px",
+                      backgroundColor: "#f8f9fa",
+                      border: "1px solid #dee2e6",
+                      borderRadius: "4px",
+                      padding: "8px",
+                      maxHeight: "150px",
+                      overflowY: "auto",
+                      fontSize: "12px",
+                      fontFamily: "monospace",
+                    }}
+                  >
+                    {debugMessages.length === 0 ? (
+                      <div style={{ color: "#666" }}>No debug messages yet</div>
+                    ) : (
+                      debugMessages.map((msg, i) => (
+                        <div key={i} style={{ marginBottom: "4px" }}>
+                          <span style={{ color: "#666" }}>[{msg.time}]</span> {msg.message}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+
+                {/* Student Emotions View */}
+                {dashboardView === "emotions" && (
+                  <div>
+                    {Object.keys(participantEmotions).length === 0 ? (
                       <div
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          marginBottom: "8px",
-                          gap: "8px",
+                          padding: "15px",
+                          textAlign: "center",
+                          backgroundColor: "#f8f9fa",
+                          borderRadius: "6px",
+                          color: "#495057",
+                        }}
+                      >
+                        <p style={{ margin: "0", fontSize: "14px" }}>No students have joined yet.</p>
+                        <button
+                          onClick={useMockData}
+                          style={{
+                            marginTop: "10px",
+                            backgroundColor: "#4dabf7",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            padding: "6px 12px",
+                            fontSize: "13px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Load Sample Data
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          backgroundColor: "#f8f9fa",
+                          borderRadius: "6px",
+                          padding: "12px",
+                          marginBottom: "15px",
                         }}
                       >
                         <div
                           style={{
-                            width: "36px",
-                            height: "36px",
-                            borderRadius: "50%",
-                            backgroundColor: getEmotionColor(participant.emotion),
+                            marginBottom: "10px",
                             display: "flex",
+                            justifyContent: "space-between",
                             alignItems: "center",
-                            justifyContent: "center",
-                            color: "white",
-                            fontWeight: "bold",
-                            fontSize: "16px",
                           }}
                         >
-                          {participant.name ? participant.name.charAt(0).toUpperCase() : "?"}
-                        </div>
-                        <div style={{ overflow: "hidden" }}>
-                          <div
+                          <span style={{ fontWeight: "500", fontSize: "14px" }}>
+                            Total Students: {Object.keys(participantEmotions).length}
+                          </span>
+                          <span
                             style={{
-                              fontWeight: "600",
-                              fontSize: "14px",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
+                              fontSize: "12px",
+                              padding: "3px 8px",
+                              borderRadius: "12px",
+                              backgroundColor: "#4dabf7",
+                              color: "white",
                             }}
                           >
-                            {participant.name || "Unknown Student"}
-                          </div>
+                            {mockMode ? "Mock Data" : "Live Updates"}
+                          </span>
                         </div>
-                      </div>
 
-                      <div
-                        style={{
-                          backgroundColor: getEmotionBackgroundColor(participant.emotion),
-                          padding: "8px",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                        }}
-                      >
                         <div
                           style={{
-                            fontWeight: "500",
-                            fontSize: "15px",
-                            color: getEmotionTextColor(participant.emotion),
+                            display: "grid",
+                            gridTemplateColumns:
+                              dashboardSize === "small" ? "1fr" : "repeat(auto-fill, minmax(150px, 1fr))",
+                            gap: "10px",
+                            maxHeight: "300px",
+                            overflowY: "auto",
+                            padding: "5px",
                           }}
                         >
-                          {participant.emotion ? participant.emotion.toUpperCase() : "UNKNOWN"}
+                          {Object.values(participantEmotions).map((participant) => (
+                            <div
+                              key={participant.id}
+                              style={{
+                                padding: "12px",
+                                borderRadius: "8px",
+                                backgroundColor: "white",
+                                boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                                border: `1px solid ${getEmotionBorderColor(participant.emotion)}`,
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  marginBottom: "8px",
+                                  gap: "8px",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    width: "36px",
+                                    height: "36px",
+                                    borderRadius: "50%",
+                                    backgroundColor: getEmotionColor(participant.emotion),
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "white",
+                                    fontWeight: "bold",
+                                    fontSize: "16px",
+                                  }}
+                                >
+                                  {participant.name ? participant.name.charAt(0).toUpperCase() : "?"}
+                                </div>
+                                <div style={{ overflow: "hidden" }}>
+                                  <div
+                                    style={{
+                                      fontWeight: "600",
+                                      fontSize: "14px",
+                                      whiteSpace: "nowrap",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                    }}
+                                  >
+                                    {participant.name || "Unknown Student"}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div
+                                style={{
+                                  backgroundColor: getEmotionBackgroundColor(participant.emotion),
+                                  padding: "8px",
+                                  borderRadius: "6px",
+                                  textAlign: "center",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    fontWeight: "500",
+                                    fontSize: "15px",
+                                    color: getEmotionTextColor(participant.emotion),
+                                  }}
+                                >
+                                  {participant.emotion ? participant.emotion.toUpperCase() : "UNKNOWN"}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                    )}
+                  </div>
+                )}
 
-            {/* Class Engagement Summary */}
-            {Object.keys(participantEmotions).length > 0 && (
-              <div style={{ marginTop: "15px" }}>
-                <h4 style={{ fontSize: "14px", margin: "0 0 8px 0", fontWeight: "600" }}>Class Engagement:</h4>
-                <div
-                  style={{
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "6px",
-                    padding: "10px",
-                  }}
-                >
-                  <ClassEngagementSummary participants={participantEmotions} />
-                </div>
+                {/* Class Stats View */}
+                {dashboardView === "stats" && (
+                  <div>
+                    {Object.keys(participantEmotions).length === 0 ? (
+                      <div
+                        style={{
+                          padding: "15px",
+                          textAlign: "center",
+                          backgroundColor: "#f8f9fa",
+                          borderRadius: "6px",
+                          color: "#495057",
+                        }}
+                      >
+                        <p style={{ margin: "0", fontSize: "14px" }}>No students have joined yet.</p>
+                        <button
+                          onClick={useMockData}
+                          style={{
+                            marginTop: "10px",
+                            backgroundColor: "#4dabf7",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            padding: "6px 12px",
+                            fontSize: "13px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Load Sample Data
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          backgroundColor: "#f8f9fa",
+                          borderRadius: "6px",
+                          padding: "12px",
+                        }}
+                      >
+                        <ClassEngagementSummary participants={participantEmotions} />
+
+                        {/* Emotion Distribution */}
+                        <div style={{ marginTop: "20px" }}>
+                          <h4 style={{ fontSize: "14px", margin: "0 0 10px 0", fontWeight: "600" }}>
+                            Emotion Distribution
+                          </h4>
+
+                          {/* Count emotions */}
+                          {(() => {
+                            const emotionCounts = {}
+                            Object.values(participantEmotions).forEach((student) => {
+                              if (student.emotion) {
+                                emotionCounts[student.emotion] = (emotionCounts[student.emotion] || 0) + 1
+                              }
+                            })
+
+                            return Object.keys(emotionCounts).length > 0 ? (
+                              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                {Object.entries(emotionCounts).map(([emotion, count]) => (
+                                  <div key={emotion} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    <div
+                                      style={{
+                                        width: "16px",
+                                        height: "16px",
+                                        borderRadius: "4px",
+                                        backgroundColor: getEmotionColor(emotion),
+                                      }}
+                                    ></div>
+                                    <div style={{ flex: 1, fontSize: "14px" }}>
+                                      {emotion.charAt(0).toUpperCase() + emotion.slice(1)}
+                                    </div>
+                                    <div style={{ fontSize: "14px", fontWeight: "500" }}>
+                                      {count} ({Math.round((count / Object.keys(participantEmotions).length) * 100)}%)
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p style={{ fontSize: "14px", color: "#666" }}>No emotion data available</p>
+                            )
+                          })()}
+                        </div>
+
+                        {/* Recommendations */}
+                        <div style={{ marginTop: "20px" }}>
+                          <h4 style={{ fontSize: "14px", margin: "0 0 10px 0", fontWeight: "600" }}>
+                            Teaching Recommendations
+                          </h4>
+
+                          {(() => {
+                            // Count emotions
+                            const emotionCounts = {}
+                            Object.values(participantEmotions).forEach((student) => {
+                              if (student.emotion) {
+                                emotionCounts[student.emotion] = (emotionCounts[student.emotion] || 0) + 1
+                              }
+                            })
+
+                            // Find dominant emotion
+                            let dominantEmotion = null
+                            let maxCount = 0
+                            Object.entries(emotionCounts).forEach(([emotion, count]) => {
+                              if (count > maxCount) {
+                                dominantEmotion = emotion
+                                maxCount = count
+                              }
+                            })
+
+                            // Generate recommendations based on dominant emotion
+                            let recommendations = []
+                            if (dominantEmotion === "happy") {
+                              recommendations = [
+                                "Students are engaged! Continue with current teaching style.",
+                                "Consider introducing more challenging material.",
+                                "Good time for group activities and discussions.",
+                              ]
+                            } else if (dominantEmotion === "sad") {
+                              recommendations = [
+                                "Students may need encouragement. Try positive reinforcement.",
+                                "Consider a short break or energizing activity.",
+                                "Simplify complex concepts and provide more examples.",
+                              ]
+                            } else if (dominantEmotion === "angry") {
+                              recommendations = [
+                                "Students may be frustrated. Check for understanding.",
+                                "Slow down and review difficult concepts.",
+                                "Consider changing teaching approach or topic.",
+                              ]
+                            } else if (dominantEmotion === "surprised") {
+                              recommendations = [
+                                "Students are reacting to new information. Pause for questions.",
+                                "Provide context and connect to familiar concepts.",
+                                "Check for understanding before moving on.",
+                              ]
+                            } else if (dominantEmotion === "neutral") {
+                              recommendations = [
+                                "Students are attentive but not emotionally engaged.",
+                                "Try incorporating interactive elements or real-world examples.",
+                                "Consider asking thought-provoking questions.",
+                              ]
+                            } else if (dominantEmotion === "fearful") {
+                              recommendations = [
+                                "Students may be anxious. Provide reassurance.",
+                                "Break down complex topics into smaller steps.",
+                                "Consider one-on-one check-ins after class.",
+                              ]
+                            } else if (dominantEmotion === "disgusted") {
+                              recommendations = [
+                                "Students may be having a negative reaction to the material.",
+                                "Consider changing topics or approach.",
+                                "Ask for feedback on what would help improve the class.",
+                              ]
+                            } else {
+                              recommendations = [
+                                "Monitor student engagement closely.",
+                                "Try different teaching approaches to gauge response.",
+                                "Consider asking for direct feedback.",
+                              ]
+                            }
+
+                            return (
+                              <ul style={{ margin: "0", paddingLeft: "20px" }}>
+                                {recommendations.map((rec, index) => (
+                                  <li key={index} style={{ fontSize: "13px", marginBottom: "6px" }}>
+                                    {rec}
+                                  </li>
+                                ))}
+                              </ul>
+                            )
+                          })()}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }
