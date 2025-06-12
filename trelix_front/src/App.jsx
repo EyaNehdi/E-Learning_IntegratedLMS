@@ -46,9 +46,7 @@ import ListBadges from "./components/Admin/ListBadges";
 
 import ModifyPreference from "./components/Student/ModifyPreference.jsx";
 
-
-
-import axios from "axios"; 
+import axios from "axios";
 
 import StatPreference from "./components/Student/preference-statistics";
 import Preference from "./components/Student/AddPreference";
@@ -92,13 +90,14 @@ import PacksLayout from "./pages/Admin/PacksLayout.jsx";
 import ViewPack from "./components/Admin/ViewPack.jsx";
 import ViewUser from "./components/Admin/ViewUser.jsx";
 import QuizzAdd from "./components/Admin/QuizzAdd.jsx";
+import CoursesWizard from "./components/Instructor/CoursesWizard.jsx";
+import HostSetup from "./components/HostSetup.jsx";
+import PostPayment from "./pages/PostPayment.jsx";
 
 function App() {
   return (
     <Router>
       <div>
-        <ChatComponent />
-
         <Routes>
           {/* **************** */}
           {/* Public routes */}
@@ -112,13 +111,12 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-
           </Route>
           <Route path="/test" element={<MoodleCourses />} />
           <Route path="/test1" element={<Calendar />} />
-          <Route path="/meeting" element={<JoinRoom />} />
+       
           <Route path="/chat" element={<ChatComponent />} />
-          <Route path="/meeting/:roomId" element={<MeetingRoom />} />
+         
           {/* **************** */}
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
@@ -140,6 +138,10 @@ function App() {
             <Route path="/quiz" element={<QuizzLeaderboard />} />
             <Route path="/Classroom" element={<ClassroomPage />} />
             <Route
+              path="/classroom/courses/:courseId"
+              element={<CourseDetailsPage />}
+            />
+            <Route
               path="course-chapter/:slugCourse"
               element={<CourseChapter />}
             />
@@ -153,41 +155,35 @@ function App() {
               path="/edit-course/:courseId"
               element={<EditCourse />}
             />
+            <Route path="/room/:roomId" element={<MeetingRoom />} />
 
 
             <Route path="/profile/classroom" element={<ClassroomPage />} />
 
-            <Route
-              path="/profile/classroom/courses/:courseId"
-              element={<CourseDetailsPage />}
-            />
-           
-        
+            
+
             <Route path="/store" element={<Store />} />
+            <Route path="/payment/success" element={<PostPayment />} />
             <Route path="/profile" element={<ProfilePage />}>
               <Route index element={<ProfileDetails />} />
               <Route path="details" element={<ProfileDetails />} />
               <Route path="test" element={<WordleGame />} />
-
+   <Route path="meeting" element={<JoinRoom />} />
+          <Route path="host" element={<HostSetup />} />
+           
               <Route path="geminichat" element={<GeminiChatbot />} />
               <Route path="dictionary" element={<Dictionary />} />
               <Route path="chat" element={<ChatComponent />} />
               <Route path="meeting" element={<JoinRoom />} />
               <Route path="preference" element={<Preference />} />
-            <Route
-              path="modify-preference"
-              element={<ModifyPreference />}
-            />
-            <Route
-              path="preferencestat"
-              element={<StatPreference />}
-            />
+              <Route path="modify-preference" element={<ModifyPreference />} />
+              <Route path="preferencestat" element={<StatPreference />} />
               <Route
-              path="intelligent-courses"
-              element={<IntelligentCourses />}
-            />
-           
+                path="intelligent-courses"
+                element={<IntelligentCourses />}
+              />
 
+              <Route path="wizard" element={<CoursesWizard />} />
               <Route path="addchapter" element={<AddChapter />} />
               <Route path="addExam" element={<AddExam />} />
               <Route path="Allexams" element={<AllExamsInstructor />} />

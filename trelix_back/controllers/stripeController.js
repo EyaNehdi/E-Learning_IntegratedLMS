@@ -5,7 +5,7 @@ const User = require('../models/userModel');
 const { recordFinancialEvent } = require('../services/financialEventService');
 
 const checkoutSession = async (req, res) => {
-  const { packId, userId } = req.body;
+  const { packId, userId, type } = req.body;
   const authUserId = req.userId;
   const userEmail = req.user?.email;
 
@@ -50,7 +50,10 @@ const checkoutSession = async (req, res) => {
       ],
       mode: "payment",
       customer_email: userEmail || undefined,
-      success_url: `${process.env.BASE_URL_FRONTEND}/store?session_id={CHECKOUT_SESSION_ID}`,
+      success_url:
+        type === "topup"
+          ? `${process.env.BASE_URL_FRONTEND}/store?session_id={CHECKOUT_SESSION_ID}`
+          : `${process.env.BASE_URL_FRONTEND}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BASE_URL_FRONTEND}/store`,
       metadata: {
         userId: authUserId || userId,

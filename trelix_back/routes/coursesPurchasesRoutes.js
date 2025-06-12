@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { purchaseCourse, checkCourseAccess } = require('../controllers/coursesPurchases');
+const { purchaseCourse, checkCoursesAccessBulk } = require('../controllers/coursesPurchases');
 const { verifyToken } = require('../middlewares/verifyToken');
 
 router.post('/purchase', verifyToken, purchaseCourse);
-router.get('/access/:courseId', verifyToken, checkCourseAccess);
+router.post('/access/bulk', verifyToken, checkCoursesAccessBulk);
 
 module.exports = router;

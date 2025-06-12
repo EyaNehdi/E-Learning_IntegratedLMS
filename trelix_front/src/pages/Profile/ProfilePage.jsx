@@ -46,24 +46,24 @@ const ProfilePage = () => {
   const [locationData, setLocationData] = useState(null);
 
   // Ensure that tracking location and fetching user data are done sequentially
-  // useEffect(() => {
-  //   const trackAndFetchData = async () => {
-  //     if (!locationTracked) {
-  //       console.log("Tracking location...");
-  //       const locationResponse = await trackLocation();
-  //       if (locationResponse) {
-  //         console.log("Location tracking completed.");
-  //         // Fetch user data AFTER location tracking completes
-  //         await fetchUser();
-  //       }
-  //     } else if (!isLoadingUser && !user) {
-  //       console.log("Fetching user data...");
-  //       await fetchUser();
-  //     }
-  //   };
+  useEffect(() => {
+    const trackAndFetchData = async () => {
+      if (!locationTracked) {
+        console.log("Tracking location...");
+        const locationResponse = await trackLocation();
+        if (locationResponse) {
+          console.log("Location tracking completed.");
+          // Fetch user data AFTER location tracking completes
+          await fetchUser();
+        }
+      } else if (!isLoadingUser && !user) {
+        console.log("Fetching user data...");
+        await fetchUser();
+      }
+    };
 
-  //   trackAndFetchData();
-  // }, []);
+    trackAndFetchData();
+  }, []);
 
   // Function to track the user's current location
   const trackLocation = async () => {
@@ -72,7 +72,7 @@ const ProfilePage = () => {
     try {
       // Make sure you send the request with credentials (cookie)
       const response = await axios.get(
-        "https://trelix-xj5h.onrender.com/api/auth/current-location",
+        `${import.meta.env.VITE_API_PROXY}/api/auth/current-location`,
         {
           withCredentials: true, // This ensures the cookie is sent along with the request
         }

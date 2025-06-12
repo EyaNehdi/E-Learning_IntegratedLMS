@@ -54,11 +54,10 @@ const Headeradmin = ({ onToggleSidebar }) => {
       ],
     },
     {
-      path: "/business-metrics",
+      path: "/business-metrics/user-transactions",
       icon: <Rocket size={16} />,
       label: "Metrics",
       children: [
-        { label: "Overview", path: "/business-metrics" },
         {
           label: "User Transactions",
           path: "/business-metrics/user-transactions",

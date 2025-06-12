@@ -15,6 +15,15 @@ const AuthDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const rowsPerPage = 5;
+
+  const indexOfLastItem = currentPage * rowsPerPage;
+  const indexOfFirstItem = indexOfLastItem - rowsPerPage;
+  const currentEvents = events.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(events.length / rowsPerPage);
+
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
@@ -111,7 +120,7 @@ const AuthDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {events.map((event, idx) => (
+              {currentEvents.map((event, idx) => (
                 <tr key={idx}>
                   <td>
                     <div className="flex items-center gap-3">
@@ -159,7 +168,7 @@ const AuthDashboard = () => {
         </div>
 
         <div className="md:hidden flex flex-col gap-4">
-          {events.map((event, idx) => (
+          {currentEvents.map((event, idx) => (
             <div
               key={idx}
               className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white"
@@ -193,6 +202,28 @@ const AuthDashboard = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="pagination-controls mt-4">
+          <span className="text-sm text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+          <div className="flex gap-2 mt-2 justify-center">
+            <button
+              className="custom-outline-btn"
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </button>
+            <button
+              className="custom-outline-btn"
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
 

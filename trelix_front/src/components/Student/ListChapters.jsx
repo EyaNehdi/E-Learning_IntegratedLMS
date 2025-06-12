@@ -10,64 +10,67 @@ import {
 } from "react-router-dom";
 import Swal from "sweetalert2";
 import "../Instructor/stylecontent.css";
+import { setRedirectSlug } from "../../utils/redirectSlug";
+import toast from "react-hot-toast";
+
 const ListChapters = () => {
-  const { slugCourse } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [finalCourseId, setFinalCourseId] = useState(null);
-  const [chapters, setChapters] = useState([]);
-  const [completedChapters, setCompletedChapters] = useState([]);
-  const { user, fetchUser } = useProfileStore();
-  const [loading, setLoading] = useState(true);
-  const [courseDetails, setCourseDetails] = useState(null);
-  const isChapterSelected = location.pathname.includes("/content/");
-  const [hasAccess, setHasAccess] = useState(false);
-  const [certificateEarned, setCertificateEarned] = useState(false);
-  const [loadingCertificate, setLoadingCertificate] = useState(false);
+  const { slugCourse } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [finalCourseId, setFinalCourseId] = useState(null)
+  const [chapters, setChapters] = useState([])
+  const [completedChapters, setCompletedChapters] = useState([])
+  const { user, fetchUser } = useProfileStore()
+  const [loading, setLoading] = useState(true)
+  const [courseDetails, setCourseDetails] = useState(null)
+  const isChapterSelected = location.pathname.includes("/content/")
+  const [hasAccess, setHasAccess] = useState(false)
+  const [certificateEarned, setCertificateEarned] = useState(false)
+  const [loadingCertificate, setLoadingCertificate] = useState(false)
 
   useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+    fetchUser()
+  }, [fetchUser])
+
+  // Function to strip HTML tags from text
+  const stripHtmlTags = (html) => {
+    if (!html) return ""
+    const doc = new DOMParser().parseFromString(html, "text/html")
+    return doc.body.textContent || ""
+  }
 
   const fetchCourseDetails = async () => {
     if (!slugCourse) {
-      console.error("Course ID is not defined");
-      return;
+      console.error("Course ID is not defined")
+      return
     }
 
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_PROXY}/chapter/course/${slugCourse}`
-      );
+      const response = await axios.get(`${import.meta.env.VITE_API_PROXY}/chapter/course/${slugCourse}`)
       if (response) {
-        setCertificateEarned(response.data.certificateEarned);
-        setCourseDetails(response.data.courseInfo);
-        setFinalCourseId(response.data.courseInfo.slugCourse);
-        setChapters(response.data.courseInfo.chapters);
-        const chaptersData =
-          response.data.chaptersWithCompletion ||
-          response.data.courseInfo.chapters;
-        const completed = chaptersData
-          .filter((chapter) => chapter.isCompleted)
-          .map((chapter) => chapter._id);
-        setCompletedChapters(completed);
-        setHasAccess(true);
-        setLoading(false);
+        setCertificateEarned(response.data.certificateEarned)
+        setCourseDetails(response.data.courseInfo)
+        setFinalCourseId(response.data.courseInfo.slugCourse)
+        setChapters(response.data.courseInfo.chapters)
+        const chaptersData = response.data.chaptersWithCompletion || response.data.courseInfo.chapters
+        const completed = chaptersData.filter((chapter) => chapter.isCompleted).map((chapter) => chapter._id)
+        setCompletedChapters(completed)
+        setHasAccess(true)
+        setLoading(false)
       }
     } catch (error) {
-      setLoading(false);
+      setLoading(false)
 
       if (error.response?.status === 403) {
-        const { courseId, courseSlug, courseTitle, coursePrice, userBalance } =
-          error.response.data;
+        const { courseId, courseSlug, courseTitle, coursePrice, userBalance } = error.response.data
 
-        const canAfford = userBalance >= coursePrice;
+        const canAfford = userBalance >= coursePrice
 
         const result = await Swal.fire({
           title: "Access Denied",
           html: `
             <p>You need to purchase <b>${courseTitle}</b> to view its chapters.</p>
-            <p>Price: $${coursePrice} | Your balance: $${userBalance}</p>
+            <p>Price: &nbsp; 🪙${coursePrice} | Your balance: &nbsp; 🪙${userBalance}</p>
             ${
               canAfford
                 ? "<p>You have enough balance to purchase this course.</p>"
@@ -76,10 +79,10 @@ const ListChapters = () => {
           `,
           icon: "warning",
           didOpen: () => {
-            document.body.classList.add("blur-background-access");
+            document.body.classList.add("blur-background-access")
           },
           willClose: () => {
-            document.body.classList.remove("blur-background-access");
+            document.body.classList.remove("blur-background-access")
           },
           showCancelButton: true,
           cancelButtonText: "Return",
@@ -96,21 +99,19 @@ const ListChapters = () => {
           allowOutsideClick: false,
           preConfirm: () => {
             if (!canAfford) {
-              Swal.showValidationMessage("You do not have enough balance.");
-              return false;
+              Swal.showValidationMessage("You do not have enough balance.")
+              return false
             }
           },
-        });
+        })
 
         if (!canAfford) {
           setTimeout(() => {
-            const confirmButton = document.querySelector(
-              ".swal-custom-confirm-button"
-            );
+            const confirmButton = document.querySelector(".swal-custom-confirm-button")
             if (confirmButton) {
-              confirmButton.setAttribute("disabled", "disabled");
+              confirmButton.setAttribute("disabled", "disabled")
             }
-          }, 0);
+          }, 0)
         }
 
         if (result.isConfirmed && canAfford) {
@@ -118,38 +119,41 @@ const ListChapters = () => {
             const purchaseResponse = await axios.post(
               `${import.meta.env.VITE_API_PROXY}/purchases/purchase`,
               { courseId },
-              { withCredentials: true }
-            );
-            Swal.fire("Purchase Successful!", "", "success");
-            fetchCourseDetails();
-            setHasAccess(true);
+              { withCredentials: true },
+            )
+            Swal.fire("Purchase Successful!", "", "success")
+            fetchCourseDetails()
+            setHasAccess(true)
           } catch (purchaseError) {
-            console.error("Purchase failed:", purchaseError);
-            Swal.fire("Operation failed", "Please try again later.", "error");
+            console.error("Purchase failed:", purchaseError)
+            Swal.fire("Operation failed", "Please try again later.", "error")
           }
         } else if (result.isDenied) {
+          setRedirectSlug(slugCourse);
+          sessionStorage.setItem("showRedirectToast", "true");
+          toast.success("Redirecting to the store...");
           navigate("/store");
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          navigate("/allcours");
+          navigate("/allcours")
         }
       } else if (error.response?.status === 404) {
         navigate("/allcours", {
           state: { error: "Course not found" },
-        });
+        })
       } else {
-        console.error("Error fetching course details:", error);
+        console.error("Error fetching course details:", error)
       }
     }
-  };
+  }
 
   useEffect(() => {
     if (slugCourse) {
-      fetchCourseDetails();
+      fetchCourseDetails()
     }
-  }, [slugCourse]);
+  }, [slugCourse])
 
   const handleCompleteChapter = async (chapterId) => {
-    console.log("Function called with chapterId:", chapterId);
+    console.log("Function called with chapterId:", chapterId)
 
     try {
       const response = await axios.post(
@@ -158,65 +162,59 @@ const ListChapters = () => {
         {
           params: { userId: user._id, chapterId },
           withCredentials: true,
-        }
-      );
+        },
+      )
 
       if (response.data.completedChapters) {
-        setCompletedChapters(response.data.completedChapters);
-        console.log("am triggered 2");
+        setCompletedChapters(response.data.completedChapters)
+        console.log("am triggered 2")
       }
     } catch (error) {
-      console.error("Error marking chapter as completed:", error);
+      console.error("Error marking chapter as completed:", error)
     }
-  };
+  }
 
   const areAllChaptersCompleted = () => {
-    if (chapters.length === 0) return false;
-    return chapters.every((chapter) => completedChapters.includes(chapter._id));
-  };
+    if (chapters.length === 0) return false
+    return chapters.every((chapter) => completedChapters.includes(chapter._id))
+  }
 
   const handleStartExam = () => {
     if (!areAllChaptersCompleted()) {
-      alert("Please complete all chapters before starting the exam.");
-      return;
+      alert("Please complete all chapters before starting the exam.")
+      return
     }
-    navigate(`/exams/${courseDetails._id}`);
-  };
+    navigate(`/exams/${courseDetails._id}`)
+  }
 
   const handleEarnCertificate = async (provider) => {
-    setLoadingCertificate(true);
+    setLoadingCertificate(true)
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_PROXY}/certificates/issueCertificate`,
-        {
-          userId: user._id,
-          courseSlug: slugCourse,
-          provider,
-        }
-      );
-      setCertificateEarned(true);
-      setLoadingCertificate(false);
+      const response = await axios.post(`${import.meta.env.VITE_API_PROXY}/certificates/issueCertificate`, {
+        userId: user._id,
+        courseSlug: slugCourse,
+        provider,
+      })
+      setCertificateEarned(true)
+      setLoadingCertificate(false)
     } catch (error) {
-      setLoadingCertificate(false);
-      console.error(
-        "Error earning certificate:",
-        error.response?.data || error
-      );
+      setLoadingCertificate(false)
+      console.error("Error earning certificate:", error.response?.data || error)
     }
-  };
+  }
 
   const formatPrice = (price, currency = "EUR") => {
-    if (price === 0 || price === "0") return "Gratuit";
+    if (price === 0 || price === "0") return "Free"
 
     const currencySymbols = {
       USD: "🪙",
       EUR: "🪙",
       DZD: "🪙",
-    };
+    }
 
-    const symbol = currencySymbols[currency] || currencySymbols.EUR;
-    return `${price} ${symbol}`;
-  };
+    const symbol = currencySymbols[currency] || currencySymbols.EUR
+    return `${price} ${symbol}`
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -351,112 +349,99 @@ const ListChapters = () => {
               )}
 
               {/* Certificate Button with fixed width to prevent text wrapping */}
-              {courseDetails?.categorie &&
-                !["OpenLearn", "OpenClassrooms"].includes(
-                  courseDetails.categorie
-                ) && (
-                  <>
-                    {areAllChaptersCompleted() && !loadingCertificate && (
-                      <button
-                        onClick={
-                          certificateEarned
-                            ? () => navigate("/certificates")
-                            : () => handleEarnCertificate("Trelix")
+              {courseDetails?.categorie && !["OpenLearn", "OpenClassrooms"].includes(courseDetails.categorie) && (
+                <>
+                  {areAllChaptersCompleted() && !loadingCertificate && (
+                    <button
+                      onClick={
+                        certificateEarned ? () => navigate("/certificates") : () => handleEarnCertificate("Trelix")
+                      }
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        whiteSpace: "nowrap",
+                        padding: "0.5rem 1rem",
+                        borderRadius: "0.375rem",
+                        fontWeight: "500",
+                        fontSize: "0.875rem",
+                        minWidth: "9rem",
+                        transition: "all 0.2s ease",
+                        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+                        border: "none",
+                        cursor: "pointer",
+                        letterSpacing: "0.01em",
+                        animation: certificateEarned ? "none" : "subtle-pulse 2s infinite ease-in-out",
+                        ...(certificateEarned
+                          ? {
+                              backgroundColor: "#e0e7ff",
+                              color: "#4338ca",
+                            }
+                          : {
+                              backgroundColor: "#4f46e5",
+                              color: "#ffffff",
+                            }),
+                      }}
+                      onMouseEnter={(e) => {
+                        if (certificateEarned) {
+                          e.currentTarget.style.backgroundColor = "#c7d2fe"
+                          e.currentTarget.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)"
+                        } else {
+                          e.currentTarget.style.backgroundColor = "#4338ca"
+                          e.currentTarget.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)"
                         }
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          whiteSpace: "nowrap",
-                          padding: "0.5rem 1rem",
-                          borderRadius: "0.375rem",
-                          fontWeight: "500",
-                          fontSize: "0.875rem",
-                          minWidth: "9rem",
-                          transition: "all 0.2s ease",
-                          boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-                          border: "none",
-                          cursor: "pointer",
-                          letterSpacing: "0.01em",
-                          animation: certificateEarned
-                            ? "none"
-                            : "subtle-pulse 2s infinite ease-in-out",
-                          ...(certificateEarned
-                            ? {
-                                backgroundColor: "#e0e7ff",
-                                color: "#4338ca",
-                              }
-                            : {
-                                backgroundColor: "#4f46e5",
-                                color: "#ffffff",
-                              }),
-                        }}
-                        onMouseEnter={(e) => {
-                          if (certificateEarned) {
-                            e.currentTarget.style.backgroundColor = "#c7d2fe";
-                            e.currentTarget.style.boxShadow =
-                              "0 2px 4px rgba(0, 0, 0, 0.1)";
-                          } else {
-                            e.currentTarget.style.backgroundColor = "#4338ca";
-                            e.currentTarget.style.boxShadow =
-                              "0 2px 4px rgba(0, 0, 0, 0.1)";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (certificateEarned) {
-                            e.currentTarget.style.backgroundColor = "#e0e7ff";
-                            e.currentTarget.style.boxShadow =
-                              "0 1px 2px rgba(0, 0, 0, 0.05)";
-                          } else {
-                            e.currentTarget.style.backgroundColor = "#4f46e5";
-                            e.currentTarget.style.boxShadow =
-                              "0 1px 2px rgba(0, 0, 0, 0.05)";
-                          }
-                        }}
-                      >
-                        {certificateEarned
-                          ? "View Certificate"
-                          : "Earn Certificate"}
-                      </button>
-                    )}
+                      }}
+                      onMouseLeave={(e) => {
+                        if (certificateEarned) {
+                          e.currentTarget.style.backgroundColor = "#e0e7ff"
+                          e.currentTarget.style.boxShadow = "0 1px 2px rgba(0, 0, 0, 0.05)"
+                        } else {
+                          e.currentTarget.style.backgroundColor = "#4f46e5"
+                          e.currentTarget.style.boxShadow = "0 1px 2px rgba(0, 0, 0, 0.05)"
+                        }
+                      }}
+                    >
+                      {certificateEarned ? "View Certificate" : "Earn Certificate"}
+                    </button>
+                  )}
 
-                    {/* Loading state with improved styling */}
-                    {loadingCertificate && (
+                  {/* Loading state with improved styling */}
+                  {loadingCertificate && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        whiteSpace: "nowrap",
+                        padding: "0.5rem 1rem",
+                        backgroundColor: "#f3f4f6",
+                        color: "#4b5563",
+                        borderRadius: "0.375rem",
+                        fontSize: "0.875rem",
+                        minWidth: "9rem",
+                        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+                        position: "relative",
+                        paddingLeft: "1.75rem",
+                      }}
+                    >
                       <div
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          whiteSpace: "nowrap",
-                          padding: "0.5rem 1rem",
-                          backgroundColor: "#f3f4f6",
-                          color: "#4b5563",
-                          borderRadius: "0.375rem",
-                          fontSize: "0.875rem",
-                          minWidth: "9rem",
-                          boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-                          position: "relative",
-                          paddingLeft: "1.75rem",
+                          position: "absolute",
+                          left: "0.75rem",
+                          width: "0.75rem",
+                          height: "0.75rem",
+                          border: "2px solid #9ca3af",
+                          borderBottomColor: "transparent",
+                          borderRadius: "50%",
+                          display: "inline-block",
+                          animation: "spin 1s linear infinite",
                         }}
-                      >
-                        <div
-                          style={{
-                            position: "absolute",
-                            left: "0.75rem",
-                            width: "0.75rem",
-                            height: "0.75rem",
-                            border: "2px solid #9ca3af",
-                            borderBottomColor: "transparent",
-                            borderRadius: "50%",
-                            display: "inline-block",
-                            animation: "spin 1s linear infinite",
-                          }}
-                        ></div>
-                        Processing...
-                      </div>
-                    )}
-                  </>
-                )}
+                      ></div>
+                      Processing...
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -464,7 +449,9 @@ const ListChapters = () => {
       {/* Main content area with sidebar and content */}
 
       {!hasAccess ? (
-        <></>
+        <div className="flex justify-center items-center min-h-screen bg-white">
+          <div className="text-gray-600 text-lg">Checking access...</div>
+        </div>
       ) : (
         <div className="flex flex-1 overflow-hidden">
           {/* Sidebar - Chapter List */}
@@ -485,12 +472,8 @@ const ListChapters = () => {
 
             <div className="p-4 space-y-3">
               {chapters.map((chapter) => {
-                const isCompleted =
-                  chapter.isCompleted ||
-                  completedChapters.includes(chapter._id);
-                const isActive = location.pathname.includes(
-                  `/content/${chapter._id}`
-                );
+                const isCompleted = chapter.isCompleted || completedChapters.includes(chapter._id)
+                const isActive = location.pathname.includes(`/content/${chapter._id}`)
 
                 return (
                   <div key={chapter._id} className="relative">
@@ -506,18 +489,12 @@ const ListChapters = () => {
                       to={`/chapters/${slugCourse}/content/${chapter._id}`}
                       onClick={() => {
                         if (!isCompleted) {
-                          console.log("sah");
-                          handleCompleteChapter(chapter._id);
+                          console.log("sah")
+                          handleCompleteChapter(chapter._id)
                         }
                       }}
                     >
-                      <span
-                        className={`font-medium ${
-                          isActive ? "text-blue-700" : ""
-                        }`}
-                      >
-                        {chapter.title}
-                      </span>
+                      <span className={`font-medium ${isActive ? "text-blue-700" : ""}`}>{chapter.title}</span>
 
                       {isCompleted ? (
                         <span className="text-green-600 flex-shrink-0 bg-green-50 p-1 rounded-full">
@@ -542,9 +519,9 @@ const ListChapters = () => {
                             cursor: "pointer",
                           }}
                           onClick={() => {
-                            console.log("sah");
+                            console.log("sah")
 
-                            handleCompleteChapter(chapter._id);
+                            handleCompleteChapter(chapter._id)
                           }}
                         >
                           <svg
@@ -563,7 +540,7 @@ const ListChapters = () => {
                       )}
                     </Link>
                   </div>
-                );
+                )
               })}
             </div>
 
@@ -579,15 +556,9 @@ const ListChapters = () => {
                   borderRadius: "6px",
                   fontWeight: "500",
                   color: "white",
-                  backgroundColor:
-                    areAllChaptersCompleted() && !loading
-                      ? "#2563eb"
-                      : "#9ca3af",
+                  backgroundColor: areAllChaptersCompleted() && !loading ? "#2563eb" : "#9ca3af",
                   border: "none",
-                  cursor:
-                    areAllChaptersCompleted() && !loading
-                      ? "pointer"
-                      : "not-allowed",
+                  cursor: areAllChaptersCompleted() && !loading ? "pointer" : "not-allowed",
                   opacity: areAllChaptersCompleted() && !loading ? "1" : "0.75",
                   marginBottom: "12px",
                   transition: "background-color 0.2s",
@@ -598,22 +569,17 @@ const ListChapters = () => {
 
               {!areAllChaptersCompleted() && !loading && (
                 <div className="text-center p-3 bg-yellow-50 rounded-md border border-yellow-100">
-                  <p className="text-sm text-yellow-800">
-                    Complete all {chapters.length} chapters to unlock the exam
-                  </p>
+                  <p className="text-sm text-yellow-800">Complete all {chapters.length} chapters to unlock the exam</p>
                   <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
                     <div
                       className="bg-blue-600 h-2.5 rounded-full"
                       style={{
-                        width: `${
-                          (completedChapters.length / chapters.length) * 100
-                        }%`,
+                        width: `${(completedChapters.length / chapters.length) * 100}%`,
                       }}
                     ></div>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    {completedChapters.length} of {chapters.length} chapters
-                    completed
+                    {completedChapters.length} of {chapters.length} chapters completed
                   </p>
                 </div>
               )}
@@ -639,66 +605,52 @@ const ListChapters = () => {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center">
                           <div>
-                            <h6 className="font-semibold">Niveau de cours</h6>
-                            <span className="text-gray-600">
-                              {courseDetails.level || "Non spécifié"}
-                            </span>
+                            <h6 className="font-semibold">Course Level</h6>
+                            <span className="text-gray-600">{courseDetails.level || "Not specified"}</span>
                           </div>
                         </div>
                         <div>
                           <h6 className="font-semibold">Module</h6>
-                          <span className="text-gray-600">
-                            {courseDetails.categorie || "Non spécifié"}
-                          </span>
+                          <span className="text-gray-600">{courseDetails.categorie || "Not specified"}</span>
                         </div>
                         <div>
-                          <h6 className="font-semibold">Prix</h6>
+                          <h6 className="font-semibold">Price</h6>
                           <span className="text-gray-600">
-                            {formatPrice(
-                              courseDetails.price,
-                              courseDetails.currency
-                            )}
+                            {formatPrice(courseDetails.price, courseDetails.currency)}
                           </span>
                         </div>
                       </div>
 
                       <div className="course-content">
-                        <h2 className="text-3xl font-bold mb-4">
-                          {courseDetails.title}
-                        </h2>
+                        <h2 className="text-3xl font-bold mb-4">{courseDetails.title}</h2>
                         <div className="mb-8">
                           <p className="text-gray-700">
-                            {courseDetails.description}
+                            {courseDetails.description && stripHtmlTags(courseDetails.description)}
                           </p>
                         </div>
 
                         {/* Course objectives or additional info */}
                         {courseDetails.objectives && (
                           <div className="mt-6">
-                            <h3 className="text-xl font-semibold mb-3">
-                              Objectifs du cours
-                            </h3>
+                            <h3 className="text-xl font-semibold mb-3">Course Objectives</h3>
                             <ul className="list-disc pl-5 space-y-2">
-                              {courseDetails.objectives.map(
-                                (objective, index) => (
-                                  <li key={index} className="text-gray-700">
-                                    {objective}
-                                  </li>
-                                )
-                              )}
+                              {courseDetails.objectives.map((objective, index) => (
+                                <li key={index} className="text-gray-700">
+                                  {objective}
+                                </li>
+                              ))}
                             </ul>
                           </div>
                         )}
 
                         {/* Call to action */}
                         <div className="mt-8 text-center">
-                          <p className="text-lg mb-4">
-                            Sélectionnez un chapitre dans le menu pour commencer
-                            à apprendre
-                          </p>
+                          <p className="text-lg mb-4">Select a chapter from the menu to start learning</p>
                           {chapters.length > 0 && (
                             <Link
-                              to={`/chapters/${finalCourseId}/content/${chapters[0]._id}`}
+
+                               to={`/chapters/${slugCourse}/content/${chapters[0]._id}`}
+
                               className="inline-flex items-center py-3.5 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-md hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm"
                             >
                               <svg
@@ -723,13 +675,8 @@ const ListChapters = () => {
 
                   {!courseDetails && !loading && (
                     <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold text-gray-700">
-                        Détails du cours non disponibles
-                      </h2>
-                      <p className="text-gray-600 mt-2">
-                        Les informations sur ce cours n'ont pas pu être
-                        chargées.
-                      </p>
+                      <h2 className="text-2xl font-bold text-gray-700">Course details not available</h2>
+                      <p className="text-gray-600 mt-2">The information for this course could not be loaded.</p>
                     </div>
                   )}
 
@@ -745,7 +692,7 @@ const ListChapters = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ListChapters;
+export default ListChapters

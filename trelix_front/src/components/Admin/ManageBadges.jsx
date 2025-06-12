@@ -100,7 +100,7 @@ const ManageBadges = () => {
       formData.append("conditionValue", conditionValue);
 
       if (isEditing) {
-        await axios.put(`/api/badges-r/updateBadge/${badgeId}`, formData, {
+        await axios.put(`${import.meta.env.VITE_API_PROXY}/api/badges-r/updateBadge/${badgeId}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setSubmitMessage({
@@ -108,7 +108,7 @@ const ManageBadges = () => {
           text: "Badge updated successfully!",
         });
       } else {
-        await axios.post("/api/badges-r/createBadge", formData, {
+        await axios.post(`${import.meta.env.VITE_API_PROXY}/api/badges-r/createBadge`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setSubmitMessage({

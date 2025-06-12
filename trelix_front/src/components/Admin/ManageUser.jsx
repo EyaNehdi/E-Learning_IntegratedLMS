@@ -25,7 +25,7 @@ const ManageUser = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`/api/admin/user/${id}`)
+        .get(`${import.meta.env.VITE_API_PROXY}/api/admin/user/${id}`)
         .then((res) => setUser(res.data))
         .catch((err) => console.error("Error fetching user:", err));
     }
@@ -55,8 +55,8 @@ const ManageUser = () => {
     if (!validateForm()) return;
 
     const request = isEditing
-      ? axios.put(`/api/admin/updateUser/${id}`, user)
-      : axios.post(`/api/admin/createUser`, user);
+      ? axios.put(`${import.meta.env.VITE_API_PROXY}/api/admin/updateUser/${id}`, user)
+      : axios.post(`${import.meta.env.VITE_API_PROXY}/api/admin/createUser`, user);
 
     request
       .then(() => {

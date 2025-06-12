@@ -43,24 +43,29 @@ const Summarizer = () => {
 
   return (
     <div className="p-4 bg-white rounded shadow max-w-xl mx-auto mt-8">
-      <h2 className="text-2xl font-bold mb-4">Résumé de PDF 📚</h2>
+
+      <h2 className="text-2xl font-bold mb-4">Summarizer of PDF files 📚</h2>
+
       <input 
         type="file" 
         accept="application/pdf"
         onChange={handleFileChange}
         className="w-full p-2 border rounded mb-2"
       />
-      <button
-        onClick={summarizePdf}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Résumer le PDF
-      </button>
 
-      {loading && <p className="mt-2">Résumé en cours...</p>}
+ <button
+  onClick={summarizePdf}
+  className="bg-blue-500 text-white px-4 py-2 rounded"
+  style={{ fontSize: "12px" }}
+>
+  Summarize Your PDF
+</button>
+
+
+      {loading && <p className="mt-2">loading...</p>}
       {summary && (
         <div className="mt-4 p-3 bg-gray-100 rounded">
-          <h3 className="font-semibold">Résumé :</h3>
+          <h3 className="font-semibold">summarize :</h3>
           <p>{summary}</p>
         </div>
       )}

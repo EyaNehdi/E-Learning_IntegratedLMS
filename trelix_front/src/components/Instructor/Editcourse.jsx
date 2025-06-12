@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { CKEditor } from "@ckeditor/ckeditor5-react"
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
-import { AlertCircle, CheckCircle2, Info } from "lucide-react"
+import { AlertCircle, CheckCircle2, Info, ChevronRight, ChevronLeft } from "lucide-react"
 
 function Editcourse() {
   const { courseId } = useParams()
@@ -312,6 +312,46 @@ function Editcourse() {
     setTimeout(calculateFormProgress, 0)
   }
 
+  // Button style component for consistent styling
+  const ButtonStyle = {
+    primary: {
+      backgroundColor: "#0066ff",
+      color: "white",
+      borderRadius: "6px",
+      padding: "8px 16px",
+      fontWeight: "500",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "auto",
+      minWidth: "140px",
+      border: "none",
+      cursor: "pointer",
+      transition: "background-color 0.2s",
+      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+    secondary: {
+      backgroundColor: "white",
+      color: "#333",
+      borderRadius: "6px",
+      padding: "8px 16px",
+      fontWeight: "500",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "auto",
+      minWidth: "140px",
+      border: "1px solid #ddd",
+      cursor: "pointer",
+      transition: "background-color 0.2s",
+      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+    },
+    disabled: {
+      opacity: 0.6,
+      cursor: "not-allowed",
+    },
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 py-12">
@@ -332,7 +372,7 @@ function Editcourse() {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-8">
-            <h1 className="text-3xl font-bold text-center text-white mb-2">Edit course</h1>
+            <h1 className="text-3xl font-bold text-center text-white mb-2">Edit Course</h1>
             <p className="text-center text-blue-100">Update your course information</p>
           </div>
 
@@ -384,23 +424,8 @@ function Editcourse() {
                     Price <span className="text-red-500">*</span>
                   </label>
 
-                  {/* Champ de prix avec symbole de devise */}
-                  <div className="relative">
-                    <input
-                      id="price"
-                      name="price"
-                      type="number"
-                      value={formData.price}
-                      onChange={handleChange}
-                      placeholder="Course price"
-                      className={`w-full p-3 pl-8 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
-                        errors.price ? "border-red-500" : "border-gray-300"
-                      }`}
-                      required
-                      disabled={currency === "free"}
-                    />
+                  <div className="space-y-4">
                     <div className="flex gap-4 mb-4">
-                      {/* Trelix Coin Radio Button */}
                       <div className="relative flex items-center">
                         <input
                           type="radio"
@@ -417,7 +442,7 @@ function Editcourse() {
                           className={`text-sm cursor-pointer flex items-center space-x-2 px-4 py-2 rounded-lg ${
                             currency === "usd"
                               ? "text-blue-500 bg-blue-100 border-blue-500 ring-2 ring-blue-300"
-                              : "text-gray-700"
+                              : "text-gray-700 border border-gray-300"
                           }`}
                         >
                           <span
@@ -429,11 +454,10 @@ function Editcourse() {
                               className={`w-3 h-3 bg-white rounded-full ${currency === "usd" ? "block" : "hidden"}`}
                             ></span>
                           </span>
-                          <span>Trelix Coin (🪙)</span>
+                          <span>Trelixcoin</span>
                         </label>
                       </div>
 
-                      {/* Free Radio Button */}
                       <div className="relative flex items-center">
                         <input
                           type="radio"
@@ -450,7 +474,7 @@ function Editcourse() {
                           className={`text-sm cursor-pointer flex items-center space-x-2 px-4 py-2 rounded-lg ${
                             currency === "free"
                               ? "text-gray-600 bg-gray-100 border-gray-500 ring-2 ring-gray-300"
-                              : "text-gray-700"
+                              : "text-gray-700 border border-gray-300"
                           }`}
                         >
                           <span
@@ -466,6 +490,21 @@ function Editcourse() {
                         </label>
                       </div>
                     </div>
+
+                    {currency === "usd" && (
+                      <input
+                        id="price"
+                        name="price"
+                        type="number"
+                        value={formData.price}
+                        onChange={handleChange}
+                        placeholder="Enter course price"
+                        className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
+                          errors.price ? "border-red-500" : "border-gray-300"
+                        }`}
+                        required
+                      />
+                    )}
                   </div>
                   {errors.price && (
                     <div className="text-red-500 text-sm mt-1 flex items-center">
@@ -572,9 +611,9 @@ function Editcourse() {
                       <option value="" disabled>
                         Select a level
                       </option>
-                      <option value="Débutant">Débutant</option>
-                      <option value="Intermédiaire">Intermédiaire</option>
-                      <option value="Avancé">Avancé</option>
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                       <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -590,22 +629,50 @@ function Editcourse() {
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 relative">
                   <label htmlFor="categorie" className="block text-sm font-medium text-gray-700">
                     Category <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    id="categorie"
-                    name="categorie"
-                    type="text"
-                    value={formData.categorie}
-                    onChange={handleChange}
-                    placeholder="Course category"
-                    className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 ${
-                      errors.categorie ? "border-red-500" : "border-gray-300"
-                    }`}
-                    required
-                  />
+                  <div className="relative">
+                    <select
+                      id="categorie"
+                      name="categorie"
+                      value={formData.categorie}
+                      onChange={handleChange}
+                      className={`w-full p-3 border rounded-md appearance-none bg-gray-50 ${
+                        errors.categorie ? "border-red-500" : "border-gray-300"
+                      }`}
+                      style={{
+                        display: "block",
+                        position: "relative",
+                        zIndex: 10,
+                      }}
+                    >
+                      <option value="" disabled>
+                        Select a category
+                      </option>
+                      <option value="Computer Science & Programming">Computer Science & Programming</option>
+                      <option value="Marketing & Communication">Marketing & Communication</option>
+                      <option value="Design & Multimedia">Design & Multimedia</option>
+                      <option value="Personal Development">Personal Development</option>
+                      <option value="Foreign Languages">Foreign Languages</option>
+                      <option value="Science & Mathematics">Science & Mathematics</option>
+                      <option value="Business & Entrepreneurship">Business & Entrepreneurship</option>
+                      <option value="Health & Wellness">Health & Wellness</option>
+                      <option value="Arts & Culture">Arts & Culture</option>
+                      <option value="Engineering & Technology">Engineering & Technology</option>
+                      <option value="Education & Training">Education & Training</option>
+                      <option value="Law & Political Science">Law & Political Science</option>
+                      <option value="Environment & Sustainability">Environment & Sustainability</option>
+                      <option value="Tourism & Hospitality">Tourism & Hospitality</option>
+                      <option value="Trades & Crafts">Trades & Crafts</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                      </svg>
+                    </div>
+                  </div>
                   {errors.categorie && (
                     <div className="text-red-500 text-sm mt-1 flex items-center">
                       <Info className="h-4 w-4 mr-1" />
@@ -635,11 +702,11 @@ function Editcourse() {
                     }}
                   >
                     <option value="" disabled>
-                      Sélectionner un module
+                      Select a module
                     </option>
                     {modules.map((module) => (
                       <option key={module._id} value={module._id}>
-                        {module.name || module.title || "Module sans nom"}
+                        {module.name || module.title || "Unnamed module"}
                       </option>
                     ))}
                   </select>
@@ -657,13 +724,54 @@ function Editcourse() {
                 )}
               </div>
 
-              <div className="pt-4">
+              <div className="flex justify-between pt-6">
+                <button type="button" onClick={() => navigate("/profile/list")} style={ButtonStyle.secondary}>
+                  <ChevronLeft className="h-5 w-5 mr-2" />
+                  Back to List
+                </button>
+
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition-colors text-lg font-medium shadow-md"
+                  style={{
+                    ...ButtonStyle.primary,
+                    width: "auto",
+                    minWidth: "180px",
+                    padding: "10px 16px",
+                    fontSize: "1.125rem",
+                    ...(isSubmitting ? ButtonStyle.disabled : {}),
+                  }}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Mise à jour en cours..." : "Update course"}
+                  {isSubmitting ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      Update Course
+                      <ChevronRight className="ml-2 h-5 w-5" />
+                    </>
+                  )}
                 </button>
               </div>
 
